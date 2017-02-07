@@ -1,0 +1,702 @@
+# befriend
+# conquer
+# antagonize
+# build_ship
+# build_army
+# unit_ratio
+# build_building
+# research_tech
+# garrison
+# protect
+# influence
+
+
+
+#join_axis_later_jap_0 = {
+#	enable = {
+#		OR = { tag = JAP tag = GER }
+#		GER = { is_ai = yes }
+#		is_historical_focus_on = yes
+#		NOT = { has_idea = neutrality_idea3 }
+#	}
+#	abort = {
+#		has_idea = neutrality_idea3
+#	}
+#	
+#	ai_strategy = { type = alliance id = "GER" value = -300 }
+#	ai_strategy = { type = antagonize id = "GER" value = 300 }
+#	ai_strategy = { type = ignore id = "GER" value = 300 }
+#	
+#	ai_strategy = { type = alliance id = "JAP" value = -300 }
+#	ai_strategy = { type = antagonize id = "JAP" value = 300 }
+#	ai_strategy = { type = ignore id = "JAP" value = 300 }
+#}
+#
+#join_axis_later_jap_1 = {
+#	enable = {
+#		OR = { tag = JAP tag = GER }
+#		GER = { is_ai = yes }
+#		is_historical_focus_on = yes
+#		has_war = yes
+#		NOT = { has_idea = neutrality_idea3 }
+#	}
+#	abort = {
+#		OR = {
+#			has_war = no
+#			has_idea = neutrality_idea3
+#		}
+#	}
+#	
+#	ai_strategy = { type = alliance id = "GER" value = -1000 }
+#	ai_strategy = { type = antagonize id = "GER" value = 1000 }
+#	ai_strategy = { type = ignore id = "GER" value = 1000 }
+#	
+#	ai_strategy = { type = alliance id = "JAP" value = -1000 }
+#	ai_strategy = { type = antagonize id = "JAP" value = 1000 }
+#	ai_strategy = { type = ignore id = "JAP" value = 1000 }
+#}
+#
+#join_axis_later_jap_2 = {
+#	enable = {
+#		OR = { tag = JAP tag = GER }
+#		GER = { is_ai = yes }
+#		is_historical_focus_on = yes
+#		NOT = { has_idea = neutrality_idea3 }
+#		
+#		OR = {
+#			AND = {
+#				OR = {
+#					CHI = { has_capitulated = yes }
+#					CHI = { exists = no }
+#					CHI = { is_puppet = yes }
+#					CHI = { is_in_faction_with = GER }
+#					CHI = { has_government = fascism }
+#					is_in_faction_with = CHI
+#				}
+#				OR = { 
+#					FRA = { has_capitulated = yes }
+#					FRA = { exists = no }
+#					FRA = { is_puppet = yes }
+#					FRA = { is_in_faction_with = GER }
+#					FRA = { has_government = fascism }
+#					is_in_faction_with = FRA
+#				}
+#				OR = {
+#					SOV = { surrender_progress > 0.75 }
+#					RAJ = { has_capitulated = yes }
+#				}
+#			}
+#			OR = {
+#				SOV = { has_capitulated = yes }
+#				SOV = { exists = no }
+#				SOV = { is_puppet = yes }
+#				SOV = { is_in_faction_with = GER }
+#				SOV = { has_government = fascism }
+#				is_in_faction_with = SOV
+#			}
+#		}
+#	}
+#	abort = {
+#		has_idea = neutrality_idea3
+#	}
+#	
+#	ai_strategy = { type = alliance id = "GER" value = 1300 }
+#	ai_strategy = { type = antagonize id = "GER" value = -1300 }
+#	ai_strategy = { type = ignore id = "GER" value = -1300 }
+#	
+#	ai_strategy = { type = alliance id = "JAP" value = 1300 }
+#	ai_strategy = { type = antagonize id = "JAP" value = -1300 }
+#	ai_strategy = { type = ignore id = "JAP" value = -1300 }
+#}
+
+#non aggression pact with sov
+NAP_jap-sov_1 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		date < 1943.1.1
+		
+		NOT = { has_war_with = SOV }
+		NOT = { has_non_aggression_pact_with = SOV }
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			NOT = { date < 1943.1.1 }
+			has_war_with = SOV
+			has_non_aggression_pact_with = SOV
+			
+			has_wargoal_against = SOV
+			is_justifying_wargoal_against = SOV
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 }
+			
+			SOV = { has_wargoal_against = JAP }
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+	ai_strategy = {
+		type = befriend
+		id = "SOV"			
+		value = 1000
+	}
+}
+
+NAP_jap-mon_1 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		date < 1943.1.1
+		
+		NOT = { has_war_with = SOV }
+		NOT = { has_non_aggression_pact_with = MON }
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			NOT = { date < 1943.1.1 }
+			has_war_with = SOV
+			has_non_aggression_pact_with = MON
+			
+			has_wargoal_against = SOV
+			is_justifying_wargoal_against = SOV
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 }
+			
+			SOV = { has_wargoal_against = JAP }
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+
+	ai_strategy = {
+		type = befriend
+		id = "MON"			
+		value = 1000
+	}
+}
+
+NAP_jap-sik_1 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		date < 1943.1.1
+		
+		NOT = { has_war_with = SOV }
+		NOT = { has_non_aggression_pact_with = SIK }
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			NOT = { date < 1943.1.1 }
+			has_war_with = SOV
+			has_non_aggression_pact_with = SIK
+			
+			has_wargoal_against = SOV
+			is_justifying_wargoal_against = SOV
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 }
+			
+			SOV = { has_wargoal_against = JAP }
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+	ai_strategy = {
+		type = befriend
+		id = "SIK"			
+		value = 1000
+	}
+}
+
+NAP_jap-sov_2 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		
+		NOT = { has_war_with = SOV }
+		has_non_aggression_pact_with = SOV
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			has_war_with = SOV 
+			NOT = { has_non_aggression_pact_with = SOV }
+			
+			has_wargoal_against = SOV 
+			is_justifying_wargoal_against = SOV 
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 } 
+			
+			SOV = { has_wargoal_against = JAP } 
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+	ai_strategy = {
+		type = befriend
+		id = "SOV"			
+		value = 100
+	}
+}
+
+NAP_jap-mon_2 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		
+		NOT = { has_war_with = SOV }
+		has_non_aggression_pact_with = MON
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			has_war_with = SOV 
+			NOT = { has_non_aggression_pact_with = MON }
+			
+			has_wargoal_against = SOV 
+			is_justifying_wargoal_against = SOV 
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 } 
+			
+			SOV = { has_wargoal_against = JAP } 
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+	ai_strategy = {
+		type = befriend
+		id = "MON"			
+		value = 100
+	}
+}
+
+NAP_jap-sik_2 = {
+	enable = {
+		tag = JAP has_government = fascism
+		is_historical_focus_on = yes
+		
+		NOT = { has_war_with = SOV }
+		has_non_aggression_pact_with = SIK
+		
+		NOT = { has_wargoal_against = SOV }
+		NOT = { is_justifying_wargoal_against = SOV }
+		NOT = { focus_progress = { focus = northern_expansion_focus progress > 0.01 } }
+		
+		NOT = { SOV = { has_wargoal_against = JAP } }
+		NOT = { SOV = { is_justifying_wargoal_against = JAP } }
+		NOT = { SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } } }
+		
+		SOV = { has_war_with = GER }
+	}
+	abort = {
+		OR = {
+			has_war_with = SOV 
+			NOT = { has_non_aggression_pact_with = SIK }
+			
+			has_wargoal_against = SOV 
+			is_justifying_wargoal_against = SOV 
+			focus_progress = { focus = northern_expansion_focus progress > 0.01 } 
+			
+			SOV = { has_wargoal_against = JAP } 
+			SOV = { is_justifying_wargoal_against = JAP }
+			SOV = { focus_progress = { focus = SOV_war_with_japan progress > 0.01 } }
+		}
+	}
+	ai_strategy = {
+		type = befriend
+		id = "SIK"			
+		value = 100
+	}
+}
+
+#tibet conquest
+c_tib = {
+	enable = {
+		has_country_flag = JAP_invade_TIB
+		has_government = fascism
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		NOT = { 
+			TIB = { has_capitulated = yes }
+			TIB = { exists = no }
+			TIB = { is_puppet = yes }
+			TIB = { has_government = fascism }
+			is_in_faction_with = TIB
+			has_war_with = TIB
+		}
+	}
+	abort = {
+		OR = { 
+			TIB = { has_capitulated = yes }
+			TIB = { exists = no }
+			TIB = { is_puppet = yes }
+			TIB = { has_government = fascism }
+			is_in_faction_with = TIB
+			has_war_with = TIB
+			NOT = { has_government = fascism }
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "TIB"
+		value = 500
+	}
+	ai_strategy = {
+		type = conquer
+		id = "TIB"
+		value = 500
+	}
+	ai_strategy = {
+		type = ignore
+		id = "TIB"
+		value = -500
+	}
+}
+
+#bhutan conquest
+c_bhu = {
+	enable = {
+		has_country_flag = JAP_invade_BHU
+		has_government = fascism
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		NOT = { 
+			BHU = { has_capitulated = yes }
+			BHU = { exists = no }
+			BHU = { is_puppet = yes }
+			BHU = { has_government = fascism }
+			is_in_faction_with = BHU
+			has_war_with = BHU
+		}
+	}
+	abort = {
+		OR = { 
+			BHU = { has_capitulated = yes }
+			BHU = { exists = no }
+			BHU = { is_puppet = yes }
+			BHU = { has_government = fascism }
+			is_in_faction_with = BHU
+			has_war_with = BHU
+			NOT = { has_government = fascism }
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "BHU"
+		value = 500
+	}
+	ai_strategy = {
+		type = conquer
+		id = "BHU"
+		value = 500
+	}
+	ai_strategy = {
+		type = ignore
+		id = "BHU"
+		value = -500
+	}
+}
+
+#nepal conquest
+c_nep = {
+	enable = {
+		has_country_flag = JAP_invade_NEP
+		has_government = fascism
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		NOT = { 
+			NEP = { has_capitulated = yes }
+			NEP = { exists = no }
+			NEP = { is_puppet = yes }
+			NEP = { has_government = fascism }
+			is_in_faction_with = NEP
+			has_war_with = NEP
+		}
+	}
+	abort = {
+		OR = { 
+			NEP = { has_capitulated = yes }
+			NEP = { exists = no }
+			NEP = { is_puppet = yes }
+			NEP = { has_government = fascism }
+			is_in_faction_with = NEP
+			has_war_with = NEP
+			NOT = { has_government = fascism }
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "NEP"
+		value = 500
+	}
+	ai_strategy = {
+		type = conquer
+		id = "NEP"
+		value = 500
+	}
+	ai_strategy = {
+		type = ignore
+		id = "NEP"
+		value = -500
+	}
+}
+
+#siam conquest
+c_sia = {
+	enable = {
+		has_country_flag = JAP_invade_SIA
+		has_government = fascism
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		NOT = { 
+			SIA = { has_capitulated = yes }
+			SIA = { exists = no }
+			SIA = { is_puppet = yes }
+			SIA = { has_government = fascism }
+			is_in_faction_with = SIA
+			has_war_with = SIA
+		}
+	}
+	abort = {
+		OR = { 
+			SIA = { has_capitulated = yes }
+			SIA = { exists = no }
+			SIA = { is_puppet = yes }
+			SIA = { has_government = fascism }
+			is_in_faction_with = SIA
+			has_war_with = SIA
+			NOT = { has_government = fascism }
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "SIA"
+		value = 500
+	}
+	ai_strategy = {
+		type = conquer
+		id = "SIA"
+		value = 500
+	}
+	ai_strategy = {
+		type = ignore
+		id = "SIA"
+		value = -500
+	}
+}
+		
+		
+		
+		
+		
+southern_expansion = {
+	enable = {
+		tag = JAP
+		has_government = fascism
+		OR = {
+			JAP = { has_completed_focus = southern_expansion_focus }
+			JAP = { focus_progress = { focus = southern_expansion_focus progress > 0.01 } }
+		}
+		OR = {
+			country_exists = HOL
+			country_exists = ENG	
+		}
+		NOT = { has_war_with = ENG }
+	}
+	abort = {
+		OR = {
+			NOT = {
+				country_exists = HOL
+				country_exists = ENG	
+			}
+			has_war_with = ENG
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "HOL"			
+		value = 200
+	}	
+	ai_strategy = {
+		type = conquer
+		id = "HOL"			
+		value = 1000
+	}		
+	ai_strategy = {
+		type = antagonize
+		id = "ENG"			
+		value = 100
+	}
+	ai_strategy = {
+		type = conquer
+		id = "ENG"			
+		value = 1000
+	}
+}
+
+northern_expansion = {
+	enable = {
+		tag = JAP
+		has_completed_focus = northern_expansion_focus
+		country_exists = SOV
+	}
+	abort = {
+		NOT = {
+			country_exists = SOV
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "SOV"			
+		value = 200
+	}		
+}
+
+chinese_war = {
+	enable = {
+		tag = JAP
+		focus_progress = { focus = chinese_war_focus progress > 0.5 }
+		NOT = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			CHI = { has_government = fascism }
+			is_in_faction_with = CHI
+			has_war_with = CHI
+		}
+	}
+	abort = {
+		OR = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			CHI = { has_government = fascism }
+			is_in_faction_with = CHI
+			has_war_with = CHI
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "CHI"			
+		value = 1000
+	}
+	ai_strategy = {
+		type = conquer
+		id = "CHI"			
+		value = 1000
+	}		
+}
+
+strike_usa = {
+	enable = {
+		tag = JAP
+		has_completed_focus = strike_usa_focus
+		country_exists = USA
+	}
+	abort = {
+		NOT = {
+			country_exists = USA
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "USA"			
+		value = 200
+	}		
+}
+
+germany_ally = {
+	enable = {
+		tag = JAP
+		has_completed_focus = axis_leanings_focus
+		country_exists = GER
+	}
+	abort = {
+		NOT = { country_exists = GER }
+	}
+	
+	ai_strategy = {
+		type = befriend
+		id = "GER"			
+		value = 200
+	}
+	ai_strategy = {
+		type = alliance
+		id = "GER"			
+		value = 200
+	}	
+}

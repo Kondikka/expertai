@@ -1,0 +1,662 @@
+﻿add_namespace = EAI_L
+
+################################
+#	ECONOMY LAWS
+################################
+
+#early 
+#country_event = {
+#	id = EAI_L.0
+#	hidden = yes
+#	
+#	mean_time_to_happen = { days = 2 }
+#
+#	trigger = {
+#		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+#		has_political_power > 50
+#		is_ai = yes
+#		
+#		threat > 0.05
+#		NOT = { has_government = fascism has_government = communism }
+#		NOT = { threat > 0.15 }
+#		
+#		NOT = {
+#			any_enemy_country = {
+#				ic_ratio = { 
+#					tag = ROOT 
+#					ratio > 0.4
+#				}
+#			}
+#		}
+#		
+#		NOT = { has_idea = low_economic_mobilisation }
+#		NOT = { has_idea = partial_economic_mobilisation }
+#		NOT = { has_idea = war_economy }
+#		NOT = { has_idea = tot_economic_mobilisation }
+#	}
+#	option = { name = "OK" add_political_power = -150 add_ideas = low_economic_mobilisation }
+#}
+
+#partial
+country_event = {
+	id = EAI_L.1
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		OR = { AND = { has_political_power > 50 date > 1937.6.1 } AND = { has_political_power > 90 date < 1937.6.1 } }
+		is_ai = yes
+		
+		OR = {
+			has_government = fascism
+			has_government = communism
+			threat > 0.15
+			has_war = yes
+		}
+		
+		NOT = {
+			any_enemy_country = {
+				ic_ratio = { 
+					tag = ROOT 
+					ratio > 0.4
+				}
+			}
+		}
+		
+		NOT = { has_idea = partial_economic_mobilisation }
+		NOT = { has_idea = war_economy }
+		NOT = { has_idea = tot_economic_mobilisation }
+	}
+	option = { name = "OK" add_political_power = -150 add_ideas = partial_economic_mobilisation }
+}
+
+#war economy
+country_event = {
+	id = EAI_L.2
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		OR = { AND = { has_political_power > 50 date > 1937.6.1 } AND = { has_political_power > 90 date < 1937.6.1 } }
+		
+		OR = {
+			AND = { threat > 0.15 has_government = fascism }
+			AND = { threat > 0.15 has_government = communism }
+			AND = {
+				threat > 0.15
+				has_war = yes
+				any_enemy_country = {
+					ic_ratio = { 
+						tag = ROOT 
+						ratio > 0.4
+					}
+				}
+			}
+		}
+		
+		NOT = { has_idea = war_economy }
+		NOT = { has_idea = tot_economic_mobilisation }
+		
+		OR = {
+			NOT = { tag = SOV }
+			AND = {
+				OR = { tag = SOV }
+				NOT = {
+					any_enemy_country = {
+						ic_ratio = { 
+							tag = ROOT 
+							ratio > 0.5
+						}
+					}
+				}
+			}
+		}
+	}
+	option = { name = "OK" add_political_power = -150 add_ideas = war_economy }
+}
+
+#total 
+country_event = {
+	id = EAI_L.3
+	hidden = yes
+
+	mean_time_to_happen = { days = 2 }
+	
+	trigger = {
+		OR = { tag = SOV }
+		OR = { AND = { has_political_power > 50 date > 1937.6.1 } AND = { has_political_power > 90 date < 1937.6.1 } }
+		is_ai = yes
+		
+		NOT = { has_idea = tot_economic_mobilisation }
+		
+		has_war = yes
+		any_enemy_country = {
+			ic_ratio = { 
+				tag = ROOT 
+				ratio > 0.5
+			}
+		}
+		
+		OR = { has_idea = limited_conscription has_idea = extensive_conscription }
+		
+		NOT = { has_idea = all_adults_serve }
+		NOT = { has_idea = scraping_the_barrel }
+		NOT = { has_idea = service_by_requirement }
+		
+		has_manpower > 1000000
+	}
+	option = { name = "OK" add_political_power = -150 add_ideas = tot_economic_mobilisation }
+}
+
+#back to war eco
+country_event = {
+	id = EAI_L.4
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		OR = { 
+			has_political_power > 50
+			AND = { has_war = yes has_manpower < 50000 has_political_power > -1 } 
+		}
+		
+		is_ai = yes
+	
+		has_idea = tot_economic_mobilisation
+		OR = { has_idea = extensive_conscription has_idea = service_by_requirement has_idea = all_adults_serve has_idea = scraping_the_barrel }
+		
+		has_manpower < 150000
+		
+	}
+	option = { name = "OK" add_political_power = -150 add_ideas = war_economy }
+}
+
+################################
+#	CONSCRIPTION LAWS
+################################
+
+#conscription
+country_event = {
+	id = EAI_L.5
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		NOT = { tag = USA }
+		OR = { 
+			AND = { has_political_power > -1 date > 1937.6.1 } 
+			AND = { has_political_power > 130 date < 1937.6.1 }
+		}
+		is_ai = yes
+		
+		OR = { 
+			AND = {
+				NOT = { tag = ENG tag = JAP }
+				OR = { has_war = yes date > 1937.1.1 } 
+			}
+			AND = { tag = ENG OR = { has_war = yes date > 1937.1.1 has_idea = ENG_philip_kerr } }
+			AND = { tag = JAP OR = { has_war = yes date > 1937.1.1 has_idea = JAP_mitsumasa_yonai } }
+		}
+		
+		#TFV
+		if = {
+			limit = {
+				original_tag = AST
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = AST_citizen_military_forces
+		}
+		if = {
+			limit = {
+				original_tag = CAN
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = CAN_commit_to_the_war
+		}
+		if = {
+			limit = {
+				original_tag = RAJ
+				has_dlc = "Together for Victory"
+			}
+			is_subject = no
+		}
+		
+		has_idea = volunteer_only
+		
+		OR = {
+			tag = SOV
+			has_manpower < 500000
+		}
+	}
+	option = { name = "OK" add_political_power = -150 add_ideas = limited_conscription }
+}
+
+#extensive
+country_event = {
+	id = EAI_L.6
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		OR = { 
+			AND = { has_political_power > -1 date > 1937.6.1 } 
+			AND = { has_political_power > 130 date < 1937.6.1 }
+		}
+		is_ai = yes
+		
+		OR = { 
+			AND = {
+				NOT = { tag = ENG tag = JAP }
+				OR = { has_war = yes date > 1937.1.1 } 
+			}
+			AND = { tag = ENG OR = { has_war = yes date > 1937.1.1 has_idea = ENG_philip_kerr } }
+			AND = { tag = JAP OR = { has_war = yes date > 1937.1.1 has_idea = JAP_mitsumasa_yonai } }
+		}
+		
+		OR = {
+			has_government = fascism
+			has_government = communism
+			AND = {
+				has_war = yes
+				enemies_strength_ratio > 0.5
+			}					
+		}
+		
+		#Special rules AST in TFV
+		if = {
+			limit = {
+				original_tag = AST
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = AST_citizen_military_forces
+			has_completed_focus = AST_fight_work_or_perish
+		}				
+		if = {
+			limit = {
+				original_tag = CAN
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = CAN_commit_to_the_war
+			has_completed_focus = CAN_if_day
+		}
+		if = {
+			limit = {
+				original_tag = RAJ
+				has_dlc = "Together for Victory"
+			}
+			is_subject = no
+		}
+		
+		has_idea = limited_conscription
+		
+		OR = {
+			AND = { has_manpower < 2000000 tag = SOV }
+			AND = { has_manpower < 500000 NOT = { tag = SOV } }
+		}
+	}
+	option = { name = "OK" 
+		add_political_power = -150 
+		add_ideas = extensive_conscription 
+	}
+}
+
+#service
+country_event = {
+	id = EAI_L.7
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		OR = { 
+			AND = { has_political_power > -1 date > 1937.6.1 } 
+			AND = { has_political_power > 130 date < 1937.6.1 }
+		}
+		is_ai = yes
+		
+		OR = { 
+			AND = {
+				NOT = { tag = ENG tag = JAP }
+				OR = { has_war = yes date > 1937.1.1 } 
+			}
+			AND = { tag = ENG OR = { has_war = yes date > 1937.1.1 has_idea = ENG_philip_kerr } }
+			AND = { tag = JAP OR = { has_war = yes date > 1937.1.1 has_idea = JAP_mitsumasa_yonai } }
+		}
+		
+		OR = {
+			has_government = fascism
+			has_government = communism
+			AND = {
+				has_war = yes
+				enemies_strength_ratio > 0.6
+			}
+		}
+		
+		#TFV
+		if = {
+			limit = {
+				original_tag = AST
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = AST_citizen_military_forces
+			has_completed_focus = AST_fight_work_or_perish
+		}
+
+		if = {
+			limit = {
+				original_tag = CAN
+				has_dlc = "Together for Victory"
+			}
+			OR = {
+				has_completed_focus = CAN_compromise_with_quebec
+				has_completed_focus = CAN_forced_quebec_conscription
+			}
+		}
+		if = {
+			limit = {
+				original_tag = RAJ
+				has_dlc = "Together for Victory"
+			}
+			is_subject = no
+		}
+		
+		has_idea = extensive_conscription
+		NOT = { has_country_flag = SBR_taken }
+		NOT = { has_idea = tot_economic_mobilisation }
+		
+		has_manpower < 150000
+	}
+	option = { name = "OK" 
+		add_political_power = -150 
+		add_ideas = service_by_requirement 
+		set_country_flag = SBR_taken 
+	}
+}
+
+#adults
+country_event = {
+	id = EAI_L.8
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		OR = { 
+			AND = { has_political_power > -1 date > 1937.6.1 } 
+			AND = { has_political_power > 130 date < 1937.6.1 }
+		}
+		is_ai = yes
+		OR = { has_war = yes date > 1937.1.1 }
+		
+		has_war = yes
+		enemies_strength_ratio > 0.75
+		
+		#TFV
+		if = {
+			limit = {
+				original_tag = AST
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = AST_citizen_military_forces
+			has_completed_focus = AST_fight_work_or_perish
+		}
+
+		if = {
+			limit = {
+				original_tag = CAN
+				has_dlc = "Together for Victory"
+			}
+			OR = {
+				has_completed_focus = CAN_compromise_with_quebec
+				has_completed_focus = CAN_forced_quebec_conscription
+			}					
+		}
+		if = {
+			limit = {
+				original_tag = RAJ
+				has_dlc = "Together for Victory"
+			}
+			is_subject = no
+		}
+		
+		OR = { has_idea = service_by_requirement AND = { has_idea = extensive_conscription has_country_flag = SBR_taken } }
+		NOT = { has_country_flag = AAS_taken }
+		NOT = { has_idea = tot_economic_mobilisation }
+		
+		has_manpower < 150000
+	}
+	option = { name = "OK" 
+		if = { limit = { has_idea = service_by_requirement } add_political_power = -150 }
+		if = { limit = { has_idea = extensive_conscription } add_political_power = -300 }
+		add_ideas = all_adults_serve 
+		set_country_flag = AAS_taken 
+	}
+}
+
+#scraping
+country_event = {
+	id = EAI_L.9
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes
+		NOT = { has_idea = undisturbed_isolation has_idea = isolation }
+		NOT = { has_country_flag = STB_taken }
+		OR = { has_war = yes date > 1937.1.1 }
+		OR = { 
+			AND = { has_political_power > -1 date > 1937.6.1 } 
+			AND = { has_political_power > 130 date < 1937.6.1 }
+		}
+		
+		has_war = yes
+		enemies_strength_ratio > 1
+		
+		#TFV
+		if = {
+			limit = {
+				original_tag = AST
+				has_dlc = "Together for Victory"
+			}
+			has_completed_focus = AST_citizen_military_forces
+			has_completed_focus = AST_fight_work_or_perish
+		}
+
+		if = {
+			limit = {
+				original_tag = CAN
+				has_dlc = "Together for Victory"
+			}
+			OR = {
+				has_completed_focus = CAN_compromise_with_quebec
+				has_completed_focus = CAN_forced_quebec_conscription
+			}
+		}
+		if = {
+			limit = {
+				original_tag = RAJ
+				has_dlc = "Together for Victory"
+			}
+			is_subject = no
+		}
+		
+		OR = { has_idea = all_adults_serve AND = { has_idea = service_by_requirement has_country_flag = AAS_taken } }
+		NOT = { has_idea = tot_economic_mobilisation }
+		
+		OR = {
+			AND = {
+				NOT = { tag = GER }
+				has_manpower < 150000
+			}
+			AND = {
+				tag = GER
+				has_tech = nd_conscription
+				has_manpower < 150000
+			}
+			AND = {
+				tag = GER
+				has_manpower < 10000
+			}
+		}
+	}
+	option = { name = "OK" 
+		if = { limit = { has_idea = all_adults_serve } add_political_power = -150 }
+		if = { limit = { has_idea = service_by_requirement } add_political_power = -300 }
+		add_ideas = scraping_the_barrel 
+		set_country_flag = STB_taken 
+	}
+}
+
+#back
+country_event = {
+	id = EAI_L.10
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		has_political_power > 200
+		is_ai = yes
+		OR = {
+			AND = { has_idea = all_adults_serve NOT = { has_country_flag = STB_taken } }
+			AND = { has_idea = scraping_the_barrel }
+		}
+		has_manpower > 1000000
+	}
+	option = { name = "OK"  
+		if = { limit = { has_idea = all_adults_serve } add_ideas = service_by_requirement add_political_power = -150 }
+		if = { limit = { has_idea = scraping_the_barrel } add_ideas = all_adults_serve add_political_power = -150 }
+	}
+}
+
+################################
+#	TRADE LAWS
+################################
+
+#FREE
+country_event = {
+	id = EAI_L.11
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes 
+		OR = { AND = { has_political_power > 70 date > 1937.6.1 } AND = { has_political_power > 110 date < 1937.6.1 } }
+		
+		OR = { 
+			NOT = { tag = CHI }
+			AND = { tag = CHI OR = { has_idea = CHI_xie_juezai } }
+		}
+		
+		NOT = { tag = JAP tag = ITA tag = ENG tag = FRA }
+		
+		OR = {
+			AND = {
+				OR = { tag = USA tag = SOV } 
+				num_of_military_factories < 120
+			}
+			AND = {
+				tag = GER
+				num_of_military_factories < 80
+			}
+			NOT = { tag = GER tag = ITA tag = JAP tag = SOV tag = ENG tag = FRA tag = USA } #minors always use free trade
+		}
+		
+		NOT = { has_idea = free_trade }
+	}
+	option = { name = "OK" add_ideas = free_trade add_political_power = -150 }
+}
+
+#EXPORT
+country_event = {
+	id = EAI_L.12
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes 
+		OR = { AND = { has_political_power > 70 date > 1937.6.1 } AND = { has_political_power > 110 date < 1937.6.1 } }
+		
+		OR = { tag = GER tag = ITA tag = JAP tag = SOV tag = ENG tag = FRA tag = USA }
+		
+		OR = {
+			AND = {
+				OR = { tag = USA tag = SOV } #switch to export on high industry
+				NOT = { num_of_military_factories < 120 }
+			}
+			OR = { tag = ENG tag = FRA } #always use export
+			AND = {
+				OR = { tag = ITA tag = JAP } #axis use export on low industry
+				num_of_military_factories < 80
+			}
+			AND = {
+				tag = GER
+				num_of_military_factories < 200
+				NOT = { num_of_military_factories < 80 }
+			}
+		}
+		
+		NOT = { has_idea = export_focus }
+	}
+	option = { name = "OK" add_ideas = export_focus add_political_power = -150 }
+}
+
+#LIMITED
+country_event = {
+	id = EAI_L.13
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes 
+		OR = { AND = { has_political_power > 70 date > 1937.6.1 } AND = { has_political_power > 110 date < 1937.6.1 } }
+		
+		OR =  {
+			AND = {
+				NOT = { num_of_military_factories < 80 } #axis switch to limited on high industry
+				OR = { tag = ITA tag = JAP }
+			}
+			AND = {
+				NOT = { num_of_military_factories < 200 } #axis switch to limited on high industry
+				tag = GER
+			}
+		}
+
+		#availability
+		OR = {
+			AND = {
+				has_government = democratic
+				has_war = yes
+				any_enemy_country = {
+					ic_ratio = { 
+						tag = ROOT 
+						ratio > 0.2
+					}
+				}
+			}
+			AND = {
+				NOT = { has_government = democratic }
+				OR = {
+					has_idea = partial_economic_mobilisation
+					has_idea = war_economy
+					has_idea = tot_economic_mobilisation
+				}
+			}
+		}
+		
+		NOT = { has_idea = limited_exports }
+	}
+	option = { name = "OK" add_ideas = limited_exports add_political_power = -150 }
+}

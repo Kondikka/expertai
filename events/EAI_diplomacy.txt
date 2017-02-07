@@ -1,0 +1,1962 @@
+﻿add_namespace = EAI_DM
+
+country_event = {
+	id = EAI_DM.0
+	hidden = yes
+	fire_only_once = yes
+	trigger = { tag = GER is_historical_focus_on = yes }
+	immediate = {
+		#every_country = { limit = { tag = ITA is_ai = yes GER = { is_ai = yes } } add_ideas = neutrality_idea3 }
+		#every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
+		#every_country = { limit = { tag = FIN is_ai = yes } add_ideas = neutrality_idea3 }
+		
+		#every_country = { limit = { tag = HOL is_ai = yes } add_ideas = neutrality_idea3 }
+		#every_country = { limit = { tag = BEL is_ai = yes } add_ideas = neutrality_idea3 }
+		#every_country = { limit = { tag = LUX is_ai = yes } add_ideas = neutrality_idea3 }
+		
+		#every_country = { limit = { tag = SIA is_ai = yes } add_ideas = neutrality_idea3 }
+		
+		every_country = { limit = { tag = USA is_ai = yes } add_ideas = EAI_USA_neutrality }
+	}
+	option = { name = "OK" }
+}
+
+
+country_event = {
+	id = EAI_DM.1
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes is_historical_focus_on = yes 
+		has_war = yes
+	}
+	immediate = {
+		add_ideas = ger_idea
+	}
+	option = { name = "OK" }
+}
+
+#china front fix
+country_event = {
+	id = EAI_DM.2
+	hidden = yes
+	fire_only_once = yes
+	trigger = { 
+		is_ai = yes tag = CHI is_historical_focus_on = yes 
+		has_war_with = JAP
+	}
+	immediate = {
+		set_country_flag = sc_war
+	
+		if = { limit = { RAJ = { is_ai = yes NOT = { has_war_with = ROOT } } }
+			diplomatic_relation = { country = RAJ relation = military_access } 
+			diplomatic_relation = { country = RAJ relation = non_aggression_pact } 
+		}
+		
+		if = { limit = { FRA = { is_ai = yes NOT = { has_war_with = ROOT } } }
+			diplomatic_relation = { country = FRA relation = military_access } 
+			diplomatic_relation = { country = FRA relation = non_aggression_pact } 
+		}
+		
+		if = { limit = { TIB = { is_ai = yes NOT = { has_war_with = ROOT } } }
+			diplomatic_relation = { country = TIB relation = military_access } 
+			diplomatic_relation = { country = TIB relation = non_aggression_pact } 
+		}
+		
+		if = { limit = { SIK = { is_ai = yes NOT = { has_war_with = ROOT } } }
+			diplomatic_relation = { country = SIK relation = military_access } 
+			diplomatic_relation = { country = SIK relation = non_aggression_pact } 
+		}
+		
+		if = { limit = { MON = { is_ai = yes NOT = { has_war_with = ROOT } } }
+			diplomatic_relation = { country = MON relation = military_access } 
+			diplomatic_relation = { country = MON relation = non_aggression_pact } 
+		}	
+	}
+	option = { name = "OK" }
+}
+#
+#country_event = {
+#	id = EAI_DM.2
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = { 
+#		tag = JAP is_ai = yes is_historical_focus_on = yes 
+#		GER = { is_ai = no }
+#		
+#		OR = {
+#			FRA = { has_capitulated = yes }
+#			FRA = { exists = no }
+#			FRA = { is_puppet = yes }
+#			FRA = { is_in_faction_with = GER }
+#			date > 1941.1.1
+#		}
+#		
+#		has_idea = neutrality_idea3
+#	}
+#	immediate = {
+#		remove_ideas = neutrality_idea3
+#	}
+#	option = { name = "OK" }
+#}
+
+country_event = {
+	id = EAI_DM.3
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = JAP is_ai = yes is_historical_focus_on = yes 
+		
+		OR = {
+			AND = {
+				OR = {
+					CHI = { has_capitulated = yes }
+					CHI = { exists = no }
+					CHI = { is_puppet = yes }
+					CHI = { is_in_faction_with = GER }
+					CHI = { has_government = fascism }
+					is_in_faction_with = CHI
+				}
+				OR = { 
+					FRA = { has_capitulated = yes }
+					FRA = { exists = no }
+					FRA = { is_puppet = yes }
+					FRA = { is_in_faction_with = GER }
+					FRA = { has_government = fascism }
+					is_in_faction_with = FRA
+				}
+				OR = {
+					SOV = { surrender_progress > 0.75 }
+					RAJ = { has_capitulated = yes }
+				}
+			}
+			OR = {
+				SOV = { has_capitulated = yes }
+				SOV = { exists = no }
+				SOV = { is_puppet = yes }
+				SOV = { is_in_faction_with = GER }
+				SOV = { has_government = fascism }
+				is_in_faction_with = SOV
+			}
+		}
+		has_idea = neutrality_idea3
+	}
+	immediate = {
+		remove_ideas = neutrality_idea3
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.4
+	hidden = yes
+	fire_only_once = yes
+	mean_time_to_happen = { days = 5 }
+	trigger = { 
+		tag = GER is_ai = yes is_historical_focus_on = yes
+		has_completed_focus = GER_ussr_war_goal
+		has_government = fascism
+		has_wargoal_against = SOV
+		
+		NOT = { 
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_puppet = yes }
+		}
+		
+		has_army_manpower = { size > 2000000 }
+		date > 1941.3.15
+		
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT					
+			}		
+		}
+		
+		#sov is a threat
+		NOT = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+			has_war_with = SOV
+		}
+
+		#not invading yug
+		OR = {
+			NOT = { has_war_with = YUG }
+			AND = {
+				has_war_with = YUG
+				YUG = { has_capitulated = yes }
+			}
+		}
+		
+		#not invading spr
+		OR = {
+			NOT = { has_war_with = SPR }
+			AND = {
+				has_war_with = SPR
+				SPR = { has_capitulated = yes }
+			}
+		}
+		
+		#controls western europe
+		NOT = {
+			any_state = {
+				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 26 state = 161 state = 162 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		declare_war_on = { target = SOV type = annex_everything } 
+	}
+	option = { name = "OK" }
+}
+
+#country_event = {
+#	id = EAI_DM.5
+#	hidden = yes
+#	fire_only_once = yes
+#	mean_time_to_happen = { days = 5 }
+#	trigger = { 
+#		tag = SOV is_ai = yes is_historical_focus_on = yes
+#		has_completed_focus = SOV_war_with_germany
+#		has_government = communism
+#		has_wargoal_against = GER
+#		
+#		NOT = { 
+#			SOV = { has_capitulated = yes }
+#			SOV = { exists = no }
+#			SOV = { is_puppet = yes }
+#		}
+#		
+#		NOT = { 
+#			GER = { has_capitulated = yes }
+#			GER = { exists = no }
+#			GER = { is_puppet = yes }
+#			NOT = { GER = { has_government = fascism } }
+#			is_in_faction_with = GER
+#			has_war_with = GER
+#		}
+#		
+#		OR = {
+#			NOT = { has_war_with = JAP }
+#			JAP = { has_capitulated = yes }
+#			JAP = { exists = no }
+#			JAP = { is_puppet = yes }
+#			NOT = { JAP = { has_government = fascism } }
+#			is_in_faction_with = JAP
+#		}
+#	}
+#	immediate = {
+#		if = { limit = { NOT = { has_war_with = GER } } declare_war_on = { target = GER type = puppet_wargoal_focus }  }
+#	}
+#	option = { name = "OK" }
+#}
+
+#country_event = {
+#	id = EAI_DM.6
+#	hidden = yes
+#	fire_only_once = yes
+#	mean_time_to_happen = { days = 5 }
+#	trigger = { 
+#		tag = SOV is_ai = yes is_historical_focus_on = yes
+#		has_completed_focus = SOV_war_with_japan
+#		has_government = communism
+#		has_wargoal_against = JAP
+#		
+#		NOT = { 
+#			SOV = { has_capitulated = yes }
+#			SOV = { exists = no }
+#			SOV = { is_puppet = yes }
+#		}
+#		
+#		NOT = { 
+#			JAP = { has_capitulated = yes }
+#			JAP = { exists = no }
+#			JAP = { is_puppet = yes }
+#			NOT = { JAP = { has_government = fascism } }
+#			is_in_faction_with = JAP
+#			has_war_with = JAP
+#		}
+#		
+#		OR = {
+#			NOT = { has_war_with = GER }
+#			GER = { has_capitulated = yes }
+#			GER = { exists = no }
+#			GER = { is_puppet = yes }
+#			NOT = { GER = { has_government = fascism } }
+#			is_in_faction_with = GER
+#		}
+#	}
+#	immediate = {
+#		if = { limit = { NOT = { has_war_with = JAP } } declare_war_on = { target = JAP type = puppet_wargoal_focus } }
+#	}
+#	option = { name = "OK" }
+#}
+
+#country_event = {
+#	id = EAI_DM.7
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = { 
+#		tag = FIN is_ai = yes is_historical_focus_on = yes 
+#		has_idea = neutrality_idea3
+#		
+#		OR = {
+#			is_in_faction = yes
+#			has_war_with = GER
+#			AND = {
+#				OR = {
+#					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+#					GER = { has_war_with = SOV }
+#				}
+#				NOT = { 146 = { is_controlled_by = FIN } }
+#				OR = {
+#					NOR = { has_capitulated = yes }
+#					NOR = { exists = no }
+#					NOR = { is_puppet = yes }
+#					NOR = { has_government = fascism }
+#					is_in_faction_with = NOR
+#					has_war_with = NOR
+#				}
+#			}
+#			AND = {
+#				has_war_with = SOV
+#				GER = { has_war_with = SOV }
+#			}
+#		}
+#	}
+#	immediate = {
+#		remove_ideas = neutrality_idea3
+#	}
+#	option = { name = "OK" }
+#}
+
+#guarantee BNL
+#country_event = {
+#	id = EAI_DM.8
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = {
+#		tag = ENG is_ai = yes is_historical_focus_on = yes
+#		threat > 0.25
+#	}
+#	immediate = {
+#		if = { limit = { HOL = { has_government = democracy } } give_guarantee = HOL }
+#		if = { limit = { BEL = { has_government = democracy } } give_guarantee = BEL }
+#		if = { limit = { LUX = { has_government = democracy } } give_guarantee = LUX }
+#	}
+#	option = { name = "OK" }
+#}
+
+#country_event = {
+#	id = EAI_DM.9
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = {
+#		OR = { tag = LUX tag = HOL tag = BEL } is_ai = yes is_historical_focus_on = yes
+#		OR = {
+#			has_war = yes
+#			GER = { has_completed_focus = GER_around_maginot }
+#			GER = { focus_progress = { focus = GER_around_maginot progress > 0.01 } }
+#			any_country = { has_war_with = BEL }
+#			any_country = { has_war_with = LUX }
+#			any_country = { has_war_with = HOL }
+#			any_country = { has_wargoal_against = LUX }
+#			any_country = { has_wargoal_against = BEL }
+#			any_country = { has_wargoal_against = HOL }
+#			any_country = { is_justifying_wargoal_against = LUX }
+#			any_country = { is_justifying_wargoal_against = BEL }
+#			any_country = { is_justifying_wargoal_against = HOL }
+#		}
+#		has_idea = neutrality_idea3
+#	}
+#	immediate = {
+#		LUX = { remove_ideas = neutrality_idea3 }
+#		#if = { limit = { LUX = { is_ai = yes } NOT = { LUX = { has_idea = usa_idea } } }  LUX = { add_ideas = usa_idea } }
+#		BEL = { remove_ideas = neutrality_idea3 }
+#		#if = { limit = { BEL = { is_ai = yes } NOT = { BEL = { has_idea = usa_idea } } }  BEL = { add_ideas = usa_idea } }
+#		HOL = { remove_ideas = neutrality_idea3 }
+#		#if = { limit = { HOL = { is_ai = yes } NOT = { HOL = { has_idea = usa_idea } } }  HOL = { add_ideas = usa_idea } }
+#	}
+#	option = { name = "OK" }
+#}
+
+#country_event = {
+#	id = EAI_DM.10
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = {
+#		tag = ITA is_ai = yes is_historical_focus_on = yes
+#		has_government = fascism
+#		GER = { is_ai = yes }
+#		
+#		is_in_faction_with = GER
+#		GER = { has_war_with = FRA }
+#		OR = { 
+#			GER = { has_war_with = BEL } 			
+#			BEL = { has_capitulated = yes }
+#			BEL = { exists = no }
+#			BEL = { is_puppet = yes }
+#			FRA = { surrender_progress > 0.5 }
+#			FRA = { has_capitulated = yes }
+#			is_in_faction_with = BEL
+#		}
+#		NOT = { has_war_with = FRA }
+#	}
+#	immediate = {
+#		declare_war_on = { target = FRA type = annex_everything } 
+#	}
+#	option = { name = "OK" }
+#}
+
+#rush maginot
+country_event = {
+	id = EAI_DM.11
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes is_historical_focus_on = yes
+		has_completed_focus = GER_around_maginot
+		has_government = fascism
+	}
+	immediate = {
+		if = {
+			limit = {
+				NOT = { 
+					LUX = { has_capitulated = yes }
+					LUX = { exists = no }
+					LUX = { is_puppet = yes }
+					LUX = { has_government = fascism }
+					is_in_faction_with = LUX
+					has_war_with = LUX
+				}
+			}
+			declare_war_on = { target = LUX type = annex_everything } 
+		}
+		if = { 
+			limit = {
+				NOT = { 
+					BEL = { has_capitulated = yes }
+					BEL = { exists = no }
+					BEL = { is_puppet = yes }
+					BEL = { has_government = fascism }
+					is_in_faction_with = BEL
+					has_war_with = BEL
+				}
+			}
+			declare_war_on = { target = BEL type = annex_everything } 
+		}
+		if = { 
+			limit = {
+				NOT = { 
+					HOL = { has_capitulated = yes }
+					HOL = { exists = no }
+					HOL = { is_puppet = yes }
+					HOL = { has_government = fascism }
+					is_in_faction_with = HOL
+					has_war_with = HOL
+				}
+			}
+			declare_war_on = { target = HOL type = annex_everything } 
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.12
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = SPR is_ai = yes is_historical_focus_on = yes
+		has_global_flag = spanish_civil_war
+		has_global_flag = EAI_neutral_spr
+	}
+	immediate = {
+		add_ideas = neutrality_idea3
+		every_enemy_country = {
+			limit = { is_ai = yes is_neighbor_of = ROOT }
+			add_ideas = neutrality_idea3
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.13
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		original_tag = SPR is_ai = yes is_historical_focus_on = yes
+		has_global_flag = scw_over
+		
+		OR = {
+			has_war = yes
+			GER = { is_ai = no }
+			NOT = { has_government = fascism }
+			AND = { 
+				has_government = fascism  
+				OR = {
+					SOV = { has_capitulated = yes }
+					SOV = { exists = no }
+					SOV = { is_puppet = yes }
+					SOV = { has_government = fascism }
+					GER = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+	immediate = {
+		remove_ideas = neutrality_idea3
+	}
+	option = { name = "OK" }
+}
+
+#usa joina allies
+country_event = {
+	id = EAI_DM.15
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = USA is_ai = yes is_historical_focus_on = yes
+		OR = {
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { is_in_faction_with = GER }
+			SOV = { has_war_with = ENG }
+			
+			AND = {
+				date > 1941.1.1
+				SOV = { has_war_with = GER }
+				SOV = { surrender_progress > 0.5 }
+			}
+			
+			date > 1942.1.1
+			
+			NOT = { 127 = { is_controlled_by = ENG } }
+			NOT = { 123 = { is_controlled_by = ENG } }
+			NOT = { 338 = { is_controlled_by = ENG } }
+			NOT = { 126 = { is_controlled_by = ENG } }
+			NOT = { 125 = { is_controlled_by = ENG } }
+			NOT = { 126 = { is_controlled_by = ENG } }
+			NOT = { 128 = { is_controlled_by = ENG } }
+			NOT = { 122 = { is_controlled_by = ENG } }
+			NOT = { 132 = { is_controlled_by = ENG } }
+			NOT = { 130 = { is_controlled_by = ENG } }
+			NOT = { 131 = { is_controlled_by = ENG } }
+			NOT = { 121 = { is_controlled_by = ENG } }
+			NOT = { 133 = { is_controlled_by = ENG } }
+			NOT = { 136 = { is_controlled_by = ENG } }
+			NOT = { 120 = { is_controlled_by = ENG } }
+			NOT = { 119 = { is_controlled_by = ENG } }
+		}
+	}
+	immediate = {
+		add_ideas = usa_idea
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.18
+	hidden = yes
+	fire_only_once = yes
+	mean_time_to_happen = { days = 5 }
+	trigger = { 
+		tag = JAP is_ai = yes
+		has_completed_focus = chinese_war_focus
+		
+		NOT = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			has_war_with = CHI
+			is_in_faction_with = CHI
+		}
+	}
+	immediate = {
+		if = { limit = { has_wargoal_against = SHX NOT = { has_war_with = SHX } NOT = { is_in_faction_with = SHX } } declare_war_on = { target = SHX type = annex_everything } }
+		if = { limit = { has_wargoal_against = CHI NOT = { has_war_with = CHI } NOT = { is_in_faction_with = CHI } } declare_war_on = { target = CHI type = take_state_focus } }
+	}
+	option = { name = "OK" }
+}
+
+#usa joina allies
+country_event = {
+	id = EAI_DM.19
+	hidden = yes
+	fire_only_once = yes
+	trigger = { 
+		is_ai = yes tag = USA is_historical_focus_on = yes 
+		has_idea = EAI_USA_neutrality
+		
+		OR = {
+			has_war = yes
+		
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { is_in_faction_with = GER }
+			SOV = { has_war_with = ENG }
+			
+			AND = {
+				date > 1941.1.1
+				SOV = { has_war_with = GER }
+				SOV = { surrender_progress > 0.5 }
+			}
+			
+			date > 1942.1.1
+			
+			NOT = { 127 = { is_controlled_by = ENG } }
+			NOT = { 123 = { is_controlled_by = ENG } }
+			NOT = { 338 = { is_controlled_by = ENG } }
+			NOT = { 126 = { is_controlled_by = ENG } }
+			NOT = { 125 = { is_controlled_by = ENG } }
+			NOT = { 126 = { is_controlled_by = ENG } }
+			NOT = { 128 = { is_controlled_by = ENG } }
+			NOT = { 122 = { is_controlled_by = ENG } }
+			NOT = { 132 = { is_controlled_by = ENG } }
+			NOT = { 130 = { is_controlled_by = ENG } }
+			NOT = { 131 = { is_controlled_by = ENG } }
+			NOT = { 121 = { is_controlled_by = ENG } }
+			NOT = { 133 = { is_controlled_by = ENG } }
+			NOT = { 136 = { is_controlled_by = ENG } }
+			NOT = { 120 = { is_controlled_by = ENG } }
+			NOT = { 119 = { is_controlled_by = ENG } }
+		}
+	}
+	immediate = {
+		remove_ideas = EAI_USA_neutrality
+	}
+	option = { name = "OK" }
+}
+
+##########################
+
+#country_event = {
+#	id = EAI_DM.50
+#	hidden = yes
+#	mean_time_to_happen = { days = 2 }
+#	trigger = {
+#		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+#		has_war_with = GRE GRE = { has_capitulated = no } YUG = { has_capitulated = yes }
+#		any_state = { OR = { region = 25 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
+#	}
+#	immediate = {
+#		every_state = { 
+#			limit = { OR = { region = 25 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
+#			ROOT = { transfer_state = PREV }
+#		}
+#	}
+#	option = { name = "OK" }
+#}
+
+country_event = {
+	id = EAI_DM.51
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+		has_war_with = FRA FRA = { has_capitulated = yes }
+	}
+	immediate = {
+		every_state = { 
+			limit = { OR = { region = 19 region = 20 } NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } } 
+			ROOT = { transfer_state = PREV }
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.52
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+		has_war_with = YUG YUG = { has_capitulated = yes }
+	}
+	immediate = {
+		every_state = { 
+			limit = { OR = { region = 24 state = 102 } NOT = { state = 44 state = 163 state = 103 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
+			ROOT = { transfer_state = PREV }
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.53
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+		has_war_with = YUG NOT = { YUG = { has_capitulated = yes } }
+		any_state = { OR = { state = 102 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
+	}
+	immediate = {
+		every_state = { 
+			limit = { OR = { state = 102 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
+			ROOT = { transfer_state = PREV }
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.54
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = ITA ITA = { is_ai = yes } is_historical_focus_on = yes
+		has_war_with = GRE GRE = { has_capitulated = yes }
+		any_state = { OR = { region = 25 } controller = { NOT = { tag = ITA } is_in_faction_with = ITA is_ai = yes } }
+	}
+	immediate = {
+		every_state = { 
+			limit = { OR = { state = 102 } controller = { NOT = { tag = ITA } is_in_faction_with = ITA is_ai = yes } }
+			ROOT = { transfer_state = PREV }
+		}
+	}
+	option = { name = "OK" }
+}
+
+#wargoals
+
+#den
+country_event = {
+	id = EAI_DM.100
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes is_historical_focus_on = yes 
+		has_government = fascism
+		
+		NOT = { 
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			DEN = { has_capitulated = yes }
+			DEN = { exists = no }
+			DEN = { is_puppet = yes }
+			DEN = { has_government = fascism }
+			is_in_faction_with = DEN
+			has_war_with = DEN
+		}
+		
+		OR = { 
+			POL = { has_capitulated = yes }
+			POL = { exists = no }
+			POL = { is_puppet = yes }
+			POL = { has_government = fascism }
+			is_in_faction_with = POL
+		}
+
+		OR = {
+			AND = {
+				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+			}
+			AND = {
+				OR = {
+					GER = { has_completed_focus = GER_ussr_war_goal }
+					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+				}
+				OR = {
+					SOV = { has_capitulated = yes }
+					SOV = { exists = no }
+					SOV = { is_puppet = yes }
+					SOV = { has_government = fascism }
+					is_in_faction_with = SOV
+				}
+			}
+		}
+		
+		OR = {
+			NOT = { has_war_with = SOV }
+			AND = {
+				has_war_with = SOV
+				SOV = { has_capitulated = yes }
+			}
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 7 region = 8 region = 38 state = 56 state = 57 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.101 days = 25 }
+		add_political_power = -5
+		set_country_flag = GER_invade_DEN
+		
+		every_country = { limit = { is_ai = no OR = { tag = DEN tag = NOR } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.101
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = DEN } }
+			create_wargoal = {
+				type = take_state
+				target = DEN
+				generator = { 99 }
+			}
+		}
+		if = { limit = { NOT = { has_wargoal_against = NOR } }
+			create_wargoal = {
+				type = take_state
+				target = NOR
+				generator = { 110 }
+			}
+		}
+		country_event = { id = EAI_DM.102 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.102
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		if = { limit = { NOT = { has_war_with = DEN } } declare_war_on = { target = DEN type = take_state_focus } } 
+		if = { limit = { NOT = { has_war_with = NOR } } declare_war_on = { target = NOR type = take_state_focus } } 
+	}
+	option = { name = "OK" }
+}
+
+
+#yug
+country_event = {
+	id = EAI_DM.110
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes is_historical_focus_on = yes has_government = fascism
+		date > 1941.3.1
+		
+		NOT = { 
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			YUG = { has_capitulated = yes }
+			YUG = { exists = no }
+			YUG = { is_puppet = yes }
+			YUG = { has_government = fascism }
+			is_in_faction_with = YUG
+			has_war_with = YUG
+		}
+		
+		OR = { 
+			POL = { has_capitulated = yes }
+			POL = { exists = no }
+			POL = { is_puppet = yes }
+			POL = { has_government = fascism }
+			is_in_faction_with = POL
+		}
+		
+		OR = { 
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_puppet = yes }
+			FRA = { has_government = fascism }
+			is_in_faction_with = FRA
+		}
+		
+		OR = { 
+			DEN = { has_capitulated = yes }
+			DEN = { exists = no }
+			DEN = { is_puppet = yes }
+			DEN = { has_government = fascism }
+			is_in_faction_with = DEN
+		}
+		
+		OR = {
+			AND = {
+				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+			}
+			AND = {
+				OR = {
+					GER = { has_completed_focus = GER_ussr_war_goal }
+					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+				}
+				OR = {
+					SOV = { has_capitulated = yes }
+					SOV = { exists = no }
+					SOV = { is_puppet = yes }
+					SOV = { has_government = fascism }
+					is_in_faction_with = SOV
+				}
+			}
+		}
+		
+		OR = {
+			NOT = { has_war_with = SOV }
+			AND = {
+				has_war_with = SOV
+				SOV = { has_capitulated = yes }
+			}
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 26 state = 161 state = 162 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.111 days = 25 }
+		add_political_power = -5
+		set_country_flag = GER_invade_YUG
+		
+		every_country = { limit = { is_ai = no OR = { tag = YUG } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.111
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = YUG } }
+			create_wargoal = {
+				type = take_state
+				target = YUG
+				generator = { 102 }
+			}
+		}
+		country_event = { id = EAI_DM.112 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.112
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = YUG } } declare_war_on = { target = YUG type = take_state_focus } } }
+	option = { name = "OK" }
+}
+
+
+#gre
+country_event = {
+	id = EAI_DM.120
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes is_historical_focus_on = yes has_government = fascism
+		date > 1941.4.1
+		
+		NOT = { 
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			GRE = { has_capitulated = yes }
+			GRE = { exists = no }
+			GRE = { is_puppet = yes }
+			GRE = { has_government = fascism }
+			is_in_faction_with = GRE
+			has_war_with = GRE
+		}
+		
+		OR = { 
+			POL = { has_capitulated = yes }
+			POL = { exists = no }
+			POL = { is_puppet = yes }
+			POL = { has_government = fascism }
+			is_in_faction_with = POL
+		}
+		
+		OR = { 
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_puppet = yes }
+			FRA = { has_government = fascism }
+			is_in_faction_with = FRA
+		}
+		
+		OR = { 
+			DEN = { has_capitulated = yes }
+			DEN = { exists = no }
+			DEN = { is_puppet = yes }
+			DEN = { has_government = fascism }
+			is_in_faction_with = DEN
+		}
+		
+		OR = { 
+			YUG = { has_capitulated = yes }
+			YUG = { exists = no }
+			YUG = { is_puppet = yes }
+			YUG = { has_government = fascism }
+			is_in_faction_with = YUG
+		}
+		
+		OR = {
+			AND = {
+				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+			}
+			AND = {
+				OR = {
+					GER = { has_completed_focus = GER_ussr_war_goal }
+					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+				}
+				OR = {
+					SOV = { has_capitulated = yes }
+					SOV = { exists = no }
+					SOV = { is_puppet = yes }
+					SOV = { has_government = fascism }
+					is_in_faction_with = SOV
+				}
+			}
+		}
+		
+		OR = {
+			NOT = { has_war_with = SOV }
+			AND = {
+				has_war_with = SOV
+				SOV = { has_capitulated = yes }
+			}
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 26 state = 161 state = 162 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.121 days = 25 }
+		add_political_power = -5
+		set_country_flag = GER_invade_GRE
+		
+		every_country = { limit = { is_ai = no OR = { tag = GRE } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.121
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = GRE } }
+			create_wargoal = {
+				type = take_state
+				target = GRE
+				generator = { 731 }
+			}
+		}
+		country_event = { id = EAI_DM.122 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.122
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = GRE } } declare_war_on = { target = GRE type = take_state_focus } } }
+	option = { name = "OK" }
+}
+
+
+#swi
+#country_event = {
+#	id = EAI_DM.130
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = {
+#		tag = GER is_ai = yes is_historical_focus_on = yes has_government = fascism
+#		
+#		NOT = { 
+#			GER = { has_capitulated = yes }
+#			GER = { exists = no }
+#			GER = { is_puppet = yes }
+#		}
+#		
+#		NOT = { 
+#			SWI = { has_capitulated = yes }
+#			SWI = { exists = no }
+#			SWI = { is_puppet = yes }
+#			SWI = { has_government = fascism }
+#			is_in_faction_with = SWI
+#			has_war_with = SWI
+#		}
+#		
+#		OR = { 
+#			POL = { has_capitulated = yes }
+#			POL = { exists = no }
+#			POL = { is_puppet = yes }
+#			POL = { has_government = fascism }
+#			is_in_faction_with = POL
+#		}
+#		
+#		OR = { 
+#			FRA = { has_capitulated = yes }
+#			FRA = { exists = no }
+#			FRA = { is_puppet = yes }
+#			FRA = { has_government = fascism }
+#			is_in_faction_with = FRA
+#		}
+#		
+#		OR = { 
+#			DEN = { has_capitulated = yes }
+#			DEN = { exists = no }
+#			DEN = { is_puppet = yes }
+#			DEN = { has_government = fascism }
+#			is_in_faction_with = DEN
+#		}
+#		
+#		OR = {
+#			AND = {
+#				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+#				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+#			}
+#			AND = {
+#				OR = {
+#					GER = { has_completed_focus = GER_ussr_war_goal }
+#					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+#				}
+#				OR = {
+#					SOV = { has_capitulated = yes }
+#					SOV = { exists = no }
+#					SOV = { is_puppet = yes }
+#					SOV = { has_government = fascism }
+#					is_in_faction_with = SOV
+#				}
+#			}
+#		}
+#		
+#		OR = {
+#			NOT = { has_war_with = SOV }
+#			AND = {
+#				has_war_with = SOV
+#				SOV = { has_capitulated = yes }
+#			}
+#		}
+#		
+#		NOT = {
+#			any_state = {
+#				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 26 state = 161 state = 162 }
+#				controller = { has_war_with = GER }
+#			}
+#		}
+#	}
+#	immediate = {
+#		country_event = { id = EAI_DM.131 days = 25 }
+#		add_political_power = -5
+#		set_country_flag = GER_invade_SWI
+#		
+#		every_country = { limit = { is_ai = no OR = { tag = SWI } } country_event = EAI_DM.1000 }
+#	}
+#	option = { name = "OK" }
+#}
+#
+#country_event = {
+#	id = EAI_DM.131
+#	hidden = yes
+#	is_triggered_only = yes
+#	immediate = {
+#		if = { limit = { NOT = { has_wargoal_against = SWI } }
+#			create_wargoal = {
+#				type = take_state
+#				target = SWI
+#				generator = { 3 }
+#			}
+#		}
+#		country_event = { id = EAI_DM.132 days = 3 }
+#	}
+#	option = { name = "OK" }
+#}
+#
+#country_event = {
+#	id = EAI_DM.132
+#	hidden = yes
+#	is_triggered_only = yes
+#	immediate = { if = { limit = { NOT = { has_war_with = SWI } } declare_war_on = { target = SWI type = take_state_focus } } }
+#	option = { name = "OK" }
+#}
+#
+
+#por
+country_event = {
+	id = EAI_DM.140
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		controls_state = 41 owns_state = 41 is_ai = yes is_historical_focus_on = yes has_government = fascism
+		is_in_faction_with = GER
+		has_global_flag = scw_over
+		
+		has_capitulated = no
+		exists = yes
+		is_puppet = no 
+		
+		NOT = { 118 = { is_controlled_by = ENG } }
+		
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT					
+			}		
+		}
+		
+		NOT = { 
+			POR = { has_capitulated = yes }
+			POR = { exists = no }
+			POR = { is_puppet = yes }
+			POR = { has_government = fascism }
+			is_in_faction_with = POR
+			has_war_with = POR
+		}
+		
+		OR = {
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.141 days = 25 }
+		add_political_power = -5
+		set_country_flag = SPR_invade_POR
+		
+		every_country = { limit = { is_ai = no OR = { tag = POR } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.141
+	
+	
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = POR } }
+			create_wargoal = {
+				type = take_state
+				target = POR
+				generator = { 180 }
+			}
+		}
+		country_event = { id = EAI_DM.142 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.142
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = POR } } declare_war_on = { target = POR type = annex_everything } } }
+	option = { name = "OK" }
+}
+
+
+#sia
+#country_event = {
+#	id = EAI_DM.150
+#	hidden = yes
+#	fire_only_once = yes
+#	trigger = {
+#		tag = JAP is_ai = yes has_government = fascism is_historical_focus_on = yes
+#		
+#		NOT = { 
+#			JAP = { has_capitulated = yes }
+#			JAP = { exists = no }
+#			JAP = { is_puppet = yes }
+#		}
+#		
+#		NOT = { 
+#			SIA = { has_capitulated = yes }
+#			SIA = { exists = no }
+#			SIA = { is_puppet = yes }
+#			SIA = { has_government = fascism }
+#			is_in_faction_with = SIA
+#			has_war_with = SIA
+#		}
+#		
+#		OR = { 
+#			CHI = { has_capitulated = yes }
+#			CHI = { exists = no }
+#			CHI = { is_puppet = yes }
+#			CHI = { has_government = fascism }
+#			is_in_faction_with = CHI
+#		}
+#		
+#		741 = { is_controlled_by = JAP }
+#		286 = { is_controlled_by = JAP }
+#		670 = { is_controlled_by = JAP }
+#		671 = { is_controlled_by = JAP }
+#	}
+#	immediate = {
+#		country_event = { id = EAI_DM.151 days = 25 }
+#		add_political_power = -5
+#		set_country_flag = JAP_invade_SIA
+#		
+#		every_country = { limit = { is_ai = no OR = { tag = SIA } } country_event = EAI_DM.1000 }
+#	}
+#	option = { name = "OK" }
+#}
+#
+#country_event = {
+#	id = EAI_DM.151
+#	hidden = yes
+#	is_triggered_only = yes
+#	immediate = {
+#		if = { limit = { NOT = { has_wargoal_against = DEN } }
+#			create_wargoal = {
+#				type = take_state
+#				target = SIA
+#				generator = { 289 }
+#			}
+#		}
+#		country_event = { id = EAI_DM.152 days = 3 }
+#	}
+#	option = { name = "OK" }
+#}
+#
+#country_event = {
+#	id = EAI_DM.152
+#	hidden = yes
+#	is_triggered_only = yes
+#	immediate = { if = { limit = { NOT = { has_war_with = SIA } } declare_war_on = { target = SIA type = take_state } } }
+#	option = { name = "OK" }
+#}
+
+
+#nep
+country_event = {
+	id = EAI_DM.160
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = JAP is_ai = yes has_government = fascism is_historical_focus_on = yes
+		
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			NEP = { has_capitulated = yes }
+			NEP = { exists = no }
+			NEP = { is_puppet = yes }
+			NEP = { has_government = fascism }
+			is_in_faction_with = NEP
+			has_war_with = NEP
+		}
+		
+		OR = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+		}
+		
+		OR = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			CHI = { has_government = fascism }
+			is_in_faction_with = CHI
+		}
+		
+		OR = { 
+			RAJ = { has_capitulated = yes }
+			RAJ = { exists = no }
+			#RAJ = { is_puppet = yes }
+			RAJ = { has_government = fascism }
+			is_in_faction_with = RAJ
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.161 days = 25 }
+		add_political_power = -5
+		set_country_flag = JAP_invade_NEP
+		
+		every_country = { limit = { is_ai = no OR = { tag = NEP } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.161
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = NEP } }
+			create_wargoal = {
+				type = take_state
+				target = NEP
+				generator = { 323 }
+			}
+		}
+		country_event = { id = EAI_DM.162 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.162
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = NEP } } declare_war_on = { target = NEP type = take_state } } }
+	option = { name = "OK" }
+}
+
+
+#bhu
+country_event = {
+	id = EAI_DM.170
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = JAP is_ai = yes has_government = fascism is_historical_focus_on = yes
+		
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			BHU = { has_capitulated = yes }
+			BHU = { exists = no }
+			BHU = { is_puppet = yes }
+			BHU = { has_government = fascism }
+			is_in_faction_with = BHU
+			has_war_with = BHU
+		}
+		
+		OR = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+		}
+		
+		OR = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			CHI = { has_government = fascism }
+			is_in_faction_with = CHI
+		}
+		
+		OR = { 
+			RAJ = { has_capitulated = yes }
+			RAJ = { exists = no }
+			#RAJ = { is_puppet = yes }
+			RAJ = { has_government = fascism }
+			is_in_faction_with = RAJ
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.171 days = 25 }
+		add_political_power = -5
+		set_country_flag = JAP_invade_BHU
+		
+		every_country = { limit = { is_ai = no OR = { tag = BHU } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.171
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = BHU } }
+			create_wargoal = {
+				type = take_state
+				target = BHU
+				generator = { 324 }
+			}
+		}
+		country_event = { id = EAI_DM.172 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.172
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = BHU } } declare_war_on = { target = BHU type = take_state } } }
+	option = { name = "OK" }
+}
+
+
+#tib
+country_event = {
+	id = EAI_DM.180
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = JAP is_ai = yes has_government = fascism is_historical_focus_on = yes
+		
+		NOT = { 
+			JAP = { has_capitulated = yes }
+			JAP = { exists = no }
+			JAP = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			TIB = { has_capitulated = yes }
+			TIB = { exists = no }
+			TIB = { is_puppet = yes }
+			TIB = { has_government = fascism }
+			is_in_faction_with = TIB
+			has_war_with = TIB
+		}
+		
+		OR = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+		}
+		
+		OR = { 
+			CHI = { has_capitulated = yes }
+			CHI = { exists = no }
+			CHI = { is_puppet = yes }
+			CHI = { has_government = fascism }
+			is_in_faction_with = CHI
+		}
+		
+		OR = { 
+			RAJ = { has_capitulated = yes }
+			RAJ = { exists = no }
+			#RAJ = { is_puppet = yes }
+			RAJ = { has_government = fascism }
+			is_in_faction_with = RAJ
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.181 days = 25 }
+		add_political_power = -5
+		set_country_flag = JAP_invade_TIB
+		
+		every_country = { limit = { is_ai = no OR = { tag = TIB } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.181
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = TIB } }
+			create_wargoal = {
+				type = take_state
+				target = TIB
+				generator = { 322 }
+			}
+		}
+		country_event = { id = EAI_DM.182 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.182
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = TIB } } declare_war_on = { target = TIB type = take_state } } }
+	option = { name = "OK" }
+}
+
+
+#through the maginot
+country_event = {
+	id = EAI_DM.190
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = GER is_ai = yes has_government = fascism is_historical_focus_on = yes
+		
+		OR = { date > 1940.1.1 NOT = { 735 = { is_controlled_by = FRA } } }
+		
+		NOT = { 
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_puppet = yes }
+		}
+		
+		OR = {
+			NOT = { 
+				BEL = { has_capitulated = yes }
+				BEL = { exists = no }
+				BEL = { is_puppet = yes }
+				is_in_faction_with = BEL
+				has_war_with = BEL
+			}
+			NOT = { 
+				HOL = { has_capitulated = yes }
+				HOL = { exists = no }
+				HOL = { is_puppet = yes }
+				is_in_faction_with = HOL
+				has_war_with = HOL
+			}
+		}
+		
+		OR = { 
+			DEN = { has_capitulated = yes }
+			DEN = { exists = no }
+			DEN = { is_puppet = yes }
+			DEN = { has_government = fascism }
+			is_in_faction_with = DEN
+		}
+		
+		OR = { 
+			POL = { has_capitulated = yes }
+			POL = { exists = no }
+			POL = { is_puppet = yes }
+			POL = { has_government = fascism }
+			is_in_faction_with = POL
+		}
+
+		OR = {
+			AND = {
+				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+			}
+			AND = {
+				OR = {
+					GER = { has_completed_focus = GER_ussr_war_goal }
+					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+				}
+				OR = {
+					SOV = { has_capitulated = yes }
+					SOV = { exists = no }
+					SOV = { is_puppet = yes }
+					SOV = { has_government = fascism }
+					is_in_faction_with = SOV
+				}
+			}
+		}
+		
+		OR = {
+			NOT = { has_war_with = SOV }
+			AND = {
+				has_war_with = SOV
+				SOV = { has_capitulated = yes }
+			}
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 7 region = 8 region = 38 state = 56 state = 57 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.191 days = 25 }
+		add_political_power = -15
+		set_country_flag = GER_invade_BNL
+		
+		every_country = { 
+			limit = { 
+				is_ai = no 
+				OR = { tag = LUX tag = BEL tag = HOL } 
+				NOT = { 
+					has_capitulated = yes
+					exists = no
+					is_puppet = yes
+					is_in_faction_with = GER
+					has_war_with = GER
+				}
+			} 
+			country_event = EAI_DM.1000 
+		}
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.191
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { 
+			limit = { 
+				NOT = { has_wargoal_against = LUX }
+				NOT = { 
+					LUX = { has_capitulated = yes }
+					LUX = { exists = no }
+					LUX = { is_puppet = yes }
+					#LUX = { has_government = fascism }
+					is_in_faction_with = LUX
+					has_war_with = LUX
+				}				
+			}
+			create_wargoal = {
+				type = take_state
+				target = LUX
+				generator = { 8 }
+			}
+		}
+		if = {
+			limit = { 
+				NOT = { has_wargoal_against = BEL } 
+				NOT = { 
+					BEL = { has_capitulated = yes }
+					BEL = { exists = no }
+					BEL = { is_puppet = yes }
+					#BEL = { has_government = fascism }
+					is_in_faction_with = BEL
+					has_war_with = BEL
+				}
+			}
+			create_wargoal = {
+				type = take_state
+				target = BEL
+				generator = { 34 }
+			}
+		}
+		if = {
+			limit = { 
+				NOT = { has_wargoal_against = HOL } 
+				NOT = { 
+					HOL = { has_capitulated = yes }
+					HOL = { exists = no }
+					HOL = { is_puppet = yes }
+					#HOL = { has_government = fascism }
+					is_in_faction_with = HOL
+					has_war_with = HOL
+				}
+			}
+			create_wargoal = {
+				type = take_state
+				target = HOL
+				generator = { 35 }
+			}
+		}
+		country_event = { id = EAI_DM.192 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.192
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		if = { 
+			limit = { 
+				NOT = { has_war_with = LUX }
+				NOT = { 
+					LUX = { has_capitulated = yes }
+					LUX = { exists = no }
+					LUX = { is_puppet = yes }
+					#LUX = { has_government = fascism }
+					is_in_faction_with = LUX
+					has_war_with = LUX
+				}				
+			} 
+			declare_war_on = { target = LUX type = take_state } 
+		}
+		if = { limit = { LUX = { is_ai = yes } } LUX = { add_ideas = usa_idea } }
+		LUX = { remove_ideas = neutrality_idea3 }
+		if = { 
+			limit = { 
+				NOT = { has_war_with = BEL }
+				NOT = { 
+					BEL = { has_capitulated = yes }
+					BEL = { exists = no }
+					BEL = { is_puppet = yes }
+					#BEL = { has_government = fascism }
+					is_in_faction_with = BEL
+					has_war_with = BEL
+				}				
+			} 
+			declare_war_on = { target = BEL type = take_state } 
+		} 	
+		if = { limit = { BEL = { is_ai = yes } } BEL = { add_ideas = usa_idea } }
+		BEL = { remove_ideas = neutrality_idea3 }
+		if = { 
+			limit = { 
+				NOT = { has_war_with = HOL }
+				NOT = { 
+					HOL = { has_capitulated = yes }
+					HOL = { exists = no }
+					HOL = { is_puppet = yes }
+					#HOL = { has_government = fascism }
+					is_in_faction_with = HOL
+					has_war_with = HOL
+				}				
+			} 
+			declare_war_on = { target = HOL type = take_state } 
+		} 
+		if = { limit = { HOL = { is_ai = yes } } HOL = { add_ideas = usa_idea } }
+		HOL = { remove_ideas = neutrality_idea3 }
+	}
+	option = { name = "OK" }
+}
+
+
+#fin
+country_event = {
+	id = EAI_DM.200
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = SOV is_ai = yes has_government = communism is_historical_focus_on = yes
+		
+		has_wargoal_against = FIN
+		has_war = no
+		
+		NOT = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			FIN = { has_capitulated = yes }
+			FIN = { exists = no }
+			FIN = { is_puppet = yes }
+			FIN = { has_government = communism }
+			FIN = { is_in_faction = yes }
+			is_in_faction_with = FIN
+			has_war_with = FIN
+		}
+	}
+	immediate = {
+		if = { limit = { NOT = { has_war_with = FIN } } declare_war_on = { target = FIN type = take_state } }
+		set_country_flag = SOV_war_since_purge
+	}
+	option = { name = "OK" }
+}
+
+
+#gre
+country_event = {
+	id = EAI_DM.210
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = ITA is_ai = yes is_historical_focus_on = yes has_government = fascism
+		date > 1940.10.1
+		
+		NOT = { 
+			ITA = { has_capitulated = yes }
+			ITA = { exists = no }
+			ITA = { is_puppet = yes }
+		}
+		
+		NOT = { 
+			GRE = { has_capitulated = yes }
+			GRE = { exists = no }
+			GRE = { is_puppet = yes }
+			GRE = { has_government = fascism }
+			is_in_faction_with = GRE
+			has_war_with = GRE
+		}
+		
+		OR = { 
+			POL = { has_capitulated = yes }
+			POL = { exists = no }
+			POL = { is_puppet = yes }
+			POL = { has_government = fascism }
+			is_in_faction_with = POL
+		}
+		
+		OR = { 
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_puppet = yes }
+			FRA = { has_government = fascism }
+			is_in_faction_with = FRA
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 26 state = 161 state = 162 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	immediate = {
+		country_event = { id = EAI_DM.211 days = 25 }
+		add_political_power = -5
+		set_country_flag = ITA_invade_GRE
+		
+		every_country = { limit = { is_ai = no OR = { tag = GRE } } country_event = EAI_DM.1000 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.211
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { NOT = { has_wargoal_against = GRE } }
+			create_wargoal = {
+				type = take_state
+				target = GRE
+				generator = { 731 }
+			}
+		}
+		country_event = { id = EAI_DM.212 days = 3 }
+	}
+	option = { name = "OK" }
+}
+
+country_event = {
+	id = EAI_DM.212
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { if = { limit = { NOT = { has_war_with = GRE } } declare_war_on = { target = GRE type = take_state_focus } } }
+	option = { name = "OK" }
+}
+
+
+########################################
+
+country_event = {
+	id = EAI_DM.1000
+	title = EAI_DM.1000.t
+	desc = EAI_DM.1000.d
+	picture = GFX_report_event_chinese_soldiers_fighting
+	is_triggered_only = yes
+	option = { name = "OK" }
+}
