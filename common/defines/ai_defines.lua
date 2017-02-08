@@ -145,8 +145,8 @@ NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.01
 
 
 
-NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 2 -- Weight when counting industry (will be added to military strength)
-NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 6 --7
+NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 10 -- Weight when counting industry (will be added to military strength)
+NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 10 --7 -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
 
 
 
