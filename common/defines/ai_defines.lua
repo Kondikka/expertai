@@ -155,7 +155,7 @@ NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 10 --7 -- Multiplied with relat
 
 --plan defines
 
-NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
+--NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
 
 --NDefines.NAI.MAX_UNITS_FACTOR_AREA_ORDER = 0.5 				-- Factor for max number of units to assign to area defense orders
 --NDefines.NAI.DESIRED_UNITS_FACTOR_AREA_ORDER = 0.5 			-- Factor for desired number of units to assign to area defense orders
