@@ -139,7 +139,7 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 
 
 
-NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.05
+NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.01
 
 
 
@@ -154,6 +154,8 @@ NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 6 --7
 
 
 --plan defines
+
+NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
 
 --NDefines.NAI.MAX_UNITS_FACTOR_AREA_ORDER = 0.5 				-- Factor for max number of units to assign to area defense orders
 --NDefines.NAI.DESIRED_UNITS_FACTOR_AREA_ORDER = 0.5 			-- Factor for desired number of units to assign to area defense orders
