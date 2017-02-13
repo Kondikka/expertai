@@ -514,7 +514,7 @@ allied_invasions_ita = { #ita invasions
 		is_historical_focus_on = yes
 		is_in_faction_with = ENG
 		has_war_with = ITA
-		has_army_manpower = { size > 300000} #minors dont bother
+		has_army_manpower = { size > 600000 } #minors dont bother
 		
 		OR = { 
 			FRA = { has_capitulated = yes }
@@ -538,16 +538,19 @@ allied_invasions_ita = { #ita invasions
 		}
 	}
 	abort = {
-		NOT = {
-			ITA = { is_ai = no alliance_strength_ratio < 0.75 }
-		
-			date > 1943.1.1
-			ITA = { surrender_progress > 0.2 }
-			AND = { ITA = { has_war_with = SOV } SOV = { surrender_progress > 0.15 } }
-			SOV = { has_capitulated = yes }
-			SOV = { exists = no }
-			SOV = { is_puppet = yes }
-			ITA = { is_in_faction_with = SOV }
+		OR = {
+			NOT = { has_army_manpower = { size > 600000 } }
+			NOT = {
+				ITA = { is_ai = no alliance_strength_ratio < 0.75 }
+			
+				date > 1943.1.1
+				ITA = { surrender_progress > 0.2 }
+				AND = { ITA = { has_war_with = SOV } SOV = { surrender_progress > 0.15 } }
+				SOV = { has_capitulated = yes }
+				SOV = { exists = no }
+				SOV = { is_puppet = yes }
+				ITA = { is_in_faction_with = SOV }
+			}
 		}
 	}
 
@@ -560,7 +563,7 @@ allied_invasions_ger = { #GER invasions
 		is_historical_focus_on = yes
 		is_in_faction_with = ENG
 		has_war_with = GER
-		has_army_manpower = { size > 300000} #minors dont bother
+		has_army_manpower = { size > 600000 } #minors dont bother
 		OR = {
 			NOT = { tag = USA } #focus on the pacific, let UK create plans in europe
 			AND = { tag = USA OR = { date > 1948.1.1 ENG = { has_capitulated = yes } } }
@@ -592,17 +595,20 @@ allied_invasions_ger = { #GER invasions
 		}
 	}
 	abort = {
-		ENG = { has_capitulated = no }
-		NOT = {
-			GER = { is_ai = no alliance_strength_ratio < 0.5 } #dont invade early without the strength to do so
-		
-			date > 1944.1.1
-			GER = { surrender_progress > 0.2 }
-			AND = { GER = { has_war_with = SOV } SOV = { surrender_progress > 0.15 } }
-			SOV = { has_capitulated = yes }
-			SOV = { exists = no }
-			SOV = { is_puppet = yes }
-			GER = { is_in_faction_with = SOV }
+		OR = {
+			NOT = { has_army_manpower = { size > 600000 } }
+			NOT = {
+				ENG = { has_capitulated = yes }
+				GER = { is_ai = no alliance_strength_ratio < 0.5 } #dont invade early without the strength to do so
+			
+				date > 1944.1.1
+				GER = { surrender_progress > 0.2 }
+				AND = { GER = { has_war_with = SOV } SOV = { surrender_progress > 0.15 } }
+				SOV = { has_capitulated = yes }
+				SOV = { exists = no }
+				SOV = { is_puppet = yes }
+				GER = { is_in_faction_with = SOV }
+			}
 		}
 	}
 
@@ -1014,35 +1020,72 @@ nap_ITA_2 = {
 	ai_strategy = { type = befriend id = "ITA" value = 5000 }
 }
 
-#
+#let's make REALLY sure that finland does not join a faction during the winter war
 dont_join_faction_fin_0 = {
 	enable = {
-		tag = FIN
-		is_historical_focus_on = yes
-	}
-	abort = {
-		always = no
-	}
-	
-	ai_strategy = { type = alliance id = "GER" value = -100 }
-	ai_strategy = { type = antagonize id = "GER" value = 100 }
-	ai_strategy = { type = ignore id = "GER" value = 100 }
-	ai_strategy = { type = alliance id = "ENG" value = -100 }
-	ai_strategy = { type = antagonize id = "ENG" value = 100 }
-	ai_strategy = { type = ignore id = "ENG" value = 100 }
-}
-dont_join_faction_fin = {
-	enable = {
-		tag = FIN
+		OR = { tag = FIN tag = ENG }
 		is_historical_focus_on = yes
 		
+		OR = {
+			SOV = { is_justifying_wargoal_against = FIN }
+			SOV = { has_wargoal_against = FIN }
+			SOV = { has_war_with = FIN }
+		}
+	}
+	abort = {
+		NOT = {
+			SOV = { is_justifying_wargoal_against = FIN }
+			SOV = { has_wargoal_against = FIN }
+			SOV = { has_war_with = FIN }
+		}
+	}
+	
+	ai_strategy = { type = alliance id = "ENG" value = -135 }
+	ai_strategy = { type = antagonize id = "ENG" value = 135 }
+	ai_strategy = { type = ignore id = "ENG" value = 500 }
+	ai_strategy = { type = alliance id = "FIN" value = -135 }
+	ai_strategy = { type = antagonize id = "FIN" value = 135 }
+	ai_strategy = { type = ignore id = "FIN" value = 500 }
+}
+dont_join_faction_fin_1 = {
+	enable = {
+		OR = { tag = FIN tag = GER }
+		is_historical_focus_on = yes
+		
+		OR = {
+			SOV = { is_justifying_wargoal_against = FIN }
+			SOV = { has_wargoal_against = FIN }
+			SOV = { has_war_with = FIN }
+		}
+	}
+	abort = {
+		NOT = {
+			SOV = { is_justifying_wargoal_against = FIN }
+			SOV = { has_wargoal_against = FIN }
+			SOV = { has_war_with = FIN }
+		}
+	}
+	
+	ai_strategy = { type = alliance id = "GER" value = -135 }
+	ai_strategy = { type = antagonize id = "GER" value = 135 }
+	ai_strategy = { type = ignore id = "GER" value = 500 }
+	ai_strategy = { type = alliance id = "FIN" value = -135 }
+	ai_strategy = { type = antagonize id = "FIN" value = 135 }
+	ai_strategy = { type = ignore id = "FIN" value = 500 }
+}
+continuation_war = {
+	enable = {
+		OR = { tag = FIN tag = GER }
+		is_historical_focus_on = yes
+		
+		FIN = { has_war = no }
 		NOT = { 146 = { is_controlled_by = FIN } }
 		
 		OR = {
-			GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.75 } }
+			GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.5 } }
 			GER = { has_war_with = SOV }
 		}
-		OR = {
+		OR = { #dont join if norway hasnt falled - otherwise finland will throw its entire army against norway
 			NOR = { has_capitulated = yes }
 			NOR = { exists = no }
 			NOR = { is_puppet = yes }
@@ -1055,9 +1098,13 @@ dont_join_faction_fin = {
 		always = no
 	}
 	
-	ai_strategy = { type = alliance id = "GER" value = 100 }
-	ai_strategy = { type = antagonize id = "GER" value = -100 }
-	ai_strategy = { type = ignore id = "GER" value = -100 }
+	ai_strategy = { type = alliance id = "GER" value = 500 }
+	ai_strategy = { type = antagonize id = "GER" value = -135 }
+	ai_strategy = { type = ignore id = "GER" value = -500 }
+	
+	ai_strategy = { type = alliance id = "FIN" value = 500 }
+	ai_strategy = { type = antagonize id = "FIN" value = -135 }
+	ai_strategy = { type = ignore id = "FIN" value = -500 }
 }
 
 #neutral low countries
@@ -1070,21 +1117,21 @@ dont_join_faction_bnl_0 = {
 		always = no
 	}
 	
-	ai_strategy = { type = alliance id = "ENG" value = -100 }
-	ai_strategy = { type = antagonize id = "ENG" value = 100 }
-	ai_strategy = { type = ignore id = "ENG" value = 100 }
+	ai_strategy = { type = alliance id = "ENG" value = -135 }
+	ai_strategy = { type = antagonize id = "ENG" value = 135 }
+	ai_strategy = { type = ignore id = "ENG" value = 135 }
 	
-	ai_strategy = { type = alliance id = "BEL" value = -100 }
-	ai_strategy = { type = antagonize id = "BEL" value = 100 }
-	ai_strategy = { type = ignore id = "BEL" value = 100 }
+	ai_strategy = { type = alliance id = "BEL" value = -135 }
+	ai_strategy = { type = antagonize id = "BEL" value = 135 }
+	ai_strategy = { type = ignore id = "BEL" value = 135 }
 	
-	ai_strategy = { type = alliance id = "HOL" value = -100 }
-	ai_strategy = { type = antagonize id = "HOL" value = 100 }
-	ai_strategy = { type = ignore id = "HOL" value = 100 }
+	ai_strategy = { type = alliance id = "HOL" value = -135 }
+	ai_strategy = { type = antagonize id = "HOL" value = 135 }
+	ai_strategy = { type = ignore id = "HOL" value = 135 }
 	
-	ai_strategy = { type = alliance id = "LUX" value = -100 }
-	ai_strategy = { type = antagonize id = "LUX" value = 100 }
-	ai_strategy = { type = ignore id = "LUX" value = 100 }
+	ai_strategy = { type = alliance id = "LUX" value = -135 }
+	ai_strategy = { type = antagonize id = "LUX" value = 135 }
+	ai_strategy = { type = ignore id = "LUX" value = 135 }
 }
 dont_join_faction_bnl = {
 	enable = {
@@ -1097,21 +1144,21 @@ dont_join_faction_bnl = {
 		always = no
 	}
 	
-	ai_strategy = { type = alliance id = "ENG" value = 100 }
-	ai_strategy = { type = antagonize id = "ENG" value = -100 }
-	ai_strategy = { type = ignore id = "ENG" value = -100 }
+	ai_strategy = { type = alliance id = "ENG" value = 135 }
+	ai_strategy = { type = antagonize id = "ENG" value = -135 }
+	ai_strategy = { type = ignore id = "ENG" value = -135 }
 	
-	ai_strategy = { type = alliance id = "BEL" value = 100 }
-	ai_strategy = { type = antagonize id = "BEL" value = -100 }
-	ai_strategy = { type = ignore id = "BEL" value = -100 }
+	ai_strategy = { type = alliance id = "BEL" value = 135 }
+	ai_strategy = { type = antagonize id = "BEL" value = -135 }
+	ai_strategy = { type = ignore id = "BEL" value = -135 }
 	
-	ai_strategy = { type = alliance id = "HOL" value = 100 }
-	ai_strategy = { type = antagonize id = "HOL" value = -100 }
-	ai_strategy = { type = ignore id = "HOL" value = -100 }
+	ai_strategy = { type = alliance id = "HOL" value = 135 }
+	ai_strategy = { type = antagonize id = "HOL" value = -135 }
+	ai_strategy = { type = ignore id = "HOL" value = -135 }
 	
-	ai_strategy = { type = alliance id = "LUX" value = 100 }
-	ai_strategy = { type = antagonize id = "LUX" value = -100 }
-	ai_strategy = { type = ignore id = "LUX" value = -100 }
+	ai_strategy = { type = alliance id = "LUX" value = 135 }
+	ai_strategy = { type = antagonize id = "LUX" value = -135 }
+	ai_strategy = { type = ignore id = "LUX" value = -135 }
 }
 
 
