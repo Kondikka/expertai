@@ -2,73 +2,30 @@
 #	EQUIPMENT SCRIPTS
 ##################################################
 
-#catch up in stockpiles before the war
-equipment_production_e0 = {
-	enable = {
-		OR = { 
-			date > 1939.1.1
-			AND = { date > 1938.1.1 original_tag = SOV } 
-		}
-		OR = {
-			has_equipment = { infantry_equipment < 1000 }
-			#has_equipment = { support_equipment < 100 }
-			has_equipment = { artillery_equipment < 100 }
-		}
-		has_war = no 
-	}
-	abort = {
-		OR = { 
-			AND = {
-				NOT = { has_equipment = { infantry_equipment < 1000 } }
-				#NOT = { has_equipment = { support_equipment < 100 } }
-				NOT = { has_equipment = { artillery_equipment < 100 } }
-			}
-			has_war = yes 
-		} 
-	}
-	ai_strategy = { type = unit_ratio id = infantry 								value = -400	}	#INFANTRY
-	ai_strategy = { type = unit_ratio id = mountaineers 							value = -400 	}	#MOUNTAINEER
-	ai_strategy = { type = unit_ratio id = marines 									value = -400 	}	#MARINES
-	ai_strategy = { type = unit_ratio id = paratroopers 							value = -400 	}	#PARATROOPERS
-	ai_strategy = { type = unit_ratio id = motorized	 							value = -400 	}	#MOTORIZED
-	ai_strategy = { type = unit_ratio id = cavalry 									value = -400 	}	#LIGHT ARMOR
-	#ai_strategy = { type = unit_ratio id = armor 									value = -400 	}	#ARMOR
-	#ai_strategy = { type = unit_ratio id = mechanized 								value = -400 	}	#HEAVY ARMOR
-}
-
 #try to keep a reserve of inf equipment in war
 equipment_production_e1 = {
 	enable = {
 		OR = {
 			has_equipment = { infantry_equipment < 10000 }
-			#has_equipment = { support_equipment < 100 }
 			has_equipment = { artillery_equipment < 100 }
 		}
 		has_war = yes 
-		OR = {
-			AND = { is_major = yes has_army_size = { type = infantry size > 50 } }
-			is_major = no
-		}
+		has_army_manpower = { size > 1250000 }
 	}
 	abort = {
 		OR = { 
 			AND = {
 				NOT = { has_equipment = { infantry_equipment < 10000 } }
-				#NOT = { has_equipment = { support_equipment < 100 } }
 				NOT = { has_equipment = { artillery_equipment < 100 } }
 			}
 			has_war = no 
-			NOT = { has_army_size = { type = infantry size > 50 } }
+			NOT = { has_army_manpower = { size > 1250000 } }
 		} 
 	}
 	ai_strategy = { type = unit_ratio id = infantry 								value = -400	}	#INFANTRY
 	ai_strategy = { type = unit_ratio id = mountaineers 							value = -400 	}	#MOUNTAINEER
 	ai_strategy = { type = unit_ratio id = marines 									value = -400 	}	#MARINES
-	ai_strategy = { type = unit_ratio id = paratroopers 							value = -400 	}	#PARATROOPERS
 	ai_strategy = { type = unit_ratio id = motorized	 							value = -400 	}	#MOTORIZED
-	ai_strategy = { type = unit_ratio id = cavalry 									value = -400 	}	#LIGHT ARMOR
-	#ai_strategy = { type = unit_ratio id = armor 									value = -400 	}	#ARMOR
-	#ai_strategy = { type = unit_ratio id = mechanized 								value = -400 	}	#HEAVY ARMOR
 }
 
 #cut air prod. when running out of land equipment and it has enough aircraft already
@@ -275,14 +232,14 @@ equipment_production_e7 = {
 equipment_production_e8 = {
 	enable = { 
 		NOT = { has_tech = modern_art }
-		has_equipment = { medium_tank_equipment > 1500 } 
+		has_equipment = { medium_tank_equipment > 2500 } 
 		has_army_size = { type = armor size < 150 } 
 		has_manpower > 250000
 	}
 	abort = { 
 		OR = {
 			has_tech = modern_art
-			NOT = { has_equipment = { medium_tank_equipment > 1500 } }
+			NOT = { has_equipment = { medium_tank_equipment > 2500 } }
 			NOT = { has_army_size = { type = armor size < 150 } }
 			NOT = { has_manpower > 250000 }
 		}
@@ -294,13 +251,13 @@ equipment_production_e8 = {
 equipment_production_e8b = {
 	enable = { 
 		has_tech = modern_art 
-		has_equipment = { modern_tank_equipment > 2000 } 
+		has_equipment = { modern_tank_equipment > 2500 } 
 		has_army_size = { type = armor size < 150 } 
 		has_manpower > 250000
 	}
 	abort = { 
 		OR = {
-			NOT = { has_equipment = { modern_tank_equipment > 1500 } }
+			NOT = { has_equipment = { modern_tank_equipment > 2500 } }
 			NOT = { has_army_size = { type = armor size < 150 } }
 			NOT = { has_manpower > 250000 }
 		}
@@ -677,7 +634,7 @@ equipment_production_e10d = {
 	ai_strategy = { type = build_army id = infantry 								value = 50		}
 }
 
-equipment_production_e11 = { #build more AA
+equipment_production_e11 = { #increase armor production for MSPAA if the country doesnt have proper armor
 	enable = {
 		has_army_size = { type = armor size < 2 }
 	}
@@ -688,6 +645,78 @@ equipment_production_e11 = { #build more AA
 	ai_strategy = { type = equipment_production_factor id = armor 								value = 50		}
 }
 
+equipment_production_e12 = { #GER: stockpile equipment for barbarossa
+	enable = {
+		original_tag = GER
+		has_army_manpower = { size > 2000000 }
+		OR = {
+			has_equipment = { infantry_equipment < 75000 }
+			has_equipment = { support_equipment < 5000 }
+			has_equipment = { artillery_equipment < 5000 }
+		}
+		
+		#conditions for the AI to start war with SOV
+		date > 1941.1.1
+		
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT					
+			}		
+		}
+		
+		NOT = { 
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+			has_war_with = SOV
+		}
+
+		OR = {
+			NOT = { has_war_with = YUG }
+			AND = {
+				has_war_with = YUG
+				YUG = { has_capitulated = yes }
+			}
+		}
+		
+		OR = {
+			NOT = { has_war_with = SPR }
+			AND = {
+				has_war_with = SPR
+				SPR = { has_capitulated = yes }
+			}
+		}
+		
+		NOT = {
+			any_state = {
+				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 26 state = 161 state = 162 }
+				controller = { has_war_with = GER }
+			}
+		}
+	}
+	abort = {
+		OR = {
+			AND = {
+				NOT = { has_equipment = { infantry_equipment < 50000 } }
+				NOT = { has_equipment = { support_equipment < 5000 } }
+				NOT = { has_equipment = { artillery_equipment < 5000 } }
+			}
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_puppet = yes }
+			SOV = { has_government = fascism }
+			is_in_faction_with = SOV
+			has_war_with = SOV
+		}
+	}
+	
+	ai_strategy = { type = unit_ratio id = infantry 							value = -200	}	#INFANTRY
+	ai_strategy = { type = unit_ratio id = mountaineers 						value = -200 	}	#MOUNTAINEER
+	ai_strategy = { type = unit_ratio id = marines 								value = -200 	}	#MARINES
+	ai_strategy = { type = unit_ratio id = motorized 							value = -200 	}	#AT
+}
 
 #stop light tank over production
 equipment_production_lt = {
@@ -710,10 +739,10 @@ equipment_production_lt = {
 equipment_production_inf_air = {
 	enable = {
 		OR = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV }
-		has_equipment = { infantry_equipment > 75000 }
+		has_equipment = { infantry_equipment > 100000 }
 	}
 	abort = {
-		NOT = { has_equipment = { infantry_equipment > 50000 } }
+		NOT = { has_equipment = { infantry_equipment > 75000 } }
 	}
 	
 	ai_strategy = { type = equipment_production_factor id = infantry 			value = -30 	}
@@ -1138,4 +1167,26 @@ navy_strategy_1b = {
 	ai_strategy = { type = equipment_production_factor id = carrier 		value = -30 	}
 	ai_strategy = { type = equipment_production_factor id = capital_ship 	value = -30 	}
 	#ai_strategy = { type = equipment_production_factor id = screen_ship 	value = 100 	}
+}
+
+navy_strategy_2 = { #dont build outdated capital ships
+	enable = { 
+		NOT = { has_tech = basic_heavy_cruiser }
+	}
+	abort = { 
+		has_tech = basic_heavy_cruiser
+	}
+	
+	ai_strategy = { type = equipment_production_factor id = capital_ship 	value = -100 	}
+}
+
+navy_strategy_2 = {
+	enable = { 
+		NOT = { has_tech = basic_carrier }
+	}
+	abort = { 
+		has_tech = basic_carrier
+	}
+	
+	ai_strategy = { type = equipment_production_factor id = carrier 		value = -100 	}
 }

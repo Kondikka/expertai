@@ -36,7 +36,7 @@ country_event = {
 
 		annex_country = { target = AUS transfer_troops = yes }
 		add_political_power = 75
-		add_named_threat = { threat = 2 name = germany.4.t }
+		add_named_threat = { threat = 10 name = germany.4.t }
 		set_country_flag = AUS_annexed
 		news_event = { hours = 6 id = news.36 }
 	}
@@ -80,7 +80,10 @@ country_event = {
 	
 	option = {
 		name = germany.5.b		#refuse
-		ai_chance = { factor = 25 }
+		trigger = { NOT = { is_puppet_of = GER } }
+		ai_chance = { 
+			factor = 25 
+		}
 		GER =  { add_opinion_modifier = { target = ROOT modifier = refused_anti_comintern_pact_opinion } }
 	}
 
@@ -99,7 +102,7 @@ country_event = {
 	is_triggered_only = yes
 	
 	option = {
-		name = germany.6.a		#join
+		name = germany.6.a		#join	
 		remove_opinion_modifier = { target = GER modifier = anti_comintern_pact_opinion }
 		add_opinion_modifier = { target = GER modifier = tripartite_pact_opinion }
 		remove_opinion_modifier = { target = SOV modifier = pact_against_us }
@@ -108,6 +111,7 @@ country_event = {
 	
 	option = {
 		name = germany.6.b		#refuse
+		trigger = { NOT = { is_puppet_of = GER } }
 		add_opinion_modifier = { target = GER modifier = refused_tripartite_pact_opinion }
 	}
 
@@ -316,6 +320,16 @@ country_event = {
 	option = {
 		ai_chance = {
 			base = 1
+			modifier = {
+				factor = 0
+				AND = {
+					POL = {
+						is_ai = no
+						has_civil_war = no
+					}
+					is_in_faction_with = POL
+				}
+			}
 		}
 		name = germany.14.a
 		if = {
@@ -432,6 +446,15 @@ country_event = {
 			modifier = {
 				add = -1
 				is_historical_focus_on = yes
+				NOT = {
+					AND = {
+						POL = {
+							is_ai = no
+							has_civil_war = no
+						}
+						is_in_faction_with = POL
+					}
+				}
 			}
 		}
 		SOV = { country_event = germany.16 }
@@ -440,7 +463,7 @@ country_event = {
 			country = SOV
 			relation = non_aggression_pact
 			active = no
-		}
+		}		
 		SOV = {
 			add_state_claim = 96
 			add_state_claim = 95
@@ -449,6 +472,12 @@ country_event = {
 			add_state_claim = 91
 			add_state_claim = 97
 			add_state_claim = 89
+			effect_tooltip = {
+				create_wargoal = {
+					type = annex_everything
+					target = GER
+				}
+			}
 		}
 	}
 }
@@ -464,8 +493,16 @@ country_event = {
 	
 	option = {
 		name = germany.12.a
-		hidden_effect = {
-			country_event = { hours = 6 id = news.33 }
+		if = {
+			limit = {
+				SOV = {
+					controls_state = 93
+					controls_state = 94
+				}
+			}
+			hidden_effect = {
+				news_event = { hours = 6 id = news.33 }
+			}
 		}
 	}
 }
@@ -481,6 +518,10 @@ country_event = {
 	
 	option = {
 		name = germany.16.a
+		create_wargoal = {
+			type = annex_everything
+			target = GER
+		}
 	}
 }
 
@@ -865,7 +906,6 @@ country_event = {
 	}
 	option = { # Support the Czechs
 		name = germany.40.b	
-		trigger = { OR = { is_historical_focus_on = no is_ai = no } } #EAI
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -902,7 +942,10 @@ country_event = {
 				}
 			}
 		}
-		add_to_faction = CZE
+		if = {
+			limit = { CZE = { is_in_faction = no } }
+			add_to_faction = CZE
+		}
 		CZE = {
 			add_ai_strategy = {
 				type = alliance
@@ -1096,17 +1139,30 @@ country_event = {
 			limit = {
 				is_in_faction = yes
 				NOT = { is_in_faction_with = ENG }
+				NOT = { is_in_faction_with = CZE }
 			}
 			remove_from_faction = FRA
 		}
 		if = {
-			limit = { NOT = { is_in_faction_with = ENG } }
+			limit = { 
+				NOT = { is_in_faction_with = ENG } 
+				NOT = { is_in_faction_with = CZE }
+				}
 			ENG = { add_to_faction = FRA }
 			add_ai_strategy = {
 				type = alliance
 				id = "ENG"
 				value = 200
 			}
+		}
+		if = {
+			limit = {
+				is_in_faction_with = CZE
+				has_completed_focus = FRA_little_entente
+				is_faction_leader = yes
+				NOT = { is_in_faction_with = ENG }
+			}
+			add_to_faction = ENG #Britain joins the little entente
 		}
 		add_opinion_modifier = { target = GER modifier = condemn_aggression }
 		CZE = { 
@@ -1977,6 +2033,19 @@ country_event = {
 				}
 			}
 		}
+		if = { #you're not getting around that, comrade
+			limit = {
+				has_idea = FRA_disjointed_government
+				has_government = communism
+			}
+			custom_effect_tooltip = germany.60.a.tt
+			effect_tooltip = {
+				start_civil_war = {
+					ideology = democratic
+					size = 0.3
+				}
+			}
+		}
 	}
 
 	option = { # Diplomatic response
@@ -2098,12 +2167,28 @@ country_event = {
 		}		
 		GER = { country_event = germany.66 }
 		if = {
-			limit = { has_idea = FRA_disjointed_government }
+			limit = { 
+				has_idea = FRA_disjointed_government 
+				NOT = { has_government = communism }
+				}
 			custom_effect_tooltip = germany.60.a.tt
 			effect_tooltip = {
 				start_civil_war = {
 					ideology = communism
 					size = 0.2
+				}
+			}
+		}
+		if = {
+			limit = { 
+				has_idea = FRA_disjointed_government 
+				has_government = communism
+				}
+			custom_effect_tooltip = germany.60.a.tt
+			effect_tooltip = {
+				start_civil_war = {
+					ideology = democratic
+					size = 0.3
 				}
 			}
 		}
@@ -2129,12 +2214,28 @@ country_event = {
 		name = germany.64.a
 		GER = { country_event = germany.65 }
 		if = {
-			limit = { has_idea = FRA_disjointed_government }
+			limit = { 
+				has_idea = FRA_disjointed_government 
+				NOT = { has_government = communism }
+			}
 			custom_effect_tooltip = germany.60.a.tt
 			effect_tooltip = {
 				start_civil_war = {
 					ideology = communism
 					size = 0.2
+				}
+			}
+		}
+		if = {
+			limit = { 
+				has_idea = FRA_disjointed_government 
+				has_government = communism
+			}
+			custom_effect_tooltip = germany.60.a.tt
+			effect_tooltip = {
+				start_civil_war = {
+					ideology = democratic
+					size = 0.3
 				}
 			}
 		}
@@ -2174,10 +2275,23 @@ country_event = {
 			}
 			country_event = germany.92
 			if = {
-				limit = { has_idea = FRA_disjointed_government }
+				limit = { 
+					has_idea = FRA_disjointed_government 
+					NOT = { has_government = communism }
+				}
 				start_civil_war = {
 					ideology = communism
 					size = 0.2
+				}
+			}
+			if = {
+				limit = { 
+					has_idea = FRA_disjointed_government 
+					has_government = communism
+				}
+				start_civil_war = {
+					ideology = democratic
+					size = 0.3
 				}
 			}
 		}
@@ -2227,7 +2341,15 @@ country_event = {
 		name = germany.65.a
 		ENG = { 
 			country_event = germany.68 
-			remove_from_faction = FRA
+			if = {
+				limit = {
+					ENG = { 
+						is_in_faction_with = FRA 
+						is_faction_leader = yes
+					}
+				}
+				remove_from_faction = FRA
+			}
 		}
 		FRA = {
 			declare_war_on = {
@@ -2237,10 +2359,23 @@ country_event = {
 			}
 			country_event = germany.92
 			if = {
-				limit = { has_idea = FRA_disjointed_government }
+				limit = { 
+					has_idea = FRA_disjointed_government 
+					NOT = { has_government = communism }
+				}
 				start_civil_war = {
 					ideology = communism
 					size = 0.2
+				}
+			}
+			if = {
+				limit = { 
+					has_idea = FRA_disjointed_government 
+					has_government = communism
+				}
+				start_civil_war = {
+					ideology = democratic
+					size = 0.3
 				}
 			}
 		}
@@ -2308,6 +2443,7 @@ country_event = {
 	fire_only_once = yes
 
 	trigger = {
+		has_country_leader = { name = "Adolf Hitler" }
 		tag = GER
 		AND = {
 			CZE = { has_capitulated = no }
@@ -2621,10 +2757,12 @@ country_event = {
 		name = germany.76.a	#bah
 		# REVISIT Balance research bonus
 		add_tech_bonus = {
+			name = GER_soviet_treaty
 			ahead_reduction = 1
 			technology = basic_medium_tank
 		}
 		add_tech_bonus = {
+			name = GER_soviet_treaty
 			bonus = 0.5
 			uses = 2
 			category = armor
@@ -2863,6 +3001,7 @@ country_event = {
 
 		hidden_effect = {
 			news_event = { hours= 6 id = news.202 }
+			set_global_flag = poland_swap_danzig
 		}
 	}
 }
@@ -2909,6 +3048,7 @@ country_event = {
 	
 	option = {
 		name = germany.83.b		#refuse
+		trigger = { NOT = { is_puppet_of = GER } }
 		ai_chance = {
 			factor = 2
 		}
@@ -3155,7 +3295,7 @@ country_event = {
 			add_national_unity = -0.2
 			create_faction = "the_berlin_moscow_axis"
 			add_to_faction = SOV
-			add_named_threat = { threat = 5 name = germany.89.t }
+			add_named_threat = { threat = 10 name = germany.89.t }
 			every_other_country = {
 				limit = {
 					has_government = fascism 
@@ -3417,7 +3557,7 @@ country_event = {
 			custom_effect_tooltip = germany.98_tt
 			effect_tooltip = {
 				add_political_power = -75
-				add_named_threat = { threat = 7 name = GER_fate_of_yugoslavia }
+				add_named_threat = { threat = 5 name = GER_fate_of_yugoslavia }
 				annex_country = { target = YUG transfer_troops = no }
 			}
 		}
@@ -3435,7 +3575,7 @@ country_event = {
 				}
 			}
 			add_political_power = -75
-			add_named_threat = { threat = 7 name = GER_fate_of_yugoslavia }
+			add_named_threat = { threat = 5 name = GER_fate_of_yugoslavia }
 			annex_country = { target = YUG transfer_troops = no }
 
 			hidden_effect = {
@@ -3474,7 +3614,7 @@ country_event = {
 			custom_effect_tooltip = germany.98_tt
 			effect_tooltip = {
 				add_political_power = -25
-				add_named_threat = { threat = 5 name = GER_fate_of_yugoslavia }
+				add_named_threat = { threat = 3 name = GER_fate_of_yugoslavia }
 				CRO = {
 					if = {
 						limit = { YUG = { owns_state = 103 } }
@@ -3507,7 +3647,7 @@ country_event = {
 				}
 			}
 			add_political_power = -25
-			add_named_threat = { threat = 5 name = GER_fate_of_yugoslavia }
+			add_named_threat = { threat = 3 name = GER_fate_of_yugoslavia }
 			CRO = {
 				if = {
 					limit = { YUG = { owns_state = 103 } }
@@ -3551,7 +3691,7 @@ country_event = {
 			YUG = { country_event = yugoslavia.9 }
 			custom_effect_tooltip = germany.98_tt
 			effect_tooltip = {
-				add_named_threat = { threat = 3 name = GER_fate_of_yugoslavia }
+				add_named_threat = { threat = 2 name = GER_fate_of_yugoslavia }
 				
 				CRO = {
 					if = {
@@ -3590,7 +3730,7 @@ country_event = {
 					}
 				}
 			}
-			add_named_threat = { threat = 3 name = GER_fate_of_yugoslavia }
+			add_named_threat = { threat = 2 name = GER_fate_of_yugoslavia }
 			
 			CRO = {
 				if = {
@@ -4975,5 +5115,72 @@ country_event = {
 				}
 			}
 		}
+	}
+}
+
+#rename city
+country_event = {
+	id = germany.999
+	title = germany.999.t
+	desc = germany.999.desc
+	picture = GFX_report_event_german_reichstag_gathering
+
+	fire_only_once = yes
+
+	trigger = {
+		tag = GER
+		GER = {
+			has_government = fascism
+			owns_state = 217 
+			owns_state = 195 
+		}
+	}
+
+	option = { #a great idea!
+		name = germany.999.a
+		ai_chance = {
+			base = 100
+		}
+		set_province_name = { id = 3529 name = "Hindenburg"}
+		set_province_name = { id = 3151 name = "Ludendorff"}
+		set_global_flag = GER_cities_renamed
+	}
+
+	option = { #rather not
+		name = germany.999.b
+		ai_chance = {
+			base = 0
+		}
+		add_national_unity = -0.05 #because fuck you
+	}
+
+}
+
+#reset city name if retaken
+country_event = {
+	id = germany.1000
+	title = germany.1000.t
+	desc = germany.1000.desc
+	picture = GFX_report_event_german_reichstag_gathering
+
+	fire_only_once = yes
+	hidden = yes 
+
+	trigger = {
+		SOV = {
+			has_government = communism
+			owns_state = 217 
+			owns_state = 195 
+		}
+	}
+
+	option = { #a great idea!
+		name = germany.1000.a
+		ai_chance = {
+			base = 100
+		}
+		reset_province_name = 3529 
+		reset_province_name = 3151 
+		clr_global_flag = GER_cities_renamed
 	}
 }

@@ -14,7 +14,6 @@ NDefines.NAI.RESEARCH_BASE_DAYS = 0					-- AI adds a base number of days when we
 --NDefines.NAI.MIN_ANTAGONIZE_FOR_WARGOAL_JUSTIFICATION = -2000
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
---NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 100000
 
 --NDefines.NAI.LENDLEASE_FRACTION_OF_PRODUCTION = 1
 --NDefines.NAI.REQUEST_LEND_LEASE_PROTECT_VALUE = -1000			    -- Limit for protect enemy desire for reducing lend lease desire
@@ -26,12 +25,12 @@ NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many un
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_NAVAL = 1		-- Ratio to send stockpile from equipment
 --NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_NAVAL = 28		-- Count of daily production amount of equipment to send
 
-NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 450				-- Minimum XP before attempting to upgrade a division template.
+NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 10				-- Minimum XP before attempting to upgrade a division template.
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 600				-- Minimum XP before attempting to create a fresh new division template.
 NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500				-- Minimum XP before attempting to create a new variant.
-NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 450				-- If XP is above this on the daily tick the AI will attempt to spend it
+NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 0				-- If XP is above this on the daily tick the AI will attempt to spend it
 
-
+NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.25
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 12
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.002
@@ -50,8 +49,8 @@ NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if 
 NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1			-- If AI has this much manpower he doesn't care about the percentage
 NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0.0					-- The AI will not deploy more units if he goes below this percentag
 
-NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 1
-NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
+--NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 1
+--NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
 
 NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
 
