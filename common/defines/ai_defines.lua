@@ -1,5 +1,3 @@
-NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
-
 --NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0 -- Multiplies value based on relative military industry size / country size.
 NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 2 -- Multiplies value based on relative naval industry size / country size.
 NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 2 -- Multiplies value based on relative number of air base / country size.
@@ -11,60 +9,26 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 0 				-- To which extent AI should care abo
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		-- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 0					-- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
---NDefines.NAI.MIN_ANTAGONIZE_FOR_WARGOAL_JUSTIFICATION = -2000
+----------------------
 
-NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
+NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 10							-- Minimum XP before attempting to upgrade a division template.
+NDefines.NAI.DIVISION_CREATE_MIN_XP = 600							-- Minimum XP before attempting to create a fresh new division template.
+NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500							-- Minimum XP before attempting to create a new variant.
+NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 0								-- If XP is above this on the daily tick the AI will attempt to spend it
 
---NDefines.NAI.LENDLEASE_FRACTION_OF_PRODUCTION = 1
---NDefines.NAI.REQUEST_LEND_LEASE_PROTECT_VALUE = -1000			    -- Limit for protect enemy desire for reducing lend lease desire
---NDefines.NAI.REQUEST_LEND_LEASE_CONTAINS_VALUE = -1000			-- Limit of contain enemy desire for boosting friendly help
---NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_LAND = 1  	-- Ratio to send stockpile from equipment
---NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_LAND = 28		-- Count of daily production amount of equipment to send
---NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_AIR = 1		-- Ratio to send stockpile from equipment
---NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_AIR = 10		-- Count of daily production amount of equipment to send
---NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_NAVAL = 1		-- Ratio to send stockpile from equipment
---NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_NAVAL = 28		-- Count of daily production amount of equipment to send
+NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
+NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
+--NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = -1				-- This score is reduced the higher width is when comparing pure changes with no target
+--NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -1			-- This score is reduced the farther the width is from the target width (if set)
+--NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 60					-- max days we keep track of since failure of a design update
 
-NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 10				-- Minimum XP before attempting to upgrade a division template.
-NDefines.NAI.DIVISION_CREATE_MIN_XP = 600				-- Minimum XP before attempting to create a fresh new division template.
-NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500				-- Minimum XP before attempting to create a new variant.
-NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 0				-- If XP is above this on the daily tick the AI will attempt to spend it
-
-NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.25
+NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0
+NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0
+NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 12
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.002
 
-NDefines.NAI.DEPLOY_MIN_TRAINING_PEACE_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in peacetime
-NDefines.NAI.DEPLOY_MIN_TRAINING_WAR_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in wartime
---NDefines.NAI.DEPLOY_MIN_EQUIPMENT_PEACE_FACTOR = 1	-- Required percentage of equipment (1.0 = 100%) for AI to deploy unit in peacetime
---NDefines.NAI.DEPLOY_MIN_EQUIPMENT_WAR_FACTOR = 1		-- Required percentage of equipment (1.0 = 100%) for AI to deploy unit in wartime
-
-NDefines.NAI.START_TRAINING_EQUIPMENT_LEVEL = 0.9               -- ai will not start to train if equipment drops below this level
-NDefines.NAI.STOP_TRAINING_EQUIPMENT_LEVEL = 0.8                -- ai will not train if equipment drops below this level
-
-NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			-- Cancel unit production if below this to get resources out to units in the field
-NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if below this to get resources out to units in the field
-
-NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1			-- If AI has this much manpower he doesn't care about the percentage
-NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0.0					-- The AI will not deploy more units if he goes below this percentag
-
---NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 1
---NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
-
-NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
-
-
-
-NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
-NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
-NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 10
-NDefines.NAI.DIVISION_DESIGN_BASE_WEIGHT_SCORE = 100			-- This score is reduced the farther the width is from the target width (if set)
---NDefines.NAI.COMBINED_ARMS_LEVEL = 2
-
-NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0.0
-NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0.0
-NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0.0
 
 DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
 
@@ -78,7 +42,7 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 	0.0, 		-- recon
 	0.0, 		-- entrenchment
 	0.0, 		-- initiative
-	2.0, 		-- casualty_trickleback
+	0.0, 		-- casualty_trickleback
 	-0.0, 		-- supply_consumption_factor
 	-0.0, 		-- supply_consumption
 	0.0, 		-- suppression
@@ -120,39 +84,53 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 	-- Common Values
 	0.0, 		-- max_organisation
 	0.0, 		-- max_strength
-	1.0, 		-- build_cost_ic
+	0.0, 		-- build_cost_ic
 	0.0,		-- maximum_speed
 	0.0,		-- armor_value
 	0.0,		-- ap_attack
-	2.0,		-- reliability
-	2.0,		-- reliability_factor
-	2.0, 		-- weight
+	0.0,		-- reliability
+	0.0,		-- reliability_factor
+	0.0, 		-- weight
 	
 	-- Special Values
 	0.0, 		-- strategic_attack
 	0.0, 		-- carrier_size
 }
 
+----------------------
 
+NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 
+NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1			-- If AI has this much manpower he doesn't care about the percentage
+NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0.0					-- The AI will not deploy more units if he goes below this percentag
 
+NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			-- Cancel unit production if below this to get resources out to units in the field
+NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if below this to get resources out to units in the field
 
+NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.25
+
+NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
+--NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 0.5
+--NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
 
 NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.01
 
+NDefines.NAI.DEPLOY_MIN_TRAINING_PEACE_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in peacetime
+NDefines.NAI.DEPLOY_MIN_TRAINING_WAR_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in wartime
+--NDefines.NAI.DEPLOY_MIN_EQUIPMENT_PEACE_FACTOR = 1	-- Required percentage of equipment (1.0 = 100%) for AI to deploy unit in peacetime
+--NDefines.NAI.DEPLOY_MIN_EQUIPMENT_WAR_FACTOR = 1		-- Required percentage of equipment (1.0 = 100%) for AI to deploy unit in wartime
 
+NDefines.NAI.START_TRAINING_EQUIPMENT_LEVEL = 0.9               -- ai will not start to train if equipment drops below this level
+NDefines.NAI.STOP_TRAINING_EQUIPMENT_LEVEL = 0.8                -- ai will not train if equipment drops below this level
 
+NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
 
+----------------------
 
-NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 10 -- Weight when counting industry (will be added to military strength)
-NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 10 --7 -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
+--NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 100 -- Weight when counting industry (will be added to military strength)
+--NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 200 --7 -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
 
-
-
-
-
-
---plan defines
+--------------------------------------------------------------------------------------------------------------
 
 --NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
 
@@ -220,10 +198,7 @@ NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		-- AI countries will ho
 --NDefines.NAI.FRONT_TERRAIN_ATTACK_FACTOR = 5.0 				-- Multiplier applied to unit attack modifier for terrain on enemy front province multiplied by terrain importance
 NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					-- A country with less provinces than this will not draw fallback plans  but rather station their troops along the front
 
-
-
-
---naval defines
+--------------------------------------------------------------------------------------------------------------
 
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
 --NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
@@ -252,7 +227,7 @@ NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 60						-- AI will generally attempt to me
 --NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 30.0
 NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 40 --go crazy with it - control through scripts
 
---air defines
+--------------------------------------------------------------------------------------------------------------
 
 NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
 ----NDefines.NAI.ESCORT_BOMBERS_IMPORTANCE_MODIFIER = 5000.0 

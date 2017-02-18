@@ -486,8 +486,7 @@ country_event = { #CHI
 
 ########################### country specific builds
 
-#GENERIC
-country_event = {
+country_event = { #GENERIC
 	id = EAI_C.11
 	hidden = yes
 	is_triggered_only = yes
@@ -543,8 +542,7 @@ country_event = {
 	option = {}
 }
 
-#ENG
-country_event = {
+country_event = { #ENG
 	id = EAI_C.21
 	hidden = yes
 	is_triggered_only = yes
@@ -584,8 +582,7 @@ country_event = {
 	option = {}
 }
 
-#JAP
-country_event = {
+country_event = { #JAP
 	id = EAI_C.31
 	hidden = yes
 	is_triggered_only = yes
@@ -659,8 +656,7 @@ country_event = {
 	option = {}
 }
 
-#GER
-country_event = {
+country_event = { #GER
 	id = EAI_C.41
 	hidden = yes
 	is_triggered_only = yes
@@ -670,8 +666,8 @@ country_event = {
 		if = { limit = { num_of_military_factories < 350 }
 			queue_REF = yes
 			queue_REF = yes
+			queue_REF = yes
 		
-			queue_MIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
@@ -686,7 +682,8 @@ country_event = {
 					queue_REF = yes
 					queue_REF = yes
 				
-					queue_MIC = yes
+					queue_NIC = yes
+					
 					queue_MIC = yes
 					queue_MIC = yes
 					queue_MIC = yes
@@ -715,8 +712,7 @@ country_event = {
 	option = {}
 }
 
-#SOV
-country_event = {
+country_event = { #SOV
 	id = EAI_C.51
 	hidden = yes
 	is_triggered_only = yes
@@ -790,8 +786,7 @@ country_event = {
 	option = {}
 }
 
-#ITA
-country_event = {
+country_event = { #ITA
 	id = EAI_C.61
 	hidden = yes
 	is_triggered_only = yes
@@ -802,8 +797,8 @@ country_event = {
 			queue_NIC = yes
 		
 			queue_REF = yes
+			queue_REF = yes
 		
-			queue_MIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
@@ -813,6 +808,7 @@ country_event = {
 			queue_MIC = yes
 			
 			else = {
+				queue_NIC = yes
 				queue_NIC = yes
 		
 				queue_REF = yes	
@@ -824,22 +820,20 @@ country_event = {
 				queue_MIC = yes
 				queue_MIC = yes
 				queue_MIC = yes
-				queue_MIC = yes
 			}
 		}
 	}
 	option = {}
 }
 
-#USA
-country_event = {
+country_event = { #USA
 	id = EAI_C.71
 	hidden = yes
 	is_triggered_only = yes
 	immediate = {
 		clr_country_flag = EAI_construction_1
 	
-		if = { limit = { NOT = { has_idea = isolation has_idea = undisturbed_isolation } }
+		if = { limit = { OR = { NOT = { has_idea = isolation has_idea = undisturbed_isolation } num_of_naval_factories > 90 } }
 			queue_MIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
@@ -906,8 +900,7 @@ country_event = {
 	option = {}
 }
 
-#CHI
-country_event = {
+country_event = { #CHI
 	id = EAI_C.81
 	hidden = yes
 	is_triggered_only = yes
@@ -925,6 +918,122 @@ country_event = {
 		queue_MIC_CHI = yes
 		queue_MIC_CHI = yes
 		queue_MIC_CHI = yes
+	}
+	option = {}
+}
+
+########################### trade fixes
+
+country_event = { #ITA
+	id = EAI_C.12
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = { date > 1937.1.1 is_ai = yes tag = ITA NOT = { has_country_flag = EAI_trade } }
+	
+	immediate = {
+		set_country_flag = EAI_trade
+		country_event = { id = EAI_C.13 months = 1 }
+	}
+	option = {}
+}
+
+country_event = { #ITA
+	id = EAI_C.13
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		clr_country_flag = EAI_trade
+	
+		#temp fix until trade is fixed
+		if = { limit = { NOT = { has_war_with = SOV } } create_import = { resource = steel factories = 30 exporter = SOV } }
+		if = { limit = { NOT = { has_war_with = ROM } } create_import = { resource = oil factories = 30 exporter = ROM } }
+	}
+	option = {}
+}
+
+country_event = { #JAP
+	id = EAI_C.32
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = { date > 1936.2.1 is_ai = yes tag = JAP NOT = { has_country_flag = EAI_trade } }
+	
+	immediate = {
+		set_country_flag = EAI_trade
+		country_event = { id = EAI_C.33 months = 1 }
+	}
+	option = {}
+}
+
+country_event = { #JAP
+	id = EAI_C.33
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		clr_country_flag = EAI_trade
+	
+		#temp fix until trade is fixed
+		if = { limit = { NOT = { has_war_with = GER } } create_import = { resource = steel factories = 30 exporter = GER } }
+		if = { limit = { NOT = { has_war_with = USA } } create_import = { resource = oil factories = 30 exporter = USA } }
+		if = { limit = { NOT = { has_war_with = USA } } create_import = { resource = aluminium factories = 30 exporter = USA } }
+	}
+	option = {}
+}
+
+country_event = { #GER
+	id = EAI_C.42
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = { is_ai = yes tag = GER NOT = { has_country_flag = EAI_trade } }
+	
+	immediate = {
+		set_country_flag = EAI_trade
+		country_event = { id = EAI_C.43 months = 1 }
+	}
+	option = {}
+}
+
+country_event = { #GER
+	id = EAI_C.43
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		clr_country_flag = EAI_trade
+	
+		#temp fix until trade is fixed
+		if = { limit = { NOT = { has_war_with = SOV } } create_import = { resource = oil factories = 30 exporter = SOV } }
+		if = { limit = { NOT = { has_war_with = POR } } create_import = { resource = tungsten factories = 40 exporter = POR } }
+		if = { limit = { NOT = { has_war_with = FRA } } create_import = { resource = steel factories = 30 exporter = FRA } }
+	}
+	option = {}
+}
+
+country_event = { #SOV
+	id = EAI_C.52
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = { date > 1938.1.1 is_ai = yes tag = SOV NOT = { has_country_flag = EAI_trade } }
+	
+	immediate = {
+		set_country_flag = EAI_trade
+		country_event = { id = EAI_C.53 months = 1 }
+	}
+	option = {}
+}
+
+country_event = { #SOV
+	id = EAI_C.53
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		clr_country_flag = EAI_trade
+	
+		#temp fix until trade is fixed
+		if = { limit = { NOT = { has_war_with = USA } } create_import = { resource = steel factories = 30 exporter = USA } }
+		if = { limit = { NOT = { has_war_with = RAJ } } create_import = { resource = tungsten factories = 30 exporter = RAJ } }
 	}
 	option = {}
 }
