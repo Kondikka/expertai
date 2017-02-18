@@ -129,6 +129,7 @@ NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
 
 --NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 100 -- Weight when counting industry (will be added to military strength)
 --NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 200 --7 -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
+NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 
 --------------------------------------------------------------------------------------------------------------
 
