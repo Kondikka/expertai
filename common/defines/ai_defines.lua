@@ -99,6 +99,8 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 
 ----------------------
 
+NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 0
+
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 
 NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
@@ -180,17 +182,19 @@ NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 --NDefines.NAI.SCARY_LEVEL_AVERAGE_DEFENSE = -0.7                 -- average front defense modifier to make it consider it as a PITA to go for
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.2 --0.45				-- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
 
+NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1
+
 NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				-- Organization % for unit to be considered strong
 NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					-- Strength (equipment) % for unit to be considered strong
 
-NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.4 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
+NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
 NDefines.NAI.STR_UNIT_WEAK = 0.5 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
 
 NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				-- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
-NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.01 -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
+NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -0.9 -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
 
 --NDefines.NAI.LOCATION_BALANCE_TO_ADVANCE = 0.0				-- Limit on location strength balance between country and enemy for unit to dare to move forward.
 NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		-- AI countries will hold on activating plans if stronger countries have plans in the same location. Majors count extra (value of 1 will negate this)
