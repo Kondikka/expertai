@@ -115,7 +115,7 @@ NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
 --NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 0.5
 --NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
 
-NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.01
+--NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.2
 
 NDefines.NAI.DEPLOY_MIN_TRAINING_PEACE_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in peacetime
 NDefines.NAI.DEPLOY_MIN_TRAINING_WAR_FACTOR = 0.25		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in wartime
@@ -190,7 +190,7 @@ NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					-- Strength (equipment
 
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
-NDefines.NAI.STR_UNIT_WEAK = 0.5 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
+NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
 
 NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				-- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
@@ -294,9 +294,9 @@ NDefines.NAI.LAND_COMBAT_FIGHTERS_PER_PLANE = 2 --1.1				-- Amount of air superi
 NDefines.NAI.LAND_COMBAT_BOMBERS_PER_LAND_FORT_LEVEL = 1 --15		-- Amount of bomber planes requested per enemy land fort level
 NDefines.NAI.LAND_COMBAT_BOMBERS_PER_COASTAL_FORT_LEVEL = 1 --10	-- Amount of bomber planes requested per enemy coastal fort level
 
-NDefines.NAI.LAND_COMBAT_CAS_WINGS_PER_ENEMY_ARMY_LIMIT = 4		-- Limit of CAS wings requested by enemy armies
-NDefines.NAI.LAND_COMBAT_CAS_PER_COMBAT = 50					-- Amount of CAS requested per combat
-NDefines.NAI.LAND_COMBAT_MIN_EXCORT_WINGS = 10					-- Min amount of airwings requested to excort operations
+--NDefines.NAI.LAND_COMBAT_CAS_WINGS_PER_ENEMY_ARMY_LIMIT = 8		-- Limit of CAS wings requested by enemy armies
+--NDefines.NAI.LAND_COMBAT_CAS_PER_COMBAT = 200					-- Amount of CAS requested per combat
+--NDefines.NAI.LAND_COMBAT_MIN_EXCORT_WINGS = 10					-- Min amount of airwings requested to excort operations
 
 --NDefines.NAI.STR_BOMB_AIR_SUPERIORITY_IMPORTANCE = 0 --0.0		-- Strategic importance of air superiority ( amount of enemy planes in area )
 --NDefines.NAI.STR_BOMB_CIVIL_FACTORY_IMPORTANCE = 1 --50			-- Strategic importance of enemy civil factories
