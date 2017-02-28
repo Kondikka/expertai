@@ -18,8 +18,8 @@ NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 600								-- If XP is above this on the d
 
 NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
 NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
---NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = -1				-- This score is reduced the higher width is when comparing pure changes with no target
---NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -200	-- This score is reduced the farther the width is from the target width (if set)
+NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0				-- This score is reduced the higher width is when comparing pure changes with no target
+NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = 1000	-- This score is reduced the farther the width is from the target width (if set)
 --NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 60					-- max days we keep track of since failure of a design update
 
 NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0
@@ -34,10 +34,10 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 
 	-- Army Values
 	0.0, 		-- default_morale
-	0.0, 		-- defense
+	1.0, 		-- defense
 	0.0, 		-- breakthrough
 	0.0, 		-- hardness
-	2.0, 		-- soft_attack
+	1.0, 		-- soft_attack
 	0.0, 		-- hard_attack
 	0.0, 		-- recon
 	0.0, 		-- entrenchment
@@ -93,13 +93,13 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 	0.0, 		-- weight
 	
 	-- Special Values
-	0.0, 		-- strategic_attack
-	0.0, 		-- carrier_size
+	1.0, 		-- strategic_attack
+	1.0, 		-- carrier_size
 }
 
 ----------------------
 
-NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 0
+NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 

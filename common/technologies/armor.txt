@@ -272,7 +272,7 @@ technologies = {
 		}
 		
 		ai_will_do = {
-			factor = 1
+			factor = 2
 			modifier = { #reseach tanks when it has the industry to support them
 				factor = 0
 				NOT = { original_tag = USA original_tag = ENG original_tag = GER original_tag = SOV }
@@ -290,6 +290,7 @@ technologies = {
 			}
 			modifier = { #always research land doctrine first
 				factor = 0
+				NOT = { original_tag = SOV }
 				prioritise_land_doctrine = yes
 			}
 		}
@@ -470,25 +471,33 @@ technologies = {
 	
 	basic_medium_tank = { #Panzer III
 
-		
 		on_research_complete = { #EAI
 			limit = { is_ai = yes }
 			hidden_effect = {
 				if = {
 					limit = { NOT = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV } }
-					division_template = {
+					division_template = { 
 						name = "Medium Armor Division"
+						priority = 2
 					
-						regiments = {
+						regiments = { #27w
 							medium_armor = { x = 0 y = 0 }
 							medium_armor = { x = 0 y = 1 }
 							medium_armor = { x = 0 y = 2 }
 							medium_armor = { x = 0 y = 3 }
-							motorized = { x = 1 y = 0 }
-							motorized = { x = 1 y = 1 }
-							motorized = { x = 1 y = 2 }
-							medium_sp_artillery_brigade = { x = 2 y = 0 }
-							medium_sp_artillery_brigade = { x = 2 y = 1 }
+							
+							medium_armor = { x = 1 y = 0 }
+							medium_armor = { x = 1 y = 1 }
+							medium_armor = { x = 1 y = 2 }
+							
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							medium_sp_artillery_brigade = { x = 3 y = 0 }
+							medium_sp_anti_air_brigade = { x = 3 y = 1 }
+							medium_sp_anti_air_brigade = { x = 3 y = 2 }
 						}
 						
 						support = {
@@ -588,7 +597,11 @@ technologies = {
 		ai_will_do = {
 			factor = 2
 			modifier = { factor = 0 NOT = { has_tech = basic_medium_tank } }
-			modifier = { factor = 0 tag = GER has_opinion_modifier = sov_ger_treaty_trade }
+			modifier = {
+				factor = 0 
+				OR = { original_tag = GER original_tag = SOV }
+				OR = { has_tech = improved_medium_tank has_opinion_modifier = sov_ger_treaty_trade }
+			}
 		}
 		
 		categories = {
@@ -610,8 +623,8 @@ technologies = {
 			modifier = { factor = 0 NOT = { has_tech = basic_medium_tank } }
 			modifier = {
 				factor = 0 
-				original_tag = GER
-				OR = { has_tech = improved_medium_tank NOT = { is_researching_technology = improved_medium_tank } }
+				OR = { original_tag = GER original_tag = SOV }
+				OR = { has_tech = improved_medium_tank has_opinion_modifier = sov_ger_treaty_trade }
 			}
 		}
 		
@@ -658,7 +671,12 @@ technologies = {
 			#		AND = { date < 1940.6.1 NOT = { has_tech_bonus = { category = armor } has_tech_bonus = { category = cat_medium_armor } } }
 			#	}
 			#}
-			modifier = { factor = 0 date < 1940.6.1 NOT = { original_tag = GER } }
+			modifier = {
+				factor = 0 
+				date < 1940.6.1 
+				NOT = { has_opinion_modifier = sov_ger_treaty_trade }
+				NOT = { has_completed_focus = SOV_lessons_of_war }
+			}
 		}
 		
 		categories = {
@@ -903,6 +921,44 @@ technologies = {
 	}
 	
 	modern_art = {
+	
+		on_research_complete = { #EAI
+			limit = { is_ai = yes }
+			hidden_effect = {
+				if = {
+					limit = { NOT = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV } }
+					division_template = { 
+						name = "Medium Armor Division"
+						priority = 2
+					
+						regiments = { #27w
+							modern_armor = { x = 0 y = 0 }
+							modern_armor = { x = 0 y = 1 }
+							modern_armor = { x = 0 y = 2 }
+							modern_armor = { x = 0 y = 3 }
+							
+							modern_armor = { x = 1 y = 0 }
+							modern_armor = { x = 1 y = 1 }
+							modern_armor = { x = 1 y = 2 }
+							
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							modern_sp_artillery_brigade = { x = 3 y = 0 }
+							modern_sp_anti_air_brigade = { x = 3 y = 1 }
+							modern_sp_anti_air_brigade = { x = 3 y = 2 }
+						}
+						
+						support = {
+							engineer = { x = 0 y = 0 }
+							artillery = { x = 0 y = 1 }
+						}
+					}
+				}
+			}
+		}
 
 		enable_equipments = {
 			modern_tank_artillery_equipment_1
@@ -1131,7 +1187,7 @@ technologies = {
 				prioritise_land_doctrine = yes
 			}
 			modifier = { factor = 0 date < 1941.1.1 }
-			modifier = { factor = 0 NOT = { original_tag = USA original_tag = GER } }
+			modifier = { factor = 0 NOT = { original_tag = USA original_tag = GER original_tag = SOV } }
 		}
 		
 		categories = {
@@ -1256,7 +1312,7 @@ technologies = {
 				prioritise_land_doctrine = yes
 			}
 			modifier = { factor = 0 date < 1943.1.1 }
-			modifier = { factor = 0 NOT = { original_tag = USA original_tag = GER } }
+			modifier = { factor = 0 NOT = { original_tag = USA original_tag = GER original_tag = SOV } }
 		}
 		
 		categories = {
