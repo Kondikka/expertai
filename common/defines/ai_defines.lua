@@ -29,7 +29,6 @@ NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 12
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.002
 
-
 DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
 
 	-- Army Values
