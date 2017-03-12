@@ -1,3 +1,62 @@
+##### LEND LEASE
+
+eligible_for_LL_sender = {
+	OR = { is_major = yes is_in_faction = yes has_war = yes }
+	NOT = { has_idea = neutrality_idea }
+	NOT = { surrender_progress > 0.5 }
+}
+
+eligible_for_LL_receiver = {
+	OR = { #cross ideology LL logic
+		AND = {
+			OR = { 
+				has_government = democratic 
+				AND = { has_offensive_war = no has_government = communism } 
+				AND = { has_offensive_war = no has_government = neutrality } 
+			}
+			ROOT = { has_government = democratic }
+		}
+		AND = { 
+			OR = { 
+				has_government = communism 
+				#AND = { has_offensive_war = no has_government = democratic } 
+				#AND = { has_offensive_war = no has_government = neutrality } 
+			} 		
+			ROOT = { has_government = communism }
+		}
+		AND = { 
+			OR = { 
+				has_government = fascism 
+				AND = { has_offensive_war = no has_government = neutrality } 
+			}																		
+			ROOT = { has_government = fascism } 
+		}
+		AND = { 
+			OR = { 
+				AND = { has_offensive_war = no has_government = democratic } 
+				AND = { has_offensive_war = no has_government = communism } 
+				AND = { has_offensive_war = no has_government = neutrality } 
+			}
+			ROOT = { has_government = neutrality } 
+		}
+		is_in_faction_with = ROOT #bypass for faction members in case of unholy alliances
+	}
+
+	OR = { #why should it send LL?
+		any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
+		has_opinion = { target = ROOT value > 0 } #friendly countries
+		is_in_faction_with = ROOT #faction members
+		
+		AND = { any_enemy_country = { has_government = fascism } ROOT = { NOT = { has_government = fascism } } } #support wars against other ideologies
+		AND = { any_enemy_country = { has_government = communism } ROOT = { NOT = { has_government = communism } } }
+		AND = { any_enemy_country = { has_government = democratic } ROOT = { NOT = { has_government = democratic } } }
+		
+		AND = { has_government = communism ROOT = { has_government = communism } } #shared ideology
+		AND = { has_government = fascism ROOT = { has_government = fascism } }
+		AND = { has_government = democratic ROOT = { has_government = democratic } }
+	}
+}
+
 ##### TECHNOLOGY
 
 prioritise_industry = {

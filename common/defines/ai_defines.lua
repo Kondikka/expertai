@@ -11,6 +11,17 @@ NDefines.NAI.RESEARCH_BASE_DAYS = 0					-- AI adds a base number of days when we
 
 ----------------------
 
+NDefines.NAI.REQUEST_LEND_LEASE_PROTECT_VALUE = 75				-- Limit for protect enemy desire for reducing lend lease desire
+NDefines.NAI.REQUEST_LEND_LEASE_CONTAINS_VALUE = 100			-- Limit of contain enemy desire for boosting friendly help
+NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_LAND = 0.1		-- Ratio to send stockpile from equipment
+NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_LAND = 28		-- Count of daily production amount of equipment to send
+NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_AIR = 0.03		-- Ratio to send stockpile from equipment
+NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_AIR = 10		-- Count of daily production amount of equipment to send
+NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_NAVAL = 0.1		-- Ratio to send stockpile from equipment
+NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_NAVAL = 28		-- Count of daily production amount of equipment to send
+
+----------------------
+
 NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 10							-- Minimum XP before attempting to upgrade a division template.
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 600							-- Minimum XP before attempting to create a fresh new division template.
 NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500							-- Minimum XP before attempting to create a new variant.

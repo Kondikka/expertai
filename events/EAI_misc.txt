@@ -36,14 +36,22 @@ country_event = {
 	
 	option = {
 		name = "Normal Expert AI rules" 
-		trigger = { NOT = { has_global_flag = EAI_normal has_global_flag = EAI_neutral_jap has_global_flag = EAI_neutral_spr } }
+		trigger = { NOT = { has_global_flag = EAI_normal } }
 		hidden_effect = {
 			set_global_flag = EAI_normal
 		
-			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
-			set_global_flag = EAI_neutral_jap
+			if = { limit = { JAP = { is_ai = yes } }
+				JAP = { add_ideas = neutrality_idea3 }
+				set_global_flag = EAI_neutral_jap
+			}
 			
-			set_global_flag = EAI_neutral_spr
+			if = { limit = { SPR = { is_ai = yes } }
+				set_global_flag = EAI_neutral_spr
+			}
+			
+			set_global_flag = EAI_free_convoys
+			
+			set_global_flag = EAI_lend_lease
 			
 			country_event = EAI_M.1001
 		}
@@ -70,14 +78,22 @@ country_event = {
 	
 	option = {
 		name = "Normal Expert AI rules" 
-		trigger = { NOT = { has_global_flag = EAI_normal has_global_flag = EAI_neutral_jap has_global_flag = EAI_neutral_spr } }
+		trigger = { NOT = { has_global_flag = EAI_normal } }
 		hidden_effect = {
 			set_global_flag = EAI_normal
 		
-			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
-			set_global_flag = EAI_neutral_jap
+			if = { limit = { JAP = { is_ai = yes } }
+				JAP = { add_ideas = neutrality_idea3 }
+				set_global_flag = EAI_neutral_jap
+			}
 			
-			set_global_flag = EAI_neutral_spr
+			if = { limit = { SPR = { is_ai = yes } }
+				set_global_flag = EAI_neutral_spr
+			}
+			
+			set_global_flag = EAI_free_convoys
+			
+			set_global_flag = EAI_lend_lease
 			
 			country_event = EAI_M.1000
 		}
@@ -95,7 +111,7 @@ country_event = {
 
 country_event = { #customise
 	id = EAI_M.1010
-	title = "Expert AI: Historical Settings"
+	title = "Expert AI Customisation"
 	desc = ""
 	picture = GFX_report_event_chinese_soldiers_fighting
 	
@@ -108,7 +124,7 @@ country_event = { #customise
 		}
 	}
 	option = {
-		name = "AI bonuses" 
+		name = "Other" 
 		hidden_effect = {
 			country_event = EAI_M.1030
 		}
@@ -123,14 +139,14 @@ country_event = { #customise
 
 country_event = { #diplomacy
 	id = EAI_M.1020
-	title = "Expert AI: Historical Settings"
+	title = "Expert AI: Diplomacy"
 	desc = EAI_M.1.d
 	picture = GFX_report_event_chinese_soldiers_fighting
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = "Keep Japan out of Axis" 
+		name = "|Enable| Keep Japan out of Axis" 
 		trigger = { JAP = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_jap } }
 		hidden_effect = {
 			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
@@ -140,7 +156,17 @@ country_event = { #diplomacy
 		}
 	}
 	option = {
-		name = "Keep Nat. Spain out of Axis" 
+		name = "|Disable| Keep Japan out of Axis" 
+		trigger = { has_global_flag = EAI_neutral_jap }
+		hidden_effect = {
+			every_country = { limit = { tag = JAP } remove_ideas = neutrality_idea3 }
+			clr_global_flag = EAI_neutral_jap
+			
+			country_event = EAI_M.1021
+		}
+	}
+	option = {
+		name = "|Enable| Keep Nat. Spain out of Axis" 
 		trigger = { SPR = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_spr } }
 		hidden_effect = {
 			set_global_flag = EAI_neutral_spr
@@ -149,10 +175,29 @@ country_event = { #diplomacy
 		}
 	}
 	option = {
-		name = "Aggressive Germany" 
-		trigger = { NOT = { has_global_flag = EAI_aggressive_GER } }
+		name = "|Disable| Keep Nat. Spain out of Axis" 
+		trigger = { has_global_flag = EAI_neutral_spr }
+		hidden_effect = {
+			every_country = { limit = { original_tag = SPR } remove_ideas = neutrality_idea3 }
+			clr_global_flag = EAI_neutral_spr
+			
+			country_event = EAI_M.1021
+		}
+	}
+	option = {
+		name = "|Enable| Aggressive Germany" 
+		trigger = { GER = { is_ai = yes } NOT = { has_global_flag = EAI_aggressive_GER } }
 		hidden_effect = {
 			set_global_flag = EAI_aggressive_GER
+			
+			country_event = EAI_M.1021
+		}
+	}
+	option = {
+		name = "|Disable| Aggressive Germany" 
+		trigger = { has_global_flag = EAI_aggressive_GER }
+		hidden_effect = {
+			clr_global_flag = EAI_aggressive_GER
 			
 			country_event = EAI_M.1021
 		}
@@ -167,14 +212,14 @@ country_event = { #diplomacy
 
 country_event = {
 	id = EAI_M.1021
-	title = "Expert AI: Historical Settings"
+	title = "Expert AI: Diplomacy"
 	desc = EAI_M.1.d
 	picture = GFX_report_event_chinese_soldiers_fighting
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = "Keep Japan out of Axis" 
+		name = "|Enable| Keep Japan out of Axis" 
 		trigger = { JAP = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_jap } }
 		hidden_effect = {
 			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
@@ -184,7 +229,17 @@ country_event = {
 		}
 	}
 	option = {
-		name = "Keep Nat. Spain out of Axis" 
+		name = "|Disable| Keep Japan out of Axis" 
+		trigger = { has_global_flag = EAI_neutral_jap }
+		hidden_effect = {
+			every_country = { limit = { tag = JAP } remove_ideas = neutrality_idea3 }
+			clr_global_flag = EAI_neutral_jap
+			
+			country_event = EAI_M.1020
+		}
+	}
+	option = {
+		name = "|Enable| Keep Nat. Spain out of Axis" 
 		trigger = { SPR = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_spr } }
 		hidden_effect = {
 			set_global_flag = EAI_neutral_spr
@@ -193,10 +248,29 @@ country_event = {
 		}
 	}
 	option = {
-		name = "Aggressive Germany" 
-		trigger = { NOT = { has_global_flag = EAI_aggressive_GER } }
+		name = "|Disable| Keep Nat. Spain out of Axis" 
+		trigger = { has_global_flag = EAI_neutral_spr }
+		hidden_effect = {
+			every_country = { limit = { original_tag = SPR } remove_ideas = neutrality_idea3 }
+			clr_global_flag = EAI_neutral_spr
+			
+			country_event = EAI_M.1020
+		}
+	}
+	option = {
+		name = "|Enable| Aggressive Germany" 
+		trigger = { GER = { is_ai = yes } NOT = { has_global_flag = EAI_aggressive_GER } }
 		hidden_effect = {
 			set_global_flag = EAI_aggressive_GER
+			
+			country_event = EAI_M.1020
+		}
+	}
+	option = {
+		name = "|Disable| Aggressive Germany" 
+		trigger = { has_global_flag = EAI_aggressive_GER }
+		hidden_effect = {
+			clr_global_flag = EAI_aggressive_GER
 			
 			country_event = EAI_M.1020
 		}
@@ -211,17 +285,44 @@ country_event = {
 
 country_event = { #bonuses
 	id = EAI_M.1030
-	title = "Expert AI: Historical Settings"
-	desc = "Free convoys for the AI: if the AI runs out of convoys due to bugs or just poor transport/trade management, it will receive free convoys."
+	title = "Expert AI: Other"
+	desc = "These options are enabled automatically with 'Normal Expert AI settings'."
 	picture = GFX_report_event_chinese_soldiers_fighting
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = "Free convoys for the AI" 
+		name = "|Enable| Free convoys for AI majors" 
 		trigger = { NOT = { has_global_flag = EAI_free_convoys } }
 		hidden_effect = {
 			set_global_flag = EAI_free_convoys
+			
+			country_event = EAI_M.1031
+		}
+	}
+	option = {
+		name = "|Disable| Free convoys for AI majors" 
+		trigger = { has_global_flag = EAI_free_convoys }
+		hidden_effect = {
+			clr_global_flag = EAI_free_convoys
+			
+			country_event = EAI_M.1031
+		}
+	}
+	option = {
+		name = "|Enable| Improved AI lend-lease logic" 
+		trigger = { NOT = { has_global_flag = EAI_lend_lease } }
+		hidden_effect = {
+			set_global_flag = EAI_lend_lease
+			
+			country_event = EAI_M.1031
+		}
+	}
+	option = {
+		name = "|Disable| Improved AI lend-lease logic" 
+		trigger = { has_global_flag = EAI_lend_lease }
+		hidden_effect = {
+			clr_global_flag = EAI_lend_lease
 			
 			country_event = EAI_M.1031
 		}
@@ -236,17 +337,44 @@ country_event = { #bonuses
 
 country_event = {
 	id = EAI_M.1031
-	title = "Expert AI: Historical Settings"
-	desc = "Free convoys for the AI: if the AI runs out of convoys due to bugs or just poor transport/trade management, it will receive free convoys."
+	title = "Expert AI: Other"
+	desc = "These options are enabled automatically with 'Normal Expert AI settings'."
 	picture = GFX_report_event_chinese_soldiers_fighting
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = "Free convoys for the AI" 
+		name = "|Enable| Free convoys for AI majors" 
 		trigger = { NOT = { has_global_flag = EAI_free_convoys } }
 		hidden_effect = {
 			set_global_flag = EAI_free_convoys
+			
+			country_event = EAI_M.1030
+		}
+	}
+	option = {
+		name = "|Disable| Free convoys for AI majors" 
+		trigger = { has_global_flag = EAI_free_convoys }
+		hidden_effect = {
+			clr_global_flag = EAI_free_convoys
+			
+			country_event = EAI_M.1030
+		}
+	}
+	option = {
+		name = "|Enable| Improved AI lend-lease logic" 
+		trigger = { NOT = { has_global_flag = EAI_lend_lease } }
+		hidden_effect = {
+			set_global_flag = EAI_lend_lease
+			
+			country_event = EAI_M.1030
+		}
+	}
+	option = {
+		name = "|Disable| Improved AI lend-lease logic" 
+		trigger = { has_global_flag = EAI_lend_lease }
+		hidden_effect = {
+			clr_global_flag = EAI_lend_lease
 			
 			country_event = EAI_M.1030
 		}
