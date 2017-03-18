@@ -227,7 +227,7 @@ NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		-- AI countries will ho
 --------------------------------------------------------------------------------------------------------------
 
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
-NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 15				-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
+--NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 15				-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 60						-- AI will generally attempt to merge fleets into this size  but as a soft limit.
 --NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 10000 				-- Base value when AI is evaluating distance score to places
 --NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 4000 --2000				-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
