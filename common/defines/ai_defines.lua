@@ -113,8 +113,8 @@ NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 
-NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
-NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
+--NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
+--NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
 
 NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			-- Cancel unit production if below this to get resources out to units in the field
 NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if below this to get resources out to units in the field
@@ -299,7 +299,7 @@ NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.5					-- Between 0 and 1  limit for %
 --NDefines.NAI.LAND_DEFENSE_MILITARY_FACTORY_IMPORTANCE = 1 --70		-- Strategic importance of military factories
 --NDefines.NAI.LAND_DEFENSE_NAVAL_FACTORY_IMPORTANCE = 1 --30			-- Strategic importance of naval factories
 --NDefines.NAI.LAND_DEFENSE_MIN_FACTORIES_FOR_AIR_IMPORTANCE = 6 --6	-- If amount of factories is less importance of factories won't apply
-NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 0 --1.1				-- Amount of air superiority planes requested per enemy plane
+NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 2 --1.1				-- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 1 --0.2		-- Amount of air interceptor planes requested per enemy plane
 
 NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1	 --0.20		-- Strategic importance of air superiority ( amount of enemy planes in area )
