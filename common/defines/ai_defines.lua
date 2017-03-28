@@ -181,7 +181,7 @@ NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.5
 --NDefines.NAI.VP_LEVEL_IMPORTANCE_LOW = 5 					-- Victory points with values higher than or equal to this are considered to be of low importance.
 --NDefines.NAI.VP_GARRISON_VALUE_FACTOR = 0.5 				-- Extent to which VP garrisons are prioritized  based on VP value and compared to other priority values.
 
---NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					-- The lower this number  the longer the AI will hold the line before sending them to the fallback line
+NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					-- The lower this number  the longer the AI will hold the line before sending them to the fallback line
 --NDefines.NAI.SCARY_LEVEL_AVERAGE_DEFENSE = -0.7             -- average front defense modifier to make it consider it as a PITA to go for
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.45 			-- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
 --NDefines.NAI.HOUR_BAD_COMBAT_REEVALUATE = 100               -- if we are in combat for this amount and it goes shitty then try skipping it 
@@ -222,7 +222,7 @@ NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		-- AI countries will ho
 --NDefines.NAI.PLAN_ACTIVATION_PLAYER_WEIGHT_FACTOR = 0.0 		-- AI countries will hold on activating plans if player controlled countries have plans in the same location. Majors count extra (value of 1 will negate this)
 --NDefines.NAI.FRONT_TERRAIN_DEFENSE_FACTOR = 5.0 				-- Multiplier applied to unit defense modifier for terrain on front province multiplied by terrain importance
 --NDefines.NAI.FRONT_TERRAIN_ATTACK_FACTOR = 5.0 				-- Multiplier applied to unit attack modifier for terrain on enemy front province multiplied by terrain importance
---NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					-- A country with less provinces than this will not draw fallback plans  but rather station their troops along the front
+NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					-- A country with less provinces than this will not draw fallback plans  but rather station their troops along the front
 
 --------------------------------------------------------------------------------------------------------------
 

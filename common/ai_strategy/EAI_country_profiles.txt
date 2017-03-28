@@ -949,9 +949,9 @@ ENG_profile_3 = { #build more air unless mainland is invaded - possibly not func
 	ai_strategy = { type = air_factory_balance value = 35 }
 }
 
-ENG_profile_4 = { #ENG should focus on air superiority early
-	enable = { original_tag = ENG num_of_military_factories > 100 }
-	abort = { num_of_military_factories < 100 }
+ENG_profile_4 = { #ENG should focus on air superiority
+	enable = { original_tag = ENG has_deployed_air_force_size = { size > 1000 type = fighter } num_of_military_factories > 100 }
+	abort = { OR = { NOT = { num_of_military_factories > 100 } NOT = { has_deployed_air_force_size = { size > 1000 type = fighter } } } }
 
 	ai_strategy = { type = unit_ratio id = fighter 								value = -40		}	#FTR/INT
 	ai_strategy = { type = unit_ratio id = strategic_bomber 					value = 40		}	#STR
@@ -1210,8 +1210,19 @@ harm_default = {
 }
 
 strat_warfare = { #start building strategic bombers
-	enable = { num_of_military_factories > 249 has_tech = strategic_bomber1 NOT = { original_tag = USA original_tag = ENG } date > 1944.1.1 OR = { alliance_strength_ratio > 1.0 NOT = { any_neighbor_country = { has_war_with = ROOT } } } }
-	abort = { num_of_military_factories < 250 }
+	enable = { 
+		num_of_military_factories > 249 
+		has_tech = strategic_bomber1 
+		NOT = { original_tag = USA original_tag = ENG } 
+		date > 1944.1.1 
+		OR = { alliance_strength_ratio > 1.0 NOT = { any_neighbor_country = { has_war_with = ROOT } } } 
+	}
+	abort = { 
+		OR = {
+			NOT = { num_of_military_factories > 249 }
+			NOT = { alliance_strength_ratio > 1.0 NOT = { any_neighbor_country = { has_war_with = ROOT } } } 
+		}
+	}
 	
 	ai_strategy = { type = equipment_production_factor id = strategic_bomber 	value = 200 	}	#STRATEGIC BOMBER
 	
