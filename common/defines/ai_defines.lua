@@ -268,7 +268,7 @@ NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
 --NDefines.NAI.AIR_MIN_ASSIGN_SCORE = 0 							-- Minimum total score for region to be considered for air missions
 ----NDefines.NAI.AIR_MIN_REASSIGN_SCORE = 0 						-- Minimum total score for region to be considered for reassigning air missions
 ----NDefines.NAI.AIR_WING_SIZE_FACTOR = 50.0 						-- Impact on air score of assigning wings to mission
-NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.5					-- Between 0 and 1  limit for % coverage for air mission to be considered
+NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.3					-- Between 0 and 1  limit for % coverage for air mission to be considered
 ----NDefines.NAI.AIR_BASE_PRIORITY_DISTANCE_FACTOR = 0.0 			-- Weight of distance between region and airbase for airbase priority score
 
 --NDefines.NAI.AIR_SUPERIORITY_MISSION_FACTOR = 1.0				-- AI air superiority mission factor

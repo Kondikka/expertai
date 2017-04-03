@@ -212,10 +212,10 @@ country_event = { #GENERIC
 		if = { limit = { num_of_civilian_factories < 25 } 		country_event = { id = EAI_C.11 days = 300  } else = {
 		if = { limit = { num_of_civilian_factories < 30 } 		country_event = { id = EAI_C.11 days = 240  } else = {
 		if = { limit = { num_of_civilian_factories < 40 } 		country_event = { id = EAI_C.11 days = 220  } else = {
-		if = { limit = { num_of_civilian_factories < 50 } 		country_event = { id = EAI_C.11 days = 175  } else = {
-		if = { limit = { num_of_civilian_factories < 60 } 		country_event = { id = EAI_C.11 days = 150  } else = {
-		if = { limit = { num_of_civilian_factories < 70 } 		country_event = { id = EAI_C.11 days = 125  } else = {
-		if = { limit = { num_of_civilian_factories < 80 } 		country_event = { id = EAI_C.11 days = 100  } else = {
+		if = { limit = { num_of_civilian_factories < 50 } 		country_event = { id = EAI_C.11 days = 165  } else = {
+		if = { limit = { num_of_civilian_factories < 60 } 		country_event = { id = EAI_C.11 days = 130  } else = {
+		if = { limit = { num_of_civilian_factories < 70 } 		country_event = { id = EAI_C.11 days = 115  } else = {
+		if = { limit = { num_of_civilian_factories < 80 } 		country_event = { id = EAI_C.11 days = 90  	} else = {
 		if = { limit = { num_of_civilian_factories < 90 } 		country_event = { id = EAI_C.11 days = 80   } else = {
 		if = { limit = { num_of_civilian_factories < 100 } 		country_event = { id = EAI_C.11 days = 75   } else = {
 		if = { limit = { num_of_civilian_factories < 110 } 		country_event = { id = EAI_C.11 days = 70   } else = {
@@ -516,7 +516,7 @@ country_event = { #GENERIC
 	
 		queue_RADAR = yes
 	
-		if = { limit = { num_of_civilian_factories < 40 }
+		if = { limit = { num_of_civilian_factories < 75 }
 			queue_CIC = yes
 			queue_MIC = yes
 			queue_MIC = yes
@@ -1171,98 +1171,56 @@ country_event = { #RADAR
 	id = EAI_C.100
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
-	trigger = { is_ai = yes num_of_available_civilian_factories > 1 any_state = { available_RADAR = yes } }
+	trigger = { 
+		is_ai = yes 
+		date > 1938.1.1
+
+		OR = {
+			AND = { #when there is nothing else to build, build more radar
+				num_of_available_civilian_factories > 1 
+				any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } }
+			}
+			any_state = { radar_location_2 = yes available_RADAR = yes } #max out any important locations 
+		}
+	}
 	
 	immediate = {
-		if = {
-			limit = { any_state = { radar_location = yes available_RADAR = yes } }
-			random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-			
-			else = { #build anywhere that is not next to an existing owned radar site
-				if = {
-					limit = { any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } } 
-					random_state = { limit = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } add_RADAR = yes }
+		if = { limit = { num_of_available_civilian_factories > 1 any_state = { available_RADAR = yes } }
+			if = {
+				limit = { any_state = { radar_location = yes available_RADAR = yes } }
+				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
 				
-					else = {
-						if = {
-							limit = { any_state = { available_RADAR = yes } }
-							random_state = { limit = { available_RADAR = yes } add_RADAR = yes }
-						}
-					}
+				else = { 
+					add_RADAR_random = yes
+				}
+			}
+			if = {
+				limit = { any_state = { radar_location = yes available_RADAR = yes } }
+				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
+				
+				else = { 
+					add_RADAR_random = yes
+				}
+			}
+			if = {
+				limit = { any_state = { radar_location = yes available_RADAR = yes } }
+				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
+				
+				else = { 
+					add_RADAR_random = yes
+				}
+			}
+			if = {
+				limit = { any_state = { radar_location = yes available_RADAR = yes } }
+				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
+				
+				else = { 
+					add_RADAR_random = yes
 				}
 			}
 		}
-		if = {
-			limit = { any_state = { radar_location = yes available_RADAR = yes } }
-			random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-			
-			else = { #build anywhere that is not next to an existing owned radar site
-				if = {
-					limit = { any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } } 
-					random_state = { limit = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } add_RADAR = yes }
-				
-					else = {
-						if = {
-							limit = { any_state = { available_RADAR = yes } }
-							random_state = { limit = { available_RADAR = yes } add_RADAR = yes }
-						}
-					}
-				}
-			}
-		}
-		if = {
-			limit = { any_state = { radar_location = yes available_RADAR = yes } }
-			random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-			
-			else = { #build anywhere that is not next to an existing owned radar site
-				if = {
-					limit = { any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } } 
-					random_state = { limit = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } add_RADAR = yes }
-				
-					else = {
-						if = {
-							limit = { any_state = { available_RADAR = yes } }
-							random_state = { limit = { available_RADAR = yes } add_RADAR = yes }
-						}
-					}
-				}
-			}
-		}
-		if = {
-			limit = { any_state = { radar_location = yes available_RADAR = yes } }
-			random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-			
-			else = { #build anywhere that is not next to an existing owned radar site
-				if = {
-					limit = { any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } } 
-					random_state = { limit = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } add_RADAR = yes }
-				
-					else = {
-						if = {
-							limit = { any_state = { available_RADAR = yes } }
-							random_state = { limit = { available_RADAR = yes } add_RADAR = yes }
-						}
-					}
-				}
-			}
-		}
-		if = {
-			limit = { any_state = { radar_location = yes available_RADAR = yes } }
-			random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-			
-			else = { #build anywhere that is not next to an existing owned radar site
-				if = {
-					limit = { any_state = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } } 
-					random_state = { limit = { available_RADAR = yes NOT = { any_state = { has_state_flag = radar_site CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } add_RADAR = yes }
-				
-					else = {
-						if = {
-							limit = { any_state = { available_RADAR = yes } }
-							random_state = { limit = { available_RADAR = yes } add_RADAR = yes }
-						}
-					}
-				}
-			}
+		if = { limit = { any_state = { radar_location_2 = yes available_RADAR = yes } }
+			every_state = { limit = { radar_location_2 = yes available_RADAR = yes } add_RADAR = yes }
 		}
 	}
 	option = {}
