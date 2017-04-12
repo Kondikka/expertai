@@ -27,8 +27,8 @@ NDefines.NAI.DIVISION_CREATE_MIN_XP = 600							-- Minimum XP before attempting 
 NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500							-- Minimum XP before attempting to create a new variant.
 NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 10								-- If XP is above this on the daily tick the AI will attempt to spend it
 
-NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
-NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
+--NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
+--NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
 NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0				-- This score is reduced the higher width is when comparing pure changes with no target
 NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = 1000	-- This score is reduced the farther the width is from the target width (if set)
 --NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 60					-- max days we keep track of since failure of a design update
