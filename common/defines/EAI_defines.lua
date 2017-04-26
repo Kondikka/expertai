@@ -109,6 +109,8 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 
 ----------------------
 
+NDefines.NAI.MAX_SUPPLY_DIVISOR = 1
+
 NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
@@ -144,6 +146,8 @@ NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
 NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 
 --------------------------------------------------------------------------------------------------------------
+
+--NDefines.NAI.SUPPLY_CRISIS_LIMIT = 1.0
 
 --NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 25		-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = 12		-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
