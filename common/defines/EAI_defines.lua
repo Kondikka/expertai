@@ -1,7 +1,7 @@
 --NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0 -- Multiplies value based on relative military industry size / country size.
 NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 2 -- Multiplies value based on relative naval industry size / country size.
 NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 2 -- Multiplies value based on relative number of air base / country size.
-NDefines.NAI.RESEARCH_DAYS_BETWEEN_WEIGHT_UPDATE = 7
+NDefines.NAI.RESEARCH_DAYS_BETWEEN_WEIGHT_UPDATE = 1
 NDefines.NAI.MAX_AHEAD_RESEARCH_PENALTY = 10
 
 NDefines.NAI.RESEARCH_NEW_WEIGHT_FACTOR = 0			-- Impact of previously unexplored tech weights. Higher means more random exploration.
@@ -109,7 +109,7 @@ DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of
 
 ----------------------
 
-NDefines.NAI.MAX_SUPPLY_DIVISOR = 1
+NDefines.NAI.MAX_SUPPLY_DIVISOR = 0.5
 
 NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
@@ -127,7 +127,8 @@ NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
 --NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 0.5
 --NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
 
---NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.2
+--NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 1
+--NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 100000
 
 NDefines.NAI.DEPLOY_MIN_TRAINING_PEACE_FACTOR = 0.9		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in peacetime
 NDefines.NAI.DEPLOY_MIN_TRAINING_WAR_FACTOR = 0.25		-- Required percentage of training (1.0 = 100%) for AI to deploy unit in wartime
@@ -327,7 +328,7 @@ NDefines.NAI.LAND_COMBAT_BOMBERS_PER_COASTAL_FORT_LEVEL = 1 --10	-- Amount of bo
 --NDefines.NAI.STR_BOMB_CIVIL_FACTORY_IMPORTANCE = 1 --50			-- Strategic importance of enemy civil factories
 --NDefines.NAI.STR_BOMB_MILITARY_FACTORY_IMPORTANCE = 1 --70		-- Strategic importance of enemy military factories
 --NDefines.NAI.STR_BOMB_NAVAL_FACTORY_IMPORTANCE = 1 --30			-- Strategic importance of enemy naval factories
-NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 500 --300		-- If amount of enemy fighters is higher than this mission won't perform
+NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 100 --300		-- If amount of enemy fighters is higher than this mission won't perform
 --NDefines.NAI.STR_BOMB_FIGHTERS_PER_PLANE = 0 --0				-- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 1 --20			-- Amount of planes requested per enemy civ factory
 --NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 1 --25			-- Amount of planes requested per enemy military factory
