@@ -2,53 +2,6 @@
 #	EQUIPMENT SCRIPTS
 ##################################################
 
-#try to keep a reserve of inf equipment in war
-#equipment_production_e1 = {
-#	enable = {
-#		OR = {
-#			has_equipment = { infantry_equipment < 10000 }
-#			has_equipment = { artillery_equipment < 100 }
-#		}
-#		has_war = yes 
-#		has_army_manpower = { size > 1250000 }
-#	}
-#	abort = {
-#		OR = { 
-#			AND = {
-#				NOT = { has_equipment = { infantry_equipment < 10000 } }
-#				NOT = { has_equipment = { artillery_equipment < 100 } }
-#			}
-#			has_war = no 
-#			NOT = { has_army_manpower = { size > 1250000 } }
-#		} 
-#	}
-#	ai_strategy = { type = unit_ratio id = infantry 								value = -400	}	#INFANTRY
-#	ai_strategy = { type = unit_ratio id = mountaineers 							value = -400 	}	#MOUNTAINEER
-#	ai_strategy = { type = unit_ratio id = marines 									value = -400 	}	#MARINES
-#	ai_strategy = { type = unit_ratio id = motorized	 							value = -400 	}	#MOTORIZED
-#}
-
-#minors: dont bother with air force when running out of equipment
-#equipment_production_e2e = {
-#	enable = {
-#		OR = {
-#			has_equipment = { infantry_equipment < 100 }
-#			has_equipment = { artillery_equipment < 100 }
-#		}
-#		NOT = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV } 
-#	}
-#	abort = {
-#		NOT = { has_equipment = { infantry_equipment < 500 } }
-#		NOT = { has_equipment = { artillery_equipment < 500 } }
-#	}
-#	
-#	ai_strategy = { type = equipment_production_factor id = fighter 			value = -4000 	}	#FIGHTER	
-#	ai_strategy = { type = equipment_production_factor id = cas 				value = -4000 	}	#CAS
-#	ai_strategy = { type = equipment_production_factor id = tactical_bomber 	value = -4000 	}	#TACTICAL BOMBER
-#	ai_strategy = { type = equipment_production_factor id = naval_bomber 		value = -4000 	}	#NAVAL BOMBER
-#	ai_strategy = { type = equipment_production_factor id = strategic_bomber 	value = -4000 	}	#STRATEGIC BOMBER
-#}
-
 #reduce inf equip production when it has massive stockpiles
 equipment_production_e6 = {
 	enable = { 
@@ -164,22 +117,6 @@ equipment_production_e12 = { #GER: stockpile equipment for barbarossa
 	#ai_strategy = { type = unit_ratio id = motorized 							value = -30 	}	#AT
 }
 
-#stop light tank over production
-equipment_production_lt = {
-	enable = { 
-		OR = { has_equipment = { light_tank_equipment > 1 } }
-		NOT = { has_tech = basic_medium_tank has_tech = improved_medium_tank } 
-	}
-	abort = {
-		OR = {
-			has_tech = basic_medium_tank has_tech = improved_medium_tank
-			NOT = { has_equipment = { light_tank_equipment > 1 } }
-		}
-	}
-	
-	ai_strategy = { type = equipment_production_factor id = armor 								value = -200		}
-}
-
 equipment_production_mot = {
 	enable = { 
 		NOT = { has_tech = interwar_antitank } 
@@ -291,87 +228,12 @@ equipment_production_at_air_m = {
 	ai_strategy = { type = equipment_production_factor id = cas 				value = 10 		}	
 }
 
-#cancel CV aircraft production when all CVs have been wiped out
-air_strategy_1 = {
-	enable = { has_navy_size = { size < 1 type = carrier } }
-	abort = { has_navy_size = { size > 0 type = carrier } }
-
-	ai_strategy = { type = equipment_production_factor id = interceptor 		value = -100	}	#CV FTR NAV
-}
-
 #strat bomber limit
 air_strategy_2 = {
 	enable = { has_deployed_air_force_size = { size > 8000 type = strategic_bomber } }
 	abort = { NOT = { has_deployed_air_force_size = { size > 7000 type = strategic_bomber } } }
 
 	ai_strategy = { type = equipment_production_factor id = strategic_bomber 		value = -200	}	#
-}
-
-#if out of fighters, prioritise fighter production
-air_strategy_3 = {
-	enable = { 
-		OR = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = ITA original_tag = JAP } 
-	
-		has_war = yes
-		has_deployed_air_force_size = { size < 1000 type = fighter } 
-		has_equipment = { fighter_equipment < 1000 }
-	}
-	abort = { 
-		OR = {
-			has_war = no
-			NOT = { has_deployed_air_force_size = { size < 1500 type = fighter } }
-			NOT = { has_equipment = { fighter_equipment < 1500 } }
-		}
-	}
-
-	ai_strategy = { type = equipment_production_factor id = fighter 			value = 10		}	#FIGHTER
-	
-	ai_strategy = { type = equipment_production_factor id = tactical_bomber 	value = -200 	}	#TACTICAL BOMBER
-	ai_strategy = { type = equipment_production_factor id = naval_bomber 		value = -200 	}	#NAVAL BOMBER
-	ai_strategy = { type = equipment_production_factor id = cas 				value = -200 	}	#CAS
-}
-
-air_strategy_3_m = {
-	enable = { 
-		NOT = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV } 
-	
-		has_war = yes
-		has_deployed_air_force_size = { size < 500 type = fighter } 
-		has_equipment = { fighter_equipment < 500 }
-	}
-	abort = { 
-		OR = {
-			has_war = no
-			NOT = { has_deployed_air_force_size = { size < 1000 type = fighter } }
-			NOT = { has_equipment = { fighter_equipment < 1000 } }
-		}
-	}
-	
-	ai_strategy = { type = equipment_production_factor id = tactical_bomber 	value = -200 	}	#TACTICAL BOMBER
-	ai_strategy = { type = equipment_production_factor id = naval_bomber 		value = -200 	}	#NAVAL BOMBER
-	ai_strategy = { type = equipment_production_factor id = cas 				value = -200 	}	#CAS
-}
-
-#dont bother with early aircraft
-air_strategy_4 = { #tac
-	enable = { 
-		OR = { original_tag = ENG original_tag = FRA original_tag = ITA original_tag = JAP original_tag = USA }
-		NOT = { has_tech = tactical_bomber1 } 
-	}
-	abort = { has_tech = tactical_bomber1 }
-
-	ai_strategy = { type = equipment_production_factor id = tactical_bomber 		value = -400	}
-	ai_strategy = { type = equipment_production_factor id = infantry 				value = 100		}
-}
-
-air_strategy_4b = { #ftr
-	enable = { 
-		NOT = { has_tech = fighter1 } 
-	}
-	abort = { has_tech = fighter1 }
-
-	ai_strategy = { type = equipment_production_factor id = fighter 				value = -400	}
-	ai_strategy = { type = equipment_production_factor id = infantry 				value = 100		}
 }
 
 #stop convoy overproduction
@@ -405,6 +267,7 @@ navy_strategy_0c = { #out of convoys - increase production
 	enable = { 
 		has_equipment = { convoy < 50 }
 		NOT = { has_global_flag = EAI_free_convoys }
+		major_country = yes
 	}
 	abort = { 
 		NOT = { has_equipment = { convoy < 60 } }
@@ -416,7 +279,22 @@ navy_strategy_0c = { #out of convoys - increase production
 	ai_strategy = { type = equipment_production_factor id = screen_ship 	value = -30 	}
 }
 
-navy_strategy_0d = {
+navy_strategy_0d = { #minors
+	enable = { 
+		has_equipment = { convoy < 50 }
+		NOT = { major_country = yes }
+	}
+	abort = { 
+		NOT = { has_equipment = { convoy < 100 } }
+	}
+	
+	ai_strategy = { type = equipment_production_factor id = carrier 		value = -1000 	}
+	ai_strategy = { type = equipment_production_factor id = capital_ship 	value = -1000 	}
+	ai_strategy = { type = equipment_production_factor id = convoy 			value = 200 	}
+	ai_strategy = { type = equipment_production_factor id = screen_ship 	value = -1000 	}
+}
+
+navy_strategy_0e = {
 	enable = { 
 		has_global_flag = EAI_free_convoys
 	}
