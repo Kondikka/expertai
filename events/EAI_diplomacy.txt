@@ -412,22 +412,22 @@ country_event = { #usa joins allies 2
 country_event = { #give germany northern france
 	id = EAI_DM.51
 	hidden = yes
-	fire_only_once = yes
+	mean_time_to_happen = { days = 20 }
 	trigger = {
 		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
 		has_war_with = FRA FRA = { has_capitulated = yes }
-		any_state = {
-			OR = { region = 19 region = 20 } 
+		any_state = { #GER doesnt control historical states
+			OR = { region = 19 region = 20 region = 5 } 
 			NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 } 
-			controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes }
+			controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV }
 		}
 	}
 	immediate = {
 		every_state = { 
 			limit = { 
-				OR = { region = 19 region = 20 } 
+				OR = { region = 19 region = 20 region = 5 } 
 				NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 } 
-				controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } 
+				controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV } 
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -436,34 +436,26 @@ country_event = { #give germany northern france
 }
 
 country_event = { #yugoslavia invasion AI fix
-	id = EAI_DM.52
-	hidden = yes
-	fire_only_once = yes
-	trigger = {
-		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
-		has_war_with = YUG YUG = { has_capitulated = yes }
-	}
-	immediate = {
-		every_state = { 
-			limit = { OR = { region = 24 state = 102 } NOT = { state = 44 state = 163 state = 103 } controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes } }
-			ROOT = { set_state_controller = PREV }
-		}
-	}
-	option = { name = "OK" }
-}
-
-country_event = { #yugoslavia
 	id = EAI_DM.53
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		tag = GER GER = { is_ai = yes } ITA = { is_ai = yes } is_historical_focus_on = yes
-		has_war_with = YUG NOT = { YUG = { has_capitulated = yes } }
-		any_state = { OR = { state = 102 state = 109 } controller = { tag = ITA is_in_faction_with = GER is_ai = yes } }
+		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+		has_war_with = YUG
+		
+		any_state = {
+			OR = { state = 102 state = 731 region = 24 }
+			NOT = { state = 103 state = 163 state = 44 }
+			controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV } 
+		}
 	}
 	immediate = {
-		every_state = { 
-			limit = { OR = { state = 102 state = 109 } controller = { tag = ITA is_in_faction_with = GER is_ai = yes } }
+		every_state = {
+			limit = {
+				OR = { state = 102 state = 731 region = 24 }
+				NOT = { state = 103 state = 163 state = 44 }
+				controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV } 
+			}
 			ROOT = { set_state_controller = PREV }
 		}
 	}
@@ -477,11 +469,18 @@ country_event = { #greece
 	trigger = {
 		tag = ITA ITA = { is_ai = yes } is_historical_focus_on = yes
 		has_war_with = GRE GRE = { has_capitulated = yes }
-		any_state = { OR = { region = 25 } controller = { NOT = { tag = ITA } is_in_faction_with = ITA is_ai = yes } }
+		any_state = { region = 25 NOT = { state = 731 } controller = { NOT = { tag = ITA owns_state = PREV } is_in_faction_with = ITA is_ai = yes } }
+		
+		NOT = { #all combat has ceased
+			any_state = {
+				region = 25
+				controller = { has_war_with = ITA }
+			}
+		}
 	}
 	immediate = {
 		every_state = { 
-			limit = { OR = { state = 102 } controller = { NOT = { tag = ITA } is_in_faction_with = ITA is_ai = yes } }
+			limit = { region = 25 NOT = { state = 731 } controller = { NOT = { tag = ITA owns_state = PREV } is_in_faction_with = ITA is_ai = yes } }
 			ROOT = { set_state_controller = PREV }
 		}
 	}
@@ -498,6 +497,13 @@ country_event = { #norway
 		any_state = {
 			OR = { state = 142 state = 110 state = 143 state = 144 } 
 			controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes }
+		}
+		
+		NOT = { #all combat has ceased
+			any_state = {
+				OR = { state = 142 state = 110 state = 143 state = 144 } 
+				controller = { has_war_with = GER }
+			}
 		}
 	}
 	immediate = {

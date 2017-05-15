@@ -37,8 +37,8 @@ NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0
 NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0
 NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
 
-NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 12
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.002
+NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 36
+NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.0015
 
 DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
 
@@ -261,6 +261,9 @@ NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 40 --go crazy with it - control through
 --------------------------------------------------------------------------------------------------------------
 
 NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
+
+NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 2
+
 ----NDefines.NAI.ESCORT_BOMBERS_IMPORTANCE_MODIFIER = 5000.0 
 ----NDefines.NAI.STRATEGIC_BOMBING_DEFENCE_IMPORTANCE = 5000.0 
 --NDefines.NAI.AIR_BASE_DANGER_ZONE_WEIGHT = 0 					-- Score used per province taken by enemy in a state to determine how dangerous it is to use an air base
@@ -270,10 +273,10 @@ NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
 --NDefines.NAI.AIR_CAS_SCORE_FACTOR = 500.0 						-- Factor applied to (friendly units) x (enemy units)) to get CAS score for region
 --NDefines.NAI.AIR_ENEMY_SUPERIORITY_FACTOR = 0.0 				-- How much enemy air superiority counts relative to own
 --NDefines.NAI.AIR_SUPERIORITY_FACTOR = 1 						-- Factor for air superiority score
---NDefines.NAI.AIR_MIN_ASSIGN_SCORE = 0 							-- Minimum total score for region to be considered for air missions
-----NDefines.NAI.AIR_MIN_REASSIGN_SCORE = 0 						-- Minimum total score for region to be considered for reassigning air missions
-----NDefines.NAI.AIR_WING_SIZE_FACTOR = 50.0 						-- Impact on air score of assigning wings to mission
-NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.3					-- Between 0 and 1  limit for % coverage for air mission to be considered
+NDefines.NAI.AIR_MIN_ASSIGN_SCORE = 1 							-- Minimum total score for region to be considered for air missions
+NDefines.NAI.AIR_MIN_REASSIGN_SCORE = 1 						-- Minimum total score for region to be considered for reassigning air missions
+NDefines.NAI.AIR_WING_SIZE_FACTOR = 1000.0 						-- Impact on air score of assigning wings to mission
+NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.2					-- Between 0 and 1  limit for % coverage for air mission to be considered
 ----NDefines.NAI.AIR_BASE_PRIORITY_DISTANCE_FACTOR = 0.0 			-- Weight of distance between region and airbase for airbase priority score
 
 --NDefines.NAI.AIR_SUPERIORITY_MISSION_FACTOR = 1.0				-- AI air superiority mission factor
@@ -312,9 +315,9 @@ NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100 --12		-- Strategic impo
 NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 100 --55		-- Strategic importance of our armies in the combats
 NDefines.NAI.LAND_COMBAT_FRIEND_ARMIES_AIR_IMPORTANCE = 100 --12	-- Strategic importance of friendly armies
 NDefines.NAI.LAND_COMBAT_FRIEND_COMBATS_AIR_IMPORTANCE = 100 --6		-- Strategic importance of friendly armies in the combat
-NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 1 --8		-- Strategic importance of our armies
-NDefines.NAI.LAND_COMBAT_ENEMY_LAND_FORTS_AIR_IMPORTANCE = 1 --5	-- Strategic importance of enemy land forts in the region
-NDefines.NAI.LAND_COMBAT_ENEMY_COASTAL_FORTS_AIR_IMPORTANCE = 1 --3-- Strategic importance of enemy coastal fronts in the region
+--NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 1 --8		-- Strategic importance of our armies
+--NDefines.NAI.LAND_COMBAT_ENEMY_LAND_FORTS_AIR_IMPORTANCE = 1 --5	-- Strategic importance of enemy land forts in the region
+--NDefines.NAI.LAND_COMBAT_ENEMY_COASTAL_FORTS_AIR_IMPORTANCE = 1 --3-- Strategic importance of enemy coastal fronts in the region
 NDefines.NAI.LAND_COMBAT_FIGHTERS_PER_PLANE = 2 --1.1				-- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.LAND_COMBAT_CAS_PER_ENEMY_ARMY = 25				-- Amount of CAS planes requested per enemy army
 NDefines.NAI.LAND_COMBAT_BOMBERS_PER_LAND_FORT_LEVEL = 1 --15		-- Amount of bomber planes requested per enemy land fort level
@@ -329,7 +332,7 @@ NDefines.NAI.LAND_COMBAT_BOMBERS_PER_COASTAL_FORT_LEVEL = 1 --10	-- Amount of bo
 --NDefines.NAI.STR_BOMB_MILITARY_FACTORY_IMPORTANCE = 1 --70		-- Strategic importance of enemy military factories
 --NDefines.NAI.STR_BOMB_NAVAL_FACTORY_IMPORTANCE = 1 --30			-- Strategic importance of enemy naval factories
 NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 100 --300		-- If amount of enemy fighters is higher than this mission won't perform
---NDefines.NAI.STR_BOMB_FIGHTERS_PER_PLANE = 0 --0				-- Amount of air superiority planes requested per enemy plane
+NDefines.NAI.STR_BOMB_FIGHTERS_PER_PLANE = 2 --0				-- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 1 --20			-- Amount of planes requested per enemy civ factory
 --NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 1 --25			-- Amount of planes requested per enemy military factory
 --NDefines.NAI.STR_BOMB_PLANES_PER_NAV_FACTORY = 1 --15			-- Amount of planes requested per enemy naval factory
