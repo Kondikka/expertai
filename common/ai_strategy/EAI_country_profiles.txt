@@ -93,7 +93,7 @@ default_unit_production_minors = {
 #GER
 GER_profile_1 = {
 	enable = { original_tag = GER num_of_military_factories < 70 }
-	abort = { num_of_military_factories > 69 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 	
@@ -131,7 +131,7 @@ GER_profile_1 = {
 }
 
 GER_profile_2 = {
-	enable = { original_tag = GER num_of_military_factories > 69 }
+	enable = { original_tag = GER NOT = { num_of_military_factories < 70 } }
 	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND 	
@@ -187,10 +187,41 @@ GER_strategy_1 = { #increase prewar armor production
 	ai_strategy = { type = equipment_production_factor id = armor value = 50 }
 }
 
+GER_strategy_2 = { #light tanks are low prio
+	enable = { 
+		original_tag = GER
+		
+		OR = {
+			AND = {
+				has_country_flag = marm_army_focus
+				NOT = { has_tech = basic_medium_tank }
+			}
+			AND = {
+				has_country_flag = harm_army_focus
+				NOT = { has_tech = basic_heavy_tank }
+			}
+		}
+	}
+	abort = { 
+		OR = {
+			AND = {
+				has_country_flag = marm_army_focus
+				has_tech = basic_medium_tank
+			}
+			AND = {
+				has_country_flag = harm_army_focus
+				has_tech = basic_heavy_tank
+			}
+		}
+	}
+	
+	ai_strategy = { type = equipment_production_factor id = armor value = -200 }
+}
+
 #ITA
 ITA_profile_1 = {
-	enable = { original_tag = ITA num_of_military_factories < 125 }
-	abort = { num_of_military_factories > 124 }
+	enable = { original_tag = ITA num_of_military_factories < 70 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 	
@@ -228,8 +259,8 @@ ITA_profile_1 = {
 }
 
 ITA_profile_2 = {
-	enable = { original_tag = ITA num_of_military_factories > 124 }
-	abort = { num_of_military_factories < 125 }
+	enable = { original_tag = ITA NOT = { num_of_military_factories < 70 } }
+	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
 
@@ -268,8 +299,8 @@ ITA_profile_2 = {
 
 #JAP
 JAP_profile_1 = {
-	enable = { original_tag = JAP num_of_military_factories < 125 }
-	abort = { num_of_military_factories > 124 }
+	enable = { original_tag = JAP num_of_military_factories < 70 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 
@@ -280,8 +311,8 @@ JAP_profile_1 = {
 	#ai_strategy = { type = unit_ratio id = submarine	 						value = -0 		}	#ss bc ca
 	#ai_strategy = { type = unit_ratio id = convoy 								value = -0 		}
 	
-	#ai_strategy = { type = equipment_production_factor id = carrier 			value = -0 		}	#cv
-	#ai_strategy = { type = equipment_production_factor id = capital_ship 		value = -0 		}	#bb
+	ai_strategy = { type = equipment_production_factor id = carrier 			value = 50 		}	#cv
+	ai_strategy = { type = equipment_production_factor id = capital_ship 		value = -50 	}	#bb
 	#ai_strategy = { type = equipment_production_factor id = screen_ship 		value = -0 		}	#dd cl
 	#ai_strategy = { type = equipment_production_factor id = submarine 			value = -0 		}	#ss bc ca
 	#ai_strategy = { type = equipment_production_factor id = convoy 			value = -0 		}
@@ -307,8 +338,8 @@ JAP_profile_1 = {
 }
 
 JAP_profile_2 = {
-	enable = { original_tag = JAP num_of_military_factories > 124 }
-	abort = { num_of_military_factories < 125 }
+	enable = { original_tag = JAP NOT = { num_of_military_factories < 70 } }
+	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
 
@@ -319,8 +350,8 @@ JAP_profile_2 = {
 	#ai_strategy = { type = unit_ratio id = submarine	 						value = -0 		}	#ss bc ca
 	#ai_strategy = { type = unit_ratio id = convoy 								value = -0 		}
 	
-	#ai_strategy = { type = equipment_production_factor id = carrier 			value = -0 		}	#cv
-	#ai_strategy = { type = equipment_production_factor id = capital_ship 		value = -0 		}	#bb
+	ai_strategy = { type = equipment_production_factor id = carrier 			value = 50 		}	#cv
+	ai_strategy = { type = equipment_production_factor id = capital_ship 		value = -50 	}	#bb
 	#ai_strategy = { type = equipment_production_factor id = screen_ship 		value = -0 		}	#dd cl
 	#ai_strategy = { type = equipment_production_factor id = submarine 			value = -0 		}	#ss bc ca
 	#ai_strategy = { type = equipment_production_factor id = convoy 			value = -0 		}
@@ -370,10 +401,34 @@ JAP_strategy_2 = { #kicked out of China, stop invasions until you have a bigger 
 	ai_strategy = { type = invade id = "PRC" value = -2000 }
 }
 
+JAP_strategy_3 = { #less focus on air during the chinese war
+	enable = { 
+		original_tag = JAP
+		
+		OR = {
+			has_war_with = CHI 
+			date < 1939.1.1
+		}
+		
+		NOT = { any_enemy_country = { has_deployed_air_force_size = { size > 500 } } }
+	}
+	abort = {
+		OR = {
+			AND = {
+				NOT = { has_war_with = CHI }
+				NOT = { date < 1939.1.1 }
+			}
+			any_enemy_country = { has_deployed_air_force_size = { size > 500 } }
+		}
+	}
+	
+	ai_strategy = { type = air_factory_balance value = -150 }
+}
+
 #SOV
 SOV_profile_1 = {
 	enable = { original_tag = SOV num_of_military_factories < 70 }
-	abort = { num_of_military_factories > 69 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND 	
 	ai_strategy = { type = equipment_production_factor id = infantry 			value = 25 		}
@@ -412,7 +467,7 @@ SOV_profile_1 = {
 }
 
 SOV_profile_2 = {
-	enable = { original_tag = SOV num_of_military_factories > 69 }
+	enable = { original_tag = SOV NOT = { num_of_military_factories < 70 } }
 	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
@@ -463,7 +518,7 @@ SOV_strategy_1 = {
 #ENG
 ENG_profile_1 = {
 	enable = { original_tag = ENG num_of_military_factories < 70 }
-	abort = { num_of_military_factories > 69 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 
@@ -501,7 +556,7 @@ ENG_profile_1 = {
 }
 
 ENG_profile_2 = {
-	enable = { original_tag = ENG num_of_military_factories > 69 }
+	enable = { original_tag = ENG NOT = { num_of_military_factories < 70 } }
 	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
@@ -552,8 +607,8 @@ ENG_strategy_1 = { #ENG should focus on air superiority
 
 #FRA
 FRA_profile_1 = {
-	enable = { tag = FRA num_of_military_factories < 100 }
-	abort = { num_of_military_factories > 99 }
+	enable = { tag = FRA num_of_military_factories < 70 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 
@@ -591,8 +646,8 @@ FRA_profile_1 = {
 }
 
 FRA_profile_2 = {
-	enable = { tag = FRA num_of_military_factories > 99 }
-	abort = { num_of_military_factories < 100 }
+	enable = { tag = FRA NOT = { num_of_military_factories < 70 } }
+	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
 
@@ -632,7 +687,7 @@ FRA_profile_2 = {
 #USA
 USA_profile_1 = {
 	enable = { original_tag = USA num_of_military_factories < 70 }
-	abort = { num_of_military_factories > 69 }
+	abort = { NOT = { num_of_military_factories < 70 } }
 	
 	#################### LAND PRODUCTION
 	
@@ -673,7 +728,7 @@ USA_profile_1 = {
 }
 
 USA_profile_2 = {
-	enable = { original_tag = USA num_of_military_factories > 69 }
+	enable = { original_tag = USA NOT = { num_of_military_factories < 70 } }
 	abort = { num_of_military_factories < 70 }
 	
 	#################### LAND PRODUCTION
@@ -728,6 +783,31 @@ USA_strategy_1 = { #focus on strat bombers
 
 	ai_strategy = { type = equipment_production_factor id = tactical_bomber value = -200 }
 	ai_strategy = { type = equipment_production_factor id = strategic_bomber value = 100 }
+}
+
+USA_strategy_2 = { #stockpile equipment early for lend-leasing China
+	enable = { 
+		is_historical_focus_on = yes
+		original_tag = USA 
+		date < 1939.1.1
+		has_war = no
+		has_equipment = { infantry_equipment < 10000 }
+	}
+	abort = { 
+		OR = {
+			NOT = { date < 1939.1.1 }
+			NOT = { has_war = no }
+			NOT = { has_equipment = { infantry_equipment < 20000 } }
+		}
+	}
+
+	ai_strategy = { type = equipment_production_factor id = infantry value = 400 }
+	ai_strategy = { type = equipment_production_factor id = motorized value = 400 }
+	
+	ai_strategy = { type = equipment_production_factor id = fighter value = -100 }
+	ai_strategy = { type = equipment_production_factor id = interceptor value = -100 }
+	ai_strategy = { type = equipment_production_factor id = tactical_bomber value = -100 }
+	ai_strategy = { type = equipment_production_factor id = cas value = -100 }
 }
 
 ##################################################
