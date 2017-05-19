@@ -44,7 +44,7 @@ news_event = {
 
 country_event = {
 	id = EAI_M.1000
-	title = "Expert AI Settings"
+	title = "Expert AI Configuration"
 	desc = EAI_M.100.d
 	
 	#desc = {
@@ -81,13 +81,19 @@ country_event = {
 	}
 	
 	option = {
-		name = "Settings"
+		name = "AI settings"
 		hidden_effect = {
 			country_event = EAI_M.1010
 		}
 	}
 	option = {
-		name = "Difficulty setup"
+		name = "Game balance settings" 
+		hidden_effect = {
+			country_event = EAI_M.1040
+		}
+	}
+	option = {
+		name = "Difficulty settings"
 		hidden_effect = {
 			country_event = EAI_H.0
 		}
@@ -109,7 +115,7 @@ country_event = {
 
 country_event = {
 	id = EAI_M.1001
-	title = "Expert AI Settings"
+	title = "Expert AI Configuration"
 	desc = EAI_M.100.d
 	
 	#desc = {
@@ -127,13 +133,19 @@ country_event = {
 	is_triggered_only = yes
 	
 	option = {
-		name = "Settings" 
+		name = "AI settings" 
 		hidden_effect = {
 			country_event = EAI_M.1010
 		}
 	}
 	option = {
-		name = "Difficulty setup" 
+		name = "Game balance settings" 
+		hidden_effect = {
+			country_event = EAI_M.1040
+		}
+	}
+	option = {
+		name = "Difficulty settings" 
 		hidden_effect = {
 			country_event = EAI_H.0
 		}
@@ -155,8 +167,8 @@ country_event = {
 
 country_event = { #customise
 	id = EAI_M.1010
-	title = "Expert AI Customisation"
-	desc = "|ON| - option currently enabled. |OFF| - option currently disabled. AI armies can only be configured at the start."
+	title = "Expert AI: AI Settings"
+	desc = EAI_M.1010.d
 	picture = GFX_report_event_expert_ai
 	
 	is_triggered_only = yes
@@ -191,7 +203,7 @@ country_event = { #customise
 
 country_event = { #diplomacy
 	id = EAI_M.1020
-	title = "Expert AI: Diplomacy"
+	title = "Expert AI: AI Settings"
 	desc = EAI_M.1.d
 	picture = GFX_report_event_expert_ai
 	
@@ -264,7 +276,7 @@ country_event = { #diplomacy
 
 country_event = {
 	id = EAI_M.1021
-	title = "Expert AI: Diplomacy"
+	title = "Expert AI: AI Settings"
 	desc = EAI_M.1.d
 	picture = GFX_report_event_expert_ai
 	
@@ -337,8 +349,8 @@ country_event = {
 
 country_event = { #bonuses
 	id = EAI_M.1030
-	title = "Expert AI: Other"
-	desc = ""
+	title = "Expert AI: AI Settings"
+	desc = EAI_M.1030.d
 	picture = GFX_report_event_expert_ai
 	
 	is_triggered_only = yes
@@ -389,8 +401,8 @@ country_event = { #bonuses
 
 country_event = {
 	id = EAI_M.1031
-	title = "Expert AI: Other"
-	desc = ""
+	title = "Expert AI: AI Settings"
+	desc = EAI_M.1030.d
 	picture = GFX_report_event_expert_ai
 	
 	is_triggered_only = yes
@@ -435,6 +447,122 @@ country_event = {
 		name = "Previous" 
 		hidden_effect = {
 			country_event = EAI_M.1010
+		}
+	}
+}
+
+country_event = { #balance
+	id = EAI_M.1040
+	title = "Expert AI: Game Balance Settings"
+	desc = EAI_M.1040.d
+	picture = GFX_report_event_expert_ai
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "|OFF| Limit research slots for minors" 
+		trigger = { NOT = { has_global_flag = EAI_limit_research } }
+		hidden_effect = {
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				add_research_slot = -3
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				add_research_slot = -2
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				add_research_slot = -1
+			}
+			
+			set_global_flag = EAI_limit_research
+			country_event = EAI_M.1041
+		}
+	}
+	option = {
+		name = "|ON| Limit research slots for minors" 
+		trigger = { has_global_flag = EAI_limit_research }
+		hidden_effect = {
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				add_research_slot = 3
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				add_research_slot = 2
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				add_research_slot = 1
+			}
+			
+			clr_global_flag = EAI_limit_research
+			country_event = EAI_M.1041
+		}
+	}
+	option = { 
+		name = "Previous" 
+		hidden_effect = {
+			country_event = EAI_M.1000
+		}
+	}
+}
+
+country_event = {
+	id = EAI_M.1041
+	title = "Expert AI: Game Balance Settings"
+	desc = EAI_M.1040.d
+	picture = GFX_report_event_expert_ai
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = "|OFF| Limit research slots for minors" 
+		trigger = { NOT = { has_global_flag = EAI_limit_research } }
+		hidden_effect = {
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				add_research_slot = -3
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				add_research_slot = -2
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				add_research_slot = -1
+			}
+			
+			set_global_flag = EAI_limit_research
+			country_event = EAI_M.1040
+		}
+	}
+	option = {
+		name = "|ON| Limit research slots for minors" 
+		trigger = { has_global_flag = EAI_limit_research }
+		hidden_effect = {
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				add_research_slot = 3
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				add_research_slot = 2
+			}
+			every_country = {
+				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				add_research_slot = 1
+			}
+			
+			clr_global_flag = EAI_limit_research
+			country_event = EAI_M.1040
+		}
+	}
+	option = { 
+		name = "Previous" 
+		hidden_effect = {
+			country_event = EAI_M.1000
 		}
 	}
 }
