@@ -15,6 +15,7 @@ news_event = {
 				country_event = EAI_M.1000
 			}
 			set_global_flag = EAI_3.13
+			set_global_flag = EAI_3.133
 		}
 	}
 }
@@ -466,14 +467,17 @@ country_event = { #balance
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 3 }
 				add_research_slot = -3
+				set_country_flag = slots_reduced_3
 			}
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
 				add_research_slot = -2
+				set_country_flag = slots_reduced_2
 			}
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
 				add_research_slot = -1
+				set_country_flag = slots_reduced_1
 			}
 			
 			set_global_flag = EAI_limit_research
@@ -485,16 +489,19 @@ country_event = { #balance
 		trigger = { has_global_flag = EAI_limit_research }
 		hidden_effect = {
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				limit = { has_country_flag = slots_reduced_3 }
 				add_research_slot = 3
+				clr_country_flag = slots_reduced_3
 			}
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				limit = { has_country_flag = slots_reduced_2 }
 				add_research_slot = 2
+				clr_country_flag = slots_reduced_2
 			}
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				limit = { has_country_flag = slots_reduced_1 }
 				add_research_slot = 1
+				clr_country_flag = slots_reduced_1
 			}
 			
 			clr_global_flag = EAI_limit_research
@@ -524,14 +531,17 @@ country_event = {
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 3 }
 				add_research_slot = -3
+				set_country_flag = slots_reduced_3
 			}
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
 				add_research_slot = -2
+				set_country_flag = slots_reduced_2
 			}
 			every_country = {
 				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
 				add_research_slot = -1
+				set_country_flag = slots_reduced_1
 			}
 			
 			set_global_flag = EAI_limit_research
@@ -543,16 +553,19 @@ country_event = {
 		trigger = { has_global_flag = EAI_limit_research }
 		hidden_effect = {
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 3 }
+				limit = { has_country_flag = slots_reduced_3 }
 				add_research_slot = 3
+				clr_country_flag = slots_reduced_3
 			}
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+				limit = { has_country_flag = slots_reduced_2 }
 				add_research_slot = 2
+				clr_country_flag = slots_reduced_2
 			}
 			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+				limit = { has_country_flag = slots_reduced_1 }
 				add_research_slot = 1
+				clr_country_flag = slots_reduced_1
 			}
 			
 			clr_global_flag = EAI_limit_research
@@ -1285,8 +1298,7 @@ country_event = {
 	option = {}	
 }
 
-#resistance modifier for new countries
-country_event = {
+country_event = { #resistance modifier for new countries
 	id = EAI_M.6
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
@@ -1295,6 +1307,27 @@ country_event = {
 	}
 	immediate = {
 		add_ideas = ns
+	}
+	option = {}
+}
+country_event = { #research reduction for new countries
+	id = EAI_M.7
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		has_global_flag = EAI_3.133
+		has_global_flag = EAI_limit_research
+		NOT = { major_country = yes }
+		OR = {
+			AND = { original_research_slots > 3 NOT = { has_country_flag = slots_reduced_3 } }
+			AND = { original_research_slots > 2 original_research_slots < 4 NOT = { has_country_flag = slots_reduced_2 } }
+			AND = { original_research_slots > 1 original_research_slots < 3 NOT = { has_country_flag = slots_reduced_1 } }
+		}
+	}
+	immediate = {
+		if = { limit = { original_research_slots > 3 } add_research_slot = -3 set_country_flag = slots_reduced_3 }
+		if = { limit = { original_research_slots > 2 original_research_slots < 4 } add_research_slot = -2 set_country_flag = slots_reduced_2 }
+		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = slots_reduced_1 }
 	}
 	option = {}
 }
