@@ -22,101 +22,104 @@ NDefines.NAI.RESEARCH_BASE_DAYS = 1					-- AI adds a base number of days when we
 
 ----------------------
 
-NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 10							-- Minimum XP before attempting to upgrade a division template.
+NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 5							-- Minimum XP before attempting to upgrade a division template.
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 600							-- Minimum XP before attempting to create a fresh new division template.
-NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 500							-- Minimum XP before attempting to create a new variant.
-NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 10								-- If XP is above this on the daily tick the AI will attempt to spend it
+NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 400							-- Minimum XP before attempting to create a new variant.
+NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 50								-- If XP is above this on the daily tick the AI will attempt to spend it
 
 --NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
 --NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
-NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0				-- This score is reduced the higher width is when comparing pure changes with no target
-NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = 1000	-- This score is reduced the farther the width is from the target width (if set)
---NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 60					-- max days we keep track of since failure of a design update
+--NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0				-- This score is reduced the higher width is when comparing pure changes with no target
+--NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = 1000	-- This score is reduced the farther the width is from the target width (if set)
+--NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 10					-- max days we keep track of since failure of a design update
 
-NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0
-NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0
-NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
+--NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0
+--NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0
+--NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
 
-NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 36
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.0015
+NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 30
+NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.003
 
-DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
-
-	-- Army Values
-	0.0, 		-- default_morale
-	1.0, 		-- defense
-	0.0, 		-- breakthrough
-	0.0, 		-- hardness
-	1.0, 		-- soft_attack
-	0.0, 		-- hard_attack
-	0.0, 		-- recon
-	0.0, 		-- entrenchment
-	0.0, 		-- initiative
-	0.0, 		-- casualty_trickleback
-	-0.0, 		-- supply_consumption_factor
-	-0.0, 		-- supply_consumption
-	0.0, 		-- suppression
-	0.0, 		-- suppression_factor
-	0.0, 		-- experience_loss_factor
-	
-	-- Navy Values
-	1.0, 		-- surface_detection
-	1.0, 		-- sub_detection
-	1.0, 		-- surface_visibility
-	1.0, 		-- sub_visibility
-	1.0, 		-- shore_bombardment
-	1.0, 		-- fire_range
-	1.0, 		-- evasion
-	1.0, 		-- torpedo_attack
-	1.0, 		-- sub_attack
-	1.0, 		-- attack
-	1.0, 		-- port_capacity_usage
-	1.0, 		-- anti_air_attack
-	1.0, 		-- amphibious_defense
-	1.0, 		-- naval_speed
-	1.0, 		-- naval_range
-	1.0, 		-- convoy_raiding_coordination
-	1.0, 		-- patrol_coordination
-	1.0, 		-- search_and_destroy_coordination
-	
-	-- Air Values
-	1.0, 		-- air_range
-	1.0, 		-- air_defence
-	1.0, 		-- air_attack
-	1.0, 		-- air_agility
-	1.0, 		-- air_bombing
-	1.0, 		-- air_superiority
-	1.0, 		-- naval_strike_attack
-	1.0, 		-- naval_strike_targetting
-	1.0, 		-- air_ground_attack
-	1.0, 		-- air_visibility_factor
-	
-	-- Common Values
-	0.0, 		-- max_organisation
-	0.0, 		-- max_strength
-	0.0, 		-- build_cost_ic
-	0.0,		-- maximum_speed
-	0.0,		-- armor_value
-	0.0,		-- ap_attack
-	0.0,		-- reliability
-	0.0,		-- reliability_factor
-	0.0, 		-- weight
-	
-	-- Special Values
-	1.0, 		-- strategic_attack
-	1.0, 		-- carrier_size
-}
+--DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
+--
+--	-- Army Values
+--	0.0, 		-- default_morale
+--	0.0, 		-- defense
+--	0.0, 		-- breakthrough
+--	0.0, 		-- hardness
+--	0.0, 		-- soft_attack
+--	0.0, 		-- hard_attack
+--	0.0, 		-- recon
+--	0.0, 		-- entrenchment
+--	0.0, 		-- initiative
+--	0.0, 		-- casualty_trickleback
+--	-0.0, 		-- supply_consumption_factor
+--	-0.0, 		-- supply_consumption
+--	0.0, 		-- suppression
+--	0.0, 		-- suppression_factor
+--	0.0, 		-- experience_loss_factor
+--	
+--	-- Navy Values
+--	0.0, 		-- surface_detection
+--	0.0, 		-- sub_detection
+--	0.0, 		-- surface_visibility
+--	0.0, 		-- sub_visibility
+--	0.0, 		-- shore_bombardment
+--	0.0, 		-- fire_range
+--	0.0, 		-- evasion
+--	0.0, 		-- torpedo_attack
+--	0.0, 		-- sub_attack
+--	0.0, 		-- attack
+--	0.0, 		-- port_capacity_usage
+--	0.0, 		-- anti_air_attack
+--	0.0, 		-- amphibious_defense
+--	0.0, 		-- naval_speed
+--	0.0, 		-- naval_range
+--	0.0, 		-- convoy_raiding_coordination
+--	0.0, 		-- patrol_coordination
+--	0.0, 		-- search_and_destroy_coordination
+--	
+--	-- Air Values
+--	0.0, 		-- air_range
+--	0.0, 		-- air_defence
+--	0.0, 		-- air_attack
+--	0.0, 		-- air_agility
+--	0.0, 		-- air_bombing
+--	0.0, 		-- air_superiority
+--	0.0, 		-- naval_strike_attack
+--	0.0, 		-- naval_strike_targetting
+--	0.0, 		-- air_ground_attack
+--	0.0, 		-- air_visibility_factor
+--	
+--	-- Common Values
+--	0.0, 		-- max_organisation
+--	0.0, 		-- max_strength
+--	0.0, 		-- build_cost_ic
+--	0.0,		-- maximum_speed
+--	0.0,		-- armor_value
+--	0.0,		-- ap_attack
+--	0.0,		-- reliability
+--	0.0,		-- reliability_factor
+--	0.0, 		-- weight
+--	
+--	-- Special Values
+--	0.0, 		-- strategic_attack
+--	0.0, 		-- carrier_size
+--}
 
 ----------------------
 
+NDefines.NAI.ESTIMATED_CONVOYS_PER_DIVISION = 6
+
 NDefines.NAI.MAX_SUPPLY_DIVISOR = 0.5
+NDefines.NAI.MIN_SUPPLY_USE_SANITY_CAP = 100
 
 NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 
---NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
---NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
+NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
+NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
 
 NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			-- Cancel unit production if below this to get resources out to units in the field
 NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if below this to get resources out to units in the field
@@ -145,6 +148,7 @@ NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
 --NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_INDUSTRY_FACTOR = 100 -- Weight when counting industry (will be added to military strength)
 --NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 200 --7 -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
 NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
+NDefines.NAI.DIPLOMACY_SEND_MAX_FACTION = 0.5
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -154,12 +158,12 @@ NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 --NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = 12		-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_RUSH = 0			-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 
-NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				-- Minimum org % for a unit to actively attack an enemy unit when executing a plan
-NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.5			-- Minimum strength for a unit to actively attack an enemy unit when executing a plan
-NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_MED = 0.75				-- (LOW,MED,HIGH) corresponds to the plan execution agressiveness level.
-NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.5	
-NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_HIGH = 0.25		
-NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.5	
+--NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				-- Minimum org % for a unit to actively attack an enemy unit when executing a plan
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.5			-- Minimum strength for a unit to actively attack an enemy unit when executing a plan
+--NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_MED = 0.75				-- (LOW,MED,HIGH) corresponds to the plan execution agressiveness level.
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.5	
+--NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_HIGH = 0.25		
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.5	
 
 --NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
 
@@ -208,19 +212,19 @@ NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					-- The lower this number  the lon
 --NDefines.NAI.SCARY_LEVEL_AVERAGE_DEFENSE = -0.7                 -- average front defense modifier to make it consider it as a PITA to go for
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.2 --0.45				-- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
 
-NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1
-
-NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		-- % or more of units in an order to consider ececuting the plan
-NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				-- Organization % for unit to be considered strong
-NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					-- Strength (equipment) % for unit to be considered strong
-
-NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
-NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
-NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
-
-NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				-- % or more average plan preparation before executing
-NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
-NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1 -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
+--NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1
+--
+--NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		-- % or more of units in an order to consider ececuting the plan
+--NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				-- Organization % for unit to be considered strong
+--NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					-- Strength (equipment) % for unit to be considered strong
+--
+--NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
+--NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
+--NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
+--
+--NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				-- % or more average plan preparation before executing
+--NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
+--NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1 -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
 
 --NDefines.NAI.LOCATION_BALANCE_TO_ADVANCE = 0.0				-- Limit on location strength balance between country and enemy for unit to dare to move forward.
 NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		-- AI countries will hold on activating plans if stronger countries have plans in the same location. Majors count extra (value of 1 will negate this)

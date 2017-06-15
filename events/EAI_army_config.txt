@@ -4,146 +4,385 @@ country_event = { #army base type
 	id = EAI_CFG.0
 	title = ""
 	desc = ""
-	
+
 	mean_time_to_happen = { days = 20 }
-	
+
 	trigger = {
 		is_ai = yes
 		NOT = { has_country_flag = EAI_army_config }
 	}
-	
+
 	immediate = {
 		set_country_flag = EAI_army_config
 	}
 
 	option = { name = inf
 		trigger = { OR = { infantry_army_focus = yes NOT = { infantry_army_focus = yes marine_army_focus = yes mountaineer_army_focus = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = {
+			factor = 3
+			modifier = { #countries with special force advisors should use special force armies
+				factor = 0
+				NOT = { infantry_army_focus = yes }
+				OR = {
+					has_available_idea_with_traits = { idea = army_commando_2 limit = 1 }
+					has_available_idea_with_traits = { idea = army_commando_3 limit = 1 }
+				}
+			}
+		}
+
 		set_country_flag = infantry_army_focus
 		country_event = EAI_CFG.1
 	}
 	option = { name = mar
 		trigger = { OR = { marine_army_focus = yes NOT = { infantry_army_focus = yes marine_army_focus = yes mountaineer_army_focus = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = {
+			factor = 1
+			modifier = { #when choosing between marines and mountaineers, go for mountaineers unless otherwise specified
+				factor = 0
+				NOT = { marine_army_focus = yes }
+			}
+			modifier = {
+				factor = 0
+				NOT = { marine_army_focus = yes }
+				NOT = {
+					has_available_idea_with_traits = { idea = army_commando_1 limit = 1 }
+					has_available_idea_with_traits = { idea = army_commando_2 limit = 1 }
+					has_available_idea_with_traits = { idea = army_commando_3 limit = 1 }
+				}
+			}
+		}
+
 		set_country_flag = marine_army_focus
 		country_event = EAI_CFG.1
 	}
 	option = { name = mnt
 		trigger = { OR = { mountaineer_army_focus = yes NOT = { infantry_army_focus = yes marine_army_focus = yes mountaineer_army_focus = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				NOT = { mountaineer_army_focus = yes }
+				NOT = {
+					has_available_idea_with_traits = { idea = army_commando_1 limit = 1 }
+					has_available_idea_with_traits = { idea = army_commando_2 limit = 1 }
+					has_available_idea_with_traits = { idea = army_commando_3 limit = 1 }
+				}
+			}
+		}
+
 		set_country_flag = mountaineer_army_focus
 		country_event = EAI_CFG.1
 	}
 }
 
-country_event = { #armor type
+country_event = { #infantry design
 	id = EAI_CFG.1
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = A
+		trigger = { OR = { infantry_design_A = yes NOT = { infantry_design_A = yes infantry_design_B = yes } } }
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = infantry_design_A
+		country_event = EAI_CFG.2
+	}
+	option = { name = B
+		trigger = { OR = { infantry_design_B = yes } }
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = infantry_design_B
+		country_event = EAI_CFG.2
+	}
+}
+
+country_event = { #armor type
+	id = EAI_CFG.2
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = marm
 		trigger = { OR = { marm_army_focus = yes NOT = { marm_army_focus = yes harm_army_focus = yes AT_army_focus = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 100 armor_tech_focus = yes } 
-			modifier = { factor = 10 tungsten > 30 NOT = { major_country = yes } } 
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 100 armor_tech_focus = yes } #armor focused countries should always go for armor
+			modifier = { factor = 10 tungsten > 30 NOT = { major_country = yes } } #minors with a lot of tungsten prefer medium armor
 		}
-		
+
+		set_country_flag = at_design_MTD
+
 		set_country_flag = marm_army_focus
-		country_event = EAI_CFG.2
+		country_event = EAI_CFG.3
 	}
 	option = { name = harm
 		trigger = { OR = { harm_army_focus = yes NOT = { marm_army_focus = yes harm_army_focus = yes AT_army_focus = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 100 armor_tech_focus = yes } 
-			modifier = { factor = 10 chromium > 30 NOT = { major_country = yes } }
-			modifier = { factor = 0.1 NOT = { chromium > 30 } NOT = { major_country = yes } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 100 armor_tech_focus = yes } #armor focused countries should always go for armor
+			modifier = { factor = 10 chromium > 30 NOT = { major_country = yes } } #minors with a lot of chromium prefer heavy armor
+			modifier = { factor = 0.1 NOT = { chromium > 30 } NOT = { major_country = yes } } #if a minor doesn't have chromium, prefer medium armor
 		}
-		
+
+		set_country_flag = at_design_HTD
+
 		set_country_flag = harm_army_focus
-		country_event = EAI_CFG.2
+		country_event = EAI_CFG.3
 	}
 	option = { name = at
 		trigger = { OR = { AT_army_focus = yes NOT = { marm_army_focus = yes harm_army_focus = yes AT_army_focus = yes } } }
-		ai_chance = { 
+		ai_chance = {
 			factor = 1
-			modifier = { factor = 1.5 NOT = { chromium > 30 tungsten > 30 } NOT = { major_country = yes } }
-			modifier = { factor = 1.5 tag = FRA }
+			modifier = { factor = 1.5 NOT = { chromium > 30 tungsten > 30 } NOT = { major_country = yes } } #a minor without tungsten or chromium favors AT armies
+			modifier = { factor = 1.5 tag = FRA } #france prefers AT against germany
 		}
-		
+
 		set_country_flag = AT_army_focus
-		country_event = EAI_CFG.2
-	}
-}
-
-country_event = { #armor attachment
-	id = EAI_CFG.2
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-
-	option = { name = mot #harm focus cant have mot attachment
-		trigger = { OR = { has_country_flag = marm_army_focus has_country_flag = AT_army_focus } OR = { mot_attachment = yes NOT = { mot_attachment = yes harm_attachment = yes } } }
-		ai_chance = { 
-			factor = 1
-			modifier = { factor = 100 NOT = { major_country = yes } }
-		}
-		
-		set_country_flag = mot_attachment
-		country_event = EAI_CFG.3
-	}
-	option = { name = harm
-		trigger = { OR = { has_country_flag = marm_army_focus has_country_flag = AT_army_focus } OR = { harm_attachment = yes NOT = { mot_attachment = yes harm_attachment = yes } } }
-		ai_chance = { factor = 1 }
-		
-		set_country_flag = harm_attachment
-		country_event = EAI_CFG.3
-	}
-	option = { name = marm
-		trigger = { has_country_flag = harm_army_focus }
-		ai_chance = { factor = 1 }
-		
-		set_country_flag = marm_attachment
 		country_event = EAI_CFG.3
 	}
 }
 
-country_event = { #inf attachment
+country_event = { #armor design
 	id = EAI_CFG.3
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
-	option = { name = inf2
-		trigger = { infantry_attachment_2 = yes NOT = { has_country_flag = infantry_army_focus has_country_flag = marine_attachment_2 has_country_flag = mountaineer_attachment_2 } }
-		ai_chance = { factor = 1 }
-		
-		set_country_flag = infantry_attachment_2
-		country_event = EAI_CFG.4
-	}
-	option = { name = inf1
-		trigger = { infantry_attachment_1 = yes NOT = { has_country_flag = infantry_army_focus } }
-		ai_chance = { factor = 1 }
-		
-		set_country_flag = infantry_attachment_1
-		country_event = EAI_CFG.4
-	}
-	option = { name = inf0
-		trigger = { OR = { has_country_flag = infantry_army_focus infantry_attachment_0 = yes NOT = { infantry_attachment_0 = yes infantry_attachment_1 = yes infantry_attachment_2 = yes } } }
-		ai_chance = { factor = 1 }
+	option = { name = A
+		trigger = { OR = { armor_design_A = yes NOT = { armor_design_A = yes armor_design_B = yes armor_design_C = yes } } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 OR = { tag = SOV tag = GER } }
+		}
 
-		set_country_flag = infantry_attachment_0
+		if = { limit = { has_country_flag = marm_army_focus }
+			set_country_flag = marm_design_A
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = harm_army_focus }
+			set_country_flag = harm_design_A
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = AT_army_focus }
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
+		country_event = EAI_CFG.4
+	}
+	option = { name = B
+		trigger = { OR = { armor_design_B = yes NOT = { armor_design_A = yes armor_design_B = yes armor_design_C = yes } } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 OR = { tag = SOV tag = GER } }
+		}
+
+		if = { limit = { has_country_flag = marm_army_focus }
+			set_country_flag = marm_design_B
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = harm_army_focus }
+			set_country_flag = harm_design_B
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = AT_army_focus }
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
+		country_event = EAI_CFG.4
+	}
+	option = { name = C
+		trigger = { OR = { armor_design_C = yes NOT = { armor_design_A = yes armor_design_B = yes armor_design_C = yes } } }
+		ai_chance = {
+			factor = 1
+		}
+
+		if = { limit = { has_country_flag = marm_army_focus }
+			set_country_flag = marm_design_C
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = harm_army_focus }
+			set_country_flag = harm_design_C
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+		}
+		if = { limit = { has_country_flag = AT_army_focus }
+			random_list = {
+				1 = { set_country_flag = marm_design_A }
+				1 = { set_country_flag = marm_design_B }
+				1 = { set_country_flag = marm_design_C }
+			}
+			random_list = {
+				1 = { set_country_flag = harm_design_A }
+				1 = { set_country_flag = harm_design_B }
+				1 = { set_country_flag = harm_design_C }
+			}
+		}
 		country_event = EAI_CFG.4
 	}
 }
 
-country_event = { #mar attachment
+country_event = { #armor attachment
 	id = EAI_CFG.4
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = mot
+		trigger = { OR = { mot_attachment = yes NOT = { mot_attachment = yes marm_attachment = yes harm_attachment = yes } } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 100 NOT = { major_country = yes } } #minors prefer mot attachment because its cheaper
+		}
+
+		if = { limit = { has_country_flag = AT_army_focus }
+			set_country_flag = at_design_AT #uses regular line artillery AT divisions
+		}
+
+		set_country_flag = mot_attachment
+		country_event = EAI_CFG.5
+	}
+	option = { name = harm
+		trigger = { NOT = { has_country_flag = harm_army_focus } OR = { harm_attachment = yes NOT = { mot_attachment = yes marm_attachment = yes harm_attachment = yes } } }
+		ai_chance = { factor = 1 }
+
+		if = { limit = { has_country_flag = AT_army_focus }
+			set_country_flag = at_design_HTD #uses HTD AT divisions
+		}
+
+		set_country_flag = harm_attachment
+		country_event = EAI_CFG.5
+	}
+	option = { name = marm
+		trigger = { NOT = { has_country_flag = marm_army_focus } OR = { mot_attachment = yes NOT = { mot_attachment = yes marm_attachment = yes harm_attachment = yes } } }
+		ai_chance = { factor = 1 }
+
+		if = { limit = { has_country_flag = AT_army_focus }
+			set_country_flag = at_design_MTD #uses MTD AT divisions
+		}
+
+		set_country_flag = marm_attachment
+		country_event = EAI_CFG.5
+	}
+}
+
+country_event = { #mot design
+	id = EAI_CFG.5
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = A
+		trigger = { has_country_flag = mot_attachment has_country_flag = marm_army_focus }
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = mot_design_A #MSPART
+		country_event = EAI_CFG.6
+	}
+	option = { name = B
+		trigger = { has_country_flag = mot_attachment }
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = mot_design_B #MOTART
+		country_event = EAI_CFG.6
+	}
+	option = { name = C
+		trigger = { has_country_flag = mot_attachment has_country_flag = AT_army_focus }
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = mot_design_C #LSPART
+		country_event = EAI_CFG.6
+	}
+	option = { name = C
+		trigger = { NOT = { has_country_flag = mot_attachment } }
+		ai_chance = {
+			factor = 1
+		}
+
+		country_event = EAI_CFG.6
+	}
+}
+
+country_event = { #inf attachment
+	id = EAI_CFG.6
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = inf2 #a country can only have one large attachment
+		trigger = { infantry_attachment_2 = yes NOT = { has_country_flag = infantry_army_focus has_country_flag = marine_attachment_2 has_country_flag = mountaineer_attachment_2 } }
+		ai_chance = { factor = 1 }
+
+		set_country_flag = infantry_attachment_2
+		country_event = EAI_CFG.7
+	}
+	option = { name = inf1
+		trigger = { infantry_attachment_1 = yes NOT = { has_country_flag = infantry_army_focus } }
+		ai_chance = { factor = 1 }
+
+		set_country_flag = infantry_attachment_1
+		country_event = EAI_CFG.7
+	}
+	option = { name = inf0 #default to 0 if the main army type is the same OR no attachment was assigned in presets
+		trigger = { OR = { has_country_flag = infantry_army_focus infantry_attachment_0 = yes NOT = { infantry_attachment_0 = yes infantry_attachment_1 = yes infantry_attachment_2 = yes } } }
+		ai_chance = { factor = 1 }
+
+		set_country_flag = infantry_attachment_0
+		country_event = EAI_CFG.7
+	}
+}
+
+country_event = { #mar attachment
+	id = EAI_CFG.7
 	title = ""
 	desc = ""
 	is_triggered_only = yes
@@ -151,28 +390,28 @@ country_event = { #mar attachment
 	option = { name = mar2
 		trigger = { marine_attachment_2 = yes NOT = { has_country_flag = marine_army_focus has_country_flag = infantry_attachment_2 has_country_flag = mountaineer_attachment_2 } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = marine_attachment_2
-		country_event = EAI_CFG.5
+		country_event = EAI_CFG.8
 	}
 	option = { name = mar1
 		trigger = { marine_attachment_1 = yes NOT = { has_country_flag = marine_army_focus } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = marine_attachment_1
-		country_event = EAI_CFG.5
+		country_event = EAI_CFG.8
 	}
 	option = { name = mar0
 		trigger = { OR = {  has_country_flag = marine_army_focus marine_attachment_0 = yes NOT = { marine_attachment_0 = yes marine_attachment_1 = yes marine_attachment_2 = yes } } }
 		ai_chance = { factor = 1 }
 
 		set_country_flag = marine_attachment_0
-		country_event = EAI_CFG.5
+		country_event = EAI_CFG.8
 	}
 }
 
 country_event = { #mnt attachment
-	id = EAI_CFG.5
+	id = EAI_CFG.8
 	title = ""
 	desc = ""
 	is_triggered_only = yes
@@ -180,133 +419,138 @@ country_event = { #mnt attachment
 	option = { name = mnt2
 		trigger = { mountaineer_attachment_2 = yes NOT = { has_country_flag = mountaineer_army_focus has_country_flag = marine_attachment_2 has_country_flag = infantry_attachment_2 } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = mountaineer_attachment_2
-		country_event = EAI_CFG.6
+		country_event = EAI_CFG.9
 	}
 	option = { name = mnt1
 		trigger = { mountaineer_attachment_1 = yes NOT = { has_country_flag = mountaineer_army_focus } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = mountaineer_attachment_1
-		country_event = EAI_CFG.6
+		country_event = EAI_CFG.9
 	}
 	option = { name = mnt0
 		trigger = { OR = { has_country_flag = mountaineer_army_focus mountaineer_attachment_0 = yes NOT = { mountaineer_attachment_0 = yes mountaineer_attachment_1 = yes mountaineer_attachment_2 = yes } } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = mountaineer_attachment_0
-		country_event = EAI_CFG.6
+		country_event = EAI_CFG.9
 	}
 }
 
 country_event = { #capital
-	id = EAI_CFG.6
+	id = EAI_CFG.9
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = capital
 		trigger = { capital_navy_focus_1 = yes }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 10 has_navy_size = { size > 100 } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 has_navy_size = { size > 100 } } #countries that start with a large navy like to focus on capital ships
 		}
-		
+
 		set_country_flag = capital_navy_focus_1
-		country_event = EAI_CFG.7
+		country_event = EAI_CFG.10
 	}
 	option = { name = nocapital
 		trigger = { OR = { capital_navy_focus_0 = yes NOT = { capital_navy_focus_0 = yes capital_navy_focus_1 = yes } } }
-		ai_chance = { 
+		ai_chance = {
 			factor = 1
-			modifier = { factor = 100 NOT = { major_country = yes } }
+			modifier = { factor = 100 NOT = { major_country = yes } } #minors dont want to focus on capital ships
 		}
-		
+
 		set_country_flag = capital_navy_focus_0
-		country_event = EAI_CFG.7
+		country_event = EAI_CFG.10
 	}
 }
 
 country_event = { #carrier
-	id = EAI_CFG.7
+	id = EAI_CFG.10
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = cv
 		trigger = { carrier_navy_focus_1 = yes }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 100 has_tech = early_carrier }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 100 has_tech = early_carrier } #countries that start with carrier tech will focus on carriers
 		}
-		
+
 		set_country_flag = carrier_navy_focus_1
-		country_event = EAI_CFG.8
+		country_event = EAI_CFG.11
 	}
 	option = { name = nocv
 		trigger = { OR = { carrier_navy_focus_0 = yes NOT = { carrier_navy_focus_0 = yes carrier_navy_focus_1 = yes } } }
-		ai_chance = { 
+		ai_chance = {
 			factor = 1
-			modifier = { factor = 100 NOT = { major_country = yes } }
+			modifier = { factor = 100 NOT = { major_country = yes } } #minors dont want to focus on carriers
 		}
-		
+
 		set_country_flag = carrier_navy_focus_0
-		country_event = EAI_CFG.8
+		country_event = EAI_CFG.11
 	}
 }
 
 country_event = { #cas/tac
-	id = EAI_CFG.8
+	id = EAI_CFG.11
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = cas
 		trigger = { OR = { cas_air_focus = yes NOT = { cas_air_focus = yes tac_air_focus = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 1.5 NOT = { major_country = yes } } #minors prefer cas
+			modifier = { factor = 1.5 OR = { tag = GER tag = SOV } } #ger/sov prefer cas
+		}
+
 		set_country_flag = cas_air_focus
-		country_event = EAI_CFG.9
+		country_event = EAI_CFG.12
 	}
 	option = { name = tac
 		trigger = { OR = { tac_air_focus = yes NOT = { cas_air_focus = yes tac_air_focus = yes } } }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = tac_air_focus
-		country_event = EAI_CFG.9
+		country_event = EAI_CFG.12
 	}
 }
 
 country_event = { #str
-	id = EAI_CFG.9
+	id = EAI_CFG.12
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = str
 		trigger = { str_air_focus_1 = yes }
-		ai_chance = { 
-			factor = 1 
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 4 OR = { tag = ENG tag = USA } } #eng/usa prefer str
 		}
-		
+
 		set_country_flag = str_air_focus_1
-		country_event = EAI_CFG.10
+		country_event = EAI_CFG.13
 	}
 	option = { name = nostr
 		trigger = { OR = { str_air_focus_0 = yes NOT = { str_air_focus_0 = yes str_air_focus_1 = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 100 NOT = { major_country = yes } }
+		ai_chance = {
+			factor = 2
+			modifier = { factor = 100 NOT = { major_country = yes } } #minors dont want str
 		}
-		
+
 		set_country_flag = str_air_focus_0
-		country_event = EAI_CFG.10
+		country_event = EAI_CFG.13
 	}
 }
 
 country_event = { #nav
-	id = EAI_CFG.10
+	id = EAI_CFG.13
 	title = ""
 	desc = ""
 	is_triggered_only = yes
@@ -314,32 +558,35 @@ country_event = { #nav
 	option = { name = nav
 		trigger = { nav_air_focus_1 = yes }
 		ai_chance = { factor = 1 }
-		
+
 		set_country_flag = nav_air_focus_1
-		country_event = EAI_CFG.11
+		country_event = EAI_CFG.14
 	}
 	option = { name = nonav
 		trigger = { OR = { nav_air_focus_0 = yes NOT = { nav_air_focus_0 = yes nav_air_focus_1 = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = { factor = 2 }
+
 		set_country_flag = nav_air_focus_0
-		country_event = EAI_CFG.11
+		country_event = EAI_CFG.14
 	}
 }
 
 country_event = { #land doctrine
-	id = EAI_CFG.11
+	id = EAI_CFG.14
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = mw
 		trigger = { OR = { mw_doctrine = yes NOT = { mw_doctrine = yes sf_doctrine = yes gb_doctrine = yes } } }
-		ai_chance = { factor = 1 }
-		
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 1.25 armor_tech_focus = yes } #armor focused countries prefer mobile warfare
+		}
+
 		set_country_flag = mw_doctrine
-		country_event = EAI_CFG.12
-		
+		country_event = EAI_CFG.15
+
 		if = { limit = { OR = { has_tech = superior_firepower has_tech = trench_warfare has_tech = mass_assault } }
 			set_technology = { mobile_warfare = 1 }
 			set_technology = { superior_firepower = 0 }
@@ -349,15 +596,15 @@ country_event = { #land doctrine
 	}
 	option = { name = sf
 		trigger = { OR = { sf_doctrine = yes NOT = { mw_doctrine = yes sf_doctrine = yes gb_doctrine = yes } } }
-		ai_chance = { 
-			factor = 2 
-			modifier = { factor = 10 NOT = { major_country = yes } } 
-			modifier = { factor = 10 has_country_flag = AT_army_focus }
+		ai_chance = {
+			factor = 1.25
+			modifier = { factor = 10 NOT = { major_country = yes } } #minors prefer sf
+			modifier = { factor = 10 has_country_flag = AT_army_focus } #at armies prefer sf or gb
 		}
-		
+
 		set_country_flag = sf_doctrine
-		country_event = EAI_CFG.12
-		
+		country_event = EAI_CFG.15
+
 		if = { limit = { OR = { has_tech = mobile_warfare has_tech = trench_warfare has_tech = mass_assault } }
 			set_technology = { mobile_warfare = 0 }
 			set_technology = { superior_firepower = 1 }
@@ -367,14 +614,14 @@ country_event = { #land doctrine
 	}
 	option = { name = gb
 		trigger = { OR = { gb_doctrine = yes NOT = { mw_doctrine = yes sf_doctrine = yes gb_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 10 has_country_flag = AT_army_focus }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 has_country_flag = AT_army_focus } #at armies prefer sf or gb
 		}
-		
+
 		set_country_flag = gb_doctrine
-		country_event = EAI_CFG.12
-		
+		country_event = EAI_CFG.15
+
 		if = { limit = { OR = { has_tech = mobile_warfare has_tech = superior_firepower has_tech = mass_assault } }
 			set_technology = { mobile_warfare = 0 }
 			set_technology = { superior_firepower = 0 }
@@ -385,21 +632,21 @@ country_event = { #land doctrine
 }
 
 country_event = { #air doctrine
-	id = EAI_CFG.12
+	id = EAI_CFG.15
 	title = ""
 	desc = ""
 	is_triggered_only = yes
-	
+
 	option = { name = sd
 		trigger = { OR = { SD_doctrine = yes NOT = { SD_doctrine = yes BFS_doctrine = yes OI_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 10 has_country_flag = str_air_focus_1 }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 has_country_flag = str_air_focus_1 } #countries that build str prefer sd
 		}
-		
+
 		set_country_flag = SD_doctrine
-		country_event = EAI_CFG.13
-		
+		country_event = EAI_CFG.16
+
 		if = { limit = { OR = { has_tech = formation_flying has_tech = force_rotation } }
 			set_technology = { air_superiority = 1 }
 			set_technology = { formation_flying = 0 }
@@ -408,14 +655,14 @@ country_event = { #air doctrine
 	}
 	option = { name = bfs
 		trigger = { OR = { BFS_doctrine = yes NOT = { SD_doctrine = yes BFS_doctrine = yes OI_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 1.25 has_country_flag = cas_air_focus }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 1.25 has_country_flag = cas_air_focus } #countries that build cas prefer bfs
 		}
-		
+
 		set_country_flag = BFS_doctrine
-		country_event = EAI_CFG.13
-		
+		country_event = EAI_CFG.16
+
 		if = { limit = { OR = { has_tech = air_superiority has_tech = force_rotation } }
 			set_technology = { air_superiority = 0 }
 			set_technology = { formation_flying = 1 }
@@ -424,14 +671,14 @@ country_event = { #air doctrine
 	}
 	option = { name = oi
 		trigger = { OR = { OI_doctrine = yes NOT = { SD_doctrine = yes BFS_doctrine = yes OI_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 1.5 NOT = { has_country_flag = cas_air_focus } }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 1.5 NOT = { has_country_flag = cas_air_focus } } #countries that dont build cas prefer oi
 		}
-		
+
 		set_country_flag = OI_doctrine
-		country_event = EAI_CFG.13
-		
+		country_event = EAI_CFG.16
+
 		if = { limit = { OR = { has_tech = air_superiority has_tech = formation_flying } }
 			set_technology = { air_superiority = 0 }
 			set_technology = { formation_flying = 0 }
@@ -441,19 +688,19 @@ country_event = { #air doctrine
 }
 
 country_event = { #naval doctrine
-	id = EAI_CFG.13
+	id = EAI_CFG.16
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	option = { name = fib
 		trigger = { OR = { FIB_doctrine = yes NOT = { FIB_doctrine = yes TI_doctrine = yes BS_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
+		ai_chance = {
+			factor = 1
 		}
-		
+
 		set_country_flag = FIB_doctrine
-		
+
 		if = { limit = { OR = { has_tech = trade_interdiction has_tech = base_strike } }
 			set_technology = { fleet_in_being = 1 }
 			set_technology = { trade_interdiction = 0 }
@@ -462,12 +709,12 @@ country_event = { #naval doctrine
 	}
 	option = { name = ti
 		trigger = { OR = { TI_doctrine = yes NOT = { FIB_doctrine = yes TI_doctrine = yes BS_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
+		ai_chance = {
+			factor = 1
 		}
-		
+
 		set_country_flag = TI_doctrine
-		
+
 		if = { limit = { OR = { has_tech = fleet_in_being has_tech = base_strike } }
 			set_technology = { fleet_in_being = 0 }
 			set_technology = { trade_interdiction = 1 }
@@ -476,17 +723,98 @@ country_event = { #naval doctrine
 	}
 	option = { name = bs
 		trigger = { OR = { BS_doctrine = yes NOT = { FIB_doctrine = yes TI_doctrine = yes BS_doctrine = yes } } }
-		ai_chance = { 
-			factor = 1 
-			modifier = { factor = 10 has_country_flag = carrier_navy_focus_1 }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 10 has_country_flag = carrier_navy_focus_1 } #countries that focus on carriers prefer bs
 		}
-		
+
 		set_country_flag = BS_doctrine
-		
+
 		if = { limit = { OR = { has_tech = fleet_in_being has_tech = trade_interdiction } }
 			set_technology = { fleet_in_being = 0 }
 			set_technology = { trade_interdiction = 0 }
 			set_technology = { base_strike = 1 }
 		}
 	}
+}
+
+###################
+
+country_event = { #change to more expensive designs and focuses in late game
+	id = EAI_CFG.100
+	hidden = yes
+
+	mean_time_to_happen = { days = 20 }
+
+	trigger = {
+		is_ai = yes
+		has_country_flag = infantry_design_B
+
+		date > 1945.1.1
+		OR = {
+			num_of_military_factories > 100
+			has_war = no
+		}
+	}
+
+	immediate = {
+		clr_country_flag = infantry_design_B
+
+		set_country_flag = infantry_design_A
+	}
+
+	option = {}
+}
+
+country_event = {
+	id = EAI_CFG.101
+	hidden = yes
+
+	mean_time_to_happen = { days = 20 }
+
+	trigger = {
+		is_ai = yes
+		has_country_flag = AT_army_focus
+
+		date > 1945.1.1
+		OR = {
+			num_of_military_factories > 100
+			has_war = no
+		}
+	}
+
+	immediate = {
+		clr_country_flag = AT_army_focus
+
+		if = { limit = { has_country_flag = marm_attachment }
+			set_country_flag = harm_army_focus
+
+			else = {
+				set_country_flag = marm_army_focus
+			}
+		}
+	}
+
+	option = {}
+}
+
+country_event = {
+	id = EAI_CFG.102
+	hidden = yes
+
+	mean_time_to_happen = { days = 20 }
+
+	trigger = {
+		is_ai = yes
+		NOT = { has_country_flag = mot_attachment }
+
+		date > 1945.1.1
+	}
+
+	immediate = {
+		set_country_flag = mot_attachmentS
+		set_country_flag = mot_design_B
+	}
+
+	option = {}
 }
