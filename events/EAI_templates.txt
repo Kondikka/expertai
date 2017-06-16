@@ -17,16 +17,28 @@ country_event = {
 
 		has_army_experience > 15
 
-		OR = {
+		OR = { #tech req
 			has_country_flag = infantry_army_focus
 			AND = { has_country_flag = infantry_attachment_1 has_tech = interwar_antitank }
 			AND = { has_country_flag = infantry_attachment_2 has_tech = interwar_antitank }
 		}
 
-		OR = {
+		OR = { #prioritise main infantry role
 			has_country_flag = infantry_army_focus
 			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
 			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+		
+		OR = { #prioritise armor role
+			has_country_flag = infantry_army_focus
+			NOT = { armor_tech_focus = yes }
+			AND = {
+				armor_tech_focus = yes
+				OR = {
+					AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+					AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+				}
+			}
 		}
 	}
 
@@ -316,16 +328,28 @@ country_event = {
 
 		has_tech = marines
 
-		OR = {
+		OR = { #tech req
 			has_country_flag = marine_army_focus
 			AND = { has_country_flag = marine_attachment_1 has_tech = interwar_antitank }
 			AND = { has_country_flag = marine_attachment_2 has_tech = interwar_antitank }
 		}
 
-		OR = {
+		OR = { #prioritise main infantry role
 			has_country_flag = marine_army_focus
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
 			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+		
+		OR = { #prioritise armor role
+			has_country_flag = marine_army_focus
+			NOT = { armor_tech_focus = yes }
+			AND = {
+				armor_tech_focus = yes
+				OR = {
+					AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+					AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+				}
+			}
 		}
 	}
 
@@ -615,16 +639,28 @@ country_event = {
 
 		has_tech = tech_mountaineers
 
-		OR = {
+		OR = { #tech req
 			has_country_flag = mountaineer_army_focus
 			AND = { has_country_flag = mountaineer_attachment_1 has_tech = interwar_antitank }
 			AND = { has_country_flag = mountaineer_attachment_2 has_tech = interwar_antitank }
 		}
 
-		OR = {
+		OR = { #prioritise main infantry role
 			has_country_flag = mountaineer_army_focus
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
 			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
+		}
+		
+		OR = { #prioritise armor role
+			has_country_flag = mountaineer_army_focus
+			NOT = { armor_tech_focus = yes }
+			AND = {
+				armor_tech_focus = yes
+				OR = {
+					AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+					AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+				}
+			}
 		}
 	}
 
@@ -912,7 +948,7 @@ country_event = {
 
 		has_army_experience > 25
 
-		OR = {
+		OR = { #tech req
 			AND = {
 				has_country_flag = infantry_army_focus
 				has_country_flag = infantry_template
@@ -944,11 +980,21 @@ country_event = {
 			}
 		}
 		
-		#role priority
-		OR = {
+		OR = { #prioritise main infantry role
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
 			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
 			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+		
+		OR = { #prioritise armor role
+			NOT = { armor_tech_focus = yes }
+			AND = {
+				armor_tech_focus = yes
+				OR = {
+					AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+					AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+				}
+			}
 		}
 	}
 
@@ -1253,13 +1299,14 @@ country_event = {
 			AND = { has_country_flag = marm_attachment date > 1942.1.1 }
 		}
 
-		OR = { has_tech = basic_medium_tank has_tech = improved_medium_tank }
+		#tech req
+		OR = { has_tech = basic_medium_tank has_tech = improved_medium_tank has_tech = advanced_medium_tank }
 	}
 
 	immediate = {
 		set_country_flag = marm_template
 
-		army_experience = -25
+		army_experience = -35
 
 		if = { limit = { has_country_flag = sf_doctrine }
 
@@ -1371,13 +1418,15 @@ country_event = {
 			AND = { has_country_flag = harm_attachment date > 1942.1.1 }
 		}
 
-		OR = { has_tech = basic_heavy_tank has_tech = improved_heavy_tank }
+		#tech req
+		OR = { has_tech = basic_heavy_tank has_tech = improved_heavy_tank has_tech = advanced_heavy_tank }
+		OR = { has_tech = basic_heavy_art has_tech = improved_heavy_art has_tech = advanced_heavy_art }
 	}
 
 	immediate = {
 		set_country_flag = harm_template
 
-		army_experience = -25
+		army_experience = -35
 
 		if = { limit = { has_country_flag = sf_doctrine }
 
@@ -1611,6 +1660,17 @@ country_event = {
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
 			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
 			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+		
+		OR = { #prioritise armor role
+			NOT = { armor_tech_focus = yes }
+			AND = {
+				armor_tech_focus = yes
+				OR = {
+					AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+					AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+				}
+			}
 		}
 	}
 
