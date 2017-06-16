@@ -124,9 +124,11 @@ country_event = { #armor type
 		trigger = { OR = { harm_army_focus = yes NOT = { marm_army_focus = yes harm_army_focus = yes AT_army_focus = yes } } }
 		ai_chance = {
 			factor = 1
+
 			modifier = { factor = 100 armor_tech_focus = yes } #armor focused countries should always go for armor
 			modifier = { factor = 10 chromium > 30 NOT = { major_country = yes } } #minors with a lot of chromium prefer heavy armor
 			modifier = { factor = 0.1 NOT = { chromium > 30 } NOT = { major_country = yes } } #if a minor doesn't have chromium, prefer medium armor
+			modifier = { factor = 5 tag = FRA } #france prefers early AT
 		}
 
 		set_country_flag = at_design_HTD
@@ -139,7 +141,7 @@ country_event = { #armor type
 		ai_chance = {
 			factor = 1
 			modifier = { factor = 1.5 NOT = { chromium > 30 tungsten > 30 } NOT = { major_country = yes } } #a minor without tungsten or chromium favors AT armies
-			modifier = { factor = 1.5 tag = FRA } #france prefers AT against germany
+			modifier = { factor = 5 tag = FRA } #france prefers early AT
 		}
 
 		set_country_flag = AT_army_focus
@@ -276,6 +278,7 @@ country_event = { #armor attachment
 		ai_chance = {
 			factor = 1
 			modifier = { factor = 100 NOT = { major_country = yes } } #minors prefer mot attachment because its cheaper
+			modifier = { factor = 5 tag = FRA } #france prefers early AT
 		}
 
 		if = { limit = { has_country_flag = AT_army_focus }
@@ -287,7 +290,11 @@ country_event = { #armor attachment
 	}
 	option = { name = harm
 		trigger = { NOT = { has_country_flag = harm_army_focus } OR = { harm_attachment = yes NOT = { mot_attachment = yes marm_attachment = yes harm_attachment = yes } } }
-		ai_chance = { factor = 1 }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 5 tag = FRA } #france prefers early AT
+			modifier = { factor = 1.5 OR = { tag = GER tag = SOV } }
+		}
 
 		if = { limit = { has_country_flag = AT_army_focus }
 			set_country_flag = at_design_HTD #uses HTD AT divisions
@@ -298,7 +305,10 @@ country_event = { #armor attachment
 	}
 	option = { name = marm
 		trigger = { NOT = { has_country_flag = marm_army_focus } OR = { mot_attachment = yes NOT = { mot_attachment = yes marm_attachment = yes harm_attachment = yes } } }
-		ai_chance = { factor = 1 }
+		ai_chance = {
+			factor = 1
+			modifier = { factor = 1.5 OR = { tag = GER tag = SOV } }
+		}
 
 		if = { limit = { has_country_flag = AT_army_focus }
 			set_country_flag = at_design_MTD #uses MTD AT divisions
@@ -328,6 +338,7 @@ country_event = { #mot design
 		trigger = { has_country_flag = mot_attachment }
 		ai_chance = {
 			factor = 1
+			modifier = { factor = 10 tag = SOV } #stalin's organ 
 		}
 
 		set_country_flag = mot_design_B #MOTART
@@ -342,7 +353,7 @@ country_event = { #mot design
 		set_country_flag = mot_design_C #LSPART
 		country_event = EAI_CFG.6
 	}
-	option = { name = C
+	option = { name = N
 		trigger = { NOT = { has_country_flag = mot_attachment } }
 		ai_chance = {
 			factor = 1
@@ -374,7 +385,7 @@ country_event = { #inf attachment
 	}
 	option = { name = inf0 #default to 0 if the main army type is the same OR no attachment was assigned in presets
 		trigger = { OR = { has_country_flag = infantry_army_focus infantry_attachment_0 = yes NOT = { infantry_attachment_0 = yes infantry_attachment_1 = yes infantry_attachment_2 = yes } } }
-		ai_chance = { factor = 1 }
+		ai_chance = { factor = 1.5 }
 
 		set_country_flag = infantry_attachment_0
 		country_event = EAI_CFG.7
@@ -403,7 +414,7 @@ country_event = { #mar attachment
 	}
 	option = { name = mar0
 		trigger = { OR = {  has_country_flag = marine_army_focus marine_attachment_0 = yes NOT = { marine_attachment_0 = yes marine_attachment_1 = yes marine_attachment_2 = yes } } }
-		ai_chance = { factor = 1 }
+		ai_chance = { factor = 1.5 }
 
 		set_country_flag = marine_attachment_0
 		country_event = EAI_CFG.8
@@ -432,7 +443,7 @@ country_event = { #mnt attachment
 	}
 	option = { name = mnt0
 		trigger = { OR = { has_country_flag = mountaineer_army_focus mountaineer_attachment_0 = yes NOT = { mountaineer_attachment_0 = yes mountaineer_attachment_1 = yes mountaineer_attachment_2 = yes } } }
-		ai_chance = { factor = 1 }
+		ai_chance = { factor = 1.5 }
 
 		set_country_flag = mountaineer_attachment_0
 		country_event = EAI_CFG.9
@@ -564,7 +575,7 @@ country_event = { #nav
 	}
 	option = { name = nonav
 		trigger = { OR = { nav_air_focus_0 = yes NOT = { nav_air_focus_0 = yes nav_air_focus_1 = yes } } }
-		ai_chance = { factor = 2 }
+		ai_chance = { factor = 1 }
 
 		set_country_flag = nav_air_focus_0
 		country_event = EAI_CFG.14
