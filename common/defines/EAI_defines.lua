@@ -40,73 +40,6 @@ NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 50								-- If XP is above this on the da
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 30
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.003
 
---DIVISION_DESIGN_WEIGHTS = {							-- Base values used by AI to evaluate value of a stat
---
---	-- Army Values
---	0.0, 		-- default_morale
---	0.0, 		-- defense
---	0.0, 		-- breakthrough
---	0.0, 		-- hardness
---	0.0, 		-- soft_attack
---	0.0, 		-- hard_attack
---	0.0, 		-- recon
---	0.0, 		-- entrenchment
---	0.0, 		-- initiative
---	0.0, 		-- casualty_trickleback
---	-0.0, 		-- supply_consumption_factor
---	-0.0, 		-- supply_consumption
---	0.0, 		-- suppression
---	0.0, 		-- suppression_factor
---	0.0, 		-- experience_loss_factor
---	
---	-- Navy Values
---	0.0, 		-- surface_detection
---	0.0, 		-- sub_detection
---	0.0, 		-- surface_visibility
---	0.0, 		-- sub_visibility
---	0.0, 		-- shore_bombardment
---	0.0, 		-- fire_range
---	0.0, 		-- evasion
---	0.0, 		-- torpedo_attack
---	0.0, 		-- sub_attack
---	0.0, 		-- attack
---	0.0, 		-- port_capacity_usage
---	0.0, 		-- anti_air_attack
---	0.0, 		-- amphibious_defense
---	0.0, 		-- naval_speed
---	0.0, 		-- naval_range
---	0.0, 		-- convoy_raiding_coordination
---	0.0, 		-- patrol_coordination
---	0.0, 		-- search_and_destroy_coordination
---	
---	-- Air Values
---	0.0, 		-- air_range
---	0.0, 		-- air_defence
---	0.0, 		-- air_attack
---	0.0, 		-- air_agility
---	0.0, 		-- air_bombing
---	0.0, 		-- air_superiority
---	0.0, 		-- naval_strike_attack
---	0.0, 		-- naval_strike_targetting
---	0.0, 		-- air_ground_attack
---	0.0, 		-- air_visibility_factor
---	
---	-- Common Values
---	0.0, 		-- max_organisation
---	0.0, 		-- max_strength
---	0.0, 		-- build_cost_ic
---	0.0,		-- maximum_speed
---	0.0,		-- armor_value
---	0.0,		-- ap_attack
---	0.0,		-- reliability
---	0.0,		-- reliability_factor
---	0.0, 		-- weight
---	
---	-- Special Values
---	0.0, 		-- strategic_attack
---	0.0, 		-- carrier_size
---}
-
 ----------------------
 
 NDefines.NAI.ESTIMATED_CONVOYS_PER_DIVISION = 6
@@ -142,6 +75,8 @@ NDefines.NAI.START_TRAINING_EQUIPMENT_LEVEL = 0.9               -- ai will not s
 NDefines.NAI.STOP_TRAINING_EQUIPMENT_LEVEL = 0.8                -- ai will not train if equipment drops below this level
 
 NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 5.0
+
+NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 7.0 -- Desire to boost relations subtracts the cost multiplied by this
 
 ----------------------
 
@@ -213,17 +148,17 @@ NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					-- The lower this number  the lon
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.2 --0.45				-- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
 
 --NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1
---
+
 NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				-- Organization % for unit to be considered strong
 NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					-- Strength (equipment) % for unit to be considered strong
---
+
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
 NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					-- Strength (equipment) % for unit to be considered weak
---
+
 --NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				-- % or more average plan preparation before executing
---NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
+NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			-- If less than this fraction of units on a front is moving  AI sees it as ready for action	
 --NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1 -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
 
 --NDefines.NAI.LOCATION_BALANCE_TO_ADVANCE = 0.0				-- Limit on location strength balance between country and enemy for unit to dare to move forward.
