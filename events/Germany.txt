@@ -1058,7 +1058,7 @@ country_event = {
 	}
 	option = { # Support the Czechs alone
 		name = germany.41.b	
-		trigger = { OR = { is_historical_focus_on = no is_ai = no } } #EAI
+		trigger = { is_puppet = no OR = { is_historical_focus_on = no is_ai = no } } #EAI
 		ai_chance = {
 			factor = 5
 			modifier = {
@@ -1788,8 +1788,10 @@ country_event = {
 		
 		if = {
 			limit = {
-				NOT = { 154 = { is_owned_by = HUN } }
-				HUN = { is_friend_or_potential_friend_of_GER = no }				
+				OR = {
+					NOT = { 154 = { is_owned_by = HUN } }
+					HUN = { is_friend_or_potential_friend_of_GER = no }
+				}				
 				73 = {
 					OR = {
 						is_owned_by = CZE
@@ -3405,6 +3407,28 @@ country_event = {
 			target = POL
 			type = take_state
 			generator = { 85 }
+		}
+		if = {
+			limit = {
+				CZE = {
+					exists = yes
+					is_subject = no
+					has_government = democratic
+					NOT = { is_in_faction_with = GER }
+				}	
+			}	
+			CZE = {
+				add_ai_strategy = {
+					type = conquer
+					id = "GER"			
+					value = 200
+				}
+				add_ai_strategy = {
+					type = alliance
+					id = "POL"			
+					value = 200
+				}	
+			}
 		}
 	}
 }
@@ -5130,9 +5154,11 @@ country_event = {
 		if = {
 			limit = {
 				is_in_faction_with = GER
+				is_subject = no
 			}
 			remove_from_faction = CZE #kicked from faction
 		}
+
 		effect_tooltip = {
 			GER = {
 				add_state_claim = 69
@@ -5186,10 +5212,27 @@ country_event = {
 		name = germany.123.a
 		add_state_claim = 69
 		add_state_claim = 74
-		create_wargoal = {
-			type = take_state_focus
-			target = CZE
-			generator = { 69 74 }
+		if = {
+			limit = {
+				CZE = { is_subject_of = FROM }
+				FROM = {
+					is_in_faction_with = GER
+					is_faction_leader = no
+				}
+			}
+			remove_from_faction = CZE
+			remove_from_faction = FROM
+		}
+		69 = {
+			controller = {
+				GER = {
+					create_wargoal = {
+						type = take_state_focus
+						target = PREV
+						generator = { 69 74 }
+					}
+				}
+			}
 		}
 	}
 }

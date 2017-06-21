@@ -51,8 +51,8 @@ NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
 NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		-- How many units a country wants is partially based on how much military industry that is available
 
-NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
-NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
+--NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					-- If AI has this much manpower he doesn't care about the percentage
+--NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					-- The AI will not deploy more units if he goes below this percentag
 
 NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			-- Cancel unit production if below this to get resources out to units in the field
 NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					-- Cancel unit production if below this to get resources out to units in the field
@@ -147,7 +147,7 @@ NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					-- The lower this number  the lon
 --NDefines.NAI.SCARY_LEVEL_AVERAGE_DEFENSE = -0.7                 -- average front defense modifier to make it consider it as a PITA to go for
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.2 --0.45				-- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
 
---NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1
+--NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1	-- How aggressive a country is in activating a plan based on how superiour their force is.
 
 NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		-- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				-- Organization % for unit to be considered strong
