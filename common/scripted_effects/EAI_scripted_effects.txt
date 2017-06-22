@@ -23,6 +23,10 @@ add_RADAR = {
 	set_state_flag = radar_site
 }
 
+add_AIR = {
+	add_building_construction = { type = air_base level = 1 instant_build = no }
+}
+
 add_RADAR_random = {
 	if = {
 		limit = {
@@ -41,6 +45,45 @@ add_RADAR_random = {
 				NOT = { any_neighbor_state = { CONTROLLER = { NOT = { tag = ROOT is_in_faction_with = ROOT } } } }
 			}
 			add_RADAR = yes
+		}
+	}
+}
+
+queue_OTHER = {
+	if = { limit = { any_enemy_country = { has_deployed_air_force_size = { size > 500 type = strategic_bomber } } }
+		queue_AA = yes
+	}
+	queue_INF = yes
+
+	queue_AIR = yes
+	queue_AIR = yes
+	queue_AIR = yes
+}
+
+queue_AIR = {
+	if = {
+		limit = { any_state = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_0 = yes } } } }
+		random_state = { limit = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_0 = yes } } } add_AIR = yes }
+
+		else = {
+			if = {
+				limit = { any_state = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_1 = yes } } } }
+				random_state = { limit = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_1 = yes } } } add_AIR = yes }
+
+				else = {
+					if = {
+						limit = { any_state = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_2 = yes } } } }
+						random_state = { limit = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_2 = yes } } } add_AIR = yes }
+
+						#else = {
+						#	if = {
+						#		limit = { any_state = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_3 = yes } } } }
+						#		random_state = { limit = { available_AIR = yes any_neighbor_state = { CONTROLLER = { threat_potential_3 = yes } } } add_AIR = yes }
+						#	}
+						#}
+					}
+				}
+			}
 		}
 	}
 }
@@ -273,7 +316,9 @@ queue_RADAR = {
 queue_AA = {
 	if = {
 		limit = {
-			is_major = yes NOT = { original_tag = USA }
+			any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+			
+			is_major = yes
 			any_state = {
 				is_controlled_by = ROOT
 				free_building_slots = { building = anti_air_building size > 0 include_locked = no }
@@ -291,10 +336,31 @@ queue_AA = {
 	}
 }
 
-queue_INF = {
-	every_state = {
-		limit = { available_INF = yes is_in_home_area = yes NOT = { state = 378 state = 395 state = 393 } } #USA focuses already add inf
-		add_INF = yes
+queue_INF = { #only used to construct infrastructure for supply
+	if = {
+		limit = { any_state = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_0 = yes } } } }
+		random_state = { limit = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_0 = yes } } } add_INF = yes }
+
+		else = {
+			if = {
+				limit = { any_state = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_1 = yes } } } }
+				random_state = { limit = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_1 = yes } } } add_INF = yes }
+
+				else = {
+					if = {
+						limit = { any_state = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_2 = yes } } } }
+						random_state = { limit = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_2 = yes } } } add_INF = yes }
+
+						else = {
+							if = {
+								limit = { any_state = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_3 = yes } } } }
+								random_state = { limit = { available_INF = yes any_neighbor_state = { CONTROLLER = { threat_potential_3 = yes } } } add_INF = yes }
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -683,7 +749,7 @@ queue_CIC = {
 												}
 											}
 										}
-										else = { queue_AA = yes }
+										else = { queue_OTHER = yes }
 									}
 								}
 							}
@@ -1080,7 +1146,7 @@ queue_MIC = {
 												}
 											}
 										}
-										else = { queue_AA = yes }
+										else = { queue_OTHER = yes }
 									}
 								}
 							}

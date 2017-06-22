@@ -179,19 +179,27 @@ carrier_developed = {
 #	CONSTRUCTION
 ######################################################
 
+available_AIR = {
+	CONTROLLER = { OR = { tag = ROOT AND = { is_puppet_of = ROOT OR = { has_autonomy_state = autonomy_integrated_puppet has_autonomy_state = autonomy_puppet has_autonomy_state = autonomy_colony } } } }
+	free_building_slots = { building = air_base size > 0 include_locked = no }
+	NOT = { free_building_slots = { building = air_base size < 7 include_locked = no } }
+	NOT = { 
+		any_neighbor_state = {
+			CONTROLLER = { OR = { tag = ROOT AND = { is_puppet_of = ROOT OR = { has_autonomy_state = autonomy_integrated_puppet has_autonomy_state = autonomy_puppet has_autonomy_state = autonomy_colony } } } }
+			free_building_slots = { building = air_base size < 7 include_locked = no }
+		} 
+	}
+}
+
 available_RADAR = {
 	is_controlled_by = ROOT
 	free_building_slots = { building = radar_station size > 0 include_locked = no }
 }
 
 available_INF = {
-	is_controlled_by = ROOT
-	OR = {
-		AND = { has_state_category = megalopolis free_building_slots = { building = industrial_complex size > 6 include_locked = no } }
-		AND = { has_state_category = metropolis free_building_slots = { building = industrial_complex size > 4 include_locked = no } }
-		AND = { has_state_category = large_city free_building_slots = { building = industrial_complex size > 2 include_locked = no } }
-	}
-	free_building_slots = { building = infrastructure size > 3 include_locked = no }
+	CONTROLLER = { OR = { tag = ROOT AND = { is_puppet_of = ROOT OR = { has_autonomy_state = autonomy_integrated_puppet has_autonomy_state = autonomy_puppet has_autonomy_state = autonomy_colony } } } }
+	free_building_slots = { building = infrastructure size > 5 include_locked = no }
+	NOT = { is_island_state = yes }
 }
 
 no_border = {
@@ -443,6 +451,39 @@ western_china = {
 #	MISC
 ######################################################
 
+threat_potential_0 = {
+	has_war_with = ROOT
+}
+
+threat_potential_1 = {
+	NOT = { is_in_faction_with = ROOT }
+	OR = {
+		is_justifying_wargoal_against = ROOT
+		has_wargoal_against = ROOT
+		any_allied_country = { PREV = { is_justifying_wargoal_against = PREV } }
+		any_allied_country = { PREV = { has_wargoal_against = PREV } }
+	}
+}
+
+threat_potential_2 = {
+	NOT = { is_in_faction_with = ROOT }
+	has_offensive_war = yes
+	threat > 0.5
+}
+
+threat_potential_3 = {
+	NOT = { is_in_faction_with = ROOT }
+	OR = {
+		ROOT = { has_war = yes }
+		AND = { has_war = yes threat > 0.5 }
+	}
+	OR = {
+		AND = { has_government = fascism ROOT = { NOT = { has_government = fascism } } }
+		AND = { has_government = communism ROOT = { NOT = { has_government = communism } } }
+		AND = { has_government = democratic ROOT = { NOT = { has_government = democratic } } }
+	}
+}
+
 major_country = { #defines the true majors in a game - add a tag here if you want to "unlock" other countries
 	OR = {
 		original_tag = ENG
@@ -569,7 +610,7 @@ army_limit_1250k = {
 	OR = {
 		AND = { original_tag = CHI is_major = no }
 		AND = { original_tag = PRC is_major = no }
-	
+
 		original_tag = RAJ
 		original_tag = BRA
 	}
@@ -631,26 +672,26 @@ army_limit_250k = {
 }
 
 #disable scaling army size to factory number
-exclude_minor_from_production_limit_A = { 
+exclude_minor_from_production_limit_A = {
 	OR = {
 		original_tag = CHI
 	}
 }
 
-exclude_major_from_production_limit_A = { 
+exclude_major_from_production_limit_A = {
 	OR = {
 		original_tag = GER
 		original_tag = JAP
 		original_tag = SOV
 	}
 }
-exclude_major_from_production_limit_B = { 
+exclude_major_from_production_limit_B = {
 	OR = {
 		original_tag = JAP
 		original_tag = SOV
 	}
 }
-exclude_major_from_production_limit_C = { 
+exclude_major_from_production_limit_C = {
 	OR = {
 		original_tag = SOV
 	}

@@ -589,6 +589,8 @@ country_event = { #ENG
 				if = { limit = { num_of_military_factories < 100 }
 					queue_RADAR = yes
 					queue_RADAR = yes
+					
+					queue_AA = yes
 
 					queue_NIC = yes
 
@@ -607,6 +609,8 @@ country_event = { #ENG
 					else = {
 						queue_RADAR = yes
 						queue_RADAR = yes
+						
+						queue_AA = yes
 
 						queue_NIC = yes
 
@@ -654,6 +658,8 @@ country_event = { #JAP
 			else = {
 				if = { limit = { num_of_military_factories < 75 }
 					queue_NIC = yes
+					
+					queue_AA = yes
 
 					queue_REF = yes
 					queue_REF = yes
@@ -670,6 +676,8 @@ country_event = { #JAP
 						if = { limit = { num_of_military_factories < 100 }
 							queue_NIC = yes
 							queue_NIC = yes
+							
+							queue_AA = yes
 
 							queue_REF = yes
 							queue_REF = yes
@@ -686,6 +694,8 @@ country_event = { #JAP
 									queue_NIC = yes
 									queue_NIC = yes
 									queue_NIC = yes
+									
+									queue_AA = yes
 
 									queue_REF = yes
 									queue_REF = yes
@@ -700,6 +710,8 @@ country_event = { #JAP
 										queue_NIC = yes
 										queue_NIC = yes
 										queue_NIC = yes
+										
+										queue_AA = yes
 
 										queue_REF = yes
 										queue_REF = yes
@@ -764,7 +776,6 @@ country_event = { #GER
 							queue_REF = yes
 							queue_REF = yes
 							queue_AA = yes
-							queue_AA = yes
 
 							queue_MIC = yes
 							queue_MIC = yes
@@ -780,7 +791,6 @@ country_event = { #GER
 									queue_REF = yes
 									queue_REF = yes
 									queue_AA = yes
-									queue_AA = yes
 
 									queue_MIC = yes
 									queue_MIC = yes
@@ -791,7 +801,6 @@ country_event = { #GER
 									else = {
 										if = { limit = { num_of_military_factories < 450 }
 											queue_REF = yes
-											queue_AA = yes
 											queue_AA = yes
 											queue_AA = yes
 
@@ -806,7 +815,6 @@ country_event = { #GER
 
 											else = {
 												queue_REF = yes
-												queue_AA = yes
 												queue_AA = yes
 												queue_AA = yes
 
@@ -863,6 +871,8 @@ country_event = { #SOV
 
 			else = {
 				if = { limit = { num_of_military_factories < 300 }
+					queue_AA = yes
+				
 					queue_MIC = yes
 					queue_MIC = yes
 					queue_MIC = yes
@@ -885,6 +895,9 @@ country_event = { #SOV
 
 					else = {
 						if = { limit = { num_of_military_factories < 500 }
+							queue_AA = yes
+							queue_AA = yes
+						
 							queue_REF = yes
 							queue_REF = yes
 							queue_MIC = yes
@@ -906,6 +919,11 @@ country_event = { #SOV
 							queue_MIC = yes
 
 							else = {
+								queue_AA = yes
+								queue_AA = yes
+								queue_AA = yes
+								queue_AA = yes
+							
 								queue_NIC = yes
 								queue_NIC = yes
 								queue_NIC = yes
@@ -965,7 +983,6 @@ country_event = { #ITA
 					queue_REF = yes
 					queue_REF = yes
 					queue_AA = yes
-					queue_AA = yes
 
 					queue_MIC = yes
 					queue_MIC = yes
@@ -977,13 +994,12 @@ country_event = { #ITA
 
 					else = {
 						queue_NIC = yes
-						queue_NIC = yes
 
 						queue_REF = yes
 						queue_REF = yes
 						queue_AA = yes
-						queue_AA = yes
 
+						queue_MIC = yes
 						queue_MIC = yes
 						queue_MIC = yes
 						queue_MIC = yes
@@ -1007,6 +1023,9 @@ country_event = { #USA
 
 		queue_RADAR = yes
 		queue_RADAR = yes
+		
+		queue_AA = yes
+		queue_AA = yes
 
 		queue_REF = yes
 
@@ -1175,60 +1194,25 @@ country_event = { #SOV
 
 ###########################
 
-country_event = { #RADAR
+country_event = { #USE FREE CIC
 	id = EAI_C.100
 	hidden = yes
-	mean_time_to_happen = { days = 40 }
+	mean_time_to_happen = { days = 2 }
 	trigger = {
 		is_ai = yes
 		date > 1938.1.1
 
-		OR = {
-			AND = { #when there is nothing else to build, build more radar
-				num_of_available_civilian_factories > 1
-				any_state = { available_RADAR = yes NOT = { any_state = { OR = { has_state_flag = radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } }
-			}
-			any_state = { radar_location_2 = yes available_RADAR = yes } #max out any important locations
-		}
+		num_of_available_civilian_factories > 5
 	}
 
 	immediate = {
-		if = { limit = { num_of_available_civilian_factories > 1 any_state = { available_RADAR = yes } }
-			if = {
-				limit = { any_state = { radar_location = yes available_RADAR = yes } }
-				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-
-				else = {
-					add_RADAR_random = yes
-				}
+		if = {
+			limit = { any_state = { available_RADAR = yes has_state_flag = radar_site NOT = { any_state = { OR = { has_state_flag = radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } }
+			queue_RADAR = yes
+			
+			else = {
+				queue_OTHER = yes
 			}
-			if = {
-				limit = { any_state = { radar_location = yes available_RADAR = yes } }
-				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-
-				else = {
-					add_RADAR_random = yes
-				}
-			}
-			if = {
-				limit = { any_state = { radar_location = yes available_RADAR = yes } }
-				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-
-				else = {
-					add_RADAR_random = yes
-				}
-			}
-			if = {
-				limit = { any_state = { radar_location = yes available_RADAR = yes } }
-				random_state = { limit = { radar_location = yes available_RADAR = yes } add_RADAR = yes }
-
-				else = {
-					add_RADAR_random = yes
-				}
-			}
-		}
-		if = { limit = { any_state = { radar_location_2 = yes available_RADAR = yes } }
-			every_state = { limit = { radar_location_2 = yes available_RADAR = yes } add_RADAR = yes }
 		}
 	}
 	option = {}
