@@ -38,7 +38,7 @@ NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 50								        -- If XP is above this o
 --NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 30
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.003
+NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.01
 
 ----------------------
 
@@ -54,10 +54,10 @@ NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		        -- How
 --NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					            -- If AI has this much manpower he doesn't care about the percentage
 --NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					                -- The AI will not deploy more units if he goes below this percentag
 
-NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7			                -- Cancel unit production if below this to get resources out to units in the field
+NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.8			                -- Cancel unit production if below this to get resources out to units in the field
 NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					                -- Cancel unit production if below this to get resources out to units in the field
 
-NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.25
+NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1.5
 
 NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
 --NDefines.NAI.PRODUCTION_UNAVAILABLE_RESORCE_FACTORY_FACTOR = 0.5
