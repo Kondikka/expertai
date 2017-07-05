@@ -1972,6 +1972,73 @@ country_event = { #mech type
 	option = {}
 }
 
+############# garrison
+
+country_event = {
+	id = EAI_T.20
+	hidden = yes
+
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes
+		NOT = { has_country_flag = garrison_template }
+		
+		has_tech = tech_engineers
+		has_tech = gw_artillery
+		
+		has_army_experience > 10
+		
+		OR = { #prioritise main infantry role
+			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
+			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
+			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+
+		if = { #prioritise armor role
+			limit = { armor_tech_focus = yes NOT = { has_country_flag = AT_army_focus } }
+			OR = {
+				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
+				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
+			}
+		}
+		
+		if = { #prioritise AT role
+			limit = { NOT = { armor_tech_focus = yes } NOT = { has_country_flag = infantry_army_focus } has_country_flag = AT_army_focus }
+			has_country_flag = at_template
+		}
+	}
+
+	immediate = {
+		set_country_flag = garrison_template
+		
+		army_experience = -10
+		
+		division_template = {
+			name = "Garrison Division"
+			priority = 0
+
+			regiments = {
+				infantry = { x = 0 y = 0 }
+				infantry = { x = 0 y = 1 }
+				infantry = { x = 0 y = 2 }
+
+				infantry = { x = 1 y = 0 }
+				infantry = { x = 1 y = 1 }
+				infantry = { x = 1 y = 2 }
+			}
+
+			support = {
+				engineer = { x = 0 y = 0 }
+				artillery = { x = 0 y = 1 }
+			}
+		}
+	}
+
+	option = {}
+}
+
+
 ############# AI design priority rotation to make sure it makes changes to every template
 
 country_event = {
@@ -2291,7 +2358,7 @@ country_event = {
 
 		set_country_flag = garrison_rotation
 
-		country_event = { id = EAI_T.111 days = 15 }
+		country_event = { id = EAI_T.111 days = 1 }
 	}
 
 	option = {}
