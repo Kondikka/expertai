@@ -155,11 +155,11 @@ NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					    -- Strength (equipmen
 
 --NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				            -- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action	
---NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1                                     -- -0.81					-- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
+--NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1                                     -- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
 
 --NDefines.NAI.LOCATION_BALANCE_TO_ADVANCE = 0.0				                -- Limit on location strength balance between country and enemy for unit to dare to move forward.
 NDefines.NAI.PLAN_ACTIVATION_MAJOR_WEIGHT_FACTOR = 0.0 		                    -- AI countries will hold on activating plans if stronger countries have plans in the same location. Majors count extra (value of 1 will negate this)
---NDefines.NAI.PLAN_ACTIVATION_PLAYER_WEIGHT_FACTOR = 0.0 		                -- AI countries will hold on activating plans if player controlled countries have plans in the same location. Majors count extra (value of 1 will negate this)
+NDefines.NAI.PLAN_ACTIVATION_PLAYER_WEIGHT_FACTOR = 0.0 		                -- AI countries will hold on activating plans if player controlled countries have plans in the same location. Majors count extra (value of 1 will negate this)
 --NDefines.NAI.FRONT_TERRAIN_DEFENSE_FACTOR = 5.0 				                -- Multiplier applied to unit defense modifier for terrain on front province multiplied by terrain importance
 --NDefines.NAI.FRONT_TERRAIN_ATTACK_FACTOR = 5.0 				                -- Multiplier applied to unit attack modifier for terrain on enemy front province multiplied by terrain importance
 NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country with less provinces than this will not draw fallback plans  but rather station their troops along the front
@@ -167,31 +167,31 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 --------------------------------------------------------------------------------------------------------------
 
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
---NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 15				                -- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
-NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 60						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
---NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 10000 				                -- Base value when AI is evaluating distance score to places
---NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 4000 --2000				        -- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 10				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
+NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 100						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
+--NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500 				                -- Base value when AI is evaluating distance score to places
+--NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_PATROL_DIVISOR = 1 		                -- Divides patrol score when not defending
---NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 1 		                -- Divides escort score when not defending
---NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 1 			                    -- Extra patrol mission score near owned provinces
---NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_OWNED = 1 			                    -- Extra escort mission score near owned provinces
---NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_CONTROLLED = 1 	                    -- Extra patrol mission score near controlled provinces
---NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_CONTROLLED = 1 	                    -- Extra escort mission score near controlled provinces
---NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 100.0 			                -- If the enemy has a navy at least these many times stronger that the own  don't bother invading
---NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0
---NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 100 --5
---NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 0                             -- 100		-- Weight of capital when calculating naval theatre assignment
---NDefines.NAI.NAVAL_THEATRE_PRIO_NAVAL_BASE_SCORE = 1 --1	                    -- Weight of naval bases when calculating naval theatre assignment
---NDefines.NAI.NAVAL_THEATRE_PRIO_MIN_DISTANCE = 250 --2000		                -- Minimum distance (in km) between priority theatres for naval assignment, to spread navy out
+--NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 2 		                -- Divides escort score when not defending
+--NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 50000 			                -- Extra patrol mission score near owned provinces
+--NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_OWNED = 20000 			                -- Extra escort mission score near owned provinces
+--NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_CONTROLLED = 12000 	                -- Extra patrol mission score near controlled provinces
+--NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_CONTROLLED = 5500 	                    -- Extra escort mission score near controlled provinces
+--NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 2.5		                	-- If the enemy has a navy at least these many times stronger that the own  don't bother invading
+--NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 200.0
+--NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 5
+--NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 100                           -- Weight of capital when calculating naval theatre assignment
+--NDefines.NAI.NAVAL_THEATRE_PRIO_NAVAL_BASE_SCORE = 1	                    	-- Weight of naval bases when calculating naval theatre assignment
+--NDefines.NAI.NAVAL_THEATRE_PRIO_MIN_DISTANCE = 2000		                	-- Minimum distance (in km) between priority theatres for naval assignment, to spread navy out
 
 --NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0.08			                    -- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
 --NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0.4                      -- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
 
---NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = 0 --25					        -- Threat value per convoy sunk in a region. Decays over time.
---NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 0 --1				            -- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
+--NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = 0					       		-- Threat value per convoy sunk in a region. Decays over time.
+--NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 0				           		-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
 
 --NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 30.0
-NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 40 --go crazy with it - control through scripts
+NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 40
 
 --------------------------------------------------------------------------------------------------------------
 
