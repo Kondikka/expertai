@@ -166,8 +166,23 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 
 --------------------------------------------------------------------------------------------------------------
 
+NDefines.NNavy.COMBAT_MIN_WIN_CHANCE_TO_KEEP_FIGHTING = 0.5
+NDefines.NNavy.REPAIR_AND_RETURN_UNIT_DYING_STR = 0.5
+
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_LOW = 0.8									--vanilla = 0.2
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_MEDIUM = 0.85								--vanilla = 0.5
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_HIGH = 0.9								--vanilla = 0.9
+
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_LOW_COMBAT = 0.70							--vanilla = 0.1
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_MEDIUM_COMBAT = 0.75						--vanilla = 0.3
+NDefines.NNavy.REPAIR_AND_RETURN_PRIO_HIGH_COMBAT = 0.80						--vanilla = 0.5
+
+NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_LOW = 0.7							--vanilla = 0.2
+NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_MEDIUM = 0.8						--vanilla = 0.4
+NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.9						--vanilla = 0.8
+
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
-NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 10				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
+NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 100						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
 --NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500 				                -- Base value when AI is evaluating distance score to places
 --NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
