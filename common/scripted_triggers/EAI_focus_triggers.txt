@@ -143,7 +143,6 @@ gb_doctrine = {
 		original_tag = ENG
 		original_tag = FRA
 		original_tag = ITA
-		original_tag = JAP
 	}
 }
 
@@ -208,7 +207,7 @@ infantry_design_A = { #inf art
 	OR = {
 		has_country_flag = infantry_design_A
 		has_country_flag = infantry_design_A_override
-	
+
 		#ARMY PRESETS
 	}
 }
@@ -217,7 +216,7 @@ infantry_design_B = { #pure inf designs
 	OR = {
 		has_country_flag = infantry_design_B
 		has_country_flag = infantry_design_B_override
-	
+
 		#ARMY PRESETS
 		original_tag = SOV
 
@@ -305,7 +304,7 @@ armor_design_A = { #more tanks, less spart
 	OR = {
 		has_country_flag = armor_design_A
 		has_country_flag = armor_design_A_override
-	
+
 		#ARMY PRESETS
 		original_tag = GER
 		original_tag = SOV
@@ -316,7 +315,7 @@ armor_design_B = {
 	OR = {
 		has_country_flag = armor_design_B
 		has_country_flag = armor_design_B_override
-		
+
 		#ARMY PRESETS
 		original_tag = GER
 		original_tag = SOV
@@ -327,7 +326,7 @@ armor_design_C = { #less tanks, more spart
 	OR = {
 		has_country_flag = armor_design_C
 		has_country_flag = armor_design_C_override
-		
+
 		#ARMY PRESETS
 	}
 }
@@ -357,7 +356,7 @@ harm_attachment = {
 		#ARMY PRESETS
 		original_tag = GER
 		original_tag = FRA
-		
+
 		AND = { original_tag = JAP has_country_flag = AT_army_focus }
 		AND = { original_tag = ITA has_country_flag = AT_army_focus }
 	}
@@ -367,11 +366,11 @@ marm_attachment = {
 	OR = {
 		has_country_flag = marm_attachment
 		has_country_flag = marm_attachment_override
-		has_global_flag = EAI_random_focuses  
+		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
 		original_tag = GER
-		
+
 		AND = { original_tag = JAP has_country_flag = AT_army_focus }
 		AND = { original_tag = ITA has_country_flag = AT_army_focus }
 	}
@@ -643,6 +642,7 @@ capital_navy_focus_1 = { #for building early, other AIs may build them later in 
 
 #SUPPORT COMPANIES
 maintenance_tech_focus = {
+	has_army_size = { type = armor size > 5 }
 	OR = {
 		major_country = yes
 		ai_has_role_template = armor
@@ -684,7 +684,6 @@ armor_tech_focus = {
 		original_tag = GER
 		original_tag = USA
 		original_tag = SOV
-		AND = { has_country_flag = AT_army_focus OR = { has_country_flag = marm_attachment has_country_flag = harm_attachment } }
 	}
 }
 
@@ -695,16 +694,20 @@ navy_tech_focus = { #CL DD
 		original_tag = ENG
 		original_tag = JAP
 		original_tag = ITA
+
+		num_of_naval_factories > 50
 	}
 }
 carrier_tech_focus = {
 	OR = {
 		has_country_flag = carrier_navy_focus_1
+		num_of_naval_factories > 50
 	}
 }
 capital_tech_focus = {
 	OR = {
 		has_country_flag = capital_navy_focus_1
+		num_of_naval_factories > 30
 	}
 }
 
@@ -741,7 +744,7 @@ str_tech_focus = {
 }
 
 #INFANTRY FOCUS
-infantry_tech_focus = { #sup 1-2, inf 1-3 techs
+infantry_tech_focus = {
 	OR = {
 		original_tag = GER
 		original_tag = SOV
@@ -764,19 +767,23 @@ mountaineer_tech_focus = {
 	}
 }
 artillery_tech_focus = {
+	if = { limit = { has_global_flag = EAI_limit_research }
+		major_country = yes
+	}
 	OR = {
 		has_country_flag = infantry_design_A
 	}
 }
 rart_tech_focus = {
+	if = { limit = { has_global_flag = EAI_limit_research }
+		major_country = yes
+	}
 	OR = {
 		has_country_flag = sf_doctrine
 	}
 }
 anti_tank_tech_focus = {
 	OR = {
-		NOT = { major_country = yes has_global_flag = EAI_limit_research }
-
 		has_country_flag = AT_army_focus
 	}
 }
@@ -793,6 +800,9 @@ air_doctrine_tech_focus = { #will attempt to research earlier
 		original_tag = ENG
 		original_tag = GER
 		original_tag = SOV
+		original_tag = ITA
+
+		has_deployed_air_force_size = { size > 3000 }
 	}
 }
 naval_doctrine_tech_focus = { #will attempt to research earlier
@@ -800,6 +810,8 @@ naval_doctrine_tech_focus = { #will attempt to research earlier
 		original_tag = USA
 		original_tag = ENG
 		original_tag = JAP
+
+		has_navy_size = { size > 75 }
 	}
 }
 land_doctrine_tech_focus = { #research land doctrine from the start
@@ -822,18 +834,25 @@ transport_tech_focus = {
 		original_tag = USA
 		original_tag = ENG
 		original_tag = JAP
+
+		num_of_naval_factories > 50
 	}
 }
 
 #INDUSTRY
 concentrated_industry_tech_focus = {
 	OR = {
-		NOT = { major_country = yes }
+		NOT = {
+			major_country = yes
+			any_enemy_country = { has_deployed_air_force_size = { size > 500 type = strategic_bomber } }
+		}
 	}
 }
 dispersed_industry_tech_focus = {
 	OR = {
 		major_country = yes
+
+		any_enemy_country = { has_deployed_air_force_size = { size > 500 type = strategic_bomber } }
 	}
 }
 synth_tech_focus = {
@@ -862,5 +881,11 @@ radar_tech_focus_2 = { #extra priority on higher radar techs
 nuclear_tech_focus = {
 	OR = {
 		original_tag = USA
+		AND = {
+			num_of_factories > 500
+			date > 1945.1.1
+			has_war = yes
+			NOT = { any_neighbor_country = { has_war_with = ROOT } }
+		}
 	}
 }

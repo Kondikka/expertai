@@ -1,11 +1,11 @@
---NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0                      -- Multiplies value based on relative military industry size / country size.
-NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 2                       -- Multiplies value based on relative naval industry size / country size.
-NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 2                         -- Multiplies value based on relative number of air base / country size.
-NDefines.NAI.RESEARCH_DAYS_BETWEEN_WEIGHT_UPDATE = 1
+NDefines.NAI.RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0                      	-- Multiplies value based on relative military industry size / country size.
+NDefines.NAI.RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 0                       -- Multiplies value based on relative naval industry size / country size.
+NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 0                         -- Multiplies value based on relative number of air base / country size.
+--NDefines.NAI.RESEARCH_DAYS_BETWEEN_WEIGHT_UPDATE = 1
 NDefines.NAI.MAX_AHEAD_RESEARCH_PENALTY = 10
 
 NDefines.NAI.RESEARCH_NEW_WEIGHT_FACTOR = 0			                            -- Impact of previously unexplored tech weights. Higher means more random exploration.
-NDefines.NAI.RESEARCH_BONUS_FACTOR = 2 				                            -- To which extent AI should care about bonuses to research
+NDefines.NAI.RESEARCH_BONUS_FACTOR = 5 				                       		-- To which extent AI should care about bonuses to research
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
@@ -16,7 +16,7 @@ NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_LAND = 0		                -- Ratio to send stockpile from equipment
 --NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_LAND = 0		                -- Count of daily production amount of equipment to send
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_AIR = 0		                -- Ratio to send stockpile from equipment
-----NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_AIR = 0		                -- Count of daily production amount of equipment to send
+--NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_AIR = 0		                -- Count of daily production amount of equipment to send
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_NAVAL = 0		                -- Ratio to send stockpile from equipment
 --NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_NAVAL = 0		                -- Count of daily production amount of equipment to send
 
@@ -183,9 +183,9 @@ NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.9						--vanilla = 0.8
 
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
 NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
-NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 100						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
+NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
 --NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500 				                -- Base value when AI is evaluating distance score to places
---NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_PATROL_DIVISOR = 1 		                -- Divides patrol score when not defending
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 2 		                -- Divides escort score when not defending
 --NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 50000 			                -- Extra patrol mission score near owned provinces
