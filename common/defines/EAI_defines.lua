@@ -181,11 +181,11 @@ NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_LOW = 0.7							--vanilla = 0.2
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_MEDIUM = 0.8						--vanilla = 0.4
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.9						--vanilla = 0.8
 
-NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 15
+NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 10
 NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
 --NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500 				                -- Base value when AI is evaluating distance score to places
-NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+--NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_PATROL_DIVISOR = 1 		                -- Divides patrol score when not defending
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 2 		                -- Divides escort score when not defending
 --NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 50000 			                -- Extra patrol mission score near owned provinces
@@ -193,7 +193,7 @@ NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for 
 --NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_CONTROLLED = 12000 	                -- Extra patrol mission score near controlled provinces
 --NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_CONTROLLED = 5500 	                    -- Extra escort mission score near controlled provinces
 --NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 2.5		                	-- If the enemy has a navy at least these many times stronger that the own  don't bother invading
---NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 200.0
+NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0
 --NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 5
 --NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 100                           -- Weight of capital when calculating naval theatre assignment
 --NDefines.NAI.NAVAL_THEATRE_PRIO_NAVAL_BASE_SCORE = 1	                    	-- Weight of naval bases when calculating naval theatre assignment
