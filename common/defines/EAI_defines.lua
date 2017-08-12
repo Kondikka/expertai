@@ -147,11 +147,11 @@ NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					                    -- The lower 
 
 NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				            -- Organization % for unit to be considered strong
-NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					    -- Strength (equipment) % for unit to be considered strong
+NDefines.NAI.STR_UNIT_STRONG = 0.75 --0.9 --0.7		0.75					    -- Strength (equipment) % for unit to be considered strong
 
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
-NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					    -- Strength (equipment) % for unit to be considered weak
+NDefines.NAI.STR_UNIT_WEAK = 0.6 --0.6 --0.5			0.1					    -- Strength (equipment) % for unit to be considered weak
 
 --NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				            -- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action	
