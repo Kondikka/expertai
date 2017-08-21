@@ -1112,19 +1112,8 @@ focus_tree = {
 		
 			has_army_manpower = { size > 2000000 }
 			OR = {
-				AND = {
-					#army/equipment targets to hit before invading
-					has_army_size = { type = armor size > 35 }
-					#has_equipment = { infantry_equipment > 50000 }
-					#has_equipment = { artillery_equipment > 5000 }
-				}
+				has_army_size = { type = armor size > 35 }
 				date > 1941.8.1
-			}		
-			
-			NOT = {
-				any_home_area_neighbor_country = {
-					has_war_with = ROOT					
-				}		
 			}
 			
 			#sov is a threat
@@ -1142,6 +1131,7 @@ focus_tree = {
 				NOT = { 
 					has_war_with = YUG 
 					has_wargoal_against = YUG
+					has_completed_focus GER_demand_slovenia
 				}
 				AND = {
 					has_war_with = YUG
@@ -1163,31 +1153,9 @@ focus_tree = {
 		}
 		ai_will_do = {
 			factor = 10
-			modifier = {
+			modifier = { #EAI
 				factor = 0
 				is_historical_focus_on = yes
-				OR = {
-					NOT = { has_army_manpower = { size > 2000000 } } 
-					NOT = { has_army_size = { type = armor size > 35 } }
-					
-					NOT = { date > 1941.3.15 }
-				
-					SOV = { has_capitulated = yes }
-					SOV = { exists = no }
-					SOV = { is_puppet = yes }
-					SOV = { has_government = fascism }
-					is_in_faction_with = SOV
-					has_war_with = SOV
-					
-					AND = { has_war_with = YUG YUG = { has_capitulated = no } }
-					AND = { has_war_with = SPR SPR = { has_capitulated = no } }
-					
-					any_state = {
-						OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 27 state = 161 state = 162 }
-						NOT = { state = 44 }
-						controller = { has_war_with = GER }
-					}
-				}
 			}
 			modifier = {
 				factor = 0
@@ -1266,7 +1234,7 @@ focus_tree = {
 			}
 		}	
 
-		#available_if_capitulated = no
+		available_if_capitulated = no
 		completion_reward = {
 			TUR = {
 				add_opinion_modifier = { target = GER modifier = ger_tur_diplomacy_focus }
@@ -1280,10 +1248,13 @@ focus_tree = {
 							NOT = {
 								is_puppet = yes
 							}
+							has_government = ROOT
 						}
 						GER = { is_faction_leader = yes }
 					}
-					GER = { add_to_faction = TUR } # REVISIT Might be a better way to handle this
+					TUR = {
+						country_event = generic.5
+					}
 					add_ai_strategy = {
 						type = alliance
 						id = "GER"
@@ -1351,7 +1322,17 @@ focus_tree = {
 				factor = 0
 				date < 1938.1.1
 			}
-		}	
+		}
+
+		bypass = {
+			AUS = {
+				OR = {
+					is_puppet = yes
+					exists = no 
+					}
+				}
+			}
+
 		completion_reward = {
 			army_experience = 10
 			if = {
@@ -1365,7 +1346,8 @@ focus_tree = {
 							owns_state = 153
 						}
 					}
-				}				
+				}
+
 				AUS = {
 					country_event = germany.28
 				}				
@@ -1716,12 +1698,12 @@ focus_tree = {
 			OR = {
 				AND = {
 					NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
-					NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+					NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } } }
 				}
 				AND = {
 					OR = {
 						GER = { has_completed_focus = GER_ussr_war_goal }
-						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
 					}
 					OR = {
 						SOV = { has_capitulated = yes }
@@ -1754,24 +1736,9 @@ focus_tree = {
 				factor = 0
 				date < 1939.1.1
 			}
-			modifier = {
+			modifier = { #EAI
 				factor = 0
-				is_historical_focus_on = yes
-				OR = {
-					any_state = {
-						OR = { region = 7 region = 8 region = 38 state = 56 state = 57 }
-						controller = { has_war_with = GER }
-					}
-					DEN = { has_capitulated = yes }
-					DEN = { exists = no }
-					DEN = { is_puppet = yes }
-					DEN = { has_government = fascism }
-					is_in_faction_with = DEN
-					has_war_with = DEN
-					GER = { has_capitulated = yes }
-					GER = { exists = no }
-					GER = { is_puppet = yes }
-				}				
+				is_historical_focus_on = yes				
 			}
 		}	
 		completion_reward = {
@@ -2114,6 +2081,9 @@ focus_tree = {
 				limit = {
 					OR = {
 						ENG = { exists = no }
+						ENG = {
+							is_subject = yes
+						}
 						has_war_with = ENG
 						has_war_with = FRA
 						AND = {
@@ -2407,7 +2377,6 @@ focus_tree = {
 			if = {
 				limit = {
 					HUN = {
-						has_government = fascism
 						is_friend_or_potential_friend_of_GER = yes
 					}
 					ROM = {
@@ -2467,7 +2436,7 @@ focus_tree = {
 			}
 			FRA = {
 				OR = {
-					NOT = { country_exists = THIS }
+					exists = no
 					has_capitulated = yes
 					has_government = fascism
 				}
@@ -3311,7 +3280,13 @@ focus_tree = {
 		y = 2
 		cost = 10
 		historical_ai = {  #EAI
-			date > 1941.1.1
+			has_government = fascism
+		
+			date > 1939.8.1
+			OR = {
+				date > 1941.1.1
+				has_global_flag = EAI_aggressive_GER
+			}
 		
 			OR = { 
 				POL = { has_capitulated = yes }
@@ -3340,12 +3315,12 @@ focus_tree = {
 			OR = {
 				AND = {
 					NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
-					NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
+					NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } } }
 				}
 				AND = {
 					OR = {
 						GER = { has_completed_focus = GER_ussr_war_goal }
-						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
+						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
 					}
 					OR = {
 						SOV = { has_capitulated = yes }
@@ -3376,15 +3351,6 @@ focus_tree = {
 			factor = 1
 			modifier = { 
 				factor = 0 
-				NOT = { date > 1941.1.1 } 
-				is_historical_focus_on = yes 
-			}
-			modifier = { 
-				factor = 0 
-				any_state = {
-					OR = { region = 19 region = 20 region = 5 region = 6 region = 21 state = 161 state = 162 }
-					controller = { has_war_with = GER }
-				}
 				is_historical_focus_on = yes 
 			}
 		}	
@@ -3805,8 +3771,72 @@ focus_tree = {
 		x = 20
 		y = 5
 		cost = 10
+		historical_ai = {
+			date > 1940.6.1
+			OR = {
+				date > 1941.1.1
+				has_global_flag = EAI_aggressive_GER
+			}
+
+			NOT = { has_war_with = GRE }
+			
+			OR = { 
+				POL = { has_capitulated = yes }
+				POL = { exists = no }
+				POL = { is_puppet = yes }
+				POL = { has_government = fascism }
+				is_in_faction_with = POL
+			}
+			
+			OR = { 
+				FRA = { has_capitulated = yes }
+				FRA = { exists = no }
+				FRA = { is_puppet = yes }
+				FRA = { has_government = fascism }
+				is_in_faction_with = FRA
+			}
+			
+			OR = {
+				AND = {
+					NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
+					NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } } }
+				}
+				AND = {
+					OR = {
+						GER = { has_completed_focus = GER_ussr_war_goal }
+						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					}
+					OR = {
+						SOV = { has_capitulated = yes }
+						SOV = { exists = no }
+						SOV = { is_puppet = yes }
+						SOV = { has_government = fascism }
+						is_in_faction_with = SOV
+					}
+				}
+			}
+			
+			OR = {
+				NOT = { has_war_with = SOV }
+				AND = {
+					has_war_with = SOV
+					SOV = { has_capitulated = yes }
+				}
+			}
+			
+			NOT = {
+				any_state = {
+					OR = { region = 19 region = 20 region = 5 region = 6 region = 21 state = 161 state = 162 }
+					controller = { has_war_with = GER }
+				}
+			}
+		}
 		ai_will_do = {
 			factor = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}	
 		completion_reward = {
 			create_wargoal = {

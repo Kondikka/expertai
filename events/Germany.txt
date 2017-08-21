@@ -834,6 +834,10 @@ country_event = {
 				add = 100
 				GER = { has_army_size = { size > 39 } }
 			}
+			modifier = {
+				add = 20
+				is_in_faction_with = GER
+			}
 		}
 		GER = {
 			country_event = { hours = 2 id = germany.4 }
@@ -860,6 +864,17 @@ country_event = {
 			modifier = {
 				add = 100
 				HUN = { has_completed_focus = HUN_protect_austria }
+			}
+			modifier = {
+				factor = 2
+				is_in_faction = yes
+				NOt = { is_in_faction_with = GER }
+			}
+			modifier = {
+				any_other_country = {
+					has_guaranteed = AUS
+				}
+				factor = 5
 			}
 		}
 		GER = {
@@ -934,6 +949,23 @@ country_event = {
 		FRA = { country_event = germany.41 }
 		CZE = {
 			add_opinion_modifier = { target = ENG modifier = western_betrayal }
+		}
+		if = {
+			limit = {
+				CZE = { is_guaranteed_by = ENG }
+			}
+			ENG = {
+				diplomatic_relation = {
+   					country = CZE
+   					relation = guarantee
+   					active = no
+  				}
+  				add_ai_strategy = {
+					type = ignore
+					id = "CZE"
+					value = 100
+				}
+			}
 		}
 	}
 	option = { # Support the Czechs
@@ -1055,6 +1087,23 @@ country_event = {
 				remove_from_faction = FRA
 			}
 		}
+		if = {
+			limit = {
+				CZE = { is_guaranteed_by = FRA }
+			}
+			FRA = {
+				diplomatic_relation = {
+   					country = CZE
+   					relation = guarantee
+   					active = no
+  				}
+  				add_ai_strategy = {
+					type = ignore
+					id = "CZE"
+					value = 100
+				}
+			}
+		}
 	}
 	option = { # Support the Czechs alone
 		name = germany.41.b	
@@ -1163,6 +1212,23 @@ country_event = {
 			}
 		}
 		if = {
+			limit = {
+				NOT = { is_in_faction_with = CZE }
+				CZE = { 
+					is_faction_leader = yes 
+					has_completed_focus = CZE_an_entente_of_our_own
+				}
+			}
+			CZE = { add_to_faction = FRA }
+			FRA = {
+				add_ai_strategy = {
+					type = alliance
+					id = "CZE"
+					value = 200
+				}
+			}
+		}
+		if = {
 			limit = { NOT = { has_completed_focus = FRA_little_entente } }
 			add_national_unity = 0.05
 		}
@@ -1250,6 +1316,23 @@ country_event = {
 				has_global_flag = GER_has_started_war
 				NOT = { is_in_faction_with = GER } #FRA doesn't care if in faction
 				factor = 0
+			}
+		}
+		if = {
+			limit = {
+				CZE = { is_guaranteed_by = FRA }
+			}
+			FRA = {
+				diplomatic_relation = {
+   					country = CZE
+   					relation = guarantee
+   					active = no
+  				}
+  				add_ai_strategy = {
+					type = ignore
+					id = "CZE"
+					value = 100
+				}
 			}
 		}
 		CZE = {
@@ -2870,6 +2953,7 @@ country_event = {
 	
 	option = {
 		name = germany.75.a	#sounds good
+		ai_chance = { factor = 1 }
 		GER = {
 			country_event = { days = 1 id = germany.76 }
 			add_opinion_modifier = {
@@ -2898,7 +2982,7 @@ country_event = {
 	option = {
 		name = germany.75.b	#no way 
 		add_timed_idea = { idea = SOV_scientist_defect days = 365 }
-		ai_chance = { factor = 0 }
+		ai_chance = { factor = 1 modifier = { factor = 0 OR = { has_country_flag = at_design_MTD has_country_flag = at_design_HTD } } } #EAI
 		add_political_power = -10
 		add_opinion_modifier = { target = GER modifier = refused_MR_pact }# no pact 
 		GER = {
@@ -3009,6 +3093,10 @@ country_event = {
 				GER = { surrender_progress > 0.25 }
 				factor = 5 #seems safe
 			}
+			modifier = {
+				has_government = democratic
+				factor = 5
+			}
 		}
 		trigger = {
 			TUR = {
@@ -3042,7 +3130,34 @@ country_event = {
 	
 	option = {
 		name = germany.79.c
-		ai_chance = { factor = 20 }
+		ai_chance = { 
+			factor = 20 
+			modifier = {
+				NOT = {
+					has_government = fascism
+				}
+				factor = 5
+			}
+			modifier = {
+			
+				AND = {
+					ENG = { 
+						has_capitulated = no 
+						has_war_with = GER
+					}
+					SOV = { 
+						has_capitulated = no 
+						has_war_with = GER
+					}
+					USA = { 
+						has_capitulated = no 
+						has_war_with = GER
+					}
+				}
+			
+				factor = 5 #lol come at me bro
+			}
+		}
 		GER = {
 			create_wargoal = {
 				target = TUR

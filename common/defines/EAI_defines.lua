@@ -9,10 +9,12 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 5 				                       		-- To which 
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
+NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2	
+
 ----------------------
 
---NDefines.NAI.REQUEST_LEND_LEASE_PROTECT_VALUE = 75				            -- Limit for protect enemy desire for reducing lend lease desire
---NDefines.NAI.REQUEST_LEND_LEASE_CONTAINS_VALUE = 100			                -- Limit of contain enemy desire for boosting friendly help
+--NDefines.NAI.REQUEST_LEND_LEASE_PROTECT_VALUE = 70				            -- Limit for protect enemy desire for reducing lend lease desire
+--NDefines.NAI.REQUEST_LEND_LEASE_CONTAINS_VALUE = 70		                	-- Limit of contain enemy desire for boosting friendly help
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_LAND = 0		                -- Ratio to send stockpile from equipment
 --NDefines.NAI.REQUEST_LEND_LEASE_PRODUCTION_DAYS_LAND = 0		                -- Count of daily production amount of equipment to send
 --NDefines.NAI.REQUEST_LEND_LEASE_STOCKPILE_RATIO_AIR = 0		                -- Ratio to send stockpile from equipment

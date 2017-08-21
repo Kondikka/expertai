@@ -3173,56 +3173,58 @@ default_aircraft_production = {
 
 str_aircraft_production = {
 	enable = {
+		#conditions for building this
 		has_tech = strategic_bomber1
-
-		OR = {
-			AND = {
-				NOT = { has_country_flag = str_air_focus_1 }
+		
+		if = { limit = { has_country_flag = str_air_focus_1 }
+			num_of_military_factories > 60
+			
+			else = {
 				num_of_military_factories > 249
-				has_tech = strategic_bomber1
 				date > 1944.1.1
 				OR = { alliance_strength_ratio > 1.0 NOT = { any_neighbor_country = { has_war_with = ROOT } } }
 			}
-			AND = {
-				has_country_flag = str_air_focus_1
-				num_of_military_factories > 60
+		}
+
+		#prioritise building fighters
+		if = { limit = { enemies_strength_ratio > 0.5 }
+			OR = {
+				has_equipment = { fighter_equipment > 1250 }
+				has_deployed_air_force_size = { size > 1250 type = fighter }
 			}
 		}
 
-		OR = {
-			has_war = no
-			AND = {
-				has_war = yes
-				OR = {
-					NOT = { has_equipment = { fighter_equipment < 1250 } }
-					NOT = { has_deployed_air_force_size = { size < 1250 type = fighter } }
-				}
-			}
-		}
-
-		NOT = { #MAX CAP
+		#max amount it can build
+		NOT = {
 			has_equipment = { strat_bomber_equipment > 5000 }
 			has_deployed_air_force_size = { size > 5000 type = strategic_bomber }
 		}
 	}
 	abort = {
 		OR = {
-			AND = {
-				NOT = { has_country_flag = str_air_focus_1 }
-				NOT = { num_of_military_factories > 249 }
-			}
-
+			#conditions for building this
 			AND = {
 				has_country_flag = str_air_focus_1
-				NOT = { num_of_military_factories > 60  }
+				NOT = { num_of_military_factories > 60 }
 			}
-
 			AND = {
-				has_war = yes
-				has_equipment = { fighter_equipment < 1000 }
-				has_deployed_air_force_size = { size < 1000 type = fighter }
+				NOT = { has_country_flag = str_air_focus_1 }
+				OR = {
+					NOT = { num_of_military_factories > 249 }
+					NOT = { alliance_strength_ratio > 1.0 NOT = { any_neighbor_country = { has_war_with = ROOT } } }
+				}
 			}
 
+			#prioritise building fighters
+			AND = {
+				enemies_strength_ratio > 0.5
+				NOT = {
+					has_equipment = { fighter_equipment > 1000 }
+					has_deployed_air_force_size = { size > 1000 type = fighter }
+				}
+			}
+
+			#max amount it can build
 			has_equipment = { strat_bomber_equipment > 6000 }
 			has_deployed_air_force_size = { size > 6000 type = strategic_bomber }
 		}
@@ -3234,8 +3236,14 @@ str_aircraft_production = {
 }
 
 cv_aircraft_production = {
-	enable = { has_navy_size = { size > 0 type = carrier } }
-	abort = { NOT = { has_navy_size = { size > 0 type = carrier } } }
+	enable = {
+		#conditions for building this
+		has_navy_size = { size > 0 type = carrier }
+	}
+	abort = {
+		#conditions for building this
+		NOT = { has_navy_size = { size > 0 type = carrier } }
+	}
 
 	ai_strategy = { type = equipment_production_factor      id = naval_bomber 		         value = 101 }
 	ai_strategy = { type = unit_ratio                       id = naval_bomber 		         value = 125 }
@@ -3244,6 +3252,7 @@ cv_aircraft_production = {
 
 ftr_aircraft_production = {
 	enable = {
+		#conditions for building this
 		has_tech = fighter1
 		ftr_air_focus = yes
 	}
@@ -3256,28 +3265,30 @@ ftr_aircraft_production = {
 
 tac_aircraft_production = {
 	enable = {
+		#conditions for building this
 		has_tech = tactical_bomber1
 		has_country_flag = tac_air_focus
-
-		OR = {
-			has_war = no
-			AND = {
-				has_war = yes
-				OR = {
-					NOT = { has_equipment = { fighter_equipment < 1250 } }
-					NOT = { has_deployed_air_force_size = { size < 1250 type = fighter } }
-				}
+		
+		#prioritise building fighters
+		if = { limit = { enemies_strength_ratio > 0.5 }
+			OR = {
+				has_equipment = { fighter_equipment > 1250 }
+				has_deployed_air_force_size = { size > 1250 type = fighter }
 			}
 		}
 	}
 	abort = {
 		OR = {
+			#conditions for building this
 			NOT = { has_country_flag = tac_air_focus }
 			
+			#prioritise building fighters
 			AND = {
-				has_war = yes
-				has_equipment = { fighter_equipment < 1000 }
-				has_deployed_air_force_size = { size < 1000 type = fighter }
+				enemies_strength_ratio > 0.5
+				NOT = {
+					has_equipment = { fighter_equipment > 1000 }
+					has_deployed_air_force_size = { size > 1000 type = fighter }
+				}
 			}
 		}
 	}
@@ -3289,10 +3300,14 @@ tac_aircraft_production = {
 
 cas_aircraft_production = {
 	enable = {
+		#conditions for building this
 		has_tech = CAS1
 		has_country_flag = cas_air_focus
 	}
-	abort = { NOT = { has_country_flag = cas_air_focus } }
+	abort = {
+		#conditions for building this
+		NOT = { has_country_flag = cas_air_focus }
+	}
 
 	ai_strategy = { type = equipment_production_factor      id = cas 				         value = 155 }
 	ai_strategy = { type = unit_ratio                       id = cas 				         value = 170 }
@@ -3301,37 +3316,47 @@ cas_aircraft_production = {
 
 nav_aircraft_production = {
 	enable = {
+		#conditions for building this
 		has_tech = naval_bomber1
-		has_country_flag = nav_air_focus_1
 
 		OR = {
-			has_war = no
-			AND = {
-				has_war = yes
-				OR = {
-					NOT = { has_equipment = { fighter_equipment < 500 } }
-					NOT = { has_deployed_air_force_size = { size < 500 type = fighter } }
-				}
+			has_country_flag = nav_air_focus_1
+			AND = { navy_tech_focus = yes enemies_naval_strength_ratio > 1 }
+		}
+		
+		#prioritise building fighters
+		if = { limit = { enemies_strength_ratio > 0.5 }
+			OR = {
+				has_equipment = { fighter_equipment > 500 }
+				has_deployed_air_force_size = { size > 500 type = fighter }
 			}
 		}
 
-		NOT = { #MAX CAP
-			has_equipment = { nav_bomber_equipment > 1250 }
-			has_deployed_air_force_size = { size > 1250 type = naval_bomber }
+		#max amount it can build
+		NOT = {
+			has_equipment = { nav_bomber_equipment > 1500 }
+			has_deployed_air_force_size = { size > 1500 type = naval_bomber }
 		}
 	}
 	abort = {
 		OR = {
-			NOT = { has_country_flag = nav_air_focus_1 }
-		
+			#conditions for building this
+			NOT = {
+				has_country_flag = nav_air_focus_1
+				AND = { navy_tech_focus = yes enemies_naval_strength_ratio > 1 }
+			}
+			
+			#prioritise building fighters
 			AND = {
-				has_war = yes
-				has_equipment = { fighter_equipment < 250 }
-				has_deployed_air_force_size = { size < 250 type = fighter }
+				enemies_strength_ratio > 0.5
+				NOT = {
+					has_equipment = { fighter_equipment > 250 }
+					has_deployed_air_force_size = { size > 250 type = fighter }
+				}
 			}
 
-			has_equipment = { nav_bomber_equipment > 1500 }
-			has_deployed_air_force_size = { size > 1500 type = naval_bomber }
+			has_equipment = { nav_bomber_equipment > 1750 }
+			has_deployed_air_force_size = { size > 1750 type = naval_bomber }
 		}
 	}
 
@@ -3355,6 +3380,7 @@ default_navy_production = {
 
 carrier_ship_production = {
 	enable = {
+		#conditions for building this
 		has_tech = basic_carrier
 		is_major = yes
 
@@ -3365,6 +3391,7 @@ carrier_ship_production = {
 	}
 	abort = {
 		OR = {
+			#conditions for building this
 			NOT = { is_major = yes }
 
 			AND = {
@@ -3374,12 +3401,13 @@ carrier_ship_production = {
 		}
 	}
 
-	ai_strategy = { type = equipment_production_factor      id = carrier 			         value = 0 }
+	ai_strategy = { type = equipment_production_factor      id = carrier 			         value = 50 }
 	ai_strategy = { type = unit_ratio                       id = carrier 			         value = 200 }
 }
 
 capital_ship_production = {
 	enable = {
+		#conditions for building this
 		has_tech = basic_battleship
 		is_major = yes
 
@@ -3390,6 +3418,7 @@ capital_ship_production = {
 	}
 	abort = {
 		OR = {
+			#conditions for building this
 			NOT = { is_major = yes }
 
 			AND = {
@@ -3399,12 +3428,14 @@ capital_ship_production = {
 		}
 	}
 
-	ai_strategy = { type = equipment_production_factor      id = capital_ship 		         value = 0 }
+	ai_strategy = { type = equipment_production_factor      id = capital_ship 		         value = -50 }
 	ai_strategy = { type = unit_ratio                       id = capital_ship 		         value = 200 }
 }
 
 screen_ship_production = {
-	enable = { always = yes }
+	enable = { 
+		OR = { has_tech = basic_destroyer has_tech = basic_light_cruiser }
+	}
 
 	ai_strategy = { type = equipment_production_factor      id = screen_ship 		         value = 0 }
 	ai_strategy = { type = unit_ratio                       id = screen_ship 		         value = 200 }
