@@ -25,13 +25,8 @@ on_actions = {
 				set_state_flag = radar_site
 			}
 
-			#save the original location of a country for the mobilization script
-			every_country = { limit = { capital_scope = { is_on_continent = europe } } set_country_flag = origin_europe }
-			every_country = { limit = { capital_scope = { is_on_continent = north_america } } set_country_flag = origin_north_america }
-			every_country = { limit = { capital_scope = { is_on_continent = south_america } } set_country_flag = origin_south_america }
-			every_country = { limit = { capital_scope = { is_on_continent = africa } } set_country_flag = origin_africa }
-			every_country = { limit = { capital_scope = { is_on_continent = asia } } set_country_flag = origin_asia }
-			every_country = { limit = { capital_scope = { is_on_continent = middle_east } } set_country_flag = origin_middle_east }
+			#save the original capital location
+			every_country = { capital_scope = { set_state_flag = original_capital_@ROOT } }
 		}
 	}
 	on_puppet = {
@@ -108,6 +103,8 @@ on_actions = {
 				limit = {
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
+					FROM = { has_country_flag = EAI_will_join_faction_@ROOT }
+
 					NOT = { FROM = { is_in_faction = yes } }
 
 					OR = {
@@ -123,19 +120,51 @@ on_actions = {
 					}
 					if = {
 						limit = { has_government = communism }
-						set_country_flag = EAI_seeks_alliance_communist
+						set_country_flag = EAI_seeks_alliance_communism
 					}
 					if = {
 						limit = { has_government = fascism }
-						set_country_flag = EAI_seeks_alliance_communist
+						set_country_flag = EAI_seeks_alliance_fascism
 					}
 					if = {
 						limit = { has_government = neutrality }
-						set_country_flag = EAI_seeks_alliance_democratic
-						set_country_flag = EAI_seeks_alliance_communist
-						set_country_flag = EAI_seeks_alliance_fascist
+
+						if = { limit = { ROOT = { has_government = democratic } }
+
+							if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_fascism
+							}
+							if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_communism
+							}
+						}
+						if = { limit = { ROOT = { has_government = communism } }
+
+							if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_fascism
+							}
+							set_country_flag = EAI_seeks_alliance_democratic
+						}
+						if = { limit = { ROOT = { has_government = fascism } }
+
+							if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_communism
+							}
+							set_country_flag = EAI_seeks_alliance_democratic
+						}
+						if = { limit = { ROOT = { has_government = neutrality } }
+
+							set_country_flag = EAI_seeks_alliance_democratic
+							if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_fascism
+							}
+							if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+								set_country_flag = EAI_seeks_alliance_communism
+							}
+						}
 					}
 
+					clr_country_flag = EAI_will_join_faction_@ROOT
 					country_event = EAI_DM.10101
 				}
 			}
@@ -145,71 +174,108 @@ on_actions = {
 				limit = {
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
-					FROM = { has_country_flag = EAI_illegal_wargoal_justified_by@ROOT } #national focuses give wargoals but they should be prevented from triggering this
-
-					threat > 0.9
-
-					FROM = { strength_ratio = { tag = ROOT ratio < 0.5 } } #target is weak compared to invader
-
-					ROOT = { has_added_tension_amount > 25 } #invader has already added a lot of threat
+					FROM = { has_country_flag = EAI_illegal_wargoal_justified_by_@ROOT } #national focuses give wargoals but they should be prevented from triggering this
 
 					any_country = {
 						OR = {
 							AND = { democratic_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_democratic } }
-							AND = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_communist } }
-							AND = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_fascist } }
+							AND = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_communism } }
+							AND = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_fascism } }
 							AND = { #which faction a neutral seeks depending on the invader's ideology
 								neutrality_willing_to_join_faction = yes
+								
 								if = { limit = { ROOT = { has_government = democratic } }
-									NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-									NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+									OR = {
+										AND = {
+											any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+										}
+										AND = {
+											any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_communism }
+										}
+									}
 								}
 								if = { limit = { ROOT = { has_government = communism } }
-									NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-									NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+
+									OR = {
+										AND = {
+											any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+										}
+										NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+									}
 								}
 								if = { limit = { ROOT = { has_government = fascism } }
-									NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-									NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+									OR = {
+										NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+										AND = {
+											any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_communism }
+										}
+									}
 								}
 								if = { limit = { ROOT = { has_government = neutrality } }
-									NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-									NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-									NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+									OR = {
+										NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+										AND = {
+											any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+										}
+										AND = {
+											any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+											NOT = { has_country_flag = EAI_seeks_alliance_communism }
+										}
+									}
 								}
 							}
 						}
 					}
 				}
 
-				FROM = { save_global_event_target_as = EAI_illegal_wardec_target }
+				if = { #add to infamy count
+					limit = { NOT = { has_country_flag = EAI_infamy_count_@ROOT } }
+
+					set_country_flag = EAI_infamy_count_@ROOT
+
+					else = { modify_country_flag = { flag = EAI_infamy_count_@ROOT value = 1 } }
+				}
+
+				FROM = { set_country_flag = EAI_infamy_added_at_@ROOT }
+
+				FROM = { save_event_target_as = EAI_illegal_wardec_target }
+
+				FROM = { clr_country_flag = EAI_illegal_wargoal_justified_by_@ROOT }
 
 				every_country = {
 					limit = { democratic_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_democratic } }
 
 					set_country_flag = EAI_seeks_alliance_democratic
 
-					clr_country_flag = EAI_faction_join_warning_issued@ROOT
+					clr_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = { id = EAI_DM.10100 hours = 1 }
 				}
 
 				every_country = {
-					limit = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_communist } }
+					limit = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_communism } }
 
-					set_country_flag = EAI_seeks_alliance_communist
+					set_country_flag = EAI_seeks_alliance_communism
 
-					clr_country_flag = EAI_faction_join_warning_issued@ROOT
+					clr_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = { id = EAI_DM.10100 hours = 1 }
 				}
 
 				every_country = {
-					limit = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_fascist } }
+					limit = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_fascism } }
 
-					set_country_flag = EAI_seeks_alliance_fascist
+					set_country_flag = EAI_seeks_alliance_fascism
 
-					clr_country_flag = EAI_faction_join_warning_issued@ROOT
+					clr_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = { id = EAI_DM.10100 hours = 1 }
 				}
@@ -217,44 +283,91 @@ on_actions = {
 				every_country = {
 					limit = {
 						neutrality_willing_to_join_faction = yes
+						
 						if = { limit = { ROOT = { has_government = democratic } }
-							NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-							NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+							OR = {
+								AND = {
+									any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+								}
+								AND = {
+									any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_communism }
+								}
+							}
 						}
 						if = { limit = { ROOT = { has_government = communism } }
-							NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-							NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+
+							OR = {
+								AND = {
+									any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+								}
+								NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+							}
 						}
 						if = { limit = { ROOT = { has_government = fascism } }
-							NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-							NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+							OR = {
+								NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+								AND = {
+									any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_communism }
+								}
+							}
 						}
 						if = { limit = { ROOT = { has_government = neutrality } }
-							NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-							NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-							NOT = { has_country_flag = EAI_seeks_alliance_commuist }
+
+							OR = {
+								NOT = { has_country_flag = EAI_seeks_alliance_democratic }
+								AND = {
+									any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_fascism }
+								}
+								AND = {
+									any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									NOT = { has_country_flag = EAI_seeks_alliance_communism }
+								}
+							}
 						}
 					}
 
 					if = { limit = { ROOT = { has_government = democratic } }
-						set_country_flag = EAI_seeks_alliance_fascist
-						set_country_flag = EAI_seeks_alliance_commuist
+
+						if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_fascism
+						}
+						if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_communism
+						}
 					}
 					if = { limit = { ROOT = { has_government = communism } }
-						set_country_flag = EAI_seeks_alliance_fascist
+
+						if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_fascism
+						}
 						set_country_flag = EAI_seeks_alliance_democratic
 					}
 					if = { limit = { ROOT = { has_government = fascism } }
+
+						if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_communism
+						}
 						set_country_flag = EAI_seeks_alliance_democratic
-						set_country_flag = EAI_seeks_alliance_commuist
 					}
 					if = { limit = { ROOT = { has_government = neutrality } }
+
 						set_country_flag = EAI_seeks_alliance_democratic
-						set_country_flag = EAI_seeks_alliance_fascist
-						set_country_flag = EAI_seeks_alliance_commuist
+						if = { limit = { any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_fascism
+						}
+						if = { limit = { any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } } }
+							set_country_flag = EAI_seeks_alliance_communism
+						}
 					}
 
-					clr_country_flag = EAI_faction_join_warning_issued@ROOT
+					clr_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = { id = EAI_DM.10100 hours = 1 }
 				}
@@ -263,80 +376,61 @@ on_actions = {
 	}
 	on_justifying_wargoal_pulse = {
 		effect = {
+			# FLAGS
+			#
+			# EAI_infamy_count_@ROOT - infamy generated by a justifier
+			# EAI_infamy_added_at_@ROOT - infamy from target added to the justifier
+			# EAI_ignore_illegal_justification_by_@ROOT - prevent the guarantee event from firing against this country
+			# EAI_illegal_wargoal_event_active - global flag to prevent more than one guarantee event from firing simultaneously
+			# EAI_faction_join_warning_issued_at_@ROOT - a country has warned the invader of attempting to join a faction on wardec
+			# EAI_illegal_wargoal_justified_by_@ROOT - a wargoal against this country was illegally justified and nearby countries will join a faction
+			# EAI_will_join_faction_@ROOT - a wargoal against this country was illegally justified and target will join a faction
+			# EAI_seeks_alliance_democratic - country attempts to join a democratic faction
+			# EAI_seeks_alliance_fascism - country attempts to join a fascist faction
+			# EAI_seeks_alliance_communism - country attempts to join a communist faction
+
 			if = { #add infamy
 				limit = {
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
-					NOT = { FROM = { has_country_flag = EAI_infamy_added@ROOT } }
+					NOT = { FROM = { has_country_flag = EAI_infamy_added_at_@ROOT } }
 				}
 
-				FROM = { set_country_flag = EAI_infamy_added@ROOT }
+				FROM = { set_country_flag = EAI_infamy_added_at_@ROOT }
 
 				if = { #add to infamy count
-					limit = { NOT = { has_country_flag = EAI_infamy_count } }
+					limit = { NOT = { has_country_flag = EAI_infamy_count_@ROOT } }
 
-					set_country_flag = EAI_infamy_count
+					set_country_flag = EAI_infamy_count_@ROOT
 
-					else = { modify_country_flag = { flag = EAI_infamy_count value = 1 } }
+					else = { modify_country_flag = { flag = EAI_infamy_count_@ROOT value = 1 } }
 				}
 
-				if = { #to make sure the script below doesnt fire below infamy limit
-					limit = { is_major = no FROM = { is_major = no } has_country_flag = { flag = EAI_infamy_count value < 2 } }
+				if = {
+					limit = {
+						ROOT = { is_major = no }
+						FROM = { is_major = no }
+						ROOT = { has_country_flag = { flag = EAI_infamy_count_@ROOT value < 2 } }
+					}
 
-					FROM = { set_country_flag = EAI_illegal_wargoal_target_country_by@ROOT }
+					FROM = { set_country_flag = EAI_ignore_illegal_justification_by_@ROOT }
 				}
+
+				FROM = { country_event = { id = EAI_DM.10009 days = 20 } } #if justification was cancelled, lower infamy
 			}
 
 			if = { #WILLING TO GUARANTEE TARGET ON ILLEGAL JUSTIFICATION: WARNING
 				limit = {
-					OR = { #dont fire this if the country is willing to join a faction instead
-						NOT = { threat > 0.9 }
-
-						NOT = { FROM = { strength_ratio = { tag = ROOT ratio < 0.5 } } }
-
-						NOT = { ROOT = { has_added_tension_amount > 25 } }
-
-						NOT = {
-							any_country = {
-								OR = {
-									AND = { democratic_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_democratic } }
-									AND = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_communist } }
-									AND = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_seeks_alliance_fascist } }
-									AND = { #which faction a neutral seeks depending on the invader's ideology
-										neutrality_willing_to_join_faction = yes
-										if = { limit = { ROOT = { has_government = democratic } }
-											NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-											NOT = { has_country_flag = EAI_seeks_alliance_commuist }
-										}
-										if = { limit = { ROOT = { has_government = communism } }
-											NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-											NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-										}
-										if = { limit = { ROOT = { has_government = fascism } }
-											NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-											NOT = { has_country_flag = EAI_seeks_alliance_commuist }
-										}
-										if = { limit = { ROOT = { has_government = neutrality } }
-											NOT = { has_country_flag = EAI_seeks_alliance_democratic }
-											NOT = { has_country_flag = EAI_seeks_alliance_fascist }
-											NOT = { has_country_flag = EAI_seeks_alliance_commuist }
-										}
-									}
-								}
-							}
-						}
-					}
-
 					#requirements for this
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
 					NOT = { has_global_flag = EAI_illegal_wargoal_event_active } #fire this event chain only one at a time
 
-					NOT = { FROM = { has_country_flag = EAI_illegal_wargoal_target_country_by@ROOT } } #fire only once per invader against this country
+					NOT = { FROM = { has_country_flag = EAI_ignore_illegal_justification_by_@ROOT } } #fire only once per invader against this country
 
 					any_country = { any_willing_to_guarantee_nation = yes }
 
-					#rules
+					#rules between majors and minors
 					OR = {
 						ROOT = { is_major = yes }
 
@@ -348,7 +442,7 @@ on_actions = {
 
 								AND = {
 									FROM = { is_major = no }
-									has_country_flag = { flag = EAI_infamy_count value > 1 }
+									has_country_flag = { flag = EAI_infamy_count_@ROOT value > 1 }
 								}
 							}
 						}
@@ -357,11 +451,11 @@ on_actions = {
 
 				set_global_flag = EAI_illegal_wargoal_event_active
 
-				FROM = { set_country_flag = EAI_illegal_wargoal_target_country_by@ROOT }
+				FROM = { set_country_flag = EAI_ignore_illegal_justification_by_@ROOT }
 
-				FROM = { save_global_event_target_as = EAI_illegal_wargoal_target }
+				FROM = { save_event_target_as = EAI_illegal_wargoal_target }
 
-				ROOT = { save_global_event_target_as = EAI_illegal_wargoal_invader }
+				ROOT = { save_event_target_as = EAI_illegal_wargoal_invader }
 
 				if = { #create a "leader" from a random defender for event description
 					limit = { any_country = { is_major = yes any_willing_to_guarantee_nation = yes } }
@@ -369,14 +463,14 @@ on_actions = {
 					random_country = {
 						limit = { is_major = yes any_willing_to_guarantee_nation = yes }
 
-						save_global_event_target_as = EAI_illegal_wargoal_defender
+						save_event_target_as = EAI_illegal_wargoal_defender
 					}
 
 					else = { #else choose a minor
 						random_country = {
 							limit = { any_willing_to_guarantee_nation = yes }
 
-							save_global_event_target_as = EAI_illegal_wargoal_defender
+							save_event_target_as = EAI_illegal_wargoal_defender
 						}
 					}
 				}
@@ -392,73 +486,145 @@ on_actions = {
 				limit = {
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
-					threat > 0.9
-
-					FROM = { strength_ratio = { tag = ROOT ratio < 0.5 } } #target is weak compared to invader
-
-					ROOT = { has_added_tension_amount > 25 } #invader has already added a lot of threat
-
 					any_country = {
-						NOT = { has_country_flag = EAI_faction_join_warning_issued@ROOT }
+						NOT = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT }
 						OR = {
-							democratic_willing_to_join_faction = yes
-							communism_willing_to_join_faction = yes
-							fascism_willing_to_join_faction = yes
-							neutrality_willing_to_join_faction = yes
+							AND = { democratic_willing_to_join_faction = yes }
+							AND = { communism_willing_to_join_faction = yes }
+							AND = { fascism_willing_to_join_faction = yes }
+							AND = { #which faction a neutral seeks depending on the invader's ideology
+								neutrality_willing_to_join_faction = yes
+								if = { limit = { ROOT = { has_government = democratic } }
+		
+									OR = {
+										any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+										any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									}
+								}
+								if = { limit = { ROOT = { has_government = communism } }
+		
+									OR = {
+										any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+										any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+									}
+								}
+								if = { limit = { ROOT = { has_government = fascism } }
+		
+									OR = {
+										any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+										any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									}
+								}
+								if = { limit = { ROOT = { has_government = neutrality } }
+		
+									OR = {
+										any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+										any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+										any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+									}
+								}
+							}
 						}
 					}
 				}
 
-				FROM = { country_event = { id = EAI_DM.10008 days = 20 } } #check if still justifying after 20 days
-
 				every_country = {
-					limit = { democratic_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued@ROOT } }
+					limit = { democratic_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT } }
 
-					set_country_flag = EAI_faction_join_warning_issued@ROOT
+					set_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = EAI_DM.10007
 				}
 
 				every_country = {
-					limit = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued@ROOT } }
+					limit = { communism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT } }
 
-					set_country_flag = EAI_faction_join_warning_issued@ROOT
-
-					country_event = EAI_DM.10007
-				}
-
-				every_country = {
-					limit = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued@ROOT } }
-
-					set_country_flag = EAI_faction_join_warning_issued@ROOT
+					set_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = EAI_DM.10007
 				}
 
 				every_country = {
-					limit = { neutrality_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued@ROOT } }
+					limit = { fascism_willing_to_join_faction = yes NOT = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT } }
 
-					set_country_flag = EAI_faction_join_warning_issued@ROOT
+					set_country_flag = EAI_faction_join_warning_issued_at_@ROOT
 
 					country_event = EAI_DM.10007
 				}
+
+				every_country = {
+					limit = {
+						neutrality_willing_to_join_faction = yes
+						NOT = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT }
+
+						if = { limit = { ROOT = { has_government = democratic } }
+
+							OR = {
+								any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+								any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+							}
+						}
+						if = { limit = { ROOT = { has_government = communism } }
+
+							OR = {
+								any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+								any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+							}
+						}
+						if = { limit = { ROOT = { has_government = fascism } }
+
+							OR = {
+								any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+								any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+							}
+						}
+						if = { limit = { ROOT = { has_government = neutrality } }
+
+							OR = {
+								any_country = { has_government = democratic NOT = { tag = FROM tag = ROOT } }
+								any_neighbor_country = { has_government = fascism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+								any_neighbor_country = { has_government = communism is_in_faction = yes NOT = { tag = FROM tag = ROOT } }
+							}
+						}
+					}
+
+					set_country_flag = EAI_faction_join_warning_issued_at_@ROOT
+
+					country_event = EAI_DM.10007
+				}
+				
+				FROM = { country_event = { id = EAI_DM.10014 days = 20 } } #if justification was cancelled, clear flag
 			}
 
-			if = { #flag a country when illegally justified against so the on_declare_war script knows when a wargoal was illegally created
+			if = { #flag a country when illegally justified against so the game knows when a wargoal was illegally created for nearby countries
 				limit = {
 					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
 
-					threat > 0.9
-
-					FROM = { strength_ratio = { tag = ROOT ratio < 0.5 } } #target is weak compared to invader
-
-					ROOT = { has_added_tension_amount > 25 } #invader has already added a lot of threat
-
-					NOT = { FROM = { has_country_flag = EAI_illegal_wargoal_justified_by@ROOT } }
+					NOT = { FROM = { has_country_flag = EAI_illegal_wargoal_justified_by_@ROOT } }
 				}
 
-				FROM = { set_country_flag = EAI_illegal_wargoal_justified_by@ROOT }
-				FROM = { country_event = { id = EAI_DM.10008 days = 20 } #if justification was cancelled, clear flag
+				FROM = { set_country_flag = EAI_illegal_wargoal_justified_by_@ROOT }
+
+				FROM = { country_event = { id = EAI_DM.10008 days = 20 } } #if justification was cancelled, clear flag
+			}
+
+			if = { #same thing for wardec target who will join a faction
+				limit = {
+					NOT = { any_state = { is_owned_by = FROM OR = { is_core_of = ROOT is_claimed_by = ROOT } } } #illegal
+
+					NOT = { FROM = { has_country_flag = EAI_will_join_faction_@ROOT } }
+
+					NOT = { FROM = { is_in_faction = yes } }
+
+					OR = {
+						FROM = { major_country = yes }
+						threat > 0.9
+					}
+				}
+
+				FROM = { set_country_flag = EAI_will_join_faction_@ROOT }
+
+				FROM = { country_event = { id = EAI_DM.10015 days = 20 } } #if justification was cancelled, clear flag
 			}
 		}
 	}

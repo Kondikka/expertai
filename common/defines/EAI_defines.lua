@@ -9,7 +9,7 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 5 				                       		-- To which 
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
-NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2	
+--NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2	
 
 ----------------------
 
@@ -91,9 +91,11 @@ NDefines.NAI.DIPLOMACY_SEND_MAX_FACTION = 0.5
 
 --NDefines.NAI.SUPPLY_CRISIS_LIMIT = 1.0
 
---NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 25		                    -- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
---NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = 12		                    -- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
---NDefines.NMilitary.PLAN_EXECUTE_RUSH = 0			                            -- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 10 --25				-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -0.1				-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+--NDefines.NMilitary.PLAN_EXECUTE_RUSH = -200						-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+--NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_MAX_FORT = 5				-- If execution mode is set to careful, units will not attack provinces with fort levels greater than or equal to this
+	
 
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				            -- Minimum org % for a unit to actively attack an enemy unit when executing a plan
 --NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.5			            -- Minimum strength for a unit to actively attack an enemy unit when executing a plan
