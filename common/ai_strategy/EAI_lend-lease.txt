@@ -143,8 +143,25 @@ lend_lease_ENG = {
 	ai_strategy = { type = support id = "ENG" value = 5200 }
 }
 lend_lease_SOV = {
-	enable = { has_global_flag = EAI_lend_lease eligible_for_LL_sender = yes SOV = { eligible_for_LL_receiver = yes } }
-	abort = { OR = { NOT = { has_global_flag = EAI_lend_lease } NOT = { eligible_for_LL_sender = yes } SOV = { NOT = { eligible_for_LL_receiver = yes } } } }
+	enable = {
+		has_global_flag = EAI_lend_lease
+		eligible_for_LL_sender = yes
+		SOV = { eligible_for_LL_receiver = yes }
+		
+		if = { limit = { GER = { is_ai = yes } } #make it a little easier for AI germany
+			OR = {
+				SOV = { surrender_progress > 0.5 }
+				ROOT = { has_government = communism }
+			}
+		}
+	}
+	abort = {
+		OR = {
+			NOT = { has_global_flag = EAI_lend_lease }
+			NOT = { eligible_for_LL_sender = yes }
+			SOV = { NOT = { eligible_for_LL_receiver = yes } }
+		} 
+	}
 	ai_strategy = { type = support id = "SOV" value = 6000 }
 }
 lend_lease_SWE = {

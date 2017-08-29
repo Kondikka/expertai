@@ -47,7 +47,7 @@ NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.1
 NDefines.NAI.ESTIMATED_CONVOYS_PER_DIVISION = 6
 
 NDefines.NAI.MAX_SUPPLY_DIVISOR = 0.5
-NDefines.NAI.MIN_SUPPLY_USE_SANITY_CAP = 100	                                -- Ignore supply cap if below this value when deciding on how many divisions to produce.
+--NDefines.NAI.MIN_SUPPLY_USE_SANITY_CAP = 100	                                -- Ignore supply cap if below this value when deciding on how many divisions to produce.
 
 NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 1
 
@@ -86,15 +86,20 @@ NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 7.0                       
 --NDefines.NAI.DIPLOMACY_SEND_EXPEDITIONARY_BASE = 200 --7                      -- Multiplied with relative strength factor to get result (if other is twice as "strong" the result with 25 would be 50)
 NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 NDefines.NAI.DIPLOMACY_SEND_MAX_FACTION = 0.5
+--NDefines.NAI.MAX_VOLUNTEER_ARMY_FRACTION = 0.01
 
 --------------------------------------------------------------------------------------------------------------
 
 --NDefines.NAI.SUPPLY_CRISIS_LIMIT = 1.0
 
-NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 10 --25				-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
-NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -0.1				-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
---NDefines.NMilitary.PLAN_EXECUTE_RUSH = -200						-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
---NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_MAX_FORT = 5				-- If execution mode is set to careful, units will not attack provinces with fort levels greater than or equal to this
+--NDefines.NAI.PLAN_ATTACK_DEPTH_FACTOR = 0.5									-- Factor applied to size or enemy being attacked.
+--NDefines.NAI.PLAN_STEP_COST_LIMIT = 1											-- When stepping to draw a plan this cost makes it break if it hits hard terrain (multiplied by number of desired steps)
+--NDefines.NAI.PLAN_STEP_COST_LIMIT_REDUCTION = 3								-- Cost limit is reduced per iteration, making hard terrain less likely to be crossed the further into enemy territory it is
+
+NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 10 --25							-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -0.1							-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+--NDefines.NMilitary.PLAN_EXECUTE_RUSH = -200									-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+--NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_MAX_FORT = 5							-- If execution mode is set to careful, units will not attack provinces with fort levels greater than or equal to this
 	
 
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				            -- Minimum org % for a unit to actively attack an enemy unit when executing a plan
@@ -151,11 +156,11 @@ NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					                    -- The lower 
 
 NDefines.NAI.PLAN_FACTION_STRONG_TO_EXECUTE = 0.65 --0.80	0.60		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_STRONG = 2 --0.5	 --0.75		0.9				            -- Organization % for unit to be considered strong
-NDefines.NAI.STR_UNIT_STRONG = 0.75 --0.9 --0.7		0.75					    -- Strength (equipment) % for unit to be considered strong
+NDefines.NAI.STR_UNIT_STRONG = 0.65 --0.9 --0.7		0.75					    -- Strength (equipment) % for unit to be considered strong
 
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for unit to be considered weak
-NDefines.NAI.STR_UNIT_WEAK = 0.6 --0.6 --0.5			0.1					    -- Strength (equipment) % for unit to be considered weak
+NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					    -- Strength (equipment) % for unit to be considered weak
 
 --NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				            -- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action	
@@ -185,11 +190,11 @@ NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_LOW = 0.7							--vanilla = 0.2
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_MEDIUM = 0.8						--vanilla = 0.4
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.9						--vanilla = 0.8
 
-NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 10
-NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
+--NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 10
+--NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 5				                	-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80						                -- AI will generally attempt to merge fleets into this size  but as a soft limit.
 --NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500 				                -- Base value when AI is evaluating distance score to places
---NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 10000				        		-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_PATROL_DIVISOR = 1 		                -- Divides patrol score when not defending
 --NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 2 		                -- Divides escort score when not defending
 --NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 50000 			                -- Extra patrol mission score near owned provinces
