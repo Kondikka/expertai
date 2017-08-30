@@ -97,7 +97,7 @@ NDefines.NAI.DIPLOMACY_SEND_MAX_FACTION = 0.5
 --NDefines.NAI.PLAN_STEP_COST_LIMIT_REDUCTION = 3								-- Cost limit is reduced per iteration, making hard terrain less likely to be crossed the further into enemy territory it is
 
 NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 10 --25							-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
-NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -0.1							-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
+NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -1						-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_RUSH = -200									-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_MAX_FORT = 5							-- If execution mode is set to careful, units will not attack provinces with fort levels greater than or equal to this
 	
