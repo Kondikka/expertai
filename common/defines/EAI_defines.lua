@@ -103,9 +103,9 @@ NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -1						-- When looking for an 
 	
 
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				            -- Minimum org % for a unit to actively attack an enemy unit when executing a plan
---NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.5			            -- Minimum strength for a unit to actively attack an enemy unit when executing a plan
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.7			            -- Minimum strength for a unit to actively attack an enemy unit when executing a plan
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_MED = 0.75				            -- (LOW,MED,HIGH) corresponds to the plan execution agressiveness level.
---NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.5	
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.6	
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_HIGH = 0.25		
 --NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.5	
 
