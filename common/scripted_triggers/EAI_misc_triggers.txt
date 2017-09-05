@@ -2,6 +2,306 @@
 #	DIPLOMACY
 ######################################################
 
+democratic_nation = {
+	OR = {
+		has_government = democratic
+		AND = { has_government = neutrality democratic > 0.5 }
+	}
+}
+
+communist_nation = {
+	OR = {
+		has_government = communism
+		AND = { has_government = neutrality communism > 0.5 }
+	}
+}
+
+fascist_nation = {
+	OR = {
+		has_government = fascism
+		AND = { has_government = neutrality fascism > 0.5 }
+	}
+}
+
+nonaligned_nation = {
+	AND = {
+		has_government = neutrality
+		NOT = {
+			democratic > 0.5
+			communism > 0.5
+			fascism > 0.5
+		}
+	}
+}
+
+invite_to_faction = {
+	ROOT = { is_faction_leader = yes }
+	NOT = { tag = ROOT }
+	OR = {
+		AND = { has_country_flag = EAI_seeks_alliance_democratic ROOT = { has_government = democratic } }
+		AND = { has_country_flag = EAI_seeks_alliance_communism ROOT = { has_government = communism } }
+		AND = { has_country_flag = EAI_seeks_alliance_fascism ROOT = { has_government = fascism } }
+	}
+}
+
+lend_lease = {
+	ROOT = { #lend leaser
+		OR = {
+			has_country_flag = EAI_supports_@PREV
+		
+			AND = {
+				has_global_flag = EAI_lend_Lease
+			
+				OR = { is_major = yes is_in_faction = yes has_war = yes }
+				NOT = { neutral_country = yes }
+				NOT = { surrender_progress > 0.05 }
+		
+				########################################
+		
+				#SPECIAL RULES
+		
+				#GER should focus on stockpiling for itself
+				if = { limit = { original_tag = GER has_war = yes }
+					OR = {
+						SOV = { has_capitulated = yes }
+						SOV = { exists = no }
+						SOV = { is_puppet = yes }
+						is_in_faction_with = SOV
+						SOV = { NOT = { has_government = communism } }
+					}
+				}
+		
+				########################################
+			}
+		}
+	}
+
+	THIS = { #target
+		OR = {
+			has_country_flag = EAI_receives_support_@THIS
+		
+			AND = {
+				########################################
+		
+				#SPECIAL RULES
+		
+				#axis shouldn't lend lease japan
+				if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes } OR = { original_tag = JAP is_puppet_of = JAP } }
+					is_in_faction_with = GER
+				}
+		
+				if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } is_in_faction_with = GER }
+					ROOT = { is_in_faction_with = GER }
+				}
+		
+				#make things easer for AI GER vs SOV
+				if = { limit = { original_tag = SOV GER = { is_ai = yes } }
+					OR = {
+						surrender_progress > 0.2
+						ROOT = { has_government = communism }
+					}
+				}
+		
+				#make things easier for AI JAP vs CHI
+				if = { limit = { OR = { original_tag = CHI original_tag = PRC } JAP = { is_ai = yes } }
+					OR = {
+						AND = { ROOT = { tag = USA } CHI = { surrender_progress > 0.75 } }
+						AND = { ROOT = { tag = SOV } CHI = { surrender_progress > 0.75 } }
+						CHI = { surrender_progress > 0.9 }
+						CHI = { is_puppet = yes }
+					}
+				}
+		
+				########################################
+		
+				NOT = { has_war_with = ROOT }
+		
+				if = { #rules for subjects
+					limit = { ROOT = { is_subject = yes } }
+		
+					ROOT = { is_subject_of = PREV } #is subject of the target
+					any_enemy_country = { has_war_with = ROOT } #common enemy
+				}
+		
+				OR = { #when should it lend lease a country depending on ideology
+		
+					AND = { ROOT = { democratic_nation = yes }
+		
+						OR = {
+							democratic_nation = yes
+		
+							AND = { communist_nation = yes
+								has_offensive_war = no
+							}
+		
+							AND = { nonaligned_nation = yes
+								has_offensive_war = no
+							}
+						}
+					}
+		
+					AND = { ROOT = { communist_nation = yes }
+		
+						OR = {
+							communist_nation = yes
+		
+							AND = { democratic_nation = yes
+								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+		
+							AND = { nonaligned_nation = yes
+								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+						}
+					}
+		
+					AND = { ROOT = { fascist_nation = yes }
+		
+						OR = {
+							fascist_nation = yes
+		
+							AND = { nonaligned_nation = yes
+								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+						}
+					}
+		
+					AND = { ROOT = { nonaligned_nation = yes }
+		
+						OR = {
+							AND = { democratic_nation = yes
+								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+						
+							AND = { fascist_nation = yes
+								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+		
+							AND = { communist_nation = yes
+								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+		
+							AND = { nonaligned_nation = yes
+								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
+							}
+						}
+					}
+		
+					is_in_faction_with = ROOT #faction members
+				}
+		
+				OR = { #why should it send LL?
+					any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
+					ROOT = { has_opinion = { target = PREV value > 0 } } #friendly countries
+					is_in_faction_with = ROOT #faction members
+		
+					AND = { #support wars against other ideologies
+						any_enemy_country = { fascist_nation = yes }
+						ROOT = { NOT = { fascist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { communist_nation = yes }
+						ROOT = { NOT = { communist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { democratic_nation = yes }
+						ROOT = { NOT = { democratic_nation = yes } }
+					}
+		
+					AND = { communist_nation = yes ROOT = { communist_nation = yes } } #shared ideology
+					AND = { fascist_nation = yes ROOT = { fascist_nation = yes } }
+					AND = { democratic_nation = yes ROOT = { democratic_nation = yes } }
+				}
+			}
+		}
+	}
+}
+
+send_volunteers = {
+	THIS = { #target
+		has_war = yes
+		NOT = { has_war_with = ROOT }
+	
+		OR = {
+			AND = {
+				ROOT = { has_country_flag = EAI_supports_@PREV }
+				has_country_flag = EAI_receives_support_@THIS
+			}
+		
+			AND = {
+				ROOT = { original_tag = SOV has_government = communism }
+				
+				OR = {
+					AND = { original_tag = CHI has_war_with = JAP }
+					AND = { original_tag = SPR has_government = communism has_civil_war = yes }
+				}
+			}
+			
+			AND = {
+				ROOT = { OR = { original_tag = GER original_tag = ITA } has_government = fascism }
+				
+				OR = {
+					AND = { OR = { original_tag = JAP original_tag = MEN } has_government = fascism has_war_with = CHI }
+					AND = { original_tag = SPR has_government = fascism has_civil_war = yes }
+				}
+			}
+			
+			AND = {
+				ROOT = { OR = { original_tag = SPR original_tag = HUN } has_government = fascism }
+				
+				OR = { original_tag = ITA original_tag = GER } has_government = fascism
+			}
+			
+			AND = {
+				ROOT = { original_tag = USA has_government = democratic }
+				
+				OR = { original_tag = ENG is_subject_of = ENG } has_government = democratic
+				
+				date > 1941.1.1
+			}
+			
+			AND = { #ahistorical mode
+				is_historical_focus_on = no
+				
+				ROOT = { has_opinion = { target = PREV value > 25 } } #friendly countries
+				
+				OR = {
+					AND = { ROOT = { democratic_nation = yes }
+						democratic_nation = yes
+					}
+					
+					AND = { ROOT = { communist_nation = yes }
+						communist_nation = yes
+					}
+					
+					AND = { ROOT = { fascist_nation = yes }
+						fascist_nation = yes
+					}
+					
+					AND = { ROOT = { nonaligned_nation = yes }
+						nonaligned_nation = yes
+					}
+				}
+				
+				OR = {
+					AND = {
+						any_enemy_country = { fascist_nation = yes }
+						ROOT = { NOT = { fascist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { communist_nation = yes }
+						ROOT = { NOT = { communist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { democratic_nation = yes }
+						ROOT = { NOT = { democratic_nation = yes } }
+					}
+				}
+			}
+		}
+	}
+}
+
 ########## guarantee nation
 
 any_willing_to_guarantee_nation = {
@@ -9,85 +309,103 @@ any_willing_to_guarantee_nation = {
 
 	NOT = { tag = FROM tag = ROOT }
 
-	OR = {
-		AND = { has_government = democratic NOT = { democratic_willing_to_join_faction = yes } }
-		AND = { has_government = communism NOT = { communism_willing_to_join_faction = yes } }
-		AND = { has_government = fascism NOT = { fascism_willing_to_join_faction = yes } }
-		AND = { has_government = neutrality NOT = { neutrality_willing_to_join_faction = yes } }
+	OR = { #check that this is not willing to join a faction instead
+		AND = {
+			democratic_nation = yes
+			NOT = { democratic_willing_to_join_faction = yes }
+		}
+
+		AND = {
+			communist_nation = yes
+			NOT = { communism_willing_to_join_faction = yes }
+		}
+
+		AND = {
+			fascist_nation = yes
+			NOT = { fascism_willing_to_join_faction = yes }
+		}
+
+		AND = {
+			nonaligned_nation = yes
+			NOT = { neutrality_willing_to_join_faction = yes }
+		}
 	}
 
 	OR = { #which ideologies this country is willing to defend
 		AND = {
-			has_government = democratic
+			democratic_nation = yes
 			FROM = {
 				OR = {
-					has_government = democratic
-					has_government = neutrality
+					democratic_nation = yes
+					nonaligned_nation = yes
 				}
 			}
 		}
 		AND = {
-			has_government = communism
+			communist_nation = yes
 			FROM = {
 				OR = {
-					has_government = communism
-					AND = { has_government = neutrality is_neighbor_of = PREV }
+					communist_nation = yes
+					AND = { nonaligned_nation = yes is_neighbor_of = PREV }
 				}
 			}
 		}
 		AND = {
-			has_government = fascism
+			fascist_nation = yes
 			FROM = {
 				OR = {
-					has_government = fascism
-					AND = { has_government = neutrality is_neighbor_of = PREV }
+					fascist_nation = yes
+					AND = { nonaligned_nation = yes is_neighbor_of = PREV }
 				}
 			}
 		}
 		AND = {
-			has_government = neutrality
+			nonaligned_nation = yes
+			FROM = {
+				AND = { nonaligned_nation = yes is_neighbor_of = PREV }
+			}
 		}
 	}
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
 		AND = {
-			has_government = democratic
+			democratic_nation = yes
 			OR = {
-				NOT = { ROOT = { has_government = democratic } }
+				NOT = { ROOT = { democratic_nation = yes } } #invader is not democratic
 				AND = {
-					ROOT = { has_government = democratic }
-					OR = {
-						FROM = { has_government = democratic }
-						FROM = { has_government = neutrality }
+					ROOT = { democratic_nation = yes } #invader is democratic AND
+					OR = { #target is democratic or neutral
+						FROM = { democratic_nation = yes }
+						FROM = { nonaligned_nation = yes }
 					}
 				}
 			}
 		}
 
 		AND = {
-			has_government = communism
+			communist_nation = yes
 			OR = {
-				NOT = { ROOT = { has_government = communism } }
+				NOT = { ROOT = { communist_nation = yes } }
 				AND = {
-					ROOT = { has_government = communism }
-					FROM = { has_government = communism }
+					ROOT = { communist_nation = yes }
+					FROM = { communist_nation = yes }
 				}
 			}
 		}
 
 		AND = {
-			has_government = fascism
+			fascist_nation = yes
 			OR = {
-				NOT = { ROOT = { has_government = fascism } }
+				NOT = { ROOT = { fascist_nation = yes } }
 				AND = {
-					ROOT = { has_government = fascism }
-					FROM = { has_government = fascism }
+					ROOT = { fascist_nation = yes }
+					FROM = { fascist_nation = yes }
 				}
 			}
 		}
 
 		AND = {
-			has_government = neutrality
+			nonaligned_nation = yes
 		}
 	}
 
@@ -146,7 +464,7 @@ any_willing_to_guarantee_nation = {
 democratic_willing_to_guarantee_nation = {
 	is_ai = yes
 
-	has_government = democratic
+	democratic_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -154,18 +472,18 @@ democratic_willing_to_guarantee_nation = {
 
 	event_target:EAI_illegal_wargoal_target = { #target ideology this is willing to defend
 		OR = {
-			has_government = democratic
-			has_government = neutrality
+			democratic_nation = yes
+			nonaligned_nation = yes
 		}
 	}
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = democratic } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { democratic_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = democratic }
+			event_target:EAI_illegal_wargoal_invader = { democratic_nation = yes }
 			OR = { #democratic is willing to defend neutrals against democracies
-				event_target:EAI_illegal_wargoal_target = { has_government = democratic }
-				event_target:EAI_illegal_wargoal_target = { has_government = neutrality }
+				event_target:EAI_illegal_wargoal_target = { democratic_nation = yes }
+				event_target:EAI_illegal_wargoal_target = { nonaligned_nation = yes }
 			}
 		}
 	}
@@ -224,7 +542,7 @@ democratic_willing_to_guarantee_nation = {
 communism_willing_to_guarantee_nation = {
 	is_ai = yes
 
-	has_government = communism
+	communist_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -232,16 +550,16 @@ communism_willing_to_guarantee_nation = {
 
 	event_target:EAI_illegal_wargoal_target = { #target ideology this is willing to defend
 		OR = {
-			has_government = communism
-			AND = { has_government = neutrality is_neighbor_of = PREV }
+			communist_nation = yes
+			AND = { nonaligned_nation = yes is_neighbor_of = PREV }
 		}
 	}
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = communism } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { communist_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = communism }
-			event_target:EAI_illegal_wargoal_target = { has_government = communism }
+			event_target:EAI_illegal_wargoal_invader = { communist_nation = yes }
+			event_target:EAI_illegal_wargoal_target = { communist_nation = yes }
 		}
 	}
 
@@ -299,7 +617,7 @@ communism_willing_to_guarantee_nation = {
 fascism_willing_to_guarantee_nation = {
 	is_ai = yes
 
-	has_government = fascism
+	fascist_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -307,16 +625,16 @@ fascism_willing_to_guarantee_nation = {
 
 	event_target:EAI_illegal_wargoal_target = { #target ideology this is willing to defend
 		OR = {
-			has_government = fascism
-			AND = { has_government = neutrality is_neighbor_of = PREV }
+			fascist_nation = yes
+			AND = { nonaligned_nation = yes is_neighbor_of = PREV }
 		}
 	}
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = fascism } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { fascist_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = fascism }
-			event_target:EAI_illegal_wargoal_target = { has_government = fascism }
+			event_target:EAI_illegal_wargoal_invader = { fascist_nation = yes }
+			event_target:EAI_illegal_wargoal_target = { fascist_nation = yes }
 		}
 	}
 
@@ -374,23 +692,21 @@ fascism_willing_to_guarantee_nation = {
 neutrality_willing_to_guarantee_nation = {
 	is_ai = yes
 
-	has_government = neutrality
+	nonaligned_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
 	NOT = { neutrality_willing_to_join_faction_2 = yes }
 
-	#event_target:EAI_illegal_wargoal_target = { #target ideology this is willing to defend
-	#	OR = {
-	#		has_government = neutrality
-	#	}
-	#}
+	event_target:EAI_illegal_wargoal_target = { #target ideology this is willing to defend
+		AND = { nonaligned_nation = yes is_neighbor_of = PREV }
+	}
 
 	#OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-	#	NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = neutrality } }
+	#	NOT = { event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes } }
 	#	AND = {
-	#		event_target:EAI_illegal_wargoal_invader = { has_government = neutrality }
-	#		event_target:EAI_illegal_wargoal_target = { has_government = neutrality }
+	#		event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes }
+	#		event_target:EAI_illegal_wargoal_target = { nonaligned_nation = yes }
 	#	}
 	#}
 
@@ -451,7 +767,7 @@ neutrality_willing_to_guarantee_nation = {
 democratic_willing_to_join_faction = {
 	is_ai = yes
 
-	has_government = democratic
+	democratic_nation = yes
 
 	NOT = { tag = FROM tag = ROOT }
 
@@ -461,12 +777,12 @@ democratic_willing_to_join_faction = {
 	ROOT = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { ROOT = { has_government = democratic } }
+		NOT = { ROOT = { democratic_nation = yes } }
 		AND = {
-			ROOT = { has_government = democratic }
+			ROOT = { democratic_nation = yes }
 			OR = {
-				FROM = { has_government = democratic }
-				FROM = { has_government = neutrality }
+				FROM = { democratic_nation = yes }
+				FROM = { nonaligned_nation = yes }
 			}
 		}
 	}
@@ -510,7 +826,7 @@ democratic_willing_to_join_faction = {
 communism_willing_to_join_faction = {
 	is_ai = yes
 
-	has_government = communism
+	communist_nation = yes
 
 	NOT = { tag = FROM tag = ROOT }
 
@@ -520,10 +836,10 @@ communism_willing_to_join_faction = {
 	ROOT = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { ROOT = { has_government = communism } }
+		NOT = { ROOT = { communist_nation = yes } }
 		AND = {
-			ROOT = { has_government = communism }
-			FROM = { has_government = communism }
+			ROOT = { communist_nation = yes }
+			FROM = { communist_nation = yes }
 		}
 	}
 
@@ -566,7 +882,7 @@ communism_willing_to_join_faction = {
 fascism_willing_to_join_faction = {
 	is_ai = yes
 
-	has_government = fascism
+	fascist_nation = yes
 
 	NOT = { tag = FROM tag = ROOT }
 
@@ -576,10 +892,10 @@ fascism_willing_to_join_faction = {
 	ROOT = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { ROOT = { has_government = fascism } }
+		NOT = { ROOT = { fascist_nation = yes } }
 		AND = {
-			ROOT = { has_government = fascism }
-			FROM = { has_government = fascism }
+			ROOT = { fascist_nation = yes }
+			FROM = { fascist_nation = yes }
 		}
 	}
 
@@ -622,7 +938,7 @@ fascism_willing_to_join_faction = {
 neutrality_willing_to_join_faction = {
 	is_ai = yes
 
-	has_government = neutrality
+	nonaligned_nation = yes
 
 	NOT = { tag = FROM tag = ROOT }
 
@@ -632,10 +948,10 @@ neutrality_willing_to_join_faction = {
 	ROOT = { has_added_tension_amount > 25 }
 
 	#OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-	#	NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = neutrality } }
+	#	NOT = { event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes } }
 	#	AND = {
-	#		event_target:EAI_illegal_wargoal_invader = { has_government = neutrality }
-	#		event_target:EAI_illegal_wargoal_target = { has_government = neutrality }
+	#		event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes }
+	#		event_target:EAI_illegal_wargoal_target = { nonaligned_nation = yes }
 	#	}
 	#}
 
@@ -681,7 +997,7 @@ neutrality_willing_to_join_faction = {
 democratic_willing_to_join_faction_2 = {
 	is_ai = yes
 
-	has_government = democratic
+	democratic_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -691,12 +1007,12 @@ democratic_willing_to_join_faction_2 = {
 	event_target:EAI_illegal_wargoal_invader = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = democratic } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { democratic_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = democratic }
+			event_target:EAI_illegal_wargoal_invader = { democratic_nation = yes }
 			OR = {
-				event_target:EAI_illegal_wargoal_target = { has_government = democratic }
-				event_target:EAI_illegal_wargoal_target = { has_government = neutrality }
+				event_target:EAI_illegal_wargoal_target = { democratic_nation = yes }
+				event_target:EAI_illegal_wargoal_target = { nonaligned_nation = yes }
 			}
 		}
 	}
@@ -740,7 +1056,7 @@ democratic_willing_to_join_faction_2 = {
 communism_willing_to_join_faction_2 = {
 	is_ai = yes
 
-	has_government = communism
+	communist_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -750,10 +1066,10 @@ communism_willing_to_join_faction_2 = {
 	event_target:EAI_illegal_wargoal_invader = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = communism } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { communist_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = communism }
-			event_target:EAI_illegal_wargoal_target = { has_government = communism }
+			event_target:EAI_illegal_wargoal_invader = { communist_nation = yes }
+			event_target:EAI_illegal_wargoal_target = { communist_nation = yes }
 		}
 	}
 
@@ -796,7 +1112,7 @@ communism_willing_to_join_faction_2 = {
 fascism_willing_to_join_faction_2 = {
 	is_ai = yes
 
-	has_government = fascism
+	fascist_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -806,10 +1122,10 @@ fascism_willing_to_join_faction_2 = {
 	event_target:EAI_illegal_wargoal_invader = { has_added_tension_amount > 25 }
 
 	OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-		NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = fascism } }
+		NOT = { event_target:EAI_illegal_wargoal_invader = { fascist_nation = yes } }
 		AND = {
-			event_target:EAI_illegal_wargoal_invader = { has_government = fascism }
-			event_target:EAI_illegal_wargoal_target = { has_government = fascism }
+			event_target:EAI_illegal_wargoal_invader = { fascist_nation = yes }
+			event_target:EAI_illegal_wargoal_target = { fascist_nation = yes }
 		}
 	}
 
@@ -852,7 +1168,7 @@ fascism_willing_to_join_faction_2 = {
 neutrality_willing_to_join_faction_2 = {
 	is_ai = yes
 
-	has_government = neutrality
+	nonaligned_nation = yes
 
 	NOT = { tag = event_target:EAI_illegal_wargoal_target tag = event_target:EAI_illegal_wargoal_invader }
 
@@ -862,10 +1178,10 @@ neutrality_willing_to_join_faction_2 = {
 	event_target:EAI_illegal_wargoal_invader = { has_added_tension_amount > 25 }
 
 	#OR = { #ignore if the invader has the same ideology as this AND target is not the same ideology
-	#	NOT = { event_target:EAI_illegal_wargoal_invader = { has_government = neutrality } }
+	#	NOT = { event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes } }
 	#	AND = {
-	#		event_target:EAI_illegal_wargoal_invader = { has_government = neutrality }
-	#		event_target:EAI_illegal_wargoal_target = { has_government = neutrality }
+	#		event_target:EAI_illegal_wargoal_invader = { nonaligned_nation = yes }
+	#		event_target:EAI_illegal_wargoal_target = { nonaligned_nation = yes }
 	#	}
 	#}
 
@@ -907,210 +1223,114 @@ neutrality_willing_to_join_faction_2 = {
 }
 
 ######################################################
-#	LEND-LEASE
-######################################################
-
-eligible_for_LL_sender = {
-	OR = { is_major = yes is_in_faction = yes has_war = yes }
-	NOT = { has_idea = neutrality_idea }
-	NOT = { surrender_progress > 0.05 }
-
-	########################################
-
-	#SPECIAL RULES
-
-	#GER should focus on stockpiling for itself
-	if = { limit = { original_tag = GER has_war = yes }
-		OR = {
-			SOV = { has_capitulated = yes }
-			SOV = { exists = no }
-			SOV = { is_puppet = yes }
-			is_in_faction_with = SOV
-			SOV = { NOT = { has_government = communism } }
-		}
-	}
-
-	########################################
-}
-
-eligible_for_LL_receiver = {
-	NOT = { has_war_with = ROOT }
-
-	########################################
-
-	#SPECIAL RULES
-
-	#axis shouldn't lend lease japan
-	if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes } OR = { original_tag = JAP is_puppet_of = JAP } }
-		is_in_faction_with = GER
-	}
-
-	if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } is_in_faction_with = GER }
-		ROOT = { is_in_faction_with = GER }
-	}
-
-	########################################
-
-	OR = { #cross ideology LL logic
-		AND = {
-			OR = {
-				has_government = democratic
-				AND = { has_offensive_war = no has_government = communism }
-				AND = { has_offensive_war = no has_government = neutrality }
-				any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
-			}
-			ROOT = { has_government = democratic }
-		}
-		AND = {
-			OR = {
-				has_government = communism
-				AND = { has_offensive_war = no has_government = neutrality }
-			}
-			ROOT = { has_government = communism }
-		}
-		AND = {
-			OR = {
-				has_government = fascism
-				AND = { has_offensive_war = no has_government = neutrality }
-			}
-			ROOT = { has_government = fascism }
-		}
-		AND = {
-			OR = {
-				AND = { has_offensive_war = no has_government = democratic }
-				AND = { has_offensive_war = no has_government = communism }
-				AND = { has_offensive_war = no has_government = neutrality }
-				any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
-			}
-			ROOT = { has_government = neutrality }
-		}
-		is_in_faction_with = ROOT #bypass for faction members in case of unholy alliances
-	}
-
-	OR = { #why should it send LL?
-		any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
-		ROOT = { has_opinion = { target = PREV value > 0 } } #friendly countries
-		is_in_faction_with = ROOT #faction members
-
-		AND = { any_enemy_country = { has_government = fascism } ROOT = { NOT = { has_government = fascism } } } #support wars against other ideologies
-		AND = { any_enemy_country = { has_government = communism } ROOT = { NOT = { has_government = communism } } }
-		AND = { any_enemy_country = { has_government = democratic } ROOT = { NOT = { has_government = democratic } } }
-
-		AND = { has_government = communism ROOT = { has_government = communism } } #shared ideology
-		AND = { has_government = fascism ROOT = { has_government = fascism } }
-		AND = { has_government = democratic ROOT = { has_government = democratic } }
-	}
-}
-
-######################################################
 #	VARIANTS
 ######################################################
 
 marm_developed = {
 	OR = {
-		AND = { has_country_flag = marm_I_6/8 has_tech = basic_medium_tank NOT = { has_tech = improved_medium_tank } }
-		AND = { has_country_flag = marm_II_6/8 has_tech = improved_medium_tank NOT = { has_tech = advanced_medium_tank } }
-		AND = { has_country_flag = marm_III_6/8 has_tech = advanced_medium_tank NOT = { has_tech = main_battle_tank } }
-		AND = { has_country_flag = marm_IV_6/8 has_tech = main_battle_tank }
+		AND = { has_country_flag = marm_I_2/4 has_tech = basic_medium_tank NOT = { has_tech = improved_medium_tank } }
+		AND = { has_country_flag = marm_II_2/4 has_tech = improved_medium_tank NOT = { has_tech = advanced_medium_tank } }
+		AND = { has_country_flag = marm_III_2/4 has_tech = advanced_medium_tank NOT = { has_tech = main_battle_tank } }
+		AND = { has_country_flag = marm_IV_2/4 has_tech = main_battle_tank }
 	}
 }
 
 mspart_developed = {
 	OR = {
-		AND = { has_country_flag = mspart_I_4/8 has_tech = basic_medium_art NOT = { has_tech = improved_medium_art } }
-		AND = { has_country_flag = mspart_II_4/8 has_tech = improved_medium_art NOT = { has_tech = advanced_medium_art } }
-		AND = { has_country_flag = mspart_III_4/8 has_tech = advanced_medium_art NOT = { has_tech = modern_art } }
-		AND = { has_country_flag = mspart_IV_4/8 has_tech = modern_art }
+		AND = { has_country_flag = mspart_I_1/4 has_tech = basic_medium_art NOT = { has_tech = improved_medium_art } }
+		AND = { has_country_flag = mspart_II_1/4 has_tech = improved_medium_art NOT = { has_tech = advanced_medium_art } }
+		AND = { has_country_flag = mspart_III_1/4 has_tech = advanced_medium_art NOT = { has_tech = modern_art } }
+		AND = { has_country_flag = mspart_IV_1/4 has_tech = modern_art }
 	}
 }
 
 mspaa_developed = {
 	OR = {
-		AND = { has_country_flag = mspaa_I_8/8 has_tech = basic_medium_spaa NOT = { has_tech = improved_medium_spaa } }
-		AND = { has_country_flag = mspaa_II_8/8 has_tech = improved_medium_spaa NOT = { has_tech = advanced_medium_spaa } }
-		AND = { has_country_flag = mspaa_III_8/8 has_tech = advanced_medium_spaa }
+		AND = { has_country_flag = mspaa_I_1/4 has_tech = basic_medium_spaa NOT = { has_tech = improved_medium_spaa } }
+		AND = { has_country_flag = mspaa_II_1/4 has_tech = improved_medium_spaa NOT = { has_tech = advanced_medium_spaa } }
+		AND = { has_country_flag = mspaa_III_1/4 has_tech = advanced_medium_spaa }
 	}
 }
 
 mtd_developed = {
 	OR = {
-		AND = { has_country_flag = mtd_I_6/8 has_tech = basic_medium_td NOT = { has_tech = improved_medium_td } }
-		AND = { has_country_flag = mtd_II_6/8 has_tech = improved_medium_td NOT = { has_tech = advanced_medium_td } }
-		AND = { has_country_flag = mtd_III_6/8 has_tech = advanced_medium_td NOT = { has_tech = modern_td } }
-		AND = { has_country_flag = mtd_IV_6/8 has_tech = modern_td }
+		AND = { has_country_flag = mtd_I_2/4 has_tech = basic_medium_td NOT = { has_tech = improved_medium_td } }
+		AND = { has_country_flag = mtd_II_2/4 has_tech = improved_medium_td NOT = { has_tech = advanced_medium_td } }
+		AND = { has_country_flag = mtd_III_2/4 has_tech = advanced_medium_td NOT = { has_tech = modern_td } }
+		AND = { has_country_flag = mtd_IV_2/4 has_tech = modern_td }
 	}
 }
 
 harm_developed = {
 	OR = {
-		AND = { has_country_flag = harm_I_6/8 has_tech = basic_heavy_tank NOT = { has_tech = improved_heavy_tank } }
-		AND = { has_country_flag = harm_II_6/8 has_tech = improved_heavy_tank NOT = { has_tech = advanced_heavy_tank } }
-		AND = { has_country_flag = harm_III_6/8 has_tech = advanced_heavy_tank }
+		AND = { has_country_flag = harm_I_2/4 has_tech = basic_heavy_tank NOT = { has_tech = improved_heavy_tank } }
+		AND = { has_country_flag = harm_II_2/4 has_tech = improved_heavy_tank NOT = { has_tech = advanced_heavy_tank } }
+		AND = { has_country_flag = harm_III_2/4 has_tech = advanced_heavy_tank }
 	}
 }
 
 hspart_developed = {
 	OR = {
-		AND = { has_country_flag = hspart_I_4/8 has_tech = basic_heavy_art NOT = { has_tech = improved_heavy_art } }
-		AND = { has_country_flag = hspart_II_4/8 has_tech = improved_heavy_art NOT = { has_tech = advanced_heavy_art } }
-		AND = { has_country_flag = hspart_III_4/8 has_tech = advanced_heavy_art }
+		AND = { has_country_flag = hspart_I_1/4 has_tech = basic_heavy_art NOT = { has_tech = improved_heavy_art } }
+		AND = { has_country_flag = hspart_II_1/4 has_tech = improved_heavy_art NOT = { has_tech = advanced_heavy_art } }
+		AND = { has_country_flag = hspart_III_1/4 has_tech = advanced_heavy_art }
 	}
 }
 
 hspaa_developed = {
 	OR = {
-		AND = { has_country_flag = hspaa_I_8/8 has_tech = basic_heavy_spaa NOT = { has_tech = improved_heavy_spaa } }
-		AND = { has_country_flag = hspaa_II_8/8 has_tech = improved_heavy_spaa NOT = { has_tech = advanced_heavy_spaa } }
-		AND = { has_country_flag = hspaa_III_8/8 has_tech = advanced_heavy_spaa }
+		AND = { has_country_flag = hspaa_I_1/4 has_tech = basic_heavy_spaa NOT = { has_tech = improved_heavy_spaa } }
+		AND = { has_country_flag = hspaa_II_1/4 has_tech = improved_heavy_spaa NOT = { has_tech = advanced_heavy_spaa } }
+		AND = { has_country_flag = hspaa_III_1/4 has_tech = advanced_heavy_spaa }
 	}
 }
 
 htd_developed = {
 	OR = {
-		AND = { has_country_flag = htd_I_6/8 has_tech = basic_heavy_td NOT = { has_tech = improved_heavy_td } }
-		AND = { has_country_flag = htd_II_6/8 has_tech = improved_heavy_td NOT = { has_tech = advanced_heavy_td } }
-		AND = { has_country_flag = htd_III_6/8 has_tech = advanced_heavy_td }
+		AND = { has_country_flag = htd_I_2/4 has_tech = basic_heavy_td NOT = { has_tech = improved_heavy_td } }
+		AND = { has_country_flag = htd_II_2/4 has_tech = improved_heavy_td NOT = { has_tech = advanced_heavy_td } }
+		AND = { has_country_flag = htd_III_2/4 has_tech = advanced_heavy_td }
 	}
 }
 
 fighter_developed = {
 	OR = {
-		AND = { has_country_flag = ftr_I_4/8 has_tech = fighter1 NOT = { has_tech = fighter2 } }
-		AND = { has_country_flag = ftr_II_4/8 has_tech = fighter2 NOT = { has_tech = fighter3 } }
-		AND = { has_country_flag = ftr_III_4/8 has_tech = fighter3 NOT = { has_tech = jet_fighter1 } }
-		AND = { has_country_flag = ftr_IV_4/8 has_tech = jet_fighter1 NOT = { has_tech = jet_fighter2 } }
-		AND = { has_country_flag = ftr_V_4/8 has_tech = jet_fighter2 }
+		AND = { has_country_flag = ftr_I_2/4 has_tech = fighter1 NOT = { has_tech = fighter2 } }
+		AND = { has_country_flag = ftr_II_2/4 has_tech = fighter2 NOT = { has_tech = fighter3 } }
+		AND = { has_country_flag = ftr_III_2/4 has_tech = fighter3 NOT = { has_tech = jet_fighter1 } }
+		AND = { has_country_flag = ftr_IV_2/4 has_tech = jet_fighter1 NOT = { has_tech = jet_fighter2 } }
+		AND = { has_country_flag = ftr_V_2/4 has_tech = jet_fighter2 }
 	}
 }
 
 bomber_developed = {
 	OR = {
-		AND = { has_country_flag = tac_I_3/8 has_tech = tactical_bomber1 NOT = { has_tech = tactical_bomber2 } }
-		AND = { has_country_flag = tac_II_3/8 has_tech = tactical_bomber2 NOT = { has_tech = tactical_bomber3 } }
-		AND = { has_country_flag = tac_III_3/8 has_tech = tactical_bomber3 NOT = { has_tech = jet_tactical_bomber1 } }
-		AND = { has_country_flag = tac_IV_3/8 has_tech = jet_tactical_bomber1 NOT = { has_tech = jet_tactical_bomber2 } }
-		AND = { has_country_flag = tac_V_3/8 has_tech = jet_tactical_bomber2 }
+		AND = { has_country_flag = tac_I_2/4 has_tech = tactical_bomber1 NOT = { has_tech = tactical_bomber2 } }
+		AND = { has_country_flag = tac_II_2/4 has_tech = tactical_bomber2 NOT = { has_tech = tactical_bomber3 } }
+		AND = { has_country_flag = tac_III_2/4 has_tech = tactical_bomber3 NOT = { has_tech = jet_tactical_bomber1 } }
+		AND = { has_country_flag = tac_IV_2/4 has_tech = jet_tactical_bomber1 NOT = { has_tech = jet_tactical_bomber2 } }
+		AND = { has_country_flag = tac_V_2/4 has_tech = jet_tactical_bomber2 }
 
-		AND = { has_country_flag = cas_I_3/8 has_tech = CAS1 NOT = { has_tech = CAS2 } }
-		AND = { has_country_flag = cas_II_3/8 has_tech = CAS2 NOT = { has_tech = CAS3 } }
-		AND = { has_country_flag = cas_III_3/8 has_tech = CAS3 }
+		AND = { has_country_flag = cas_I_2/4 has_tech = CAS1 NOT = { has_tech = CAS2 } }
+		AND = { has_country_flag = cas_II_2/4 has_tech = CAS2 NOT = { has_tech = CAS3 } }
+		AND = { has_country_flag = cas_III_2/4 has_tech = CAS3 }
 	}
 }
 
 strat_developed = {
 	OR = {
-		AND = { has_country_flag = strat_I_5/5 has_tech = strategic_bomber1 NOT = { has_tech = strategic_bomber2 } }
-		AND = { has_country_flag = strat_II_5/5 has_tech = strategic_bomber2 NOT = { has_tech = strategic_bomber3 } }
-		AND = { has_country_flag = strat_III_5/5 has_tech = strategic_bomber3 NOT = { has_tech = jet_strategic_bomber1 } }
-		AND = { has_country_flag = strat_IV_5/5 has_tech = jet_strategic_bomber1 }
+		AND = { has_country_flag = str_I_2/4 has_tech = strategic_bomber1 NOT = { has_tech = strategic_bomber2 } }
+		AND = { has_country_flag = str_II_2/4 has_tech = strategic_bomber2 NOT = { has_tech = strategic_bomber3 } }
+		AND = { has_country_flag = str_III_2/4 has_tech = strategic_bomber3 NOT = { has_tech = jet_strategic_bomber1 } }
+		AND = { has_country_flag = str_IV_2/4 has_tech = jet_strategic_bomber1 }
 	}
 }
 
 carrier_developed = {
 	OR = {
-		AND = { has_country_flag = cv_II_5/5 has_tech = basic_carrier NOT = { has_tech = improved_carrier } }
-		AND = { has_country_flag = cv_III_5/5 has_tech = improved_carrier NOT = { has_tech = advanced_carrier } }
-		AND = { has_country_flag = cv_IV_5/5 has_tech = advanced_carrier }
+		AND = { has_country_flag = cv_II_4/4 has_tech = basic_carrier NOT = { has_tech = improved_carrier } }
+		AND = { has_country_flag = cv_III_4/4 has_tech = improved_carrier NOT = { has_tech = advanced_carrier } }
+		AND = { has_country_flag = cv_IV_4/4 has_tech = advanced_carrier }
 	}
 }
 
@@ -1458,6 +1678,7 @@ civil_war_country = {
 }
 
 neutral_country = {
+	NOT = { has_war = yes }
 	OR = {
 		tag = BEL
 		tag = SWI
@@ -1755,10 +1976,10 @@ army_limit_250k = {
 		original_tag = LIT original_tag = LAT original_tag = EST
 
 		original_tag = NOR original_tag = FIN original_tag = DEN
-		
-		
+
+
 		original_tag = XSM original_tag = GXC original_tag = YUN
-		
+
 		AND = { original_tag = CHI is_major = no JAP = { is_ai = yes } date < 1941.1.1 }
 		AND = { original_tag = PRC is_major = no JAP = { is_ai = yes } date < 1941.1.1 }
 	}
