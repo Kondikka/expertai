@@ -48,18 +48,16 @@ lend_lease = {
 	ROOT = { #lend leaser
 		OR = {
 			has_country_flag = EAI_supports_@PREV
-		
+    
 			AND = {
 				has_global_flag = EAI_lend_Lease
-			
-				OR = { is_major = yes is_in_faction = yes has_war = yes }
-				NOT = { neutral_country = yes }
+    
 				NOT = { surrender_progress > 0.05 }
-		
+    
 				########################################
-		
+    
 				#SPECIAL RULES
-		
+    
 				#GER should focus on stockpiling for itself
 				if = { limit = { original_tag = GER has_war = yes }
 					OR = {
@@ -70,30 +68,30 @@ lend_lease = {
 						SOV = { NOT = { has_government = communism } }
 					}
 				}
-		
+    
 				########################################
 			}
 		}
 	}
-
+    
 	THIS = { #target
 		OR = {
 			has_country_flag = EAI_receives_support_@THIS
-		
+    
 			AND = {
 				########################################
-		
+    
 				#SPECIAL RULES
-		
+    
 				#axis shouldn't lend lease japan
 				if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes } OR = { original_tag = JAP is_puppet_of = JAP } }
 					is_in_faction_with = GER
 				}
-		
+    
 				if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } is_in_faction_with = GER }
 					ROOT = { is_in_faction_with = GER }
 				}
-		
+    
 				#make things easer for AI GER vs SOV
 				if = { limit = { original_tag = SOV GER = { is_ai = yes } }
 					OR = {
@@ -101,7 +99,7 @@ lend_lease = {
 						ROOT = { has_government = communism }
 					}
 				}
-		
+    
 				#make things easier for AI JAP vs CHI
 				if = { limit = { OR = { original_tag = CHI original_tag = PRC } JAP = { is_ai = yes } }
 					OR = {
@@ -111,90 +109,114 @@ lend_lease = {
 						CHI = { is_puppet = yes }
 					}
 				}
-		
+    
 				########################################
-		
+    
+				ROOT = { #neutral countries ll to neighbors only
+					OR = {
+						NOT = { neutral_country = yes }
+						AND = {
+							is_neighbor_of = PREV
+							has_opinion = { target = PREV value > 25 }
+						}
+					}
+				}
+				
+				ROOT = {
+					OR = {
+						is_major = yes
+						is_in_faction = yes
+						has_war = yes
+						AND = {
+							is_neighbor_of = PREV
+							has_opinion = { target = PREV value > 25 }
+						}
+					}
+				}
+    
 				NOT = { has_war_with = ROOT }
-		
+    
 				if = { #rules for subjects
 					limit = { ROOT = { is_subject = yes } }
-		
-					ROOT = { is_subject_of = PREV } #is subject of the target
-					any_enemy_country = { has_war_with = ROOT } #common enemy
+    
+					OR = {
+						ROOT = { is_subject_of = PREV } #is subject of the target
+						any_enemy_country = { has_war_with = ROOT } #common enemy
+					}
 				}
-		
+    
 				OR = { #when should it lend lease a country depending on ideology
-		
+    
 					AND = { ROOT = { democratic_nation = yes }
-		
+    
 						OR = {
 							democratic_nation = yes
-		
+    
 							AND = { communist_nation = yes
 								has_offensive_war = no
 							}
-		
+    
 							AND = { nonaligned_nation = yes
 								has_offensive_war = no
 							}
 						}
 					}
-		
+    
 					AND = { ROOT = { communist_nation = yes }
-		
+    
 						OR = {
 							communist_nation = yes
-		
+    
 							AND = { democratic_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-		
+    
 							AND = { nonaligned_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-		
+    
 					AND = { ROOT = { fascist_nation = yes }
-		
+    
 						OR = {
 							fascist_nation = yes
-		
+    
 							AND = { nonaligned_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-		
+    
 					AND = { ROOT = { nonaligned_nation = yes }
-		
+    
 						OR = {
 							AND = { democratic_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-						
+    
 							AND = { fascist_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-		
+    
 							AND = { communist_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-		
+    
 							AND = { nonaligned_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-		
+    
 					is_in_faction_with = ROOT #faction members
 				}
-		
+    
 				OR = { #why should it send LL?
 					any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
 					ROOT = { has_opinion = { target = PREV value > 0 } } #friendly countries
 					is_in_faction_with = ROOT #faction members
-		
+    
 					AND = { #support wars against other ideologies
 						any_enemy_country = { fascist_nation = yes }
 						ROOT = { NOT = { fascist_nation = yes } }
@@ -207,7 +229,7 @@ lend_lease = {
 						any_enemy_country = { democratic_nation = yes }
 						ROOT = { NOT = { democratic_nation = yes } }
 					}
-		
+    
 					AND = { communist_nation = yes ROOT = { communist_nation = yes } } #shared ideology
 					AND = { fascist_nation = yes ROOT = { fascist_nation = yes } }
 					AND = { democratic_nation = yes ROOT = { democratic_nation = yes } }
@@ -221,68 +243,68 @@ send_volunteers = {
 	THIS = { #target
 		has_war = yes
 		NOT = { has_war_with = ROOT }
-	
+
 		OR = {
 			AND = {
 				ROOT = { has_country_flag = EAI_supports_@PREV }
 				has_country_flag = EAI_receives_support_@THIS
 			}
-		
+
 			AND = {
 				ROOT = { original_tag = SOV has_government = communism }
-				
+
 				OR = {
 					AND = { original_tag = CHI has_war_with = JAP }
 					AND = { original_tag = SPR has_government = communism has_civil_war = yes }
 				}
 			}
-			
+
 			AND = {
 				ROOT = { OR = { original_tag = GER original_tag = ITA } has_government = fascism }
-				
+
 				OR = {
 					AND = { OR = { original_tag = JAP original_tag = MEN } has_government = fascism has_war_with = CHI }
 					AND = { original_tag = SPR has_government = fascism has_civil_war = yes }
 				}
 			}
-			
+
 			AND = {
 				ROOT = { OR = { original_tag = SPR original_tag = HUN } has_government = fascism }
-				
+
 				OR = { original_tag = ITA original_tag = GER } has_government = fascism
 			}
-			
+
 			AND = {
 				ROOT = { original_tag = USA has_government = democratic }
-				
+
 				OR = { original_tag = ENG is_subject_of = ENG } has_government = democratic
-				
+
 				date > 1941.1.1
 			}
-			
+
 			AND = { #ahistorical mode
 				is_historical_focus_on = no
-				
+
 				ROOT = { has_opinion = { target = PREV value > 25 } } #friendly countries
-				
+
 				OR = {
 					AND = { ROOT = { democratic_nation = yes }
 						democratic_nation = yes
 					}
-					
+
 					AND = { ROOT = { communist_nation = yes }
 						communist_nation = yes
 					}
-					
+
 					AND = { ROOT = { fascist_nation = yes }
 						fascist_nation = yes
 					}
-					
+
 					AND = { ROOT = { nonaligned_nation = yes }
 						nonaligned_nation = yes
 					}
 				}
-				
+
 				OR = {
 					AND = {
 						any_enemy_country = { fascist_nation = yes }
@@ -1328,9 +1350,9 @@ strat_developed = {
 
 carrier_developed = {
 	OR = {
-		AND = { has_country_flag = cv_II_4/4 has_tech = basic_carrier NOT = { has_tech = improved_carrier } }
-		AND = { has_country_flag = cv_III_4/4 has_tech = improved_carrier NOT = { has_tech = advanced_carrier } }
-		AND = { has_country_flag = cv_IV_4/4 has_tech = advanced_carrier }
+		AND = { has_country_flag = cv_II_1/4 has_tech = basic_carrier NOT = { has_tech = improved_carrier } }
+		AND = { has_country_flag = cv_III_1/4 has_tech = improved_carrier NOT = { has_tech = advanced_carrier } }
+		AND = { has_country_flag = cv_IV_1/4 has_tech = advanced_carrier }
 	}
 }
 
