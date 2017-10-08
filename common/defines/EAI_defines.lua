@@ -27,7 +27,7 @@ NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a
 NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 5							            -- Minimum XP before attempting to upgrade a division template.
 NDefines.NAI.DIVISION_CREATE_MIN_XP = 600							            -- Minimum XP before attempting to create a fresh new division template.
 NDefines.NAI.VARIANT_UPGRADE_MIN_XP = 600							            -- Minimum XP before attempting to create a new variant.
-NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 50								        -- If XP is above this on the daily tick the AI will attempt to spend it
+NDefines.NAI.UPGRADE_XP_RUSH_UPDATE = 5								        -- If XP is above this on the daily tick the AI will attempt to spend it
 
 --NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0
 --NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0
