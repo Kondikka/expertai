@@ -2,27 +2,25 @@
 #	DIPLOMACY
 ######################################################
 
+# looks at ideology as well as party popularity to determine real alignment
 democratic_nation = {
 	OR = {
 		has_government = democratic
 		AND = { has_government = neutrality democratic > 0.5 }
 	}
 }
-
 communist_nation = {
 	OR = {
 		has_government = communism
 		AND = { has_government = neutrality communism > 0.5 }
 	}
 }
-
 fascist_nation = {
 	OR = {
 		has_government = fascism
 		AND = { has_government = neutrality fascism > 0.5 }
 	}
 }
-
 nonaligned_nation = {
 	AND = {
 		has_government = neutrality
@@ -34,6 +32,7 @@ nonaligned_nation = {
 	}
 }
 
+# anti-aggression script: faction leader invites countries who seek an alliance
 invite_to_faction = {
 	ROOT = { is_faction_leader = yes }
 	NOT = { tag = ROOT }
@@ -44,20 +43,21 @@ invite_to_faction = {
 	}
 }
 
+# factors when determining who to give lend-lease
 lend_lease = {
 	ROOT = { #lend leaser
 		OR = {
 			has_country_flag = EAI_supports_@PREV
-    
+
 			AND = {
 				has_global_flag = EAI_lend_Lease
-    
+
 				NOT = { surrender_progress > 0.05 }
-    
+
 				########################################
-    
+
 				#SPECIAL RULES
-    
+
 				#GER should focus on stockpiling for itself
 				if = { limit = { original_tag = GER has_war = yes }
 					OR = {
@@ -68,30 +68,30 @@ lend_lease = {
 						SOV = { NOT = { has_government = communism } }
 					}
 				}
-    
+
 				########################################
 			}
 		}
 	}
-    
+
 	THIS = { #target
 		OR = {
 			has_country_flag = EAI_receives_support_@THIS
-    
+
 			AND = {
 				########################################
-    
+
 				#SPECIAL RULES
-    
+
 				#axis shouldn't lend lease japan
 				if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes } OR = { original_tag = JAP is_puppet_of = JAP } }
 					is_in_faction_with = GER
 				}
-    
+
 				if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } is_in_faction_with = GER }
 					ROOT = { is_in_faction_with = GER }
 				}
-    
+
 				#make things easer for AI GER vs SOV
 				if = { limit = { original_tag = SOV GER = { is_ai = yes } }
 					OR = {
@@ -99,7 +99,7 @@ lend_lease = {
 						ROOT = { has_government = communism }
 					}
 				}
-    
+
 				#make things easier for AI JAP vs CHI
 				if = { limit = { OR = { original_tag = CHI original_tag = PRC } JAP = { is_ai = yes } }
 					OR = {
@@ -109,11 +109,11 @@ lend_lease = {
 						CHI = { is_puppet = yes }
 					}
 				}
-    
+
 				########################################
-				
+
 				has_equipment = { convoy > 75 }
-    
+
 				ROOT = { #neutral countries ll to neighbors only
 					OR = {
 						NOT = { neutral_country = yes }
@@ -123,7 +123,7 @@ lend_lease = {
 						}
 					}
 				}
-				
+
 				ROOT = {
 					OR = {
 						is_major = yes
@@ -135,90 +135,90 @@ lend_lease = {
 						}
 					}
 				}
-    
+
 				NOT = { has_war_with = ROOT }
-    
+
 				if = { #rules for subjects
 					limit = { ROOT = { is_subject = yes } }
-    
+
 					OR = {
 						ROOT = { is_subject_of = PREV } #is subject of the target
 						any_enemy_country = { has_war_with = ROOT } #common enemy
 					}
 				}
-    
+
 				OR = { #when should it lend lease a country depending on ideology
-    
+
 					AND = { ROOT = { democratic_nation = yes }
-    
+
 						OR = {
 							democratic_nation = yes
-    
+
 							AND = { communist_nation = yes
 								has_offensive_war = no
 							}
-    
+
 							AND = { nonaligned_nation = yes
 								has_offensive_war = no
 							}
 						}
 					}
-    
+
 					AND = { ROOT = { communist_nation = yes }
-    
+
 						OR = {
 							communist_nation = yes
-    
+
 							AND = { democratic_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-    
+
 							AND = { nonaligned_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-    
+
 					AND = { ROOT = { fascist_nation = yes }
-    
+
 						OR = {
 							fascist_nation = yes
-    
+
 							AND = { nonaligned_nation = yes
 								any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-    
+
 					AND = { ROOT = { nonaligned_nation = yes }
-    
+
 						OR = {
 							AND = { democratic_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-    
+
 							AND = { fascist_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-    
+
 							AND = { communist_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
-    
+
 							AND = { nonaligned_nation = yes
 								has_offensive_war = no any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT } }
 							}
 						}
 					}
-    
+
 					is_in_faction_with = ROOT #faction members
 				}
-    
+
 				OR = { #why should it send LL?
 					any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
 					ROOT = { has_opinion = { target = PREV value > 0 } } #friendly countries
 					is_in_faction_with = ROOT #faction members
-    
+
 					AND = { #support wars against other ideologies
 						any_enemy_country = { fascist_nation = yes }
 						ROOT = { NOT = { fascist_nation = yes } }
@@ -231,7 +231,7 @@ lend_lease = {
 						any_enemy_country = { democratic_nation = yes }
 						ROOT = { NOT = { democratic_nation = yes } }
 					}
-    
+
 					AND = { communist_nation = yes ROOT = { communist_nation = yes } } #shared ideology
 					AND = { fascist_nation = yes ROOT = { fascist_nation = yes } }
 					AND = { democratic_nation = yes ROOT = { democratic_nation = yes } }
@@ -241,6 +241,7 @@ lend_lease = {
 	}
 }
 
+# factors when determining where to send volunteers
 send_volunteers = {
 	THIS = { #target
 		has_war = yes
@@ -326,7 +327,7 @@ send_volunteers = {
 	}
 }
 
-########## guarantee nation
+########## anti-aggression script: guarantee nation
 
 any_willing_to_guarantee_nation = {
 	is_ai = yes
@@ -786,7 +787,7 @@ neutrality_willing_to_guarantee_nation = {
 	}
 }
 
-########## join faction
+########## anti-aggression script: join faction
 
 democratic_willing_to_join_faction = {
 	is_ai = yes
@@ -1250,6 +1251,7 @@ neutrality_willing_to_join_faction_2 = {
 #	VARIANTS
 ######################################################
 
+# checks the current variant status for a tech when sorting out upgrade priorities between various techs
 marm_developed = {
 	OR = {
 		AND = { has_country_flag = marm_I_2/4 has_tech = basic_medium_tank NOT = { has_tech = improved_medium_tank is_researching_technology = improved_medium_tank } }
@@ -1362,7 +1364,7 @@ carrier_developed = {
 #	CONSTRUCTION
 ######################################################
 
-available_AIR = {
+available_AIR = { # air bases
 	CONTROLLER = { OR = { tag = ROOT AND = { is_puppet_of = ROOT OR = { has_autonomy_state = autonomy_integrated_puppet has_autonomy_state = autonomy_puppet has_autonomy_state = autonomy_colony } } } }
 	free_building_slots = { building = air_base size > 0 include_locked = no }
 	NOT = { free_building_slots = { building = air_base size < 7 include_locked = no } }
@@ -1376,13 +1378,13 @@ available_AIR = {
 
 available_RADAR = {
 	is_controlled_by = ROOT
+
 	free_building_slots = { building = radar_station size > 0 include_locked = no }
 }
 
 available_INF = {
-	CONTROLLER = { OR = { tag = ROOT AND = { is_puppet_of = ROOT OR = { has_autonomy_state = autonomy_integrated_puppet has_autonomy_state = autonomy_puppet has_autonomy_state = autonomy_colony } } } }
-	free_building_slots = { building = infrastructure size > 5 include_locked = no }
-	NOT = { is_island_state = yes }
+	is_controlled_by = ROOT
+	free_building_slots = { building = infrastructure size > 0 include_locked = no }
 }
 
 no_border = {
@@ -1401,84 +1403,95 @@ available_NIC = {
 	free_building_slots = { building = dockyard size > 0 include_locked = no }
 }
 
-available_state_10 = {
+available_state_10 = { # 100% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 1 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_9 = {
+available_state_9 = { # 90% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 2 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_8 = {
+available_state_8 = { # 80% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 3 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_7 = {
+available_state_7 = { # 70% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 4 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_6 = {
+available_state_6 = { # 60% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 5 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_5 = {
+available_state_5 = { # 50% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 6 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_4 = {
+available_state_4 = { # 40% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 7 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_3 = {
+available_state_3 = { # 30% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 8 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_2 = {
+available_state_2 = { # 20% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 9 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_1 = {
+available_state_1 = { # 10% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 10 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-available_state_0 = {
+available_state_0 = { # 0% infr
 	is_controlled_by = ROOT
-	free_building_slots = { building = industrial_complex size > 0 include_locked = no }
-	free_building_slots = { building = arms_factory size > 0 include_locked = no }
+
 	free_building_slots = { building = infrastructure size < 11 include_locked = no }
+
+	free_building_slots = { building = dummy size > 0 include_locked = no }
 }
 
-radar_location = {
+radar_location = { # all existing radar locations
 	OR = {
 		state = 282 #tokyo
 		state = 645 #iwo jima
@@ -1529,7 +1542,7 @@ radar_location = {
 	}
 }
 
-radar_location_2 = {
+radar_location_2 = { # good radar locations
 	OR = {
 		state = 282 #tokyo
 		state = 645 #iwo jima
@@ -1576,8 +1589,7 @@ radar_location_2 = {
 	}
 }
 
-#region construction priorities
-region_priority = {
+region_priority = { # prioritise building in a certain area
 	OR = {
 		AND = { ROOT = { NOT = { original_tag = SOV original_tag = CHI } } is_in_home_area = yes }
 
@@ -1587,7 +1599,7 @@ region_priority = {
 	}
 }
 
-restrict_location = {
+restrict_location = { # force the AI to build in the region priority area
 	OR = {
 		ROOT = { original_tag = SOV }
 	}
@@ -1634,13 +1646,13 @@ western_china = {
 #	MISC
 ######################################################
 
-dont_invade = {
+dont_invade = { # prevent invasions against a specific tag when it is a bad idea
 	strength_ratio = { tag = ROOT ratio > 0.5 }
 
 	any_state = {
 		is_controlled_by = PREV
 		is_in_home_area = yes
-		
+
 		any_neighbor_state = {
 			is_controlled_by = ROOT
 			is_in_home_area = yes
@@ -1648,40 +1660,7 @@ dont_invade = {
 	}
 }
 
-threat_potential_0 = {
-	has_war_with = ROOT
-}
-
-threat_potential_1 = {
-	NOT = { is_in_faction_with = ROOT }
-	OR = {
-		is_justifying_wargoal_against = ROOT
-		has_wargoal_against = ROOT
-		any_allied_country = { PREV = { is_justifying_wargoal_against = PREV } }
-		any_allied_country = { PREV = { has_wargoal_against = PREV } }
-	}
-}
-
-threat_potential_2 = {
-	NOT = { is_in_faction_with = ROOT }
-	has_offensive_war = yes
-	threat > 0.5
-}
-
-threat_potential_3 = {
-	NOT = { is_in_faction_with = ROOT }
-	OR = {
-		ROOT = { has_war = yes }
-		AND = { has_war = yes threat > 0.5 }
-	}
-	OR = {
-		AND = { has_government = fascism ROOT = { NOT = { has_government = fascism } } }
-		AND = { has_government = communism ROOT = { NOT = { has_government = communism } } }
-		AND = { has_government = democratic ROOT = { NOT = { has_government = democratic } } }
-	}
-}
-
-major_country = { #defines the true majors in a game - add a tag here if you want to "unlock" other countries
+major_country = { # true majors in the game
 	OR = {
 		original_tag = ENG
 		original_tag = FRA
@@ -1695,7 +1674,7 @@ major_country = { #defines the true majors in a game - add a tag here if you wan
 	}
 }
 
-civil_war_country = {
+civil_war_country = { # civil war country tags
 	OR = {
 		tag = D01
 		tag = D02
@@ -1715,7 +1694,7 @@ civil_war_country = {
 	}
 }
 
-neutral_country = {
+neutral_country = { # true neutrals
 	NOT = { has_war = yes }
 	OR = {
 		tag = BEL
@@ -1725,7 +1704,7 @@ neutral_country = {
 	}
 }
 
-named_variants = { #countries that have properly named variants in variant creation events
+named_variants = { # countries that have properly named variants in variant creation events
 	OR = {
 		original_tag = ENG
 		original_tag = FRA
@@ -1739,7 +1718,7 @@ named_variants = { #countries that have properly named variants in variant creat
 	}
 }
 
-prefer_artillery_design = { #true if artillery designs are preferable
+prefer_artillery_design = { # true if artillery designs are preferable
 	OR = {
 		AND = { #infantry armies dont need spec ops advisor
 			has_country_flag = infantry_army_focus
@@ -1771,7 +1750,7 @@ prefer_artillery_design = { #true if artillery designs are preferable
 	}
 }
 
-mobilize_army = {
+mobilize_army = { # triggers the AI to build more units if threatened
 	OR = {
 		has_country_flag = mobilize_army
 
@@ -1795,7 +1774,7 @@ mobilize_army = {
 	}
 }
 
-can_raise_conscription_law = {
+can_raise_conscription_law = { # checks if conscription law can be raised up to service by requirement
 	OR = {
 		AND = {
 			has_idea = volunteer_only
@@ -1938,11 +1917,23 @@ can_raise_conscription_law = {
 	}
 }
 
-#hard limits on max army sizes
+use_infantry_army_comp = { # mnt/mar army composition shouldnt be used if it doesn't have a template for it
+	OR = {
+		has_country_flag = infantry_army_focus
+		AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
+		AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
+	}
+}
+
+######################################################
+#	production limits
+######################################################
+
+# army size limits for minors
 army_limit_3000k = {
 	OR = {
-		AND = { original_tag = CHI is_major = yes OR = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense JAP = { is_ai = no } date > 1941.1.1 } }
-		AND = { original_tag = PRC is_major = yes OR = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense JAP = { is_ai = no } date > 1941.1.1 } }
+		AND = { original_tag = CHI OR = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense JAP = { is_ai = no } date > 1941.1.1 } }
+		AND = { original_tag = PRC OR = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense JAP = { is_ai = no } date > 1941.1.1 } }
 	}
 }
 army_limit_1250k = {
@@ -1989,10 +1980,10 @@ army_limit_500k = {
 army_limit_250k = {
 	OR = {
 		AND = { original_tag = YUG NOT = { any_neighbor_country = { is_ai = no } } }
-	
+
 		original_tag = NZL
-		
-	
+
+
 		original_tag = SIK original_tag = SIA original_tag = MON original_tag = TIB original_tag = NEP original_tag = BHU
 
 
@@ -2022,12 +2013,12 @@ army_limit_250k = {
 
 		original_tag = XSM original_tag = GXC original_tag = YUN
 
-		AND = { original_tag = CHI NOT = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense } is_major = no JAP = { is_ai = yes } date < 1941.1.1 }
-		AND = { original_tag = PRC NOT = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense } is_major = no JAP = { is_ai = yes } date < 1941.1.1 }
+		AND = { original_tag = CHI NOT = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense } JAP = { is_ai = yes } date < 1941.1.1 }
+		AND = { original_tag = PRC NOT = { has_country_flag = EAI_country_difficulty has_country_flag EAI_desperate_defense } JAP = { is_ai = yes } date < 1941.1.1 }
 	}
 }
 
-#disable scaling army size to factory number
+# excludes tags from certain production limits
 exclude_minor_from_production_limit_A = {
 	OR = {
 		original_tag = CHI
@@ -2050,14 +2041,6 @@ exclude_major_from_production_limit_B = {
 exclude_major_from_production_limit_C = {
 	OR = {
 		original_tag = SOV
-	}
-}
-
-use_infantry_army_comp = { #mnt/mar army composition shouldnt be used if it doesn't have a template for it
-	OR = {
-		has_country_flag = infantry_army_focus
-		AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-		AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
 	}
 }
 

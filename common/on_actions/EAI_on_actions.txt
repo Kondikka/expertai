@@ -7,13 +7,13 @@ on_actions = {
 
 			#add resistance reduction for AI
 			every_country  = { limit = { is_ai = yes NOT = { tag = NOR tag = SWI tag = POL tag = CHI tag = FIN tag = GRE tag = SPR } } add_ideas = ns }
-			every_country  = { limit = { is_ai = yes OR = { tag = NOR tag = SWI tag = POL tag = CHI tag = FIN tag = GRE tag = SPR } } add_ideas = ns2 } #highly defensive countries
+			every_country  = { limit = { is_ai = yes OR = { tag = NOR tag = SWI tag = POL tag = CHI tag = FIN tag = GRE tag = SPR } } add_ideas = ns2 } #highly defensive countries #probably does nothing
 
 			#AI neutrality ideas
 			USA = { country_event = EAI_DM.0 }
 
 			#AI starting construction queue
-			GER = { country_event = EAI_C.0 }
+			every_country = { limit = { is_ai = yes } country_event = EAI_C.0 }
 
 			#default EAI settings
 			set_global_flag = EAI_lend_lease
@@ -604,6 +604,32 @@ on_actions = {
 				FROM = { set_country_flag = EAI_will_join_faction_@ROOT }
 
 				FROM = { country_event = { id = EAI_DM.10015 days = 20 } } #if justification was cancelled, clear flag
+			}
+		}
+	}
+	on_capitulation = {
+		effect = {
+			if =  { #bug fix to central africa flipping to GER on FRA capitulation
+				limit = {
+					ROOT = { tag = FRA is_in_faction = yes }
+					FROM = { is_in_faction_with = GER }
+				}
+				
+				if = { limit = { 539 = { CONTROLLER = { is_in_faction_with = GER } } }
+					FRA = { set_state_controller = 539 }
+				}
+				
+				if = { limit = { 660 = { CONTROLLER = { is_in_faction_with = GER } } }
+					FRA = { set_state_controller = 660 }
+				}
+				
+				if = { limit = { 556 = { CONTROLLER = { is_in_faction_with = GER } } }
+					FRA = { set_state_controller = 556 }
+				}
+				
+				if = { limit = { 272 = { CONTROLLER = { is_in_faction_with = GER } } }
+					FRA = { set_state_controller = 272 }
+				}
 			}
 		}
 	}
