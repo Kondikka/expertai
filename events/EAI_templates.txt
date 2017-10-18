@@ -1,7 +1,12 @@
 ﻿add_namespace = EAI_T
 
+######################################################
+# AI templates
+######################################################
+
 # the AI likes to get stuck while designing divisions or is otherwise inefficient especially when creating completely new templates
 # so a basic template is created for the AI when it fills the requirements before it is allowed to update designs on its own
+# also controls the design priorities for various army focus setups
 
 ############# infantry
 
@@ -13,6 +18,10 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
+		
+		NOT = { has_country_flag = infantry_template }
+		
+		############ special rules
 
 		if = { limit = { OR = { tag = CHI tag = PRC } } #for balancing reasons, prevent China from upgrades against AI JAP
 			OR = {
@@ -24,20 +33,24 @@ country_event = {
 			}
 		}
 
-		NOT = { has_country_flag = infantry_template }
+		############ xp req
 
-		OR = { #xp req
+		OR = {
 			AND = { has_country_flag = infantry_design_A has_army_experience > 15 }
 			AND = { has_country_flag = infantry_design_B has_army_experience > 30 }
 		}
 		if = { limit = { has_country_flag = ma_doctrine }
 			has_army_experience > 50
 		}
+		
+		############ tech req
 
 		if = {
 			limit = { has_country_flag = infantry_design_A }
 			has_tech = gw_artillery
 		}
+		
+		############ template priorities
 
 		if = { #prioritise main infantry role
 			limit = { has_country_flag = marine_army_focus }
@@ -387,22 +400,28 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = marine_template }
+		
+		############ xp req
 
 		if = { limit = { ai_has_role_division = marine }
 			has_army_experience > 15
 			else = { has_army_experience > 35 }
 		}
+		
+		############ tech/focus req
 
 		has_tech = marines
 
-		OR = { #tech req
+		OR = { 
 			has_country_flag = marine_army_focus
 			AND = { has_country_flag = marine_attachment_1 has_tech = interwar_antitank }
 			AND = { has_country_flag = marine_attachment_2 has_tech = interwar_antitank }
 		}
 
+		############ template priorities
+		
 		if = { #prioritise main infantry role
 			limit = { has_country_flag = infantry_army_focus }
 			has_country_flag = infantry_template
@@ -717,21 +736,27 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = mountaineer_template }
+		
+		############ xp req
 
 		if = { limit = { ai_has_role_division = mountaineer }
 			has_army_experience > 15
 			else = { has_army_experience > 35 }
 		}
+		
+		############ tech/focus req
 
 		has_tech = tech_mountaineers
 
-		OR = { #tech req
+		OR = {
 			has_country_flag = mountaineer_army_focus
 			AND = { has_country_flag = mountaineer_attachment_1 has_tech = interwar_antitank }
 			AND = { has_country_flag = mountaineer_attachment_2 has_tech = interwar_antitank }
 		}
+		
+		############ template priorities
 
 		if = { #prioritise main infantry role
 			limit = { has_country_flag = infantry_army_focus }
@@ -1047,13 +1072,16 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = at_template }
 
-		#xp req
+		############ xp req
+		
 		has_army_experience > 20
+		
+		############ tech req
 
-		OR = { #tech req
+		OR = { 
 			AND = { has_country_flag = at_design_AT has_tech = interwar_antitank }
 			AND = {
 				has_country_flag = at_design_MTD
@@ -1070,21 +1098,8 @@ country_event = {
 				}
 			}
 		}
-
-		OR = { #tech req
-			AND = {
-				has_country_flag = infantry_army_focus
-				has_country_flag = infantry_template
-			}
-			AND = {
-				has_country_flag = marine_army_focus
-				has_country_flag = marine_template
-			}
-			AND = {
-				has_country_flag = mountaineer_army_focus
-				has_country_flag = mountaineer_template
-			}
-		}
+		
+		############ template priorities
 
 		OR = { #prioritise main infantry role
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
@@ -1817,6 +1832,123 @@ country_event = {
 
 ############# light_armor
 
+country_event = {
+	id = EAI_T.14
+	hidden = yes
+
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes
+		
+		NOT = { has_country_flag = Larm_template }
+		
+		############ focus req
+
+		larm_army_focus = yes
+		
+		############ xp req
+
+		has_army_experience > 20
+		
+		############ tech req
+
+		OR = { has_tech = basic_light_tank has_tech = improved_light_tank has_tech = advanced_light_tank }
+
+		############ template priorities
+		
+		OR = { #prioritise main infantry role
+			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
+			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
+			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		}
+	}
+
+	immediate = {
+		set_country_flag = larm_template
+
+		army_experience = -20
+
+		if = { limit = { has_country_flag = sf_doctrine }
+
+			division_template = {
+				name = "Armored Division"
+				priority = 2
+
+				regiments = {
+					light_armor = { x = 0 y = 0 }
+					light_armor = { x = 0 y = 1 }
+					light_armor = { x = 0 y = 2 }
+					light_armor = { x = 0 y = 3 }
+					light_armor = { x = 0 y = 4 }
+
+					motorized = { x = 1 y = 0 }
+					motorized = { x = 1 y = 1 }
+					motorized = { x = 1 y = 2 }
+					motorized = { x = 1 y = 3 }
+				}
+
+				support = {
+					engineer = { x = 0 y = 0 }
+				}
+			}
+		}
+
+		if = { limit = { has_country_flag = mw_doctrine }
+
+			division_template = {
+				name = "Armored Division"
+				priority = 2
+
+				regiments = {
+					light_armor = { x = 0 y = 0 }
+					light_armor = { x = 0 y = 1 }
+					light_armor = { x = 0 y = 2 }
+					
+					light_armor = { x = 1 y = 0 }
+					light_armor = { x = 1 y = 1 }
+					light_armor = { x = 1 y = 2 }
+
+					motorized = { x = 2 y = 0 }
+					motorized = { x = 2 y = 1 }
+					motorized = { x = 2 y = 2 }
+					motorized = { x = 2 y = 3 }
+				}
+
+				support = {
+					engineer = { x = 0 y = 0 }
+				}
+			}
+		}
+
+		if = { limit = { has_country_flag = gb_doctrine }
+
+			division_template = {
+				name = "Armored Division"
+				priority = 2
+
+				regiments = {
+					light_armor = { x = 0 y = 0 }
+					light_armor = { x = 0 y = 1 }
+					light_armor = { x = 0 y = 2 }
+					light_armor = { x = 0 y = 3 }
+					light_armor = { x = 0 y = 4 }
+
+					motorized = { x = 1 y = 0 }
+					motorized = { x = 1 y = 1 }
+					motorized = { x = 1 y = 2 }
+				}
+
+				support = {
+					engineer = { x = 0 y = 0 }
+				}
+			}
+		}
+	}
+
+	option = {}
+}
+
 ############# medium_armor
 
 country_event = {
@@ -1827,19 +1959,26 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = marm_template }
-
-		has_army_experience > 35
+		
+		############ focus req
 
 		OR = {
 			has_country_flag = marm_army_focus
 			AND = { has_country_flag = marm_attachment date > 1942.1.1 }
 		}
+		
+		############ xp req
 
-		#tech req
+		has_army_experience > 35
+		
+		############ tech req
+
 		OR = { has_tech = basic_medium_tank has_tech = improved_medium_tank has_tech = advanced_medium_tank }
 
+		############ template priorities
+		
 		if = { #prioritise AT role
 			limit = { OR = { NOT = { armor_tech_focus = yes } has_country_flag = AT_army_focus } }
 			has_country_flag = at_template
@@ -1977,20 +2116,28 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = harm_template }
-
-		has_army_experience > 35
-
+		
+		############ focus req
+		
 		OR = {
 			has_country_flag = harm_army_focus
 			AND = { has_country_flag = harm_attachment date > 1942.1.1 }
 		}
+		
+		############ xp req
+
+		has_army_experience > 35
+		
+		############ tech req
 
 		#tech req
 		OR = { has_tech = basic_heavy_tank has_tech = improved_heavy_tank has_tech = advanced_heavy_tank }
 		OR = { has_tech = basic_heavy_art has_tech = improved_heavy_art has_tech = advanced_heavy_art }
 
+		############ template priorities
+		
 		if = { #prioritise AT role
 			limit = { OR = { NOT = { armor_tech_focus = yes } has_country_flag = AT_army_focus } }
 			has_country_flag = at_template
@@ -2128,10 +2275,14 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = mod_template }
+		
+		############ xp req
 
 		has_army_experience > 50
+		
+		############ tech req
 
 		has_tech = main_battle_tank
 	}
@@ -2266,12 +2417,18 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-
+		
 		NOT = { has_country_flag = mot_template }
+		
+		############ focus req
+		
+		has_country_flag = mot_attachment
+		
+		############ xp req
 
 		has_army_experience > 25
-
-		has_country_flag = mot_attachment
+		
+		############ tech req
 
 		has_tech = motorised_infantry
 
@@ -2280,6 +2437,8 @@ country_event = {
 			AND = { has_country_flag = mot_design_B has_tech = motorized_rocket_unit }
 			AND = { has_country_flag = mot_design_C OR = { has_tech = basic_light_art has_tech = improved_light_art has_tech = advanced_light_art } }
 		}
+		
+		############ template priorities
 
 		OR = { #prioritise main infantry
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
@@ -2407,10 +2566,16 @@ country_event = { #mech type
 		is_ai = yes
 
 		NOT = { has_country_flag = mech_template }
+		
+		############ focus req
+		
+		has_country_flag = mot_attachment
+		
+		############ xp req
 
 		has_army_experience > 25
-
-		has_country_flag = mot_attachment
+		
+		############ tech req
 
 		has_tech = mechanised_infantry2
 
@@ -2529,30 +2694,24 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
+		
 		NOT = { has_country_flag = garrison_template }
+		
+		############ tech req
 
 		has_tech = tech_engineers
 		has_tech = gw_artillery
+		
+		############ xp req
 
 		has_army_experience > 10
+		
+		############ template priorities
 
 		OR = { #prioritise main infantry role
 			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
 			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
 			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
-		}
-
-		if = { #prioritise armor role
-			limit = { armor_tech_focus = yes NOT = { has_country_flag = AT_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
-		}
-
-		if = { #prioritise AT role
-			limit = { NOT = { armor_tech_focus = yes } NOT = { has_country_flag = infantry_army_focus } has_country_flag = AT_army_focus }
-			has_country_flag = at_template
 		}
 	}
 
@@ -2584,7 +2743,6 @@ country_event = {
 
 	option = {}
 }
-
 
 ############# AI design priority rotation to make sure it makes changes to every template # not used anymore, delete later to prevent broken savegames
 

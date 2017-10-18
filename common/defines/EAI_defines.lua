@@ -9,7 +9,7 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 5 				                       		-- To which 
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
---NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2	
+--NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2
 
 ----------------------
 
@@ -56,7 +56,7 @@ NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --0.0025 --0.001 		        -- How
 --NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1					            -- If AI has this much manpower he doesn't care about the percentage
 --NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0					                -- The AI will not deploy more units if he goes below this percentag
 
-NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.8			                -- Cancel unit production if below this to get resources out to units in the field
+NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.6			                -- Cancel unit production if below this to get resources out to units in the field
 NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.0					                -- Cancel unit production if below this to get resources out to units in the field
 
 NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1.5
@@ -100,49 +100,46 @@ NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_LIMIT = 10 --25							-- When looking fo
 NDefines.NMilitary.PLAN_EXECUTE_BALANCED_LIMIT = -1						-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_RUSH = -200									-- When looking for an attach target, this score limit is required in the battle plan to consider province for attack
 --NDefines.NMilitary.PLAN_EXECUTE_CAREFUL_MAX_FORT = 5							-- If execution mode is set to careful, units will not attack provinces with fort levels greater than or equal to this
-	
 
 --NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85				            -- Minimum org % for a unit to actively attack an enemy unit when executing a plan
---NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.7			            -- Minimum strength for a unit to actively attack an enemy unit when executing a plan
---NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_MED = 0.75				            -- (LOW,MED,HIGH) corresponds to the plan execution agressiveness level.
---NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.6	
---NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_HIGH = 0.25		
---NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.5	
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.5 --0.4			        -- Minimum strength for a unit to actively attack an enemy unit when executing a plan
+--NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_MED = 0.75 		 		        	-- (LOW,MED,HIGH) corresponds to the plan execution agressiveness level.
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_MED = 0.4 --0.3
+--NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_HIGH = 0.25
+--NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_HIGH = 0.3	--0.2
 
---NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 1000.0
+--NDefines.NAI.FRONT_UNITS_CAP_FACTOR = 15.0									-- A factor applied to total front size and supply use. Primarily effects small fronts
 
---NDefines.NAI.MAX_UNITS_FACTOR_AREA_ORDER = 0.5 				                -- Factor for max number of units to assign to area defense orders
---NDefines.NAI.DESIRED_UNITS_FACTOR_AREA_ORDER = 0.5 			                -- Factor for desired number of units to assign to area defense orders
---NDefines.NAI.MIN_UNITS_FACTOR_AREA_ORDER = 0.25 				                -- Factor for min number of units to assign to area defense orders
-
---NDefines.NAI.MAX_UNITS_FACTOR_FRONT_ORDER = 10			                    -- Factor for max number of units to assign to area front orders
---NDefines.NAI.DESIRED_UNITS_FACTOR_FRONT_ORDER = 10	 		                -- Factor for desired number of units to assign to area front orders
---NDefines.NAI.MIN_UNITS_FACTOR_FRONT_ORDER = 10.0 			                    -- Factor for min number of units to assign to area front orders
-
---NDefines.NAI.MAX_UNITS_FACTOR_INVASION_ORDER = 1.5 			                -- Factor for max number of units to assign to naval invasion orders
---NDefines.NAI.DESIRED_UNITS_FACTOR_INVASION_ORDER = 1.5 		                -- Factor for desired number of units to assign to naval invasion orders
---NDefines.NAI.MIN_UNITS_FACTOR_INVASION_ORDER = 1.0 			                -- Factor for min number of units to assign to naval invasion orders
+--NDefines.NAI.MAX_UNITS_FACTOR_AREA_ORDER = 1.5 --1.0								-- Factor for max number of units to assign to area defense orders
+--NDefines.NAI.DESIRED_UNITS_FACTOR_AREA_ORDER = 1.5 --1.0							-- Factor for desired number of units to assign to area defense orders
+--NDefines.NAI.MIN_UNITS_FACTOR_AREA_ORDER = 1.5									-- Factor for min number of units to assign to area defense orders
+--NDefines.NAI.MAX_UNITS_FACTOR_FRONT_ORDER = 1.5									-- Factor for max number of units to assign to area front orders
+--NDefines.NAI.DESIRED_UNITS_FACTOR_FRONT_ORDER = 1.5								-- Factor for desired number of units to assign to area front orders
+--NDefines.NAI.MIN_UNITS_FACTOR_FRONT_ORDER = 1.0									-- Factor for min number of units to assign to area front orders
+--NDefines.NAI.MAX_UNITS_FACTOR_INVASION_ORDER = 1.0								-- Factor for max number of units to assign to naval invasion orders
+--NDefines.NAI.DESIRED_UNITS_FACTOR_INVASION_ORDER = 1.0							-- Factor for desired number of units to assign to naval invasion orders
+--NDefines.NAI.MIN_UNITS_FACTOR_INVASION_ORDER = 1.0								-- Factor for min number of units to assign to naval invasion orders
 
 --NDefines.NAI.STATE_COTROL_FOR_AREA_DEFENSE = 0.4 			                    -- To avoid AI sending area defense to area with very little foothold
 --NDefines.NAI.AREA_DEFENSE_BASE_IMPORTANCE = 3 				                -- Area defense order base importance value (used for determining order of troop selections)
 --NDefines.NAI.AREA_DEFENSE_CIVIL_WAR_IMPORTANCE = 10000 		                -- Area defense order importance value when a country is in a civil war as target or revolter.
 --NDefines.NAI.MIN_STATE_VALUE_TO_PROTECT = 7.5 				                -- When AI is considering which states to protect it looks at state values to consider if it is worth it.
---NDefines.NAI.STATE_GARRISON_MAX_UNITS = 2 					                -- Max units to guard a garrison under normal circumstances (isolated core areas like England has is excempt)
+--NDefines.NAI.STATE_GARRISON_MAX_UNITS = 5 					                	-- Max units to guard a garrison under normal circumstances (isolated core areas like England has is excempt)
 
---NDefines.NAI.VP_LEVEL_IMPORTANCE_HIGH = 30 					                -- Victory points with values higher than or equal to this are considered to be of high importance.
---NDefines.NAI.VP_LEVEL_IMPORTANCE_MEDIUM = 10 				                    -- Victory points with values higher than or equal to this are considered to be of medium importance.
---NDefines.NAI.VP_LEVEL_IMPORTANCE_LOW = 5 					                    -- Victory points with values higher than or equal to this are considered to be of low importance.
---NDefines.NAI.VP_GARRISON_VALUE_FACTOR = 0.5 				                    -- Extent to which VP garrisons are prioritized  based on VP value and compared to other priority values.
+--NDefines.NAI.VP_LEVEL_IMPORTANCE_HIGH = 1 --30					                -- Victory points with values higher than or equal to this are considered to be of high importance.
+--NDefines.NAI.VP_LEVEL_IMPORTANCE_MEDIUM = 1 --10				                -- Victory points with values higher than or equal to this are considered to be of medium importance.
+--NDefines.NAI.VP_LEVEL_IMPORTANCE_LOW = 1 --5					                -- Victory points with values higher than or equal to this are considered to be of low importance.
+--NDefines.NAI.VP_GARRISON_VALUE_FACTOR = 0 				                    -- Extent to which VP garrisons are prioritized  based on VP value and compared to other priority values.
 
 NDefines.NAI.FALLBACK_LOSING_FACTOR = 0.0 					                    -- The lower this number  the longer the AI will hold the line before sending them to the fallback line
 --NDefines.NAI.SCARY_LEVEL_AVERAGE_DEFENSE = -0.7                               -- average front defense modifier to make it consider it as a PITA to go for
 --NDefines.NAI.ATTACK_HEAVILY_DEFENDED_LIMIT = 0.45 			                -- AI will not launch attacks against heavily defended fronts unless they consider to have this level of advantage (1.0 = 100%)
---NDefines.NAI.HOUR_BAD_COMBAT_REEVALUATE = 100                                 -- if we are in combat for this amount and it goes shitty then try skipping it 
+NDefines.NAI.HOUR_BAD_COMBAT_REEVALUATE = 4                                 	-- if we are in combat for this amount and it goes shitty then try skipping it
 
 --NDefines.NAI.MIN_PLAN_VALUE_TO_MICRO_INACTIVE = 0.2			                -- The AI will not consider members of groups which plan is not activated AND evaluates lower than this.
 --NDefines.NAI.MAX_MICRO_ATTACKS_PER_ORDER = 5 				                    -- AI goes through its orders and checks if there are situations to take advantage of
 --NDefines.NAI.MICRO_POCKET_SIZE = 10 						                    -- Pockets with a size equal to or lower than this will be mocroed by the AI  for efficiency.
---NDefines.NAI.POCKET_DISTANCE_MAX = 40000 					                    -- shortest square distance we bother about chasing pockets	
+--NDefines.NAI.POCKET_DISTANCE_MAX = 40000 					                    -- shortest square distance we bother about chasing pockets
 
 --NDefines.NAI.RESERVE_TO_COMMITTED_BALANCE = 0.1 				                -- How many reserves compared to number of committed divisions in a combat (1.0 = as many as reserves as committed)
 --NDefines.NAI.REDEPLOY_DISTANCE_VS_ORDER_SIZE = 1.0 			                -- Factor applied to the path length of a unit compared to length of an order to determine if it should use strategic redeployment
@@ -163,7 +160,7 @@ NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.25 --0.3			0.15					-- Organization % for 
 NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.6 --0.5			0.1					    -- Strength (equipment) % for unit to be considered weak
 
 --NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.0				            -- % or more average plan preparation before executing
-NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action	
+NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action
 --NDefines.NAI.PLAN_VALUE_TO_EXECUTE = -1.1                                     -- AI will typically avoid carrying out a plan it below this value (0.0 is considered balanced).
 
 --NDefines.NAI.LOCATION_BALANCE_TO_ADVANCE = 0.0				                -- Limit on location strength balance between country and enemy for unit to dare to move forward.
@@ -172,6 +169,10 @@ NDefines.NAI.PLAN_ACTIVATION_PLAYER_WEIGHT_FACTOR = 0.0 		                -- AI 
 --NDefines.NAI.FRONT_TERRAIN_DEFENSE_FACTOR = 5.0 				                -- Multiplier applied to unit defense modifier for terrain on front province multiplied by terrain importance
 --NDefines.NAI.FRONT_TERRAIN_ATTACK_FACTOR = 5.0 				                -- Multiplier applied to unit attack modifier for terrain on enemy front province multiplied by terrain importance
 NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country with less provinces than this will not draw fallback plans  but rather station their troops along the front
+
+--NDefines.NAI.FRONT_BULGE_RATIO_UPPER_CUTOFF = 1.5								-- If total bulginess is lower than this, the front is ignored.
+--NDefines.NAI.FRONT_BULGE_RATIO_LOWER_CUTOFF = 0.95							-- If local bulginess drops below this, a point of interest is found
+--NDefines.NAI.FRONT_CUTOFF_MIN_EDGE_PROXIMITY = 2								-- Minimum number of provinces to the front edge to determine for cutoff oportunity.
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -223,8 +224,8 @@ NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
 
 --NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 2
 
-----NDefines.NAI.ESCORT_BOMBERS_IMPORTANCE_MODIFIER = 5000.0 
-----NDefines.NAI.STRATEGIC_BOMBING_DEFENCE_IMPORTANCE = 5000.0 
+----NDefines.NAI.ESCORT_BOMBERS_IMPORTANCE_MODIFIER = 5000.0
+----NDefines.NAI.STRATEGIC_BOMBING_DEFENCE_IMPORTANCE = 5000.0
 --NDefines.NAI.AIR_BASE_DANGER_ZONE_WEIGHT = 0 					                -- Score used per province taken by enemy in a state to determine how dangerous it is to use an air base
 ----NDefines.NAI.AIR_CONTROLLED_TERRITORY_INTERCEPT_SCORE = 6		            -- Interception score per controlled state in mission region
 --NDefines.NAI.AIR_ALLY_TERRITORY_INTERCEPT_SCORE = -4000 			            -- Interception score per ally controlled state in mission region

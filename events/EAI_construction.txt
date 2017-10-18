@@ -301,7 +301,7 @@ country_event = {
 
 			if = { limit = { num_of_civilian_factories < 5  } 		country_event = { id = EAI_C.11 days = 3000 } else = {
 			if = { limit = { num_of_civilian_factories < 10 } 		country_event = { id = EAI_C.11 days = 1500 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		country_event = { id = EAI_C.11 days = 1154 }  else = {
+			if = { limit = { num_of_civilian_factories < 13 } 		country_event = { id = EAI_C.11 days = 1154 } else = {
 			if = { limit = { num_of_civilian_factories < 16 } 		country_event = { id = EAI_C.11 days = 938 }  else = {
 			if = { limit = { num_of_civilian_factories < 20 } 		country_event = { id = EAI_C.11 days = 750 }  else = {
 			if = { limit = { num_of_civilian_factories < 23 } 		country_event = { id = EAI_C.11 days = 652 }  else = {
@@ -913,11 +913,11 @@ country_event = {
 				queue_REF = yes
 
 				queue_CIC = yes
-				
+
 				queue_MIC = yes
 				queue_MIC = yes
 				queue_MIC = yes
-	
+
 				queue_MIC = yes
 				queue_MIC = yes
 				queue_MIC = yes
@@ -931,18 +931,18 @@ country_event = {
 						queue_CIC = yes
 						queue_CIC = yes
 						queue_CIC = yes
-			
+
 						queue_MIC = yes
 						queue_MIC = yes
-		
+
 						else = {
 							queue_REF = yes
-						
+
 							queue_MIC = yes
 							queue_MIC = yes
 							queue_MIC = yes
 							queue_MIC = yes
-			
+
 							queue_MIC = yes
 							queue_MIC = yes
 							queue_MIC = yes
@@ -1114,9 +1114,27 @@ country_event = { #JAP
 	trigger = { is_ai = yes tag = JAP date > 1938.1.1 }
 
 	immediate = {
-		if = { limit = { NOT = { has_war_with = GER has_war_with = ENG } } create_import = { resource = steel factories = 30 exporter = GER } }
-		if = { limit = { NOT = { has_war_with = USA } } create_import = { resource = oil factories = 30 exporter = USA } }
-		if = { limit = { NOT = { has_war_with = USA } } create_import = { resource = aluminium factories = 30 exporter = USA } }
+		if = {
+			limit = {
+				GER = { steel > 50 }
+				NOT = { has_war_with = GER has_war_with = ENG }
+			}
+			create_import = { resource = steel factories = 30 exporter = GER }
+		}
+		if = {
+			limit = {
+				USA = { oil > 50 }
+				NOT = { has_war_with = USA }
+			}
+			create_import = { resource = oil factories = 30 exporter = USA }
+		}
+		if = {
+			limit = {
+				USA = { aluminium > 50 }
+				NOT = { has_war_with = USA }
+			}
+			create_import = { resource = aluminium factories = 30 exporter = USA }
+		}
 	}
 
 	option = {}
@@ -1131,8 +1149,22 @@ country_event = { #GER
 	trigger = { is_ai = yes tag = GER date > 1938.1.1 }
 
 	immediate = {
-		if = { limit = { NOT = { has_war_with = POR } has_country_flag = marm_army_focus } create_import = { resource = tungsten factories = 40 exporter = POR } }
-		if = { limit = { NOT = { has_war_with = TUR } has_country_flag = harm_army_focus } create_import = { resource = chromium factories = 40 exporter = TUR } }
+		if = {
+			limit = {
+				POR = { tungsten > 50 }
+				NOT = { has_war_with = POR }
+				has_country_flag = marm_army_focus
+			}
+			create_import = { resource = chromium factories = 40 exporter = POR }
+		}
+		if = {
+			limit = {
+				TUR = { chromium > 50 }
+				NOT = { has_war_with = TUR }
+				has_country_flag = harm_army_focus
+			}
+			create_import = { resource = chromium factories = 40 exporter = TUR }
+		}
 	}
 
 	option = {}
@@ -1147,7 +1179,37 @@ country_event = { #SOV
 	trigger = { is_ai = yes tag = SOV date > 1938.1.1 }
 
 	immediate = {
-		if = { limit = { NOT = { has_war_with = RAJ } has_country_flag = marm_army_focus } create_import = { resource = tungsten factories = 40 exporter = RAJ } }
+		if = {
+			limit = {
+				RAJ = { tungsten > 50 }
+				NOT = { has_war_with = RAJ }
+				has_country_flag = marm_army_focus
+			}
+			create_import = { resource = chromium factories = 40 exporter = RAJ }
+		}
+	}
+
+	option = {}
+}
+
+country_event = { #USA
+	id = EAI_C.23
+	hidden = yes
+
+	mean_time_to_happen = { days = 30 }
+
+	trigger = { is_ai = yes tag = USA date > 1940.1.1 }
+
+	immediate = {
+		if = {
+			limit = {
+				ENG = { chromium > 50 }
+				NOT = { has_war_with = ENG }
+				NOT = { ENG = { has_country_flag = harm_army_focus } }
+				has_country_flag = harm_army_focus
+			}
+			create_import = { resource = chromium factories = 40 exporter = ENG }
+		}
 	}
 
 	option = {}
