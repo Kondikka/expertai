@@ -441,17 +441,17 @@ country_event = { #yugoslavia invasion AI fix
 		has_war_with = YUG
 
 		any_state = {
-			OR = { state = 102 state = 731 region = 24 }
+			OR = { state = 102 state = 731 state = 185 state = 47 region = 24 }
 			NOT = { state = 103 state = 163 state = 44 }
-			controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV }
+			controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes }
 		}
 	}
 	immediate = {
 		every_state = {
 			limit = {
-				OR = { state = 102 state = 731 region = 24 }
+				OR = { state = 102 state = 731 state = 185 state = 47 region = 24 }
 				NOT = { state = 103 state = 163 state = 44 }
-				controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV }
+				controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes }
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -541,10 +541,20 @@ country_event = { #give italy vichy france
 	option = { name = "OK" }
 }
 
-country_event = { # create puppets after GER annexes SOV
+country_event = { #create puppets after GER annexes SOV
 	id = EAI_DM.57
 	hidden = yes
-	is_triggered_only = yes
+	
+	mean_time_to_happen = { days = 2 }
+	
+	trigger = {
+		tag = GER
+		is_ai = yes
+		has_government = fascism
+		219 = { is_owned_by = GER }
+		
+		NOT = { has_country_flag = GER_puppeting_finished }
+	}
 	
 	immediate = { #spaces out the releases to avoid freezing the game
 		GER = {
@@ -554,24 +564,51 @@ country_event = { # create puppets after GER annexes SOV
 			if = { limit = { EST = { exists = no } } release = EST puppet = EST country_event = { id = EAI_DM.57 hours = 2 } else = {
 			if = { limit = { UKR = { exists = no } } release = UKR puppet = UKR country_event = { id = EAI_DM.57 hours = 2 } else = {
 			if = { limit = { BLR = { exists = no } } release = BLR puppet = BLR country_event = { id = EAI_DM.57 hours = 2 } else = {
-			if = { limit = { SOV = { exists = no } } release = SOV puppet = SOV country_event = { id = EAI_DM.57 hours = 2 } else = {
-			}}}}}}}}}}}}}}
+			if = { limit = { SOV = { exists = no } } release = SOV puppet = SOV else = { set_country_flag = GER_puppeting_finished }
+			}}}}}}}}}}}}}
 		}
 	}
 	option = { name = "OK" }
 }
 
-country_event = { # ETH puppet
+country_event = { #creation of italian east africa
 	id = EAI_DM.58
-	hidden = yes
+	title = EAI_DM.58.t
+	desc = EAI_DM.58.d
+	picture = GFX_report_event_military_planning
 	is_triggered_only = yes
-	
-	immediate = { #spaces out the releases to avoid freezing the game
-		ITA = {
-			if = { limit = { ETH = { exists = no } } release = ETH puppet = ETH }
+
+	option = {
+		name = EAI_DM.58.o1
+		
+		ETH = { set_cosmetic_tag = ETH_IEA }
+		
+		hidden_effect = {
+			if = { limit = { ETH = { exists = no } }
+				release = ETH
+				puppet = ETH
+			}
+		}
+		
+		ETH = {
+			create_country_leader = {
+				name = "Pietro Badoglio"
+				desc = "Pietro_Badoglio_desc"
+				picture = GFX_ETH_pietro_badoglio
+				expire = "1965.1.1"
+				ideology = nazism
+				traits = { }
+			}
+			
+			transfer_state = 559
+			transfer_state = 550
 		}
 	}
-	option = { name = "OK" }
+	option = { 
+		name = EAI_DM.58.o2 
+	
+		trigger = { is_ai = no }
+	}
 }
 
 ################### wargoals

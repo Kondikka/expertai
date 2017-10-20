@@ -4,7 +4,7 @@
 
 default_production = {
 	enable = { major_country = yes }
-	
+
 	ai_strategy = { type = equipment_production_factor id = infantry 			value = -10 }
 	ai_strategy = { type = equipment_production_factor id = anti_tank 			value = 20 }
 	ai_strategy = { type = equipment_production_factor id = anti_air 			value = 10 }
@@ -118,15 +118,15 @@ GER_strategy_1 = { #increase prewar armor production
 	enable = {
 		original_tag = GER
 		is_historical_focus_on = yes
-		
+
 		OR = {
 			ai_has_role_template = armor
 			ai_has_role_template = heavy_armor
 		}
 	}
-	
+
 	ai_strategy = { type = equipment_production_factor id = armor               value = 25 }
-	
+
 	ai_strategy = { type = equipment_production_factor id = infantry            value = -10 }
 	ai_strategy = { type = equipment_production_factor id = artillery           value = -10 }
 }
@@ -478,7 +478,7 @@ SOV_strategy_2 = { #light tanks are low prio
 SOV_strategy_3 = { #increase prewar armor production
 	enable = {
 		original_tag = SOV
-		
+
 		OR = {
 			AND = {
 				has_country_flag = marm_army_focus
@@ -489,7 +489,7 @@ SOV_strategy_3 = { #increase prewar armor production
 				has_country_flag = harm_template
 			}
 		}
-		
+
 		is_historical_focus_on = yes
 		has_army_size = { type = armor size < 20 }
 		has_war = no
@@ -507,7 +507,7 @@ SOV_strategy_3 = { #increase prewar armor production
 SOV_strategy_4 = { #focus on convoys to allow lend-leasing
 	enable = {
 		original_tag = SOV
-		
+
 		has_equipment = { convoy < 400 }
 	}
 	abort = {
@@ -616,7 +616,7 @@ ENG_strategy_2 = { #save manpower for deploying ships
 		has_war = no
 		has_manpower < 50000
 	}
-	abort = { 
+	abort = {
 		OR = {
 			NOT = { date < 1939.6.1 }
 			has_war = yes
@@ -847,7 +847,7 @@ USA_strategy_3 = { #save manpower for deploying ships
 		has_war = no
 		has_manpower < 50000
 	}
-	abort = { 
+	abort = {
 		OR = {
 			NOT = { has_idea = volunteer_only }
 			has_war = yes
@@ -872,42 +872,57 @@ USA_strategy_3 = { #save manpower for deploying ships
 
 force_production_inf = { #countries not building units after peace deals
 	enable = {
-		has_country_flag = infantry_army_focus
+		use_infantry_army_comp = yes
 
 		has_manpower > 100000
+
 		has_army_manpower = { size < 100000 }
+
 		num_of_available_military_factories > 5
 	}
 	abort = {
-		NOT = { has_army_manpower = { size < 100000 } }
+		OR = {
+			NOT = { has_army_manpower = { size < 100000 } }
+			NOT = { use_infantry_army_comp = yes }
+		}
 	}
 
 	ai_strategy = { type = build_army id = infantry 							value = 50 }
 }
 force_production_mar = {
 	enable = {
-		has_country_flag = marine_army_focus
+		use_marine_army_comp = yes
 
 		has_manpower > 100000
+
 		has_army_manpower = { size < 100000 }
+
 		num_of_available_military_factories > 5
 	}
 	abort = {
-		NOT = { has_army_manpower = { size < 100000 } }
+		OR = {
+			NOT = { has_army_manpower = { size < 100000 } }
+			NOT = { use_marine_army_comp = yes }
+		}
 	}
 
 	ai_strategy = { type = build_army id = marine 								value = 50 }
 }
 force_production_mnt = {
 	enable = {
-		has_country_flag = mountaineer_army_focus
+		use_mountaineer_army_comp = yes
 
 		has_manpower > 100000
+
 		has_army_manpower = { size < 100000 }
+
 		num_of_available_military_factories > 5
 	}
 	abort = {
-		NOT = { has_army_manpower = { size < 100000 } }
+		OR = {
+			NOT = { has_army_manpower = { size < 100000 } }
+			NOT = { use_mountaineer_army_comp = yes }
+		}
 	}
 
 	ai_strategy = { type = build_army id = mountaineer 							value = 50 }
@@ -919,21 +934,16 @@ mobilize_army_3000k_inf = {
 		mobilize_army = yes
 
 		army_limit_3000k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_infantry_army_comp = yes
+
+		has_army_manpower = { size < 2000000 } num_divisions < 200
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 2000000 } num_divisions < 200 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
@@ -944,15 +954,15 @@ mobilize_army_3000k_mar = {
 		mobilize_army = yes
 
 		army_limit_3000k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_marine_army_comp = yes
+
+		has_army_manpower = { size < 2000000 } num_divisions < 200
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 2000000 } num_divisions < 200 }
 		}
 	}
 
@@ -963,15 +973,15 @@ mobilize_army_3000k_mnt = {
 		mobilize_army = yes
 
 		army_limit_3000k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_mountaineer_army_comp = yes
+
+		has_army_manpower = { size < 2000000 } num_divisions < 200
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 2000000 } num_divisions < 200 }
 		}
 	}
 
@@ -984,63 +994,58 @@ mobilize_army_1250k_inf = {
 		mobilize_army = yes
 
 		army_limit_1250k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_infantry_army_comp = yes
+
+		has_army_manpower = { size < 1240000 } num_divisions < 124
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1240000 } num_divisions < 124 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 100 }
+	ai_strategy = { type = build_army id = infantry 							value = 62 }
 }
 mobilize_army_1250k_mar = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_1250k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_marine_army_comp = yes
+
+		has_army_manpower = { size < 1240000 } num_divisions < 124
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1240000 } num_divisions < 124 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 100 }
+	ai_strategy = { type = build_army id = marine 								value = 62 }
 }
 mobilize_army_1250k_mnt = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_1250k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 1000000 }
+		use_mountaineer_army_comp = yes
+
+		has_army_manpower = { size < 1240000 } num_divisions < 124
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1240000 } num_divisions < 124 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 100 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 62 }
 }
 
 #1000k
@@ -1049,78 +1054,58 @@ mobilize_army_1000k_inf = {
 		mobilize_army = yes
 
 		army_limit_1000k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 800000 }
+		use_infantry_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 800000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 80 }
+	ai_strategy = { type = build_army id = infantry 							value = 50 }
 }
 mobilize_army_1000k_mar = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_1000k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 800000 }
+		use_marine_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 800000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 80 }
+	ai_strategy = { type = build_army id = marine 								value = 50 }
 }
 mobilize_army_1000k_mnt = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_1000k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 800000 }
+		use_mountaineer_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 800000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 80 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 50 }
 }
 
 #750k
@@ -1129,63 +1114,58 @@ mobilize_army_750k_inf = {
 		mobilize_army = yes
 
 		army_limit_750k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 650000 }
+		use_infantry_army_comp = yes
+
+		has_army_manpower = { size < 740000 } num_divisions < 74
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 740000 } num_divisions < 74 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 65 }
+	ai_strategy = { type = build_army id = infantry 							value = 37 }
 }
 mobilize_army_750k_mar = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_750k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 650000 }
+		use_marine_army_comp = yes
+
+		has_army_manpower = { size < 740000 } num_divisions < 74
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 740000 } num_divisions < 74 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 65 }
+	ai_strategy = { type = build_army id = marine 								value = 37 }
 }
 mobilize_army_750k_mnt = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_750k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 650000 }
+		use_mountaineer_army_comp = yes
+
+		has_army_manpower = { size < 740000 } num_divisions < 74
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 740000 } num_divisions < 74 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 65 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 37 }
 }
 
 #500k
@@ -1194,63 +1174,58 @@ mobilize_army_500k_inf = {
 		mobilize_army = yes
 
 		army_limit_500k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 400000 }
+		use_infantry_army_comp = yes
+
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 400000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 40 }
+	ai_strategy = { type = build_army id = infantry 							value = 25 }
 }
 mobilize_army_500k_mar = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_500k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 400000 }
+		use_marine_army_comp = yes
+
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 400000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 40 }
+	ai_strategy = { type = build_army id = marine 								value = 25 }
 }
 mobilize_army_500k_mnt = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_500k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 400000 }
+		use_mountaineer_army_comp = yes
+
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 400000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 40 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 25 }
 }
 
 #250k
@@ -1259,99 +1234,76 @@ mobilize_army_250k_inf = {
 		mobilize_army = yes
 
 		army_limit_250k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
 
-		has_war = no
-		has_army_manpower = { size < 200000 }
+		use_infantry_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 240000 } num_divisions < 20
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 200000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 240000 } num_divisions < 24 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 20 }
+	ai_strategy = { type = build_army id = infantry 							value = 12 }
 }
 mobilize_army_250k_mar = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_250k = yes
-		has_country_flag = marine_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 200000 }
+		use_marine_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 240000 } num_divisions < 24
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 200000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 240000 } num_divisions < 20 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 20 }
+	ai_strategy = { type = build_army id = marine 								value = 12 }
 }
 mobilize_army_250k_mnt = {
 	enable = {
 		mobilize_army = yes
 
 		army_limit_250k = yes
-		has_country_flag = mountaineer_army_focus
 
-		has_war = no
-		has_army_manpower = { size < 200000 }
+		use_mountaineer_army_comp = yes
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 240000 } num_divisions < 24
 	}
 	abort = {
 		OR = {
-			has_war = yes
-			NOT = { has_army_manpower = { size < 200000 } }
+			NOT = { mobilize_army = yes }
+			NOT = { has_army_manpower = { size < 240000 } num_divisions < 24 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 20 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 12 }
 }
 
 ######## make sure minors build at least this much early
 peacetime_army_3000k_inf = {
 	enable = {
 		army_limit_3000k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 1000000 }
+
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
@@ -1360,15 +1312,17 @@ peacetime_army_3000k_inf = {
 peacetime_army_3000k_mar = {
 	enable = {
 		army_limit_3000k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 1000000 }
+
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
 		}
 	}
 
@@ -1377,15 +1331,17 @@ peacetime_army_3000k_mar = {
 peacetime_army_3000k_mnt = {
 	enable = {
 		army_limit_3000k = yes
-		has_country_flag = mountaineer_army_focus
+
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 1000000 }
+
+		has_army_manpower = { size < 1000000 } num_divisions < 100
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 1000000 } }
+			NOT = { has_army_manpower = { size < 1000000 } num_divisions < 100 }
 		}
 	}
 
@@ -1396,86 +1352,78 @@ peacetime_army_3000k_mnt = {
 peacetime_army_1250k_inf = {
 	enable = {
 		army_limit_1250k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 650000 }
+
+		has_army_manpower = { size < 620000 } num_divisions < 62
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
-
+			NOT = { has_army_manpower = { size < 620000 } num_divisions < 62 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 65 }
+	ai_strategy = { type = build_army id = infantry 							value = 62 }
 }
 peacetime_army_1250k_mar = {
 	enable = {
 		army_limit_1250k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 650000 }
+
+		has_army_manpower = { size < 620000 } num_divisions < 62
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
+			NOT = { has_army_manpower = { size < 620000 } num_divisions < 62 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 65 }
+	ai_strategy = { type = build_army id = marine 								value = 62 }
 }
 peacetime_army_1250k_mnt = {
 	enable = {
 		army_limit_1250k = yes
-		has_country_flag = mountaineer_army_focus
+
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 650000 }
+
+		has_army_manpower = { size < 620000 } num_divisions < 62
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 650000 } }
+			NOT = { has_army_manpower = { size < 620000 } num_divisions < 62 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 65 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 62 }
 }
 
 #1000k
 peacetime_army_1000k_inf = {
 	enable = {
 		army_limit_1000k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 500000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 500000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
@@ -1484,20 +1432,17 @@ peacetime_army_1000k_inf = {
 peacetime_army_1000k_mar = {
 	enable = {
 		army_limit_1000k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 500000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 500000 } }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
 		}
 	}
 
@@ -1506,20 +1451,16 @@ peacetime_army_1000k_mar = {
 peacetime_army_1000k_mnt = {
 	enable = {
 		army_limit_1000k = yes
-		has_country_flag = mountaineer_army_focus
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 500000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = POL }
-		}
+		has_army_manpower = { size < 500000 } num_divisions < 50
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 500000 } }
+			NOT = { has_army_manpower = { size < 500000 } num_divisions < 50 }
 		}
 	}
 
@@ -1530,80 +1471,78 @@ peacetime_army_1000k_mnt = {
 peacetime_army_750k_inf = {
 	enable = {
 		army_limit_750k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 375000 }
+
+		has_army_manpower = { size < 370000 } num_divisions < 37
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 375000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { has_army_manpower = { size < 370000 } num_divisions < 37 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
-	ai_strategy = { type = build_army id = infantry 							value = 35 }
+	ai_strategy = { type = build_army id = infantry 							value = 37 }
 }
 peacetime_army_750k_mar = {
 	enable = {
 		army_limit_750k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 375000 }
+    
+		has_army_manpower = { size < 370000 } num_divisions < 37
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 375000 } }
+			NOT = { has_army_manpower = { size < 370000 } num_divisions < 37 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = marine 								value = 35 }
+	ai_strategy = { type = build_army id = marine 								value = 37 }
 }
 peacetime_army_750k_mnt = {
 	enable = {
 		army_limit_750k = yes
-		has_country_flag = mountaineer_army_focus
+
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 375000 }
+
+		has_army_manpower = { size < 370000 } num_divisions < 37
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 375000 } }
+			NOT = { has_army_manpower = { size < 370000 } num_divisions < 37 }
 		}
 	}
 
-	ai_strategy = { type = build_army id = mountaineer 							value = 35 }
+	ai_strategy = { type = build_army id = mountaineer 							value = 37 }
 }
 
 #500k
 peacetime_army_500k_inf = {
 	enable = {
 		army_limit_500k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 250000 }
+
+		has_army_manpower = { size < 250000 } num_divisions < 25
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 250000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { has_army_manpower = { size < 250000 } num_divisions < 25 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
@@ -1612,15 +1551,17 @@ peacetime_army_500k_inf = {
 peacetime_army_500k_mar = {
 	enable = {
 		army_limit_500k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 250000 }
+
+		has_army_manpower = { size < 250000 } num_divisions < 25
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 250000 } }
+			NOT = { has_army_manpower = { size < 250000 } num_divisions < 25 }
 		}
 	}
 
@@ -1629,15 +1570,17 @@ peacetime_army_500k_mar = {
 peacetime_army_500k_mnt = {
 	enable = {
 		army_limit_500k = yes
-		has_country_flag = mountaineer_army_focus
+
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 250000 }
+
+		has_army_manpower = { size < 250000 } num_divisions < 25
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 250000 } }
+			NOT = { has_army_manpower = { size < 250000 } num_divisions < 25 }
 		}
 	}
 
@@ -1648,26 +1591,18 @@ peacetime_army_500k_mnt = {
 peacetime_army_250k_inf = {
 	enable = {
 		army_limit_250k = yes
-		OR = {
-			has_country_flag = infantry_army_focus
-			AND = { has_country_flag = marine_army_focus NOT = { ai_has_role_template = marine } }
-			AND = { has_country_flag = mountaineer_army_focus NOT = { ai_has_role_template = mountaineer } }
-		}
+
+		use_infantry_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 125000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 120000 } num_divisions < 12
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 125000 } }
-			AND = { has_country_flag = marine_army_focus ai_has_role_template = marine }
-			AND = { has_country_flag = mountaineer_army_focus ai_has_role_template = mountaineer }
+			NOT = { has_army_manpower = { size < 120000 } num_divisions < 12 }
+			NOT = { use_infantry_army_comp = yes }
 		}
 	}
 
@@ -1676,20 +1611,17 @@ peacetime_army_250k_inf = {
 peacetime_army_250k_mar = {
 	enable = {
 		army_limit_250k = yes
-		has_country_flag = marine_army_focus
+
+		use_marine_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 125000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 120000 } num_divisions < 12
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 125000 } }
+			NOT = { has_army_manpower = { size < 120000 } num_divisions < 12 }
 		}
 	}
 
@@ -1698,20 +1630,17 @@ peacetime_army_250k_mar = {
 peacetime_army_250k_mnt = {
 	enable = {
 		army_limit_250k = yes
-		has_country_flag = mountaineer_army_focus
+
+		use_mountaineer_army_comp = yes
 
 		has_war = no
-		has_army_manpower = { size < 125000 }
 
-		#AI has too much trouble with this
-		if = { limit = { GER = { is_ai = yes } }
-			NOT = { tag = HOL tag = BEL tag = LUX }
-		}
+		has_army_manpower = { size < 120000 } num_divisions < 12
 	}
 	abort = {
 		OR = {
 			has_war = yes
-			NOT = { has_army_manpower = { size < 125000 } }
+			NOT = { has_army_manpower = { size < 120000 } num_divisions < 12 }
 		}
 	}
 
