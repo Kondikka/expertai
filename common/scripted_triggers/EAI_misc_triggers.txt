@@ -84,12 +84,15 @@ lend_lease = {
 				#SPECIAL RULES
 
 				#axis shouldn't lend lease japan
-				if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes } OR = { original_tag = JAP is_puppet_of = JAP } }
-					is_in_faction_with = GER
+				if = { limit = { ROOT = { is_in_faction_with = GER has_war = yes NOT = { is_puppet_of = JAP } } }
+					NOT = { tag = JAP is_puppet_of = JAP } #dont ll japan or its puppets
 				}
 
-				if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } is_in_faction_with = GER }
-					ROOT = { is_in_faction_with = GER }
+				if = { limit = { ROOT = { OR = { original_tag = JAP is_puppet_of = JAP } has_war = yes } }
+					OR = {
+						is_puppet_of = JAP #only LL its own puppets within axis
+						NOT = { is_in_faction_with = GER }
+					}
 				}
 
 				#make things easer for AI GER vs SOV
