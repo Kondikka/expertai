@@ -213,24 +213,24 @@ mountaineer_army_focus = {
 
 #INFANTRY DESIGN
 infantry_design_A = { #inf art
-	NOT = { has_country_flag = infantry_design_B_override }
+	NOT = { has_country_flag = infantry_design_B_override has_country_flag = infantry_design_C_override }
 	OR = {
 		has_country_flag = infantry_design_A
 		has_country_flag = infantry_design_A_override
 
 		#ARMY PRESETS
+		original_tag = ENG
+		original_tag = USA
+		original_tag = ITA
 	}
 }
 infantry_design_B = { #pure inf designs
-	NOT = { has_country_flag = infantry_design_A_override }
+	NOT = { has_country_flag = infantry_design_A_override has_country_flag = infantry_design_C_override }
 	OR = {
 		has_country_flag = infantry_design_B
 		has_country_flag = infantry_design_B_override
 
 		#ARMY PRESETS
-		original_tag = SOV
-		original_tag = GER
-
 		original_tag = CHI
 		original_tag = XSM
 		original_tag = YUN
@@ -249,6 +249,23 @@ infantry_design_B = { #pure inf designs
 		original_tag = ETH
 
 		num_of_controlled_states < 2 #one state countries use cheap designs
+	}
+}
+infantry_design_C = { #40w designs
+	OR = { has_global_flag = EAI_general_challenging has_country_flag = infantry_design_C_override }
+	NOT = { has_country_flag = infantry_design_A_override has_country_flag = infantry_design_B_override }
+	OR = {
+		has_country_flag = infantry_design_C
+		has_country_flag = infantry_design_C_override
+
+		#ARMY PRESETS
+		original_tag = GER
+		original_tag = SOV
+		original_tag = JAP
+		
+		original_tag = ITA
+		original_tag = ENG
+		original_tag = USA
 	}
 }
 
@@ -383,7 +400,7 @@ mot_attachment = {
 		#ARMY PRESETS
 		NOT = { major_country = yes }
 		original_tag = GER
-		original_tag = SOV
+		AND = { original_tag = SOV NOT = { has_country_flag = ma_doctrine } }
 		AND = { original_tag = ITA NOT = { has_country_flag = AT_army_focus } }
 	}
 }
@@ -432,11 +449,16 @@ infantry_attachment_1 = {
 		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
-		original_tag = JAP
-		original_tag = ENG
-		original_tag = USA
-		original_tag = FRA
-		original_tag = ITA
+		AND = {
+			NOT = { has_country_flag = infantry_design_C }
+			OR = {
+				original_tag = JAP
+				original_tag = ENG
+				original_tag = USA
+				original_tag = FRA
+				original_tag = ITA
+			}
+		}
 	}
 }
 infantry_attachment_2 = {
@@ -472,9 +494,14 @@ marine_attachment_1 = {
 		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
-		original_tag = GER
-		original_tag = ITA
-		original_tag = FRA
+		AND = {
+			NOT = { has_country_flag = infantry_design_C }
+			OR = {
+				original_tag = GER
+				original_tag = ITA
+				original_tag = FRA
+			}
+		}
 	}
 }
 marine_attachment_2 = {
@@ -485,9 +512,14 @@ marine_attachment_2 = {
 		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
-		original_tag = ENG
-		original_tag = USA
-		original_tag = JAP
+		AND = {
+			NOT = { has_country_flag = infantry_design_C }
+			OR = {
+				original_tag = ENG
+				original_tag = USA
+				original_tag = JAP
+			}
+		}
 	}
 }
 
@@ -513,10 +545,15 @@ mountaineer_attachment_1 = {
 		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
-		original_tag = GER
-		original_tag = ENG
-		original_tag = USA
-		original_tag = JAP
+		AND = {
+			NOT = { has_country_flag = infantry_design_C }
+			OR = {
+				original_tag = GER
+				original_tag = ENG
+				original_tag = USA
+				original_tag = JAP
+			}
+		}
 	}
 }
 mountaineer_attachment_2 = {
@@ -527,9 +564,14 @@ mountaineer_attachment_2 = {
 		has_global_flag = EAI_random_focuses
 
 		#ARMY PRESETS
-		original_tag = ITA
-		original_tag = FRA
-		original_tag = SOV
+		AND = {
+			NOT = { has_country_flag = infantry_design_C }
+			OR = {
+				original_tag = ITA
+				original_tag = FRA
+				original_tag = SOV
+			}
+		}
 	}
 }
 
@@ -694,6 +736,7 @@ hospital_tech_focus = {
 logistics_tech_focus = {
 	OR = {
 		has_country_flag = ma_doctrine
+		has_country_flag = infantry_design_C
 	}
 }
 recon_tech_focus = {
@@ -707,8 +750,9 @@ engineer_tech_focus = {
 	}
 }
 signal_tech_focus = {
+	NOT = { original_tag = ITA original_tag = JAP }
 	OR = {
-		always = no
+		has_country_flag = infantry_design_C
 	}
 }
 
@@ -814,6 +858,7 @@ artillery_tech_focus = {
 	}
 	OR = {
 		has_country_flag = infantry_design_A
+		has_country_flag = infantry_design_C
 		has_country_flag = ma_doctrine
 		AND = { has_country_flag = mw_doctrine has_country_flag = infantry_design_B }
 	}
@@ -961,6 +1006,10 @@ resource_extraction_tech_focus = {
 	OR = {
 		NOT = { major_country = yes }
 		original_tag = JAP
+	}
+	
+	if = { limit = { original_tag = RAJ has_country_flag = ma_doctrine }
+		has_tech = human_wave_offensive
 	}
 	
 	OR = {

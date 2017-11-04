@@ -243,7 +243,7 @@ country_event = { #infantry design
 		trigger = {
 			OR = {
 				infantry_design_A = yes
-				NOT = { infantry_design_A = yes infantry_design_B = yes }
+				NOT = { infantry_design_A = yes infantry_design_B = yes infantry_design_C = yes }
 			}
 		}
 
@@ -268,6 +268,23 @@ country_event = { #infantry design
 		set_country_flag = infantry_design_B
 		country_event = EAI_CFG.3
 	}
+
+	option = { name = C #42 width army
+
+		trigger = {
+			infantry_design_C = yes
+		}
+
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = infantry_design_C
+		set_country_flag = EAI_upgrade_modern_armor_width
+		set_country_flag = EAI_upgrade_heavy_armor_width
+		set_country_flag = EAI_upgrade_medium_armor_width
+		country_event = EAI_CFG.3
+	}
 }
 
 country_event = { #armor type
@@ -286,7 +303,7 @@ country_event = { #armor type
 		}
 
 		ai_chance = {
-			factor = 1.25
+			factor = 1.15
 			modifier = { factor = 100 armor_tech_focus = yes } #armor focused countries should always go for armor
 			modifier = { factor = 10 tungsten > 30 NOT = { major_country = yes } } #minors with a lot of tungsten prefer medium armor
 			modifier = { #countries with an armor advisor
@@ -1218,16 +1235,25 @@ country_event = { # sets a flag to enable 40w armor templates for a country
 		is_ai = yes
 
 		OR = {
-			has_equipment = { medium_tank_equipment > 10000 }
-			has_equipment = { heavy_tank_equipment > 10000 }
-			has_equipment = { modern_tank_equipment > 10000 }
+			AND = { has_equipment = { medium_tank_equipment > 10000 } NOT = { has_country_flag = EAI_upgrade_medium_armor_width } }
+			AND = { has_equipment = { heavy_tank_equipment > 10000 } NOT = { has_country_flag = EAI_upgrade_heavy_armor_width } }
+			AND = { has_equipment = { modern_tank_equipment > 10000 } NOT = { has_country_flag = EAI_upgrade_modern_armor_width } }
 			AND = {
 				has_country_flag = EAI_country_difficulty
 				OR = {
 					has_idea = EAI_very_hard_mode
 					has_idea = EAI_insane_mode
 				}
+				NOT = {
+					has_country_flag = EAI_upgrade_modern_armor_width
+					has_country_flag = EAI_upgrade_heavy_armor_width
+					has_country_flag = EAI_upgrade_medium_armor_width
+				}
 			}
+		}
+
+		NOT = {
+
 		}
 	}
 
@@ -1240,6 +1266,18 @@ country_event = { # sets a flag to enable 40w armor templates for a country
 		}
 		if = { limit = { has_equipment = { modern_tank_equipment > 10000 } }
 			set_country_flag = EAI_upgrade_modern_armor_width
+		}
+		if = {
+			limit = {
+				has_country_flag = EAI_country_difficulty
+				OR = {
+					has_idea = EAI_very_hard_mode
+					has_idea = EAI_insane_mode
+				}
+			}
+			set_country_flag = EAI_upgrade_modern_armor_width
+			set_country_flag = EAI_upgrade_heavy_armor_width
+			set_country_flag = EAI_upgrade_medium_armor_width
 		}
 	}
 

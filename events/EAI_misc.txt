@@ -82,8 +82,8 @@ country_event = {
 	#################################################
 
 	option = {
-		name = EAI_M.1001.o1a # "Historical off"
-		trigger = { NOT = { has_global_flag = EAI_general_historical } }
+		name = EAI_M.1001.o1a # "Mode: Normal"
+		trigger = { NOT = { has_global_flag = EAI_general_historical has_global_flag = EAI_general_challenging } }
 		hidden_effect = {
 			set_global_flag = EAI_general_historical
 
@@ -93,15 +93,27 @@ country_event = {
 		custom_effect_tooltip = EAI_M.1001.o1a.tt
 	}
 	option = {
-		name = EAI_M.1001.o1b # "Historical on"
+		name = EAI_M.1001.o1b # "Mode: Historical"
 		trigger = { has_global_flag = EAI_general_historical }
 		hidden_effect = {
 			clr_global_flag = EAI_general_historical
+			set_global_flag = EAI_general_challenging
 
 			country_event = EAI_M.1002
 		}
 
 		custom_effect_tooltip = EAI_M.1001.o1b.tt
+	}
+	option = {
+		name = EAI_M.1001.o1c # "Mode: Challenging"
+		trigger = { has_global_flag = EAI_general_challenging }
+		hidden_effect = {
+			clr_global_flag = EAI_general_challenging
+
+			country_event = EAI_M.1002
+		}
+
+		custom_effect_tooltip = EAI_M.1001.o1c.tt
 	}
 
 	#################################################
@@ -180,7 +192,6 @@ country_event = {
 			if = { limit = { has_global_flag = EAI_general_historical }
 				EAI_set_historical = yes
 			}
-
 			if = { limit = { has_global_flag = EAI_general_difficulty_insane }
 				set_global_flag = EAI_global_desperate_defense
 				set_global_flag = EAI_very_hard_enemies
@@ -282,8 +293,8 @@ country_event = {
 	#################################################
 
 	option = {
-		name = EAI_M.1001.o1a # "Historical off"
-		trigger = { NOT = { has_global_flag = EAI_general_historical } }
+		name = EAI_M.1001.o1a # "Mode: Normal"
+		trigger = { NOT = { has_global_flag = EAI_general_historical has_global_flag = EAI_general_challenging } }
 		hidden_effect = {
 			set_global_flag = EAI_general_historical
 
@@ -293,15 +304,27 @@ country_event = {
 		custom_effect_tooltip = EAI_M.1001.o1a.tt
 	}
 	option = {
-		name = EAI_M.1001.o1b # "Historical on"
+		name = EAI_M.1001.o1b # "Mode: Historical"
 		trigger = { has_global_flag = EAI_general_historical }
 		hidden_effect = {
 			clr_global_flag = EAI_general_historical
+			set_global_flag = EAI_general_challenging
 
 			country_event = EAI_M.1001
 		}
 
 		custom_effect_tooltip = EAI_M.1001.o1b.tt
+	}
+	option = {
+		name = EAI_M.1001.o1c # "Mode: Challenging"
+		trigger = { has_global_flag = EAI_general_challenging }
+		hidden_effect = {
+			clr_global_flag = EAI_general_challenging
+
+			country_event = EAI_M.1001
+		}
+
+		custom_effect_tooltip = EAI_M.1001.o1c.tt
 	}
 
 	#################################################
@@ -1666,9 +1689,10 @@ country_event = { #infantry design
 	id = EAI_M.101
 	title = EAI_M.101.t
 	# "Infantry design. This determines the basic design of its infantry, marine and mountaineer units."
-	desc = { text = EAI_M.101.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_design_A has_country_flag = infantry_design_B } } } }
+	desc = { text = EAI_M.101.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_design_A has_country_flag = infantry_design_B has_country_flag = infantry_design_C } } } }
 	desc = { text = EAI_M.101.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_A } } }
 	desc = { text = EAI_M.101.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_B } } }
+	desc = { text = EAI_M.101.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_C } } }
 	picture = GFX_report_event_expert_ai
 
 	is_triggered_only = yes
@@ -1686,6 +1710,14 @@ country_event = { #infantry design
 
 		hidden_effect = {
 			event_target:EAI_AI_customisation = { set_country_flag = infantry_design_B_override }
+			country_event = EAI_M.102
+		}
+	}
+	option = {
+		name = EAI_M.101.o4 # "42 width infantry"
+
+		hidden_effect = {
+			event_target:EAI_AI_customisation = { set_country_flag = infantry_design_C_override }
 			country_event = EAI_M.102
 		}
 	}
@@ -1744,6 +1776,7 @@ country_event = { #armor type
 			event_target:EAI_AI_customisation = {
 				clr_country_flag = infantry_design_A_override
 				clr_country_flag = infantry_design_B_override
+				clr_country_flag = infantry_design_C_override
 			}
 			country_event = EAI_M.101
 		}
@@ -2717,14 +2750,15 @@ country_event = {
 	is_triggered_only = yes
 
 	trigger = { 
-		capital_scope = { has_state_flag = original_capital_@ROOT } 
-		any_enemy_country = { ships_in_area = { area = 18 size > 10 } }
-	}
-
-	option = { name = "-"
-		trigger = {
-			any_enemy_country = { ships_in_area = { area = 18 size > 10 } }
-		}
+		capital_scope = { has_state_flag = original_capital_@ROOT }
+		
+		has_army_manpower = { type = armor size > 450000 }
+		has_army_manpower = { type = armor size > 400000 }
+		has_army_manpower = { type = armor size > 350000 }
+		has_army_manpower = { type = armor size > 300000 }
+		has_army_manpower = { type = armor size > 250000 }
+		has_army_manpower = { type = armor size > 200000 }
+		has_army_manpower = { type = armor size > 150000 }
 	}
 	option = { name = "major"
 		trigger = { is_major = yes }
@@ -2749,3 +2783,18 @@ country_event = {
 	}
 }
 
+country_event = {
+	id = EAI_M.11112
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = { 
+		capital_scope = { has_state_flag = original_capital_@ROOT }
+	}
+	option = { name = 1
+		every_country = {
+			set_country_flag = infantry_design_C_override
+		}
+	}
+}
