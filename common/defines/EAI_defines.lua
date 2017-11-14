@@ -5,7 +5,7 @@ NDefines.NAI.RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 0                         
 NDefines.NAI.MAX_AHEAD_RESEARCH_PENALTY = 10
 
 NDefines.NAI.RESEARCH_NEW_WEIGHT_FACTOR = 0			                            -- Impact of previously unexplored tech weights. Higher means more random exploration.
-NDefines.NAI.RESEARCH_BONUS_FACTOR = 5 				                       		-- To which extent AI should care about bonuses to research
+NDefines.NAI.RESEARCH_BONUS_FACTOR = 2 				                       		-- To which extent AI should care about bonuses to research
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 1					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 
