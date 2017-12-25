@@ -329,14 +329,85 @@ country_event = {
 	option = {
 		ai_chance = {
 			base = 1
-			modifier = {
+			modifier = { #vanilla
 				factor = 0
+				is_historical_focus_on = yes
 				AND = {
 					POL = {
 						is_ai = no
 						has_civil_war = no
 					}
 					is_in_faction_with = POL
+				}
+			}
+			modifier = { #EOUH
+				factor = 0
+				is_historical_focus_on = no
+				OR = {
+					AND = {
+						POL = {
+							is_ai = no
+							has_civil_war = no
+						}
+						is_in_faction_with = POL
+					}
+					has_wargoal_against = SOV
+					SOV = { has_wargoal_against = ROOT }
+					SOV = { is_justifying_wargoal_against = ROOT }
+					any_other_country = {
+						is_in_faction_with = ROOT
+						SOV = { is_justifying_wargoal_against = PREV }
+					}
+					AND = {
+						JAP = {
+							has_government = ROOT
+							NOT = { is_in_faction_with = ROOT }
+							NOT = { has_war_with = ROOT }
+							has_war_with = SOV
+						}
+						NOT = { has_war_with = ENG }
+						NOT = { has_war_with = FRA }
+						any_country = {
+							controls_state = 28
+							NOT = { has_war_with = ROOT }
+						}
+						NOT = { has_war_with = USA }
+						NOT = {
+							AND = {
+						        SOV = { has_government = communism }
+						        FRA = {
+						        	has_government = communism
+						        	has_civil_war = no
+						        	NOT = { has_capitulated = yes }
+						        }
+							}
+						}
+						NOT = {
+							ITA = {
+								has_government = ROOT
+								NOT = { is_in_faction_with = ROOT }
+								NOT = { has_war_with = ROOT }
+								any_other_country = {
+									has_government = democratic
+									has_war_with = PREV
+								}
+							}
+						}
+						NOT = {
+							OR = {
+								any_home_area_neighbor_country = {
+									is_major = yes
+									has_war_with = ROOT
+									NOT = { has_capitulated = yes }
+								}
+								any_other_country = {
+									has_war_with = ROOT
+									has_war_with = SOV
+									NOT = { has_capitulated = yes }
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -452,32 +523,93 @@ country_event = {
 		name = germany.14.b
 		ai_chance = {
 			base = 1
+			modifier = { #vanilla
+				add = -1
+				is_historical_focus_on = yes
+				NOT = {
+					AND = {
+						POL = {
+							is_ai = no
+							has_civil_war = no
+						}
+						is_in_faction_with = POL
+					}
+				}
+			}
 			modifier = { #EOUH
 				factor = 0
-				OR = {
-					any_home_area_neighbor_country = {
-						is_major = yes
-						has_war_with = GER
-						NOT = { has_capitulated = yes }
-					}
-					AND = {
-						has_war_with = ENG
-						NOT = { has_war_with = FRA }
-						NOT = { has_war_with = ITA }
-						NOT = { has_war_with = USA }
-					}
-					AND = {
-						SOV = { has_government = communism }
-						FRA = {
-							has_government = communism
-							has_civil_war = no
+				is_historical_focus_on = no
+				AND = {
+					OR = {
+						any_home_area_neighbor_country = {
+							is_major = yes
+							has_war_with = ROOT
 							NOT = { has_capitulated = yes }
 						}
-						OR = {
+						any_other_country = {
+							has_war_with = ROOT
+							has_war_with = SOV
+							NOT = { has_capitulated = yes }
+						}
+						AND = {
+							has_war_with = ENG
+							NOT = { has_global_flag = franco-british_union_formed }
+							NOT = { has_global_flag = france_opposed_sudetenland }
+							NOT = { has_war_with = FRA }
+							NOT = {
+								any_other_country = {
+									original_tag = FRA
+									has_war_with = ROOT
+								}
+							}
+							NOT = { has_war_with = ITA }
+							NOT = { has_war_with = USA }
+						}
+						AND = {
+							SOV = { has_government = communism }
+							FRA = {
+								has_government = communism
+								has_civil_war = no
+								NOT = { has_capitulated = yes }
+							}
+							OR = {
+								NOT = { has_completed_focus = GER_around_maginot }
+								has_wargoal_against = HOL
+								has_wargoal_against = BEL
+								has_wargoal_against = LUX
+							}
+						}
+						AND = {
+							ITA = {
+								has_government = ROOT
+								NOT = { is_in_faction_with = ROOT }
+								NOT = { has_war_with = ROOT }
+								any_other_country = {
+									has_government = democratic
+									has_war_with = PREV
+								}
+							}
 							NOT = { has_completed_focus = GER_around_maginot }
-							has_wargoal_against = HOL
-							has_wargoal_against = BEL
-							has_wargoal_against = LUX
+						}
+					}
+					NOT = {
+						OR = {
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
+							}
+						}
+					}
+					NOT = {
+						AND = {
+							POL = {
+								is_ai = no
+								has_civil_war = no
+							}
+							is_in_faction_with = POL
 						}
 					}
 				}
@@ -1569,6 +1701,7 @@ country_event = {
 		}
 		add_state_claim = 69
 		add_state_claim = 74
+		set_global_flag = france_opposed_sudetenland
 		hidden_effect = {
 			country_event = { hours = 6 id = news.58 }
 		}

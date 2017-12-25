@@ -1166,9 +1166,22 @@ focus_tree = {
 					any_neighbor_country = {
 						has_war_with = ROOT
 					}
+					any_other_country = {
+						has_war_with = ROOT
+						has_war_with = SOV
+						NOT = { has_capitulated = yes }
+					}
 					AND = {
 						has_war_with = ENG
+						NOT = { has_global_flag = franco-british_union_formed }
+						NOT = { has_global_flag = france_opposed_sudetenland }
 						NOT = { has_war_with = FRA }
+						NOT = {
+							any_other_country = {
+								original_tag = FRA
+								has_war_with = ROOT
+							}
+						}
 						NOT = { has_war_with = ITA }
 						NOT = { has_war_with = USA }
 					}
@@ -1196,18 +1209,33 @@ focus_tree = {
 							}
 						}
 					}
+					AND = {
+						ITA = {
+							has_government = ROOT
+							NOT = { is_in_faction_with = ROOT }
+							NOT = { has_war_with = ROOT }
+							any_other_country = {
+								has_government = democratic
+								has_war_with = PREV
+							}
+						}
+						NOT = { has_completed_focus = GER_around_maginot }
+					}
 					has_global_flag = danzig_conflict_ongoing
 					has_global_flag = yugoslavia_challenges_fate
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 					has_wargoal_against = CZE
 					has_wargoal_against = AUS
 					has_wargoal_against = FRA
 					has_wargoal_against = ROM
+					has_wargoal_against = DEN
+					has_wargoal_against = NOR
 					has_wargoal_against = SOV
 					AND = {
 						has_global_flag = sov_yes_pact
@@ -1568,6 +1596,14 @@ focus_tree = {
 			modifier = {
 				factor = 0
 				date < 1938.1.1
+				NOT = {
+					HUN = {
+						OR = {
+							focus_progress = { focus = HUN_renew_the_rome_protocols progress > 0}
+							has_completed_focus = HUN_renew_the_rome_protocols
+						}
+					}
+				}
 			}
 		}
 
@@ -1718,7 +1754,10 @@ focus_tree = {
 					}
 					has_wargoal_against = AUS
 					has_wargoal_against = CZE
-					has_wargoal_against = YUG
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
+					}
 					has_global_flag = yugoslavia_challenges_fate
 				}
 			}
@@ -1817,21 +1856,32 @@ focus_tree = {
 						has_war_with = ROOT
 						NOT = { has_capitulated = yes }
 					}
+					any_other_country = {
+						has_war_with = ROOT
+						has_war_with = POL
+						NOT = { has_capitulated = yes }
+					}
 					AND = {
-						has_wargoal_against = SOV
 						OR = {
-							NOT = { POL = { is_faction_leader = yes } }
-							NOT = { has_non_aggression_pact_with = SOV }
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
+							}
+						}
+						NOT = {
+							AND = {
+								POL = { is_faction_leader = yes }
+								has_non_aggression_pact_with = SOV
+							}
 						}
 					}
 					AND = {
-						SOV = { has_wargoal_against = ROOT }
-						OR = {
-							NOT = { POL = { is_faction_leader = yes } }
-							NOT = { has_non_aggression_pact_with = SOV }
-						}
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 					has_global_flag = yugoslavia_challenges_fate
 					has_wargoal_against = CZE
 					AND = {
@@ -2166,7 +2216,15 @@ focus_tree = {
 					date < 1939.1.1
 					AND = {
 						has_war_with = ENG
+						NOT = { has_global_flag = franco-british_union_formed }
+						NOT = { has_global_flag = france_opposed_sudetenland }
 						NOT = { has_war_with = FRA }
+						NOT = {
+							any_other_country = {
+								original_tag = FRA
+								has_war_with = ROOT
+							}
+						}
 						NOT = { has_war_with = ITA }
 						NOT = { has_war_with = SOV }
 						NOT = { has_war_with = USA }
@@ -2300,6 +2358,11 @@ focus_tree = {
 					has_global_flag = danzig_conflict_ongoing
 					has_wargoal_against = SOV
 					SOV = { has_wargoal_against = ROOT }
+					SOV = { is_justifying_wargoal_against = ROOT }
+					any_other_country = {
+						is_in_faction_with = ROOT
+						SOV = { is_justifying_wargoal_against = PREV }
+					}
 					AND = {
 						SOV = {
 							has_war_with = ROOT
@@ -2310,7 +2373,50 @@ focus_tree = {
 							NOT = { has_war_with = ROOT }
 						}
 					}
-					has_wargoal_against = YUG
+					AND = {
+						JAP = {
+							has_government = ROOT
+							NOT = { is_in_faction_with = ROOT }
+							NOT = { has_war_with = ROOT }
+							has_war_with = SOV
+						}
+						NOT = { has_war_with = ENG }
+						NOT = { has_war_with = FRA }
+						any_country = {
+							controls_state = 28
+							NOT = { has_war_with = ROOT }
+						}
+						NOT = { has_war_with = USA }
+						NOT = {
+							AND = {
+						        SOV = { has_government = communism }
+						        FRA = {
+						        	has_government = communism
+						        	has_civil_war = no
+						        	NOT = { has_capitulated = yes }
+						        }
+							}
+						}
+						NOT = { has_war_with = SOV }
+						any_home_area_neighbor_country = { tag = SOV }
+						NOT = { has_completed_focus = GER_ussr_war_goal }
+						NOT = { has_completed_focus = GER_soviet_ally }
+						NOT = {
+							ITA = {
+								has_government = ROOT
+								NOT = { is_in_faction_with = ROOT }
+								NOT = { has_war_with = ROOT }
+								any_other_country = {
+									has_government = democratic
+									has_war_with = PREV
+								}
+							}
+						}
+					}
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
+					}
 					has_wargoal_against = CZE
 					has_wargoal_against = ROM
 					AND = {
@@ -2717,6 +2823,11 @@ focus_tree = {
 					has_global_flag = yugoslavia_challenges_fate
 					has_wargoal_against = SOV
 					SOV = { has_wargoal_against = ROOT }
+					SOV = { is_justifying_wargoal_against = ROOT }
+					any_other_country = {
+						is_in_faction_with = ROOT
+						SOV = { is_justifying_wargoal_against = PREV }
+					}
 					AND = {
 						SOV = {
 							has_war_with = ROOT
@@ -2925,12 +3036,13 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 					has_wargoal_against = AUS
 				}
 			}
@@ -3160,23 +3272,15 @@ focus_tree = {
 						}
 					}
 					AND = {
-						has_wargoal_against = SOV
-						NOT = { has_non_aggression_pact_with = SOV }
 						OR = {
-							has_war_with = ENG
-							has_war_with = FRA
-							CZE = { is_in_faction_with = ENG }
-							CZE = { is_in_faction_with = FRA }
-							FRA = { is_in_faction_with = SOV }
-							AND = {
-								SOV = { has_government = communism }
-								FRA = { has_government = communism }
-								FRA = { NOT = { is_in_faction = yes } }
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
 							}
 						}
-					}
-					AND = {
-						SOV = { has_wargoal_against = ROOT }
 						NOT = { has_non_aggression_pact_with = SOV }
 						OR = {
 							has_war_with = ENG
@@ -3400,17 +3504,17 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 					has_global_flag = yugoslavia_challenges_fate
 				}
 			}
 		}
-
 
 		completion_reward = {
 			
@@ -3472,17 +3576,20 @@ focus_tree = {
 					has_global_flag = danzig_conflict_ongoing
 					has_global_flag = yugoslavia_challenges_fate
 					AND = {
-						has_wargoal_against = SOV
 						OR = {
-							NOT = { ROM = { is_faction_leader = yes } }
-							NOT = { has_non_aggression_pact_with = SOV }
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
+							}
 						}
-					}
-					AND = {
-						SOV = { has_wargoal_against = ROOT }
-						OR = {
-							NOT = { ROM = { is_faction_leader = yes } }
-							NOT = { has_non_aggression_pact_with = SOV }
+						NOT = {
+							AND = {
+								ROM = { is_faction_leader = yes }
+								has_non_aggression_pact_with = SOV
+							}
 						}
 					}
 					AND = {
@@ -3693,14 +3800,15 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 				}
-			}
+			}			
 		}
 		available = {
 			is_puppet = no
@@ -3963,6 +4071,7 @@ focus_tree = {
 			is_puppet = no			
 			NOT = { is_in_faction_with = FRA }
 		}
+		will_lead_to_war_with = FRA
 		x = 16
 		y = 8
 		cost = 10
@@ -3988,7 +4097,7 @@ focus_tree = {
 			}
 		}
 		ai_will_do = {
-			factor = 10			
+			factor = 10
 			modifier = {
 				factor = 0.05
 				date < 1939.1.1
@@ -4009,11 +4118,20 @@ focus_tree = {
 							}
 						}
 					}
+					any_other_country = {
+						original_tag = FRA
+						has_war_with = ROOT
+					}
 					AND = {
 						has_war_with = ENG
 						NOT = { has_war_with = ITA }
 						NOT = { has_war_with = SOV }
 						NOT = { has_war_with = USA }
+					}
+					any_other_country = {
+						has_war_with = ROOT
+						has_war_with = FRA
+						NOT = { has_capitulated = yes }
 					}
 					AND = {
 						FRA = {
@@ -4042,10 +4160,6 @@ focus_tree = {
 							}
 						}
 					}
-					FRA = {
-						has_government = ROOT
-						has_war_together_with = ROOT
-					}
 					AND = {
 						FRA = { has_government = ROOT }
 						NOT = { SOV = { has_government = ROOT } }
@@ -4054,6 +4168,11 @@ focus_tree = {
 					}
 					has_wargoal_against = SOV
 					SOV = { has_wargoal_against = ROOT }
+					SOV = { is_justifying_wargoal_against = ROOT }
+					any_other_country = {
+						is_in_faction_with = ROOT
+						SOV = { is_justifying_wargoal_against = PREV }
+					}
 					AND = {
 						has_global_flag = sov_yes_pact
 						SOV = {
@@ -4252,15 +4371,18 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
 					}
-					has_wargoal_against = YUG
 					has_global_flag = yugoslavia_challenges_fate
 					has_wargoal_against = CZE
 					has_wargoal_against = ROM
+					has_wargoal_against = DEN
+					has_wargoal_against = NOR
 				}
 			}
 		}	
@@ -4451,7 +4573,7 @@ focus_tree = {
 		cost = 10
 		ai_will_do = {
 			factor = 0.25
-			modifier = { factor = 0 date < 1944.1.1 } #EAI
+			modifier = { factor = 0 is_historical_focus_on = yes date < 1944.1.1 } #EAI
 		}	
 
 		available_if_capitulated = yes
@@ -5009,17 +5131,15 @@ focus_tree = {
 					}
 					has_global_flag = danzig_conflict_ongoing
 					AND = {
-						has_wargoal_against = SOV
-						NOT = {
-							AND = {
-								has_non_aggression_pact_with = SOV
-								has_war_with = ENG
-								YUG = { NOT = { is_in_faction = yes } }
+						OR = {
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
 							}
 						}
-					}
-					AND = {
-						SOV = { has_wargoal_against = ROOT }
 						NOT = {
 							AND = {
 								has_non_aggression_pact_with = SOV
@@ -5236,11 +5356,9 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
-					}
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
 					has_wargoal_against = AUS
 					has_wargoal_against = CZE
 				}
@@ -5505,17 +5623,15 @@ focus_tree = {
 					}
 					has_global_flag = danzig_conflict_ongoing
 					AND = {
-						has_wargoal_against = SOV
-						NOT = {
-							AND = {
-								has_non_aggression_pact_with = SOV
-								has_war_with = ENG
-								YUG = { NOT = { is_in_faction = yes } }
+						OR = {
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
 							}
 						}
-					}
-					AND = {
-						SOV = { has_wargoal_against = ROOT }
 						NOT = {
 							AND = {
 								has_non_aggression_pact_with = SOV
@@ -5532,7 +5648,7 @@ focus_tree = {
 						YUG = {
 							OR = {
 								is_in_faction = yes
-								focus_progress = { focus = YUG_join_allies progress > 0}
+								focus_progress = { focus = YUG_join_allies progress > 0 }
 							}
 						}
 					}
@@ -5734,11 +5850,9 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
-					}
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
 					has_wargoal_against = CZE
 				}
 			}
@@ -5768,6 +5882,252 @@ focus_tree = {
 		cost = 10
 		ai_will_do = {
 			factor = 10
+			modifier = { #EOUH
+				factor = 0
+				OR = {
+					any_home_area_neighbor_country = {
+						has_war_with = ROOT
+						NOT = { has_capitulated = yes }
+					}
+					has_global_flag = danzig_conflict_ongoing
+					AND = {
+						OR = {
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
+							}
+						}
+						NOT = {
+							AND = {
+								has_non_aggression_pact_with = SOV
+								has_war_with = ENG
+								GRE = { NOT = { is_in_faction = yes } }
+							}
+						}
+					}
+					AND = {
+						SOV = {
+							has_war_with = ROOT
+							NOT = { has_capitulated = yes }
+						}
+						ENG = {
+							exists = yes
+							NOT = { has_war_with = ROOT }
+						}
+					}
+					AND = {
+						has_global_flag = sov_yes_pact
+						SOV = {
+							exists = yes
+							NOT = { has_war_with = ROOT }
+						}
+						OR = {
+							SOV = {	owns_state = 88 }
+							SOV = {	owns_state = 92 }
+							SOV = {	owns_state = 90 }
+							SOV = {	owns_state = 86 }
+							SOV = {	owns_state = 87 }
+							SOV = {	owns_state = 85 }
+							SOV = {	owns_state = 98 }
+							SOV = {	owns_state = 10 }
+							AND = {
+								POL = { has_capitulated = yes }
+								OR = {
+									SOV = {	controls_state = 88 }
+									SOV = {	controls_state = 92 }
+									SOV = {	controls_state = 90 }
+									SOV = {	controls_state = 86 }
+									SOV = {	controls_state = 87 }
+									SOV = {	controls_state = 85 }
+									SOV = {	controls_state = 98 }
+									SOV = {	controls_state = 10 }
+								}
+							}
+							AND = {
+								SOV = { is_faction_leader = yes }
+								OR = {
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 88
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 92
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 90
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 86
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 87
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 85
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 98
+									}
+									any_other_country = {
+										is_in_faction_with = SOV
+										owns_state = 10
+									}
+									AND = {
+										POL = { has_capitulated = yes }
+										OR = {
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 88
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 92
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 90
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 86
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 87
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 85
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 98
+											}
+											any_other_country = {
+												is_in_faction_with = SOV
+												controls_state = 10
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					AND = {
+						has_global_flag = sov_yes_pact
+						SOV = {
+							exists = yes
+							NOT = { has_war_with = ROOT }
+						}
+						OR = {
+							owns_state = 96
+							owns_state = 95
+							owns_state = 94
+							owns_state = 93
+							owns_state = 91
+							owns_state = 97
+							owns_state = 89
+							AND = {
+								POL = { has_capitulated = yes }
+								OR = {
+									controls_state = 96
+									controls_state = 95
+									controls_state = 94
+									controls_state = 93
+									controls_state = 91
+									controls_state = 97
+									controls_state = 89
+								}
+							}
+							AND = {
+								is_faction_leader = yes
+								OR = {
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 96
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 95
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 94
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 93
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 91
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 97
+									}
+									any_other_country = {
+										is_in_faction_with = GER
+										owns_state = 89
+									}
+									AND = {
+										POL = { has_capitulated = yes }
+										OR = {
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 96
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 95
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 94
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 93
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 91
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 97
+											}
+											any_other_country = {
+												is_in_faction_with = GER
+												controls_state = 89
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
+					AND = {
+						has_wargoal_against = YUG
+						NOT = { is_in_faction_with = YUG }
+					}
+					has_global_flag = yugoslavia_challenges_fate
+					has_wargoal_against = CZE
+					has_wargoal_against = ROM
+				}
+			}
 		}
 
 		#bypass = {
@@ -6034,17 +6394,15 @@ focus_tree = {
 					}
 					has_global_flag = danzig_conflict_ongoing
 					AND = {
-						has_wargoal_against = SOV
-						NOT = {
-							AND = {
-								has_non_aggression_pact_with = SOV
-								has_war_with = ENG
-								GRE = { NOT = { is_in_faction = yes } }
+						OR = {
+							has_wargoal_against = SOV
+							SOV = { has_wargoal_against = ROOT }
+							SOV = { is_justifying_wargoal_against = ROOT }
+							any_other_country = {
+								is_in_faction_with = ROOT
+								SOV = { is_justifying_wargoal_against = PREV }
 							}
 						}
-					}
-					AND = {
-						SOV = { has_wargoal_against = ROOT }
 						NOT = {
 							AND = {
 								has_non_aggression_pact_with = SOV
@@ -6261,11 +6619,9 @@ focus_tree = {
 							}
 						}
 					}
-					OR = {
-						has_wargoal_against = HOL
-						has_wargoal_against = BEL
-						has_wargoal_against = LUX
-					}
+					has_wargoal_against = HOL
+					has_wargoal_against = BEL
+					has_wargoal_against = LUX
 					has_wargoal_against = CZE
 					has_wargoal_against = ROM
 				}
