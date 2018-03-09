@@ -1,2441 +1,39 @@
-﻿add_namespace = EAI_M
-
-####################################################
-# News Event
-####################################################
-
-news_event = {
-	id = EAI_M.0
-	title = EAI_M.14.t
-	desc = EAI_M.14.d
-	picture = GFX_news_event_001
-	is_triggered_only = yes
-	option = {
-		name = "OK."
-		hidden_effect = {
-			if = { limit = { has_country_flag = customisation_event }
-				country_event = EAI_M.1001
-			}
-
-			#version flags for allowing save compatibility or retriggering the news event after big changes
-			set_global_flag = EAI_3.4
-		}
-	}
-}
-
-country_event = { #news event for old saves
-	id = EAI_M.1
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		original_tag = USA
-		date > 1936.2.1
-		NOT = { has_global_flag = EAI_3.4 }
-	}
-	immediate = {
-		set_global_flag = EAI_3.4
-		every_country = { limit = { is_ai = no } country_event = EAI_M.2 }
-	}
-
-	option = {}
-}
-
-news_event = {
-	id = EAI_M.2
-	title = EAI_M.14.t
-	desc = EAI_M.14.d
-	picture = GFX_news_event_001
-	is_triggered_only = yes
-	option = {
-		name = "OK."
-	}
-}
-
-####################################################
-# Customisation Event
-####################################################
-
-country_event = {
-	id = EAI_M.1001
-	title = EAI_M.1001.t
-	desc = EAI_M.1001.d
-
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	immediate = { #set default historical settings
-		if = { limit = { is_historical_focus_on = yes NOT = { has_global_flag = EAI_normal } }
-			set_global_flag = EAI_normal
-
-			if = { limit = { JAP = { is_ai = yes } }
-				JAP = { add_ideas = neutrality_idea3 }
-				set_global_flag = EAI_neutral_jap
-			}
-
-			if = { limit = { SPR = { is_ai = yes } }
-				set_global_flag = EAI_neutral_spr
-			}
-		}
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o1a # "Mode: Normal"
-		trigger = { NOT = { has_global_flag = EAI_general_historical has_global_flag = EAI_general_challenging } }
-		hidden_effect = {
-			set_global_flag = EAI_general_historical
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1a.tt
-	}
-	option = {
-		name = EAI_M.1001.o1b # "Mode: Historical"
-		trigger = { has_global_flag = EAI_general_historical }
-		hidden_effect = {
-			clr_global_flag = EAI_general_historical
-			set_global_flag = EAI_general_challenging
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1b.tt
-	}
-	option = {
-		name = EAI_M.1001.o1c # "Mode: Challenging"
-		trigger = { has_global_flag = EAI_general_challenging }
-		hidden_effect = {
-			clr_global_flag = EAI_general_challenging
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1c.tt
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o2d # "Insane"
-		trigger = { has_global_flag = EAI_general_difficulty_insane }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_insane
-			set_global_flag = EAI_general_difficulty_easy
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2d.tt
-	}
-	option = {
-		name = EAI_M.1001.o2c # "Very Hard"
-		trigger = { has_global_flag = EAI_general_difficulty_very_hard }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_very_hard
-			set_global_flag = EAI_general_difficulty_insane
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2c.tt
-	}
-	option = {
-		name = EAI_M.1001.o2b # "Hard"
-		trigger = { has_global_flag = EAI_general_difficulty_hard }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_hard
-			set_global_flag = EAI_general_difficulty_very_hard
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2b.tt
-	}
-	option = {
-		name = EAI_M.1001.o2a # "Normal"
-		trigger = {
-			NOT = {
-				has_global_flag = EAI_general_difficulty_easy
-				has_global_flag = EAI_general_difficulty_hard
-				has_global_flag = EAI_general_difficulty_very_hard
-				has_global_flag = EAI_general_difficulty_insane
-			}
-		}
-		hidden_effect = {
-			set_global_flag = EAI_general_difficulty_hard
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2a.tt
-	}
-	option = {
-		name = EAI_M.1001.o2e # "Easy"
-		trigger = { has_global_flag = EAI_general_difficulty_easy }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_easy
-
-			country_event = EAI_M.1002
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2e.tt
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o3 # "Customise"
-		hidden_effect = {
-			if = { limit = { has_global_flag = EAI_general_historical }
-				EAI_set_historical = yes
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_insane }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_very_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_1
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_very_hard }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_2
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_hard }
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_3
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_easy }
-				clr_global_flag = EAI_lend_lease
-				set_global_flag = EAI_no_resistance_reduction
-
-				every_country = { limit = { OR = { has_idea = ns has_idea = ns2 } }
-					remove_ideas = ns
-					remove_ideas = ns2
-				}
-			}
-
-			country_event = EAI_M.1000
-		}
-	}
-	option = {
-		name = EAI_M.1001.o4 # "Exit"
-		hidden_effect = {
-			if = { limit = { has_global_flag = EAI_general_historical }
-				EAI_set_historical = yes
-			}
-
-			if = { limit = { has_global_flag = EAI_general_difficulty_insane }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_very_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_1
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_very_hard }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_2
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_hard }
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_3
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_easy }
-				clr_global_flag = EAI_lend_lease
-				set_global_flag = EAI_no_resistance_reduction
-
-				every_country = { limit = { OR = { has_idea = ns has_idea = ns2 } }
-					remove_ideas = ns
-					remove_ideas = ns2
-				}
-			}
-
-			every_country = {
-				limit = {
-					is_ai = yes
-					NOT = { has_country_flag = EAI_army_config }
-				}
-				country_event = EAI_CFG.0
-			}
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1002
-	title = EAI_M.1001.t
-	desc = EAI_M.1001.d
-
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	immediate = { #set default historical settings
-		if = { limit = { is_historical_focus_on = yes NOT = { has_global_flag = EAI_normal } }
-			set_global_flag = EAI_normal
-
-			if = { limit = { JAP = { is_ai = yes } }
-				JAP = { add_ideas = neutrality_idea3 }
-				set_global_flag = EAI_neutral_jap
-			}
-
-			if = { limit = { SPR = { is_ai = yes } }
-				set_global_flag = EAI_neutral_spr
-			}
-		}
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o1a # "Mode: Normal"
-		trigger = { NOT = { has_global_flag = EAI_general_historical has_global_flag = EAI_general_challenging } }
-		hidden_effect = {
-			set_global_flag = EAI_general_historical
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1a.tt
-	}
-	option = {
-		name = EAI_M.1001.o1b # "Mode: Historical"
-		trigger = { has_global_flag = EAI_general_historical }
-		hidden_effect = {
-			clr_global_flag = EAI_general_historical
-			set_global_flag = EAI_general_challenging
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1b.tt
-	}
-	option = {
-		name = EAI_M.1001.o1c # "Mode: Challenging"
-		trigger = { has_global_flag = EAI_general_challenging }
-		hidden_effect = {
-			clr_global_flag = EAI_general_challenging
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o1c.tt
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o2d # "Insane"
-		trigger = { has_global_flag = EAI_general_difficulty_insane }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_insane
-			set_global_flag = EAI_general_difficulty_easy
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2d.tt
-	}
-	option = {
-		name = EAI_M.1001.o2c # "Very Hard"
-		trigger = { has_global_flag = EAI_general_difficulty_very_hard }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_very_hard
-			set_global_flag = EAI_general_difficulty_insane
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2c.tt
-	}
-	option = {
-		name = EAI_M.1001.o2b # "Hard"
-		trigger = { has_global_flag = EAI_general_difficulty_hard }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_hard
-			set_global_flag = EAI_general_difficulty_very_hard
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2b.tt
-	}
-	option = {
-		name = EAI_M.1001.o2a # "Normal"
-		trigger = {
-			NOT = {
-				has_global_flag = EAI_general_difficulty_easy
-				has_global_flag = EAI_general_difficulty_hard
-				has_global_flag = EAI_general_difficulty_very_hard
-				has_global_flag = EAI_general_difficulty_insane
-			}
-		}
-		hidden_effect = {
-			set_global_flag = EAI_general_difficulty_hard
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2a.tt
-	}
-	option = {
-		name = EAI_M.1001.o2e # "Easy"
-		trigger = { has_global_flag = EAI_general_difficulty_easy }
-		hidden_effect = {
-			clr_global_flag = EAI_general_difficulty_easy
-
-			country_event = EAI_M.1001
-		}
-
-		custom_effect_tooltip = EAI_M.1001.o2e.tt
-	}
-
-	#################################################
-
-	option = {
-		name = EAI_M.1001.o3 # "Customise"
-		hidden_effect = {
-			if = { limit = { has_global_flag = EAI_general_historical }
-				EAI_set_historical = yes
-			}
-
-			if = { limit = { has_global_flag = EAI_general_difficulty_insane }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_very_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_1
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_very_hard }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_2
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_hard }
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_3
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_easy }
-				clr_global_flag = EAI_lend_lease
-				set_global_flag = EAI_no_resistance_reduction
-
-				every_country = { limit = { OR = { has_idea = ns has_idea = ns2 } }
-					remove_ideas = ns
-					remove_ideas = ns2
-				}
-			}
-
-			country_event = EAI_M.1000
-		}
-	}
-	option = {
-		name = EAI_M.1001.o4 # "Exit"
-		hidden_effect = {
-			if = { limit = { has_global_flag = EAI_general_historical }
-				EAI_set_historical = yes
-			}
-
-			if = { limit = { has_global_flag = EAI_general_difficulty_insane }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_very_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_1
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_very_hard }
-				set_global_flag = EAI_global_desperate_defense
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_2
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_hard }
-				set_global_flag = EAI_hard_enemies
-				set_global_flag = EAI_attrition
-				set_global_flag = EAI_attrition_3
-			}
-			if = { limit = { has_global_flag = EAI_general_difficulty_easy }
-				clr_global_flag = EAI_lend_lease
-				set_global_flag = EAI_no_resistance_reduction
-
-				every_country = { limit = { OR = { has_idea = ns has_idea = ns2 } }
-					remove_ideas = ns
-					remove_ideas = ns2
-				}
-			}
-
-			every_country = {
-				limit = {
-					is_ai = yes
-					NOT = { has_country_flag = EAI_army_config }
-				}
-				country_event = EAI_CFG.0
-			}
-		}
-	}
-}
-
-country_event = {
-	id = EAI_M.1000
-	title = EAI_M.1000.t # "Expert AI Configuration"
-	desc = EAI_M.1000.d
-
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1000.o1 # "AI settings"
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-	option = {
-		name = EAI_M.1000.o2 # "Game balance settings"
-		hidden_effect = {
-			country_event = EAI_M.1040
-		}
-	}
-	option = {
-		name = EAI_M.1000.o3 # "Difficulty settings"
-		hidden_effect = {
-			country_event = EAI_H.0
-		}
-	}
-	option = {
-		name = EAI_M.1000.o4 # "Exit"
-		hidden_effect = {
-			every_country = {
-				limit = {
-					is_ai = yes
-					NOT = { has_country_flag = EAI_army_config }
-				}
-				country_event = EAI_CFG.0
-			}
-		}
-	}
-}
-
-country_event = { #customise
-	id = EAI_M.1010
-	title = EAI_M.1010.t # "Expert AI: AI Settings"
-	desc = EAI_M.1010.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1010.o1 # "AI diplomacy"
-		trigger = { is_historical_focus_on = yes }
-		hidden_effect = {
-			country_event = EAI_M.1020
-		}
-	}
-	option = {
-		name = EAI_M.1010.o2 # "AI focus configuration"
-		hidden_effect = {
-			country_event = EAI_M.1103
-		}
-	}
-	option = {
-		name = EAI_M.1010.o3 # "Other"
-		hidden_effect = {
-			country_event = EAI_M.1030
-		}
-	}
-	option = {
-		name = EAI_M.1010.o4 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1000
-		}
-	}
-}
-
-country_event = { #diplomacy
-	id = EAI_M.1020
-	title = EAI_M.1020.t # "Expert AI: AI Settings > Diplomacy"
-	desc = EAI_M.1020.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1020.o1a # "|OFF| Keep Japan out of Axis"
-		trigger = { JAP = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_jap } }
-		hidden_effect = {
-			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
-			set_global_flag = EAI_neutral_jap
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o1b # "|ON| Keep Japan out of Axis"
-		trigger = { has_global_flag = EAI_neutral_jap }
-		hidden_effect = {
-			every_country = { limit = { tag = JAP } remove_ideas = neutrality_idea3 }
-			clr_global_flag = EAI_neutral_jap
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o2a # "|OFF| Keep Nat. Spain out of Axis"
-		trigger = { SPR = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_spr } }
-		hidden_effect = {
-			set_global_flag = EAI_neutral_spr
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o2b # "|ON| Keep Nat. Spain out of Axis"
-		trigger = { has_global_flag = EAI_neutral_spr }
-		hidden_effect = {
-			every_country = { limit = { original_tag = SPR } remove_ideas = neutrality_idea3 }
-			clr_global_flag = EAI_neutral_spr
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o3a # "|OFF| Aggressive Germany"
-		trigger = { GER = { is_ai = yes } NOT = { has_global_flag = EAI_aggressive_GER } }
-		hidden_effect = {
-			set_global_flag = EAI_aggressive_GER
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o3b # "|ON| Aggressive Germany"
-		trigger = { has_global_flag = EAI_aggressive_GER }
-		hidden_effect = {
-			clr_global_flag = EAI_aggressive_GER
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o4a # "|OFF| More historical progression"
-		trigger = { NOT = { has_global_flag = EAI_super_historical_AI } }
-		hidden_effect = {
-			set_global_flag = EAI_super_historical_AI
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o4b # "|ON| More historical progression"
-		trigger = { has_global_flag = EAI_super_historical_AI }
-		hidden_effect = {
-			clr_global_flag = EAI_super_historical_AI
-
-			country_event = EAI_M.1021
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o5 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1021
-	title = EAI_M.1020.t # "Expert AI: AI Settings > Diplomacy"
-	desc = EAI_M.1020.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1020.o1a # "|OFF| Keep Japan out of Axis"
-		trigger = { JAP = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_jap } }
-		hidden_effect = {
-			every_country = { limit = { tag = JAP is_ai = yes } add_ideas = neutrality_idea3 }
-			set_global_flag = EAI_neutral_jap
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o1b # "|ON| Keep Japan out of Axis"
-		trigger = { has_global_flag = EAI_neutral_jap }
-		hidden_effect = {
-			every_country = { limit = { tag = JAP } remove_ideas = neutrality_idea3 }
-			clr_global_flag = EAI_neutral_jap
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o2a # "|OFF| Keep Nat. Spain out of Axis"
-		trigger = { SPR = { is_ai = yes } NOT = { has_global_flag = EAI_neutral_spr } }
-		hidden_effect = {
-			set_global_flag = EAI_neutral_spr
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o2b # "|ON| Keep Nat. Spain out of Axis"
-		trigger = { has_global_flag = EAI_neutral_spr }
-		hidden_effect = {
-			every_country = { limit = { original_tag = SPR } remove_ideas = neutrality_idea3 }
-			clr_global_flag = EAI_neutral_spr
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o3a # "|OFF| Aggressive Germany"
-		trigger = { GER = { is_ai = yes } NOT = { has_global_flag = EAI_aggressive_GER } }
-		hidden_effect = {
-			set_global_flag = EAI_aggressive_GER
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o3b # "|ON| Aggressive Germany"
-		trigger = { has_global_flag = EAI_aggressive_GER }
-		hidden_effect = {
-			clr_global_flag = EAI_aggressive_GER
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o4a # "|OFF| More historical progression"
-		trigger = { NOT = { has_global_flag = EAI_super_historical_AI } }
-		hidden_effect = {
-			set_global_flag = EAI_super_historical_AI
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1020.o4b # "|ON| More historical progression"
-		trigger = { has_global_flag = EAI_super_historical_AI }
-		hidden_effect = {
-			clr_global_flag = EAI_super_historical_AI
-
-			country_event = EAI_M.1020
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1020.o5 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-
-country_event = { #other
-	id = EAI_M.1030
-	title = EAI_M.1030.t # "Expert AI: AI Settings > Other"
-	desc = EAI_M.1030.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1030.o1a # "|OFF| Free convoys for AI"
-		trigger = { NOT = { has_global_flag = EAI_free_convoys } }
-		hidden_effect = {
-			set_global_flag = EAI_free_convoys
-
-			country_event = EAI_M.1031
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1030.o1b # "|ON| Free convoys for AI"
-		trigger = { has_global_flag = EAI_free_convoys }
-		hidden_effect = {
-			clr_global_flag = EAI_free_convoys
-
-			country_event = EAI_M.1031
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1030.o2a # "|OFF| Improved AI lend-lease logic"
-		trigger = { NOT = { has_global_flag = EAI_lend_lease } }
-		hidden_effect = {
-			set_global_flag = EAI_lend_lease
-
-			country_event = EAI_M.1031
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1030.o2b # "|ON| Improved AI lend-lease logic"
-		trigger = { has_global_flag = EAI_lend_lease }
-		hidden_effect = {
-			clr_global_flag = EAI_lend_lease
-
-			country_event = EAI_M.1031
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1030.o3 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1031
-	title = EAI_M.1030.t # "Expert AI: AI Settings > Other"
-	desc = EAI_M.1030.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1030.o1a # "|OFF| Free convoys for AI"
-		trigger = { NOT = { has_global_flag = EAI_free_convoys } }
-		hidden_effect = {
-			set_global_flag = EAI_free_convoys
-
-			country_event = EAI_M.1030
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1030.o1b # "|ON| Free convoys for AI"
-		trigger = { has_global_flag = EAI_free_convoys }
-		hidden_effect = {
-			clr_global_flag = EAI_free_convoys
-
-			country_event = EAI_M.1030
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1030.o2a # "|OFF| Improved AI lend-lease logic"
-		trigger = { NOT = { has_global_flag = EAI_lend_lease } }
-		hidden_effect = {
-			set_global_flag = EAI_lend_lease
-
-			country_event = EAI_M.1030
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1030.o2b # "|ON| Improved AI lend-lease logic"
-		trigger = { has_global_flag = EAI_lend_lease }
-		hidden_effect = {
-			clr_global_flag = EAI_lend_lease
-
-			country_event = EAI_M.1030
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1030.o3 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-
-country_event = { #balance
-	id = EAI_M.1040
-	title = EAI_M.1040.t # "Expert AI: Game Balance Settings"
-	desc = EAI_M.1040.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1040.o1a # "|OFF| Limit research slots for minors"
-		trigger = { NOT = { has_global_flag = EAI_limit_research } }
-		hidden_effect = {
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 3 }
-				add_research_slot = -3
-				set_country_flag = slots_reduced_3
-			}
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
-				add_research_slot = -2
-				set_country_flag = slots_reduced_2
-			}
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
-				add_research_slot = -1
-				set_country_flag = slots_reduced_1
-			}
-
-			set_global_flag = EAI_limit_research
-			country_event = EAI_M.1041
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1040.o1b # "|ON| Limit research slots for minors"
-		trigger = { has_global_flag = EAI_limit_research }
-		hidden_effect = {
-			every_country = {
-				limit = { has_country_flag = slots_reduced_3 }
-				add_research_slot = 3
-				clr_country_flag = slots_reduced_3
-			}
-			every_country = {
-				limit = { has_country_flag = slots_reduced_2 }
-				add_research_slot = 2
-				clr_country_flag = slots_reduced_2
-			}
-			every_country = {
-				limit = { has_country_flag = slots_reduced_1 }
-				add_research_slot = 1
-				clr_country_flag = slots_reduced_1
-			}
-
-			clr_global_flag = EAI_limit_research
-			country_event = EAI_M.1041
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1040.o2 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1000
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1041
-	title = EAI_M.1040.t # "Expert AI: Game Balance Settings"
-	desc = EAI_M.1040.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1040.o1a # "|OFF| Limit research slots for minors"
-		trigger = { NOT = { has_global_flag = EAI_limit_research } }
-		hidden_effect = {
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 3 }
-				add_research_slot = -3
-				set_country_flag = slots_reduced_3
-			}
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 2 original_research_slots < 4 }
-				add_research_slot = -2
-				set_country_flag = slots_reduced_2
-			}
-			every_country = {
-				limit = { NOT = { major_country = yes } original_research_slots > 1 original_research_slots < 3 }
-				add_research_slot = -1
-				set_country_flag = slots_reduced_1
-			}
-
-			set_global_flag = EAI_limit_research
-			country_event = EAI_M.1040
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1040.o1b # "|ON| Limit research slots for minors"
-		trigger = { has_global_flag = EAI_limit_research }
-		hidden_effect = {
-			every_country = {
-				limit = { has_country_flag = slots_reduced_3 }
-				add_research_slot = 3
-				clr_country_flag = slots_reduced_3
-			}
-			every_country = {
-				limit = { has_country_flag = slots_reduced_2 }
-				add_research_slot = 2
-				clr_country_flag = slots_reduced_2
-			}
-			every_country = {
-				limit = { has_country_flag = slots_reduced_1 }
-				add_research_slot = 1
-				clr_country_flag = slots_reduced_1
-			}
-
-			clr_global_flag = EAI_limit_research
-			country_event = EAI_M.1040
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1040.o2 # "<----"
-		hidden_effect = {
-			country_event = EAI_M.1000
-		}
-	}
-}
-
-####################################################
-# AI army config
-####################################################
-
-country_event = {
-	id = EAI_M.1103
-	title = EAI_M.1104.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1104.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1104.o1 # "Configure AI focuses"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-	option = {
-		name = EAI_M.1104.o2a # "|ON| Default AI focuses"
-		trigger = { NOT = { has_global_flag = EAI_random_focuses } }
-
-		hidden_effect = {
-			set_global_flag = EAI_random_focuses
-			country_event = EAI_M.1104
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1104.o2b # "|OFF| Default AI focuses"
-		trigger = { has_global_flag = EAI_random_focuses }
-
-		hidden_effect = {
-			clr_global_flag = EAI_random_focuses
-			country_event = EAI_M.1104
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1104.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1104
-	title = EAI_M.1104.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1104.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1104.o1 # "Configure AI focuses"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-	option = {
-		name = EAI_M.1104.o2a # "|ON| Default AI focuses"
-		trigger = { NOT = { has_global_flag = EAI_random_focuses } }
-
-		hidden_effect = {
-			set_global_flag = EAI_random_focuses
-			country_event = EAI_M.1103
-		}
-
-		custom_effect_tooltip = EAI_M.1000.e.tt
-	}
-	option = {
-		name = EAI_M.1104.o2b # "|OFF| Default AI focuses"
-		trigger = { has_global_flag = EAI_random_focuses }
-
-		hidden_effect = {
-			clr_global_flag = EAI_random_focuses
-			country_event = EAI_M.1103
-		}
-
-		custom_effect_tooltip = EAI_M.1000.d.tt
-	}
-	option = {
-		name = EAI_M.1104.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1010
-		}
-	}
-}
-
-#categories
-country_event = {
-	id = EAI_M.1100
-	title = EAI_M.1100.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1100.d # "Select a category."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1100.o1 # "Majors"
-
-		hidden_effect = {
-			country_event = EAI_M.1200
-		}
-	}
-	option = {
-		name = EAI_M.1100.o2 # "Minors"
-
-		hidden_effect = {
-			country_event = EAI_M.1300
-		}
-	}
-	option = {
-		name = EAI_M.1100.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1103
-		}
-	}
-}
-
-#majors
-country_event = {
-	id = EAI_M.1200
-	title = EAI_M.1200.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1200.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1200.o1 # "Germany"
-
-		hidden_effect = {
-			GER = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1200.o2 # "Italy"
-
-		hidden_effect = {
-			ITA = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1200.o3 # "Japan"
-
-		hidden_effect = {
-			JAP = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1200.o4 # "Page 2/3"
-
-		hidden_effect = {
-			country_event = EAI_M.1201
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1201
-	title = EAI_M.1201.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1201.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1201.o1 # "United Kingdom"
-
-		hidden_effect = {
-			ENG = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1201.o2 # "France"
-
-		hidden_effect = {
-			FRA = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1201.o3 # "United States"
-
-		hidden_effect = {
-			USA = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1201.o4 # "Page 3/3"
-
-		hidden_effect = {
-			country_event = EAI_M.1202
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1202
-	title = EAI_M.1202.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1202.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1202.o1 # "Soviet Union"
-
-		hidden_effect = {
-			SOV = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1202.o2 # "Page 1/3"
-
-		hidden_effect = {
-			country_event = EAI_M.1200
-		}
-	}
-	option = {
-		name = EAI_M.1202.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-}
-
-#minor categories
-country_event = {
-	id = EAI_M.1300
-	title = EAI_M.1300.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1300.d # "Select a category."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1300.o1 # "'Death Or Dishonor' minors"
-
-		hidden_effect = {
-			country_event = EAI_M.1310
-		}
-	}
-	option = {
-		name = EAI_M.1300.o2 # "'Together For Victory' minors"
-
-		hidden_effect = {
-			country_event = EAI_M.1320
-		}
-	}
-	option = {
-		name = EAI_M.1300.o3 # "Other"
-
-		hidden_effect = {
-			country_event = EAI_M.1330
-		}
-	}
-	option = {
-		name = EAI_M.1300.o4 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-}
-
-#DOD
-country_event = {
-	id = EAI_M.1310
-	title = EAI_M.1310.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1310.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1310.o1 # "Romania"
-
-		hidden_effect = {
-			ROM = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1310.o2 # "Hungary"
-
-		hidden_effect = {
-			HUN = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1310.o3 # "Yugoslavia"
-
-		hidden_effect = {
-			YUG = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1310.o4 # "Page 2/2"
-
-		hidden_effect = {
-			country_event = EAI_M.1311
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1311
-	title = EAI_M.1311.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1311.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1311.o1 # "Czechoslovakia"
-
-		hidden_effect = {
-			CZE = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1311.o2 # "Page 1/2"
-
-		hidden_effect = {
-			country_event = EAI_M.1310
-		}
-	}
-	option = {
-		name = EAI_M.1311.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1300
-		}
-	}
-}
-
-#TFV
-country_event = {
-	id = EAI_M.1320
-	title = EAI_M.1320.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1320.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1320.o1 # "Canada"
-
-		hidden_effect = {
-			CAN = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1320.o2 # "Australia"
-
-		hidden_effect = {
-			AST = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1320.o3 # "Raj"
-
-		hidden_effect = {
-			RAJ = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1320.o4 # "Page 2/2"
-
-		hidden_effect = {
-			country_event = EAI_M.1321
-		}
-	}
-}
-country_event = {
-	id = EAI_M.1321
-	title = EAI_M.1321.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1321.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1321.o1 # "South Africa"
-
-		hidden_effect = {
-			SAF = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1321.o2 # "New Zealand"
-
-		hidden_effect = {
-			NZL = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1321.o3 # "Page 1/2"
-
-		hidden_effect = {
-			country_event = EAI_M.1320
-		}
-	}
-	option = {
-		name = EAI_M.1321.o4 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1300
-		}
-	}
-}
-
-#Other
-country_event = {
-	id = EAI_M.1330
-	title = EAI_M.1330.t # "Expert AI: AI Settings > Focus Configuration"
-	desc = EAI_M.1330.d # "Select a country."
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.1330.o1 # "China"
-
-		hidden_effect = {
-			CHI = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1330.o2 # "Poland"
-
-		hidden_effect = {
-			POL = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1330.o3 # "Spain"
-
-		hidden_effect = {
-			SPR = { save_event_target_as = EAI_AI_customisation }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.1330.o4 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1300
-		}
-	}
-}
-
-#98-115 focus config
-country_event = {
-	id = EAI_M.98
-	title = EAI_M.99.t
-	desc = {
-		text = EAI_M.99.da
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				NOT = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-	}
-	desc = {
-		text = EAI_M.99.db
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				OR = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-	}
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.99.o1 # "Configure focuses"
-
-		#trigger = {
-		#	event_target:EAI_AI_customisation = {
-		#		NOT = {
-		#			has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-		#			#has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-		#		}
-		#	}
-		#}
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { clear_focuses_override = yes }
-			country_event = EAI_M.100
-		}
-	}
-	option = {
-		name = EAI_M.99.o2 # "Reset focuses"
-
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				OR = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { clear_focuses = yes clear_focuses_override = yes clr_country_flag = EAI_army_config }
-			country_event = EAI_M.99
-		}
-	}
-	option = {
-		name = EAI_M.99.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-}
-country_event = {
-	id = EAI_M.99
-	title = EAI_M.99.t
-	desc = {
-		text = EAI_M.99.da
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				NOT = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-	}
-	desc = {
-		text = EAI_M.99.db
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				OR = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-	}
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.99.o1 # "Configure focuses"
-
-		#trigger = {
-		#	event_target:EAI_AI_customisation = {
-		#		NOT = {
-		#			has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-		#			#has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-		#		}
-		#	}
-		#}
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { clear_focuses_override = yes }
-			country_event = EAI_M.100
-		}
-	}
-	option = {
-		name = EAI_M.99.o2 # "Reset focuses"
-
-		trigger = {
-			event_target:EAI_AI_customisation = {
-				OR = {
-					has_country_flag = infantry_army_focus_override has_country_flag = mountaineer_army_focus_override has_country_flag = marine_army_focus_override
-					has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus
-				}
-			}
-		}
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { clear_focuses = yes clear_focuses_override = yes clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.99.o3 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.1100
-		}
-	}
-}
-
-country_event = { #infantry type
-	id = EAI_M.100
-	title = EAI_M.100.t
-	# "Infantry Type. This determines the battalion type of its main front line units."
-	desc = { text = EAI_M.100.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_army_focus has_country_flag = mountaineer_army_focus has_country_flag = marine_army_focus } } } }
-	desc = { text = EAI_M.100.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_army_focus } } }
-	desc = { text = EAI_M.100.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = mountaineer_army_focus } } }
-	desc = { text = EAI_M.100.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = marine_army_focus } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.100.o1 # "Infantry"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_army_focus_override }
-			country_event = EAI_M.101
-		}
-	}
-	option = {
-		name = EAI_M.100.o2 # "Mountaineer"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mountaineer_army_focus_override }
-			country_event = EAI_M.101
-		}
-	}
-	option = {
-		name = EAI_M.100.o3 # "Marine"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marine_army_focus_override }
-			country_event = EAI_M.101
-		}
-	}
-	option = {
-		name = EAI_M.100.o4 # "<----"
-
-		hidden_effect = {
-			country_event = EAI_M.98
-		}
-	}
-}
-country_event = { #infantry design
-	id = EAI_M.101
-	title = EAI_M.101.t
-	# "Infantry design. This determines the basic design of its infantry, marine and mountaineer units."
-	desc = { text = EAI_M.101.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_design_A has_country_flag = infantry_design_B has_country_flag = infantry_design_C } } } }
-	desc = { text = EAI_M.101.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_A } } }
-	desc = { text = EAI_M.101.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_B } } }
-	desc = { text = EAI_M.101.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_design_C } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.101.o1 # "Infantry + artillery"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_design_A_override }
-			country_event = EAI_M.102
-		}
-	}
-	option = {
-		name = EAI_M.101.o2 # "Infantry"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_design_B_override }
-			country_event = EAI_M.102
-		}
-	}
-	option = {
-		name = EAI_M.101.o4 # "42 width infantry"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_design_C_override }
-			country_event = EAI_M.102
-		}
-	}
-	option = {
-		name = EAI_M.101.o3 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = infantry_army_focus_override
-				clr_country_flag = mountaineer_army_focus_override
-				clr_country_flag = marine_army_focus_override
-			}
-			country_event = EAI_M.100
-		}
-	}
-}
-country_event = { #armor type
-	id = EAI_M.102
-	title = EAI_M.102.t
-	desc = { text = EAI_M.102.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = marm_army_focus has_country_flag = harm_army_focus has_country_flag = AT_army_focus } } } }
-	desc = { text = EAI_M.102.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = marm_army_focus } } }
-	desc = { text = EAI_M.102.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = harm_army_focus } } }
-	desc = { text = EAI_M.102.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = AT_army_focus } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.102.o1 # "Medium Armor"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marm_army_focus_override }
-			country_event = EAI_M.103
-		}
-	}
-	option = {
-		name = EAI_M.102.o2 # "Heavy Armor"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = harm_army_focus_override }
-			country_event = EAI_M.103
-		}
-	}
-	option = {
-		name = EAI_M.102.o3 # "AT Focus"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = AT_army_focus_override }
-			country_event = EAI_M.103
-		}
-	}
-	option = {
-		name = EAI_M.102.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = infantry_design_A_override
-				clr_country_flag = infantry_design_B_override
-				clr_country_flag = infantry_design_C_override
-			}
-			country_event = EAI_M.101
-		}
-	}
-}
-country_event = { #armor design
-	id = EAI_M.103
-	title = EAI_M.103.t
-	# "Armor design. This determines which kind of an armored division design the AI makes."
-	desc = { text = EAI_M.103.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = armor_design_A has_country_flag = armor_design_B has_country_flag = armor_design_C } } } }
-	desc = { text = EAI_M.103.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = armor_design_A } } }
-	desc = { text = EAI_M.103.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = armor_design_B } } }
-	desc = { text = EAI_M.103.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = armor_design_C } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.103.o1 # "More tanks"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = armor_design_A_override }
-			country_event = EAI_M.104
-		}
-	}
-	option = {
-		name = EAI_M.103.o2 # "Balanced"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = armor_design_B_override }
-			country_event = EAI_M.104
-		}
-	}
-	option = {
-		name = EAI_M.103.o3 # "More SP. artillery"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = armor_design_C_override }
-			country_event = EAI_M.104
-		}
-	}
-	option = {
-		name = EAI_M.103.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = marm_army_focus_override
-				clr_country_flag = harm_army_focus_override
-				clr_country_flag = AT_army_focus_override
-			}
-			country_event = EAI_M.102
-		}
-	}
-}
-country_event = { #armor attachment
-	id = EAI_M.104
-	title = EAI_M.104.t
-	desc = { text = EAI_M.104.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = harm_attachment has_country_flag = marm_attachment has_country_flag = mot_attachment } } } }
-	desc = { text = EAI_M.104.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = harm_attachment } } }
-	desc = { text = EAI_M.104.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = marm_attachment } } }
-	desc = { text = EAI_M.104.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = mot_attachment } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.104.o1 # "Heavy Armor attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = harm_army_focus_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = harm_attachment_override }
-			country_event = EAI_M.105
-		}
-	}
-	option = {
-		name = EAI_M.104.o2 # "Medium Armor attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = marm_army_focus_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marm_attachment_override }
-			country_event = EAI_M.105
-		}
-	}
-	option = {
-		name = EAI_M.104.o3 # "Motorized attachment"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mot_attachment_override }
-			country_event = EAI_M.105
-		}
-	}
-	option = {
-		name = EAI_M.104.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = armor_design_A_override
-				clr_country_flag = armor_design_B_override
-				clr_country_flag = armor_design_C_override
-			}
-			country_event = EAI_M.103
-		}
-	}
-}
-country_event = { #infantry attachment
-	id = EAI_M.105
-	title = EAI_M.105.t
-	# "Infantry attachment. If the main front line type is not infantry, you can make the AI build a special force attachment made out of regular infantry. Special force designs are the same as the front line except that they include AT support."
-	desc = { text = EAI_M.105.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_attachment_2 has_country_flag = infantry_attachment_1 has_country_flag = infantry_attachment_0 } } } }
-	desc = { text = EAI_M.105.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_attachment_2 } } }
-	desc = { text = EAI_M.105.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_attachment_1 } } }
-	desc = { text = EAI_M.105.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = infantry_attachment_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.105.o1 # "Large Infantry Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_army_focus_override has_country_flag = marine_attachment_2_override has_country_flag = mountaineer_attachment_2_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_attachment_2_override }
-			country_event = EAI_M.106
-		}
-	}
-	option = {
-		name = EAI_M.105.o2 # "Small Infantry Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = infantry_army_focus_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_attachment_1_override }
-			country_event = EAI_M.106
-		}
-	}
-	option = {
-		name = EAI_M.105.o3 # "None"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = infantry_attachment_0_override }
-			country_event = EAI_M.106
-		}
-	}
-	option = {
-		name = EAI_M.105.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = harm_attachment_override
-				clr_country_flag = marm_attachment_override
-				clr_country_flag = mot_attachment_override
-			}
-			country_event = EAI_M.104
-		}
-	}
-}
-country_event = { #mountaineer attachment
-	id = EAI_M.106
-	title = EAI_M.106.t
-	desc = { text = EAI_M.106.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = mountaineer_attachment_2 has_country_flag = mountaineer_attachment_1 has_country_flag = mountaineer_attachment_0 } } } }
-	desc = { text = EAI_M.106.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = mountaineer_attachment_2 } } }
-	desc = { text = EAI_M.106.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = mountaineer_attachment_1 } } }
-	desc = { text = EAI_M.106.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = mountaineer_attachment_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.106.o1 # "Large Mountaineer Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = mountaineer_army_focus_override has_country_flag = marine_attachment_2_override has_country_flag = infantry_attachment_2_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mountaineer_attachment_2_override }
-			country_event = EAI_M.107
-		}
-	}
-	option = {
-		name = EAI_M.106.o2 # "Small Mountaineer Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = mountaineer_army_focus_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mountaineer_attachment_1_override }
-			country_event = EAI_M.107
-		}
-	}
-	option = {
-		name = EAI_M.106.o3 # "None"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mountaineer_attachment_0_override }
-			country_event = EAI_M.107
-		}
-	}
-	option = {
-		name = EAI_M.106.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = infantry_attachment_2_override
-				clr_country_flag = infantry_attachment_1_override
-				clr_country_flag = infantry_attachment_0_override
-			}
-			country_event = EAI_M.105
-		}
-	}
-}
-country_event = { #marine attachment
-	id = EAI_M.107
-	title = EAI_M.107.t
-	# "Marine attachment. If the main front line type is not marine, you can make the AI build a special force attachment made out of marines. Special force designs are the same as the front line except that they include AT support."
-	desc = { text = EAI_M.107.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = marine_attachment_2 has_country_flag = marine_attachment_1 has_country_flag = marine_attachment_0 } } } }
-	desc = { text = EAI_M.107.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = marine_attachment_2 } } }
-	desc = { text = EAI_M.107.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = marine_attachment_1 } } }
-	desc = { text = EAI_M.107.dc trigger = { event_target:EAI_AI_customisation = { has_country_flag = marine_attachment_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.107.o1 # "Large Marine Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = marine_army_focus_override has_country_flag = infantry_attachment_2_override has_country_flag = mountaineer_attachment_2_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marine_attachment_2_override }
-			country_event = EAI_M.108
-		}
-	}
-	option = {
-		name = EAI_M.107.o2 # "Small Marine Attachment"
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = marine_army_focus_override } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marine_attachment_1_override }
-			country_event = EAI_M.108
-		}
-	}
-	option = {
-		name = EAI_M.107.o3 # "None"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = marine_attachment_0_override }
-			country_event = EAI_M.108
-		}
-	}
-	option = {
-		name = EAI_M.107.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = marine_attachment_2_override
-				clr_country_flag = marine_attachment_1_override
-				clr_country_flag = marine_attachment_0_override
-			}
-			country_event = EAI_M.106
-		}
-	}
-}
-country_event = { #bomber
-	id = EAI_M.108
-	title = EAI_M.108.t
-	# "Bomber type. The AI will research and build either CAS or TAC."
-	desc = { text = EAI_M.108.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = cas_air_focus has_country_flag = tac_air_focus } } } }
-	desc = { text = EAI_M.108.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = cas_air_focus } } }
-	desc = { text = EAI_M.108.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = tac_air_focus } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.108.o1 # "Close Air Support"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = cas_air_focus_override }
-			country_event = EAI_M.109
-		}
-	}
-	option = {
-		name = EAI_M.108.o2 # "Tactical Bomber"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = tac_air_focus_override }
-			country_event = EAI_M.109
-		}
-	}
-	option = {
-		name = EAI_M.108.o3 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = mountaineer_attachment_2_override
-				clr_country_flag = mountaineer_attachment_1_override
-				clr_country_flag = mountaineer_attachment_0_override
-			}
-			country_event = EAI_M.107
-		}
-	}
-}
-country_event = { #nav bomber
-	id = EAI_M.109
-	title = EAI_M.109.t
-	# "Naval bomber focus. This determines whether the AI builds naval bombers or not."
-	desc = { text = EAI_M.109.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = nav_air_focus_1 has_country_flag = nav_air_focus_0 } } } }
-	desc = { text = EAI_M.109.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = nav_air_focus_1 } } }
-	desc = { text = EAI_M.109.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = nav_air_focus_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.109.o1 # "Enable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = nav_air_focus_1_override }
-			country_event = EAI_M.110
-		}
-	}
-	option = {
-		name = EAI_M.109.o2 # "Disable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = nav_air_focus_0_override }
-			country_event = EAI_M.110
-		}
-	}
-	option = {
-		name = EAI_M.109.o3 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = cas_air_focus_override
-				clr_country_flag = tac_air_focus_override
-			}
-			country_event = EAI_M.108
-		}
-	}
-}
-country_event = { #strat bomber
-	id = EAI_M.110
-	title = EAI_M.110.t
-	# "Strategic bomber focus. This determines whether the AI will attempt to build strategic bombers early in the game. Otherwise the AI may build them later in the game if the situation is right."
-	desc = { text = EAI_M.110.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = str_air_focus_1 has_country_flag = str_air_focus_0 } } } }
-	desc = { text = EAI_M.110.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = str_air_focus_1 } } }
-	desc = { text = EAI_M.110.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = str_air_focus_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.110.o1 # "Enable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = str_air_focus_1_override }
-			country_event = EAI_M.111
-		}
-	}
-	option = {
-		name = EAI_M.110.o2 # "Disable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = str_air_focus_0_override }
-			country_event = EAI_M.111
-		}
-	}
-	option = {
-		name = EAI_M.110.o3 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = nav_air_focus_1_override
-				clr_country_flag = nav_air_focus_0_override
-			}
-			country_event = EAI_M.109
-		}
-	}
-}
-country_event = { #carrier
-	id = EAI_M.111
-	title = EAI_M.111.t
-	# "Carrier focus. This determines whether the AI will attempt to build carriers early in the game. Otherwise the AI may build them later in the game if the situation is right."
-	desc = { text = EAI_M.111.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = carrier_navy_focus_1 has_country_flag = carrier_navy_focus_0 } } } }
-	desc = { text = EAI_M.111.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = carrier_navy_focus_1 } } }
-	desc = { text = EAI_M.111.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = carrier_navy_focus_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.111.o1 # "Enable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = carrier_navy_focus_1_override }
-			country_event = EAI_M.112
-		}
-	}
-	option = {
-		name = EAI_M.111.o2 # "Disable"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = carrier_navy_focus_0_override }
-			country_event = EAI_M.112
-		}
-	}
-	option = {
-		name = EAI_M.111.o3 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = str_air_focus_1_override
-				clr_country_flag = str_air_focus_0_override
-			}
-			country_event = EAI_M.110
-		}
-	}
-}
-country_event = { #capital
-	id = EAI_M.112
-	title = EAI_M.112.t
-	# "Battleship focus. This determines whether the AI will attempt to build battleships early in the game. Otherwise the AI may build them later in the game if the situation is right."
-	desc = { text = EAI_M.112.d trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = capital_navy_focus_1 has_country_flag = capital_navy_focus_0 } } } }
-	desc = { text = EAI_M.112.da trigger = { event_target:EAI_AI_customisation = { has_country_flag = capital_navy_focus_1 } } }
-	desc = { text = EAI_M.112.db trigger = { event_target:EAI_AI_customisation = { has_country_flag = capital_navy_focus_0 } } }
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.112.o1 # "Enable"
-
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = mw_doctrine has_country_flag = sf_doctrine has_country_flag = gb_doctrine has_country_flag = ma_doctrine } } } #can't switch doctrines later
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = capital_navy_focus_1_override }
-			country_event = EAI_M.113
-		}
-	}
-	option = {
-		name = EAI_M.112.o2 # "Disable"
-
-		trigger = { event_target:EAI_AI_customisation = { NOT = { has_country_flag = mw_doctrine has_country_flag = sf_doctrine has_country_flag = gb_doctrine has_country_flag = ma_doctrine } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = capital_navy_focus_0_override }
-			country_event = EAI_M.113
-		}
-	}
-
-	option = {
-		name = EAI_M.112.o3 # "Enable & finish configuration"
-
-		trigger = { event_target:EAI_AI_customisation = { OR = { has_country_flag = mw_doctrine has_country_flag = sf_doctrine has_country_flag = gb_doctrine has_country_flag = ma_doctrine } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = capital_navy_focus_1_override clear_focuses = yes clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.112.o4 # "Disable & finish configuration"
-
-		trigger = { event_target:EAI_AI_customisation = { OR = { has_country_flag = mw_doctrine has_country_flag = sf_doctrine has_country_flag = gb_doctrine has_country_flag = ma_doctrine } } }
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = capital_navy_focus_0_override clear_focuses = yes clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.112.o5 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = carrier_navy_focus_1_override
-				clr_country_flag = carrier_navy_focus_0_override
-			}
-			country_event = EAI_M.111
-		}
-	}
-}
-country_event = { #land doctrine
-	id = EAI_M.113
-	title = EAI_M.113.t
-	# "Land doctrine."
-	desc = EAI_M.113.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.113.o1 # "Mobile Warfare"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = mw_doctrine_override }
-			country_event = EAI_M.114
-		}
-	}
-	option = {
-		name = EAI_M.113.o2 # "Superior Firepower"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = sf_doctrine_override }
-			country_event = EAI_M.114
-		}
-	}
-	option = {
-		name = EAI_M.113.o3 # "Grand Battleplan"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = gb_doctrine_override }
-			country_event = EAI_M.114
-		}
-	}
-	option = {
-		name = EAI_M.113.o4 # "Mass Assault"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = ma_doctrine_override }
-			country_event = EAI_M.114
-		}
-	}
-	option = {
-		name = EAI_M.113.o5 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = capital_navy_focus_1_override
-				clr_country_flag = capital_navy_focus_0_override
-			}
-			country_event = EAI_M.112
-		}
-	}
-}
-country_event = { #air doctrine
-	id = EAI_M.114
-	title = EAI_M.114.t
-	# "Air doctrine."
-	desc = EAI_M.114.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.114.o1 # "Strategic Destruction"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = SD_doctrine_override }
-			country_event = EAI_M.115
-		}
-	}
-	option = {
-		name = EAI_M.114.o2 # "Battlefield Support"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = BFS_doctrine_override }
-			country_event = EAI_M.115
-		}
-	}
-	option = {
-		name = EAI_M.114.o3 # "Operational Integrity"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = OI_doctrine_override }
-			country_event = EAI_M.115
-		}
-	}
-	option = {
-		name = EAI_M.114.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = mw_doctrine_override
-				clr_country_flag = sf_doctrine_override
-				clr_country_flag = gb_doctrine_override
-				clr_country_flag = ma_doctrine_override
-			}
-			country_event = EAI_M.113
-		}
-	}
-}
-country_event = { #naval doctrine
-	id = EAI_M.115
-	title = EAI_M.115.t
-	# "Naval doctrine."
-	desc = EAI_M.115.d
-	picture = GFX_report_event_expert_ai
-
-	is_triggered_only = yes
-
-	option = {
-		name = EAI_M.115.o1 # "Fleet In Being & finish configuration"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = FIB_doctrine_override clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.115.o2 # "Trade Interdiction & finish configuration"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = TI_doctrine_override clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.115.o3 # "Base Strike & finish configuration"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = { set_country_flag = BS_doctrine_override clr_country_flag = EAI_army_config }
-			country_event = EAI_M.98
-		}
-	}
-	option = {
-		name = EAI_M.115.o4 # "Previous"
-
-		hidden_effect = {
-			event_target:EAI_AI_customisation = {
-				clr_country_flag = FIB_doctrine_override
-				clr_country_flag = TI_doctrine_override
-				clr_country_flag = BS_doctrine_override
-			}
-			country_event = EAI_M.114
-		}
-	}
-}
-
-####################################################
-# background events
-####################################################
+﻿############################################################################################################
+# Expert AI mod - background events
+############################################################################################################
+
+add_namespace = EAI_background
 
 country_event = { #resistance modifier for new countries
-	id = EAI_M.6
+	id = EAI_background.0
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		is_ai = yes NOT = { has_idea = ns has_idea = ns2 } date > 1936.2.1
+		is_ai = yes NOT = { has_idea = EAI_resistance_effects_reduced has_idea = EAI_resistance_effects_reduced } date > 1936.2.1
 		NOT = { has_global_flag = EAI_no_resistance_reduction }
 	}
 	immediate = {
-		add_ideas = ns
+		add_ideas = EAI_resistance_effects_reduced
 	}
 	option = {}
 }
 country_event = { #free convoys for the AI
-	id = EAI_M.10
+	id = EAI_background.1
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
 		has_global_flag = EAI_free_convoys
 		is_ai = yes
-		major_country = yes
 		any_state = { is_controlled_by = ROOT is_coastal = yes }
 		has_equipment = { convoy < 50 }
 	}
 	immediate = {
-		add_equipment_to_stockpile = { type = convoy_1 amount = 100 producer = ENG }
+		add_equipment_to_stockpile = { type = convoy_1 amount = 100 }
 	}
 	option = {}
 }
-country_event = { #because the AI won't save up 250 PP
-	id = EAI_M.11
+country_event = { #USA advisor: because the AI won't save up 250 PP
+	id = EAI_background.2
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
@@ -2452,19 +50,36 @@ country_event = { #because the AI won't save up 250 PP
 	}
 	option = {}
 }
+country_event = { #GER advisor: switch
+	id = EAI_background.21
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		original_tag = GER
+		is_ai = yes
+		has_political_power > 150
+		has_idea = martin_bormann
+		NOT = { has_idea = heinrich_himmler }
+	}
+	immediate = {
+		swap_ideas = { remove_idea = martin_bormann add_idea = heinrich_himmler }
+		add_political_power = -150
+	}
+	option = {}
+}
 country_event = { #mobile warfare doctrine tech switch to manpower branch
-	id = EAI_M.3
+	id = EAI_background.3
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
 		is_ai = yes
 		has_idea = service_by_requirement
-		has_manpower < 1000000
+		has_manpower < 100000
 		has_tech = modern_blitzkrieg
-		NOT = { has_country_flag = volkssturm_taken }
+		NOT = { has_country_flag = EAI_volkssturm_taken }
 	}
 	immediate = {
-		set_country_flag = volkssturm_taken
+		set_country_flag = EAI_volkssturm_taken
 
 		set_technology = { firebrigades = 0 }
 		set_technology = { backhand_blow = 0 }
@@ -2475,713 +90,237 @@ country_event = { #mobile warfare doctrine tech switch to manpower branch
 	option = {}
 }
 country_event = { #research reduction for new countries
-	id = EAI_M.7
+	id = EAI_background.4
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
 		has_global_flag = EAI_limit_research
-		NOT = { major_country = yes }
+		NOT = { EAI_major_country = yes }
 		OR = {
-			AND = { original_research_slots > 3 NOT = { has_country_flag = slots_reduced_3 } }
-			AND = { original_research_slots > 2 original_research_slots < 4 NOT = { has_country_flag = slots_reduced_2 } }
-			AND = { original_research_slots > 1 original_research_slots < 3 NOT = { has_country_flag = slots_reduced_1 } }
+			AND = { original_research_slots > 3 NOT = { has_country_flag = EAI_slots_reduced_3 } }
+			AND = { original_research_slots > 2 original_research_slots < 4 NOT = { has_country_flag = EAI_slots_reduced_2 } }
+			AND = { original_research_slots > 1 original_research_slots < 3 NOT = { has_country_flag = EAI_slots_reduced_1 } }
 		}
 	}
 	immediate = {
-		if = { limit = { original_research_slots > 3 } add_research_slot = -3 set_country_flag = slots_reduced_3 }
-		if = { limit = { original_research_slots > 2 original_research_slots < 4 } add_research_slot = -2 set_country_flag = slots_reduced_2 }
-		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = slots_reduced_1 }
+		if = { limit = { original_research_slots > 3 } add_research_slot = -3 set_country_flag = EAI_slots_reduced_3 }
+		if = { limit = { original_research_slots > 2 original_research_slots < 4 } add_research_slot = -2 set_country_flag = EAI_slots_reduced_2 }
+		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = EAI_slots_reduced_1 }
 	}
 	option = {}
 }
 country_event = { #save original capital loc
-	id = EAI_M.8
+	id = EAI_background.5
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
 		NOT = {
-			any_state = { has_state_flag = original_capital_@ROOT }
+			any_state = { has_state_flag = EAI_original_capital_@ROOT }
 		}
 	}
 	immediate = {
-		capital_scope = { set_state_flag = original_capital_@ROOT }
+		capital_scope = { set_state_flag = EAI_original_capital_@ROOT }
 	}
 	option = {}
 }
-
 country_event = { #for performance reasons, check these monthly
-	id = EAI_M.9
-	hidden = yes
-	mean_time_to_happen = { days = 30 }
+	id = EAI_background.6
+	title = ""
+	desc = ""
+	mean_time_to_happen = { days = 20 }
 	trigger = { is_ai = yes }
 	immediate = {
-		if = { limit = { GER = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_GER else = { clr_country_flag = dont_invade_GER } }
-		if = { limit = { ENG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ENG else = { clr_country_flag = dont_invade_ENG } }
-		if = { limit = { SOV = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SOV else = { clr_country_flag = dont_invade_SOV } }
-		if = { limit = { SWE = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SWE else = { clr_country_flag = dont_invade_SWE } }
-		if = { limit = { FRA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_FRA else = { clr_country_flag = dont_invade_FRA } }
-		if = { limit = { LUX = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LUX else = { clr_country_flag = dont_invade_LUX } }
-		if = { limit = { BEL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BEL else = { clr_country_flag = dont_invade_BEL } }
-		if = { limit = { HOL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_HOL else = { clr_country_flag = dont_invade_HOL } }
-		if = { limit = { CZE = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CZE else = { clr_country_flag = dont_invade_CZE } }
-		if = { limit = { POL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_POL else = { clr_country_flag = dont_invade_POL } }
-		if = { limit = { AUS = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_AUS else = { clr_country_flag = dont_invade_AUS } }
-		if = { limit = { LIT = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LIT else = { clr_country_flag = dont_invade_LIT } }
-		if = { limit = { EST = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_EST else = { clr_country_flag = dont_invade_EST } }
-		if = { limit = { LAT = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LAT else = { clr_country_flag = dont_invade_LAT } }
-		if = { limit = { SPR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SPR else = { clr_country_flag = dont_invade_SPR } }
-		if = { limit = { ITA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ITA else = { clr_country_flag = dont_invade_ITA } }
-		if = { limit = { ROM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ROM else = { clr_country_flag = dont_invade_ROM } }
-		if = { limit = { YUG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_YUG else = { clr_country_flag = dont_invade_YUG } }
-		if = { limit = { SER = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SER else = { clr_country_flag = dont_invade_SER } }
-		if = { limit = { SWI = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SWI else = { clr_country_flag = dont_invade_SWI } }
-		if = { limit = { TUR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_TUR else = { clr_country_flag = dont_invade_TUR } }
-		if = { limit = { GRE = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_GRE else = { clr_country_flag = dont_invade_GRE } }
-		if = { limit = { ALB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ALB else = { clr_country_flag = dont_invade_ALB } }
-		if = { limit = { NOR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_NOR else = { clr_country_flag = dont_invade_NOR } }
-		if = { limit = { DEN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_DEN else = { clr_country_flag = dont_invade_DEN } }
-		if = { limit = { BUL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BUL else = { clr_country_flag = dont_invade_BUL } }
-		if = { limit = { POR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_POR else = { clr_country_flag = dont_invade_POR } }
-		if = { limit = { FIN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_FIN else = { clr_country_flag = dont_invade_FIN } }
-		if = { limit = { IRE = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_IRE else = { clr_country_flag = dont_invade_IRE } }
-		if = { limit = { HUN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_HUN else = { clr_country_flag = dont_invade_HUN } }
-		if = { limit = { AFG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_AFG else = { clr_country_flag = dont_invade_AFG } }
-		if = { limit = { ARG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ARG else = { clr_country_flag = dont_invade_ARG } }
-		if = { limit = { AST = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_AST else = { clr_country_flag = dont_invade_AST } }
-		if = { limit = { BHU = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BHU else = { clr_country_flag = dont_invade_BHU } }
-		if = { limit = { BOL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BOL else = { clr_country_flag = dont_invade_BOL } }
-		if = { limit = { BRA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BRA else = { clr_country_flag = dont_invade_BRA } }
-		if = { limit = { CAN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CAN else = { clr_country_flag = dont_invade_CAN } }
-		if = { limit = { CHI = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CHI else = { clr_country_flag = dont_invade_CHI } }
-		if = { limit = { CHL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CHL else = { clr_country_flag = dont_invade_CHL } }
-		if = { limit = { COL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_COL else = { clr_country_flag = dont_invade_COL } }
-		if = { limit = { COS = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_COS else = { clr_country_flag = dont_invade_COS } }
-		if = { limit = { ECU = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ECU else = { clr_country_flag = dont_invade_ECU } }
-		if = { limit = { ELS = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ELS else = { clr_country_flag = dont_invade_ELS } }
-		if = { limit = { ETH = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ETH else = { clr_country_flag = dont_invade_ETH } }
-		if = { limit = { GUA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_GUA else = { clr_country_flag = dont_invade_GUA } }
-		if = { limit = { HON = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_HON else = { clr_country_flag = dont_invade_HON } }
-		if = { limit = { IRQ = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_IRQ else = { clr_country_flag = dont_invade_IRQ } }
-		if = { limit = { JAP = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_JAP else = { clr_country_flag = dont_invade_JAP } }
-		if = { limit = { KOR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_KOR else = { clr_country_flag = dont_invade_KOR } }
-		if = { limit = { LIB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LIB else = { clr_country_flag = dont_invade_LIB } }
-		if = { limit = { MEX = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MEX else = { clr_country_flag = dont_invade_MEX } }
-		if = { limit = { MEN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MEN else = { clr_country_flag = dont_invade_MEN } }
-		if = { limit = { NEP = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_NEP else = { clr_country_flag = dont_invade_NEP } }
-		if = { limit = { NIC = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_NIC else = { clr_country_flag = dont_invade_NIC } }
-		if = { limit = { NZL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_NZL else = { clr_country_flag = dont_invade_NZL } }
-		if = { limit = { PER = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PER else = { clr_country_flag = dont_invade_PER } }
-		if = { limit = { PRU = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PRU else = { clr_country_flag = dont_invade_PRU } }
-		if = { limit = { SAF = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SAF else = { clr_country_flag = dont_invade_SAF } }
-		if = { limit = { SAU = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SAU else = { clr_country_flag = dont_invade_SAU } }
-		if = { limit = { SIA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SIA else = { clr_country_flag = dont_invade_SIA } }
-		if = { limit = { SIK = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SIK else = { clr_country_flag = dont_invade_SIK } }
-		if = { limit = { TIB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_TIB else = { clr_country_flag = dont_invade_TIB } }
-		if = { limit = { URG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_URG else = { clr_country_flag = dont_invade_URG } }
-		if = { limit = { VEN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_VEN else = { clr_country_flag = dont_invade_VEN } }
-		if = { limit = { YUN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_YUN else = { clr_country_flag = dont_invade_YUN } }
-		if = { limit = { USA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_USA else = { clr_country_flag = dont_invade_USA } }
-		if = { limit = { MON = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MON else = { clr_country_flag = dont_invade_MON } }
-		if = { limit = { TAN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_TAN else = { clr_country_flag = dont_invade_TAN } }
-		if = { limit = { PAR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PAR else = { clr_country_flag = dont_invade_PAR } }
-		if = { limit = { CUB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CUB else = { clr_country_flag = dont_invade_CUB } }
-		if = { limit = { DOM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_DOM else = { clr_country_flag = dont_invade_DOM } }
-		if = { limit = { HAI = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_HAI else = { clr_country_flag = dont_invade_HAI } }
-		if = { limit = { YEM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_YEM else = { clr_country_flag = dont_invade_YEM } }
-		if = { limit = { OMA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_OMA else = { clr_country_flag = dont_invade_OMA } }
-		if = { limit = { SLO = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SLO else = { clr_country_flag = dont_invade_SLO } }
-		if = { limit = { RAJ = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_RAJ else = { clr_country_flag = dont_invade_RAJ } }
-		if = { limit = { CRO = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CRO else = { clr_country_flag = dont_invade_CRO } }
-		if = { limit = { GXC = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_GXC else = { clr_country_flag = dont_invade_GXC } }
-		if = { limit = { PRC = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PRC else = { clr_country_flag = dont_invade_PRC } }
-		if = { limit = { SHX = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SHX else = { clr_country_flag = dont_invade_SHX } }
-		if = { limit = { XSM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_XSM else = { clr_country_flag = dont_invade_XSM } }
-		if = { limit = { ICE = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ICE else = { clr_country_flag = dont_invade_ICE } }
-		if = { limit = { LEB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LEB else = { clr_country_flag = dont_invade_LEB } }
-		if = { limit = { JOR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_JOR else = { clr_country_flag = dont_invade_JOR } }
-		if = { limit = { SYR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_SYR else = { clr_country_flag = dont_invade_SYR } }
-		if = { limit = { EGY = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_EGY else = { clr_country_flag = dont_invade_EGY } }
-		if = { limit = { LBA = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LBA else = { clr_country_flag = dont_invade_LBA } }
-		if = { limit = { WGR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_WGR else = { clr_country_flag = dont_invade_WGR } }
-		if = { limit = { DDR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_DDR else = { clr_country_flag = dont_invade_DDR } }
-		if = { limit = { PAL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PAL else = { clr_country_flag = dont_invade_PAL } }
-		if = { limit = { ISR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ISR else = { clr_country_flag = dont_invade_ISR } }
-		if = { limit = { VIN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_VIN else = { clr_country_flag = dont_invade_VIN } }
-		if = { limit = { CAM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_CAM else = { clr_country_flag = dont_invade_CAM } }
-		if = { limit = { MAL = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MAL else = { clr_country_flag = dont_invade_MAL } }
-		if = { limit = { INS = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_INS else = { clr_country_flag = dont_invade_INS } }
-		if = { limit = { LAO = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_LAO else = { clr_country_flag = dont_invade_LAO } }
-		if = { limit = { MNT = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MNT else = { clr_country_flag = dont_invade_MNT } }
-		if = { limit = { UKR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_UKR else = { clr_country_flag = dont_invade_UKR } }
-		if = { limit = { GEO = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_GEO else = { clr_country_flag = dont_invade_GEO } }
-		if = { limit = { KAZ = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_KAZ else = { clr_country_flag = dont_invade_KAZ } }
-		if = { limit = { AZR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_AZR else = { clr_country_flag = dont_invade_AZR } }
-		if = { limit = { ARM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ARM else = { clr_country_flag = dont_invade_ARM } }
-		if = { limit = { BLR = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BLR else = { clr_country_flag = dont_invade_BLR } }
-		if = { limit = { ANG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ANG else = { clr_country_flag = dont_invade_ANG } }
-		if = { limit = { MZB = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MZB else = { clr_country_flag = dont_invade_MZB } }
-		if = { limit = { ZIM = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_ZIM else = { clr_country_flag = dont_invade_ZIM } }
-		if = { limit = { COG = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_COG else = { clr_country_flag = dont_invade_COG } }
-		if = { limit = { KEN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_KEN else = { clr_country_flag = dont_invade_KEN } }
-		if = { limit = { PAK = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_PAK else = { clr_country_flag = dont_invade_PAK } }
-		if = { limit = { BOT = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_BOT else = { clr_country_flag = dont_invade_BOT } }
-		if = { limit = { MAN = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_MAN else = { clr_country_flag = dont_invade_MAN } }
-		if = { limit = { D01 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D01 else = { clr_country_flag = dont_invade_D01 } }
-		if = { limit = { D02 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D02 else = { clr_country_flag = dont_invade_D02 } }
-		if = { limit = { D03 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D03 else = { clr_country_flag = dont_invade_D03 } }
-		if = { limit = { D04 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D04 else = { clr_country_flag = dont_invade_D04 } }
-		if = { limit = { D05 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D05 else = { clr_country_flag = dont_invade_D05 } }
-		if = { limit = { D06 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D06 else = { clr_country_flag = dont_invade_D06 } }
-		if = { limit = { D07 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D07 else = { clr_country_flag = dont_invade_D07 } }
-		if = { limit = { D08 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D08 else = { clr_country_flag = dont_invade_D08 } }
-		if = { limit = { D09 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D09 else = { clr_country_flag = dont_invade_D09 } }
-		if = { limit = { D10 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D10 else = { clr_country_flag = dont_invade_D10 } }
-		if = { limit = { D11 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D11 else = { clr_country_flag = dont_invade_D11 } }
-		if = { limit = { D12 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D12 else = { clr_country_flag = dont_invade_D12 } }
-		if = { limit = { D13 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D13 else = { clr_country_flag = dont_invade_D13 } }
-		if = { limit = { D14 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D14 else = { clr_country_flag = dont_invade_D14 } }
-		if = { limit = { D15 = { dont_invade = yes NOT = { tag = ROOT } } } set_country_flag = dont_invade_D15 else = { clr_country_flag = dont_invade_D15 } }
+		# check the need to mobilize
 		
-		if = { limit = { GER = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_GER else = { clr_country_flag = lend_lease_GER } }
-		if = { limit = { ENG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ENG else = { clr_country_flag = lend_lease_ENG } }
-		if = { limit = { SOV = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SOV else = { clr_country_flag = lend_lease_SOV } }
-		if = { limit = { SWE = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SWE else = { clr_country_flag = lend_lease_SWE } }
-		if = { limit = { FRA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_FRA else = { clr_country_flag = lend_lease_FRA } }
-		if = { limit = { LUX = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LUX else = { clr_country_flag = lend_lease_LUX } }
-		if = { limit = { BEL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BEL else = { clr_country_flag = lend_lease_BEL } }
-		if = { limit = { HOL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_HOL else = { clr_country_flag = lend_lease_HOL } }
-		if = { limit = { CZE = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CZE else = { clr_country_flag = lend_lease_CZE } }
-		if = { limit = { POL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_POL else = { clr_country_flag = lend_lease_POL } }
-		if = { limit = { AUS = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_AUS else = { clr_country_flag = lend_lease_AUS } }
-		if = { limit = { LIT = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LIT else = { clr_country_flag = lend_lease_LIT } }
-		if = { limit = { EST = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_EST else = { clr_country_flag = lend_lease_EST } }
-		if = { limit = { LAT = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LAT else = { clr_country_flag = lend_lease_LAT } }
-		if = { limit = { SPR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SPR else = { clr_country_flag = lend_lease_SPR } }
-		if = { limit = { ITA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ITA else = { clr_country_flag = lend_lease_ITA } }
-		if = { limit = { ROM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ROM else = { clr_country_flag = lend_lease_ROM } }
-		if = { limit = { YUG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_YUG else = { clr_country_flag = lend_lease_YUG } }
-		if = { limit = { SER = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SER else = { clr_country_flag = lend_lease_SER } }
-		if = { limit = { SWI = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SWI else = { clr_country_flag = lend_lease_SWI } }
-		if = { limit = { TUR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_TUR else = { clr_country_flag = lend_lease_TUR } }
-		if = { limit = { GRE = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_GRE else = { clr_country_flag = lend_lease_GRE } }
-		if = { limit = { ALB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ALB else = { clr_country_flag = lend_lease_ALB } }
-		if = { limit = { NOR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_NOR else = { clr_country_flag = lend_lease_NOR } }
-		if = { limit = { DEN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_DEN else = { clr_country_flag = lend_lease_DEN } }
-		if = { limit = { BUL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BUL else = { clr_country_flag = lend_lease_BUL } }
-		if = { limit = { POR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_POR else = { clr_country_flag = lend_lease_POR } }
-		if = { limit = { FIN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_FIN else = { clr_country_flag = lend_lease_FIN } }
-		if = { limit = { IRE = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_IRE else = { clr_country_flag = lend_lease_IRE } }
-		if = { limit = { HUN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_HUN else = { clr_country_flag = lend_lease_HUN } }
-		if = { limit = { AFG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_AFG else = { clr_country_flag = lend_lease_AFG } }
-		if = { limit = { ARG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ARG else = { clr_country_flag = lend_lease_ARG } }
-		if = { limit = { AST = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_AST else = { clr_country_flag = lend_lease_AST } }
-		if = { limit = { BHU = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BHU else = { clr_country_flag = lend_lease_BHU } }
-		if = { limit = { BOL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BOL else = { clr_country_flag = lend_lease_BOL } }
-		if = { limit = { BRA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BRA else = { clr_country_flag = lend_lease_BRA } }
-		if = { limit = { CAN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CAN else = { clr_country_flag = lend_lease_CAN } }
-		if = { limit = { CHI = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CHI else = { clr_country_flag = lend_lease_CHI } }
-		if = { limit = { CHL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CHL else = { clr_country_flag = lend_lease_CHL } }
-		if = { limit = { COL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_COL else = { clr_country_flag = lend_lease_COL } }
-		if = { limit = { COS = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_COS else = { clr_country_flag = lend_lease_COS } }
-		if = { limit = { ECU = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ECU else = { clr_country_flag = lend_lease_ECU } }
-		if = { limit = { ELS = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ELS else = { clr_country_flag = lend_lease_ELS } }
-		if = { limit = { ETH = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ETH else = { clr_country_flag = lend_lease_ETH } }
-		if = { limit = { GUA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_GUA else = { clr_country_flag = lend_lease_GUA } }
-		if = { limit = { HON = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_HON else = { clr_country_flag = lend_lease_HON } }
-		if = { limit = { IRQ = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_IRQ else = { clr_country_flag = lend_lease_IRQ } }
-		if = { limit = { JAP = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_JAP else = { clr_country_flag = lend_lease_JAP } }
-		if = { limit = { KOR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_KOR else = { clr_country_flag = lend_lease_KOR } }
-		if = { limit = { LIB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LIB else = { clr_country_flag = lend_lease_LIB } }
-		if = { limit = { MEX = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MEX else = { clr_country_flag = lend_lease_MEX } }
-		if = { limit = { MEN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MEN else = { clr_country_flag = lend_lease_MEN } }
-		if = { limit = { NEP = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_NEP else = { clr_country_flag = lend_lease_NEP } }
-		if = { limit = { NIC = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_NIC else = { clr_country_flag = lend_lease_NIC } }
-		if = { limit = { NZL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_NZL else = { clr_country_flag = lend_lease_NZL } }
-		if = { limit = { PER = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PER else = { clr_country_flag = lend_lease_PER } }
-		if = { limit = { PRU = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PRU else = { clr_country_flag = lend_lease_PRU } }
-		if = { limit = { SAF = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SAF else = { clr_country_flag = lend_lease_SAF } }
-		if = { limit = { SAU = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SAU else = { clr_country_flag = lend_lease_SAU } }
-		if = { limit = { SIA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SIA else = { clr_country_flag = lend_lease_SIA } }
-		if = { limit = { SIK = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SIK else = { clr_country_flag = lend_lease_SIK } }
-		if = { limit = { TIB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_TIB else = { clr_country_flag = lend_lease_TIB } }
-		if = { limit = { URG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_URG else = { clr_country_flag = lend_lease_URG } }
-		if = { limit = { VEN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_VEN else = { clr_country_flag = lend_lease_VEN } }
-		if = { limit = { YUN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_YUN else = { clr_country_flag = lend_lease_YUN } }
-		if = { limit = { USA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_USA else = { clr_country_flag = lend_lease_USA } }
-		if = { limit = { MON = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MON else = { clr_country_flag = lend_lease_MON } }
-		if = { limit = { TAN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_TAN else = { clr_country_flag = lend_lease_TAN } }
-		if = { limit = { PAR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PAR else = { clr_country_flag = lend_lease_PAR } }
-		if = { limit = { CUB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CUB else = { clr_country_flag = lend_lease_CUB } }
-		if = { limit = { DOM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_DOM else = { clr_country_flag = lend_lease_DOM } }
-		if = { limit = { HAI = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_HAI else = { clr_country_flag = lend_lease_HAI } }
-		if = { limit = { YEM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_YEM else = { clr_country_flag = lend_lease_YEM } }
-		if = { limit = { OMA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_OMA else = { clr_country_flag = lend_lease_OMA } }
-		if = { limit = { SLO = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SLO else = { clr_country_flag = lend_lease_SLO } }
-		if = { limit = { RAJ = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_RAJ else = { clr_country_flag = lend_lease_RAJ } }
-		if = { limit = { CRO = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CRO else = { clr_country_flag = lend_lease_CRO } }
-		if = { limit = { GXC = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_GXC else = { clr_country_flag = lend_lease_GXC } }
-		if = { limit = { PRC = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PRC else = { clr_country_flag = lend_lease_PRC } }
-		if = { limit = { SHX = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SHX else = { clr_country_flag = lend_lease_SHX } }
-		if = { limit = { XSM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_XSM else = { clr_country_flag = lend_lease_XSM } }
-		if = { limit = { ICE = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ICE else = { clr_country_flag = lend_lease_ICE } }
-		if = { limit = { LEB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LEB else = { clr_country_flag = lend_lease_LEB } }
-		if = { limit = { JOR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_JOR else = { clr_country_flag = lend_lease_JOR } }
-		if = { limit = { SYR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_SYR else = { clr_country_flag = lend_lease_SYR } }
-		if = { limit = { EGY = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_EGY else = { clr_country_flag = lend_lease_EGY } }
-		if = { limit = { LBA = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LBA else = { clr_country_flag = lend_lease_LBA } }
-		if = { limit = { WGR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_WGR else = { clr_country_flag = lend_lease_WGR } }
-		if = { limit = { DDR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_DDR else = { clr_country_flag = lend_lease_DDR } }
-		if = { limit = { PAL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PAL else = { clr_country_flag = lend_lease_PAL } }
-		if = { limit = { ISR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ISR else = { clr_country_flag = lend_lease_ISR } }
-		if = { limit = { VIN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_VIN else = { clr_country_flag = lend_lease_VIN } }
-		if = { limit = { CAM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_CAM else = { clr_country_flag = lend_lease_CAM } }
-		if = { limit = { MAL = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MAL else = { clr_country_flag = lend_lease_MAL } }
-		if = { limit = { INS = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_INS else = { clr_country_flag = lend_lease_INS } }
-		if = { limit = { LAO = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_LAO else = { clr_country_flag = lend_lease_LAO } }
-		if = { limit = { MNT = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MNT else = { clr_country_flag = lend_lease_MNT } }
-		if = { limit = { UKR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_UKR else = { clr_country_flag = lend_lease_UKR } }
-		if = { limit = { GEO = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_GEO else = { clr_country_flag = lend_lease_GEO } }
-		if = { limit = { KAZ = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_KAZ else = { clr_country_flag = lend_lease_KAZ } }
-		if = { limit = { AZR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_AZR else = { clr_country_flag = lend_lease_AZR } }
-		if = { limit = { ARM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ARM else = { clr_country_flag = lend_lease_ARM } }
-		if = { limit = { BLR = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BLR else = { clr_country_flag = lend_lease_BLR } }
-		if = { limit = { ANG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ANG else = { clr_country_flag = lend_lease_ANG } }
-		if = { limit = { MZB = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MZB else = { clr_country_flag = lend_lease_MZB } }
-		if = { limit = { ZIM = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_ZIM else = { clr_country_flag = lend_lease_ZIM } }
-		if = { limit = { COG = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_COG else = { clr_country_flag = lend_lease_COG } }
-		if = { limit = { KEN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_KEN else = { clr_country_flag = lend_lease_KEN } }
-		if = { limit = { PAK = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_PAK else = { clr_country_flag = lend_lease_PAK } }
-		if = { limit = { BOT = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_BOT else = { clr_country_flag = lend_lease_BOT } }
-		if = { limit = { MAN = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_MAN else = { clr_country_flag = lend_lease_MAN } }
-		if = { limit = { D01 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D01 else = { clr_country_flag = lend_lease_D01 } }
-		if = { limit = { D02 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D02 else = { clr_country_flag = lend_lease_D02 } }
-		if = { limit = { D03 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D03 else = { clr_country_flag = lend_lease_D03 } }
-		if = { limit = { D04 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D04 else = { clr_country_flag = lend_lease_D04 } }
-		if = { limit = { D05 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D05 else = { clr_country_flag = lend_lease_D05 } }
-		if = { limit = { D06 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D06 else = { clr_country_flag = lend_lease_D06 } }
-		if = { limit = { D07 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D07 else = { clr_country_flag = lend_lease_D07 } }
-		if = { limit = { D08 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D08 else = { clr_country_flag = lend_lease_D08 } }
-		if = { limit = { D09 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D09 else = { clr_country_flag = lend_lease_D09 } }
-		if = { limit = { D10 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D10 else = { clr_country_flag = lend_lease_D10 } }
-		if = { limit = { D11 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D11 else = { clr_country_flag = lend_lease_D11 } }
-		if = { limit = { D12 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D12 else = { clr_country_flag = lend_lease_D12 } }
-		if = { limit = { D13 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D13 else = { clr_country_flag = lend_lease_D13 } }
-		if = { limit = { D14 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D14 else = { clr_country_flag = lend_lease_D14 } }
-		if = { limit = { D15 = { lend_lease = yes NOT = { tag = ROOT } } } set_country_flag = lend_lease_D15 else = { clr_country_flag = lend_lease_D15 } }
+		if = { limit = { EAI_mobilize_army = yes } set_country_flag = EAI_mobilize_army else = { clr_country_flag = EAI_mobilize_army } }
+
+		####################################################################################################################################
+
+		# set targets for these actions
 		
-		if = { limit = { GER = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_GER else = { clr_country_flag = send_volunteers_GER } }
-		if = { limit = { ENG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ENG else = { clr_country_flag = send_volunteers_ENG } }
-		if = { limit = { SOV = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SOV else = { clr_country_flag = send_volunteers_SOV } }
-		if = { limit = { SWE = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SWE else = { clr_country_flag = send_volunteers_SWE } }
-		if = { limit = { FRA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_FRA else = { clr_country_flag = send_volunteers_FRA } }
-		if = { limit = { LUX = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LUX else = { clr_country_flag = send_volunteers_LUX } }
-		if = { limit = { BEL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BEL else = { clr_country_flag = send_volunteers_BEL } }
-		if = { limit = { HOL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_HOL else = { clr_country_flag = send_volunteers_HOL } }
-		if = { limit = { CZE = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CZE else = { clr_country_flag = send_volunteers_CZE } }
-		if = { limit = { POL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_POL else = { clr_country_flag = send_volunteers_POL } }
-		if = { limit = { AUS = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_AUS else = { clr_country_flag = send_volunteers_AUS } }
-		if = { limit = { LIT = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LIT else = { clr_country_flag = send_volunteers_LIT } }
-		if = { limit = { EST = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_EST else = { clr_country_flag = send_volunteers_EST } }
-		if = { limit = { LAT = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LAT else = { clr_country_flag = send_volunteers_LAT } }
-		if = { limit = { SPR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SPR else = { clr_country_flag = send_volunteers_SPR } }
-		if = { limit = { ITA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ITA else = { clr_country_flag = send_volunteers_ITA } }
-		if = { limit = { ROM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ROM else = { clr_country_flag = send_volunteers_ROM } }
-		if = { limit = { YUG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_YUG else = { clr_country_flag = send_volunteers_YUG } }
-		if = { limit = { SER = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SER else = { clr_country_flag = send_volunteers_SER } }
-		if = { limit = { SWI = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SWI else = { clr_country_flag = send_volunteers_SWI } }
-		if = { limit = { TUR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_TUR else = { clr_country_flag = send_volunteers_TUR } }
-		if = { limit = { GRE = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_GRE else = { clr_country_flag = send_volunteers_GRE } }
-		if = { limit = { ALB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ALB else = { clr_country_flag = send_volunteers_ALB } }
-		if = { limit = { NOR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_NOR else = { clr_country_flag = send_volunteers_NOR } }
-		if = { limit = { DEN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_DEN else = { clr_country_flag = send_volunteers_DEN } }
-		if = { limit = { BUL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BUL else = { clr_country_flag = send_volunteers_BUL } }
-		if = { limit = { POR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_POR else = { clr_country_flag = send_volunteers_POR } }
-		if = { limit = { FIN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_FIN else = { clr_country_flag = send_volunteers_FIN } }
-		if = { limit = { IRE = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_IRE else = { clr_country_flag = send_volunteers_IRE } }
-		if = { limit = { HUN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_HUN else = { clr_country_flag = send_volunteers_HUN } }
-		if = { limit = { AFG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_AFG else = { clr_country_flag = send_volunteers_AFG } }
-		if = { limit = { ARG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ARG else = { clr_country_flag = send_volunteers_ARG } }
-		if = { limit = { AST = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_AST else = { clr_country_flag = send_volunteers_AST } }
-		if = { limit = { BHU = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BHU else = { clr_country_flag = send_volunteers_BHU } }
-		if = { limit = { BOL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BOL else = { clr_country_flag = send_volunteers_BOL } }
-		if = { limit = { BRA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BRA else = { clr_country_flag = send_volunteers_BRA } }
-		if = { limit = { CAN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CAN else = { clr_country_flag = send_volunteers_CAN } }
-		if = { limit = { CHI = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CHI else = { clr_country_flag = send_volunteers_CHI } }
-		if = { limit = { CHL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CHL else = { clr_country_flag = send_volunteers_CHL } }
-		if = { limit = { COL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_COL else = { clr_country_flag = send_volunteers_COL } }
-		if = { limit = { COS = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_COS else = { clr_country_flag = send_volunteers_COS } }
-		if = { limit = { ECU = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ECU else = { clr_country_flag = send_volunteers_ECU } }
-		if = { limit = { ELS = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ELS else = { clr_country_flag = send_volunteers_ELS } }
-		if = { limit = { ETH = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ETH else = { clr_country_flag = send_volunteers_ETH } }
-		if = { limit = { GUA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_GUA else = { clr_country_flag = send_volunteers_GUA } }
-		if = { limit = { HON = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_HON else = { clr_country_flag = send_volunteers_HON } }
-		if = { limit = { IRQ = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_IRQ else = { clr_country_flag = send_volunteers_IRQ } }
-		if = { limit = { JAP = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_JAP else = { clr_country_flag = send_volunteers_JAP } }
-		if = { limit = { KOR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_KOR else = { clr_country_flag = send_volunteers_KOR } }
-		if = { limit = { LIB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LIB else = { clr_country_flag = send_volunteers_LIB } }
-		if = { limit = { MEX = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MEX else = { clr_country_flag = send_volunteers_MEX } }
-		if = { limit = { MEN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MEN else = { clr_country_flag = send_volunteers_MEN } }
-		if = { limit = { NEP = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_NEP else = { clr_country_flag = send_volunteers_NEP } }
-		if = { limit = { NIC = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_NIC else = { clr_country_flag = send_volunteers_NIC } }
-		if = { limit = { NZL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_NZL else = { clr_country_flag = send_volunteers_NZL } }
-		if = { limit = { PER = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PER else = { clr_country_flag = send_volunteers_PER } }
-		if = { limit = { PRU = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PRU else = { clr_country_flag = send_volunteers_PRU } }
-		if = { limit = { SAF = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SAF else = { clr_country_flag = send_volunteers_SAF } }
-		if = { limit = { SAU = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SAU else = { clr_country_flag = send_volunteers_SAU } }
-		if = { limit = { SIA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SIA else = { clr_country_flag = send_volunteers_SIA } }
-		if = { limit = { SIK = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SIK else = { clr_country_flag = send_volunteers_SIK } }
-		if = { limit = { TIB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_TIB else = { clr_country_flag = send_volunteers_TIB } }
-		if = { limit = { URG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_URG else = { clr_country_flag = send_volunteers_URG } }
-		if = { limit = { VEN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_VEN else = { clr_country_flag = send_volunteers_VEN } }
-		if = { limit = { YUN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_YUN else = { clr_country_flag = send_volunteers_YUN } }
-		if = { limit = { USA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_USA else = { clr_country_flag = send_volunteers_USA } }
-		if = { limit = { MON = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MON else = { clr_country_flag = send_volunteers_MON } }
-		if = { limit = { TAN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_TAN else = { clr_country_flag = send_volunteers_TAN } }
-		if = { limit = { PAR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PAR else = { clr_country_flag = send_volunteers_PAR } }
-		if = { limit = { CUB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CUB else = { clr_country_flag = send_volunteers_CUB } }
-		if = { limit = { DOM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_DOM else = { clr_country_flag = send_volunteers_DOM } }
-		if = { limit = { HAI = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_HAI else = { clr_country_flag = send_volunteers_HAI } }
-		if = { limit = { YEM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_YEM else = { clr_country_flag = send_volunteers_YEM } }
-		if = { limit = { OMA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_OMA else = { clr_country_flag = send_volunteers_OMA } }
-		if = { limit = { SLO = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SLO else = { clr_country_flag = send_volunteers_SLO } }
-		if = { limit = { RAJ = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_RAJ else = { clr_country_flag = send_volunteers_RAJ } }
-		if = { limit = { CRO = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CRO else = { clr_country_flag = send_volunteers_CRO } }
-		if = { limit = { GXC = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_GXC else = { clr_country_flag = send_volunteers_GXC } }
-		if = { limit = { PRC = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PRC else = { clr_country_flag = send_volunteers_PRC } }
-		if = { limit = { SHX = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SHX else = { clr_country_flag = send_volunteers_SHX } }
-		if = { limit = { XSM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_XSM else = { clr_country_flag = send_volunteers_XSM } }
-		if = { limit = { ICE = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ICE else = { clr_country_flag = send_volunteers_ICE } }
-		if = { limit = { LEB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LEB else = { clr_country_flag = send_volunteers_LEB } }
-		if = { limit = { JOR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_JOR else = { clr_country_flag = send_volunteers_JOR } }
-		if = { limit = { SYR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_SYR else = { clr_country_flag = send_volunteers_SYR } }
-		if = { limit = { EGY = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_EGY else = { clr_country_flag = send_volunteers_EGY } }
-		if = { limit = { LBA = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LBA else = { clr_country_flag = send_volunteers_LBA } }
-		if = { limit = { WGR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_WGR else = { clr_country_flag = send_volunteers_WGR } }
-		if = { limit = { DDR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_DDR else = { clr_country_flag = send_volunteers_DDR } }
-		if = { limit = { PAL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PAL else = { clr_country_flag = send_volunteers_PAL } }
-		if = { limit = { ISR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ISR else = { clr_country_flag = send_volunteers_ISR } }
-		if = { limit = { VIN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_VIN else = { clr_country_flag = send_volunteers_VIN } }
-		if = { limit = { CAM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_CAM else = { clr_country_flag = send_volunteers_CAM } }
-		if = { limit = { MAL = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MAL else = { clr_country_flag = send_volunteers_MAL } }
-		if = { limit = { INS = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_INS else = { clr_country_flag = send_volunteers_INS } }
-		if = { limit = { LAO = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_LAO else = { clr_country_flag = send_volunteers_LAO } }
-		if = { limit = { MNT = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MNT else = { clr_country_flag = send_volunteers_MNT } }
-		if = { limit = { UKR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_UKR else = { clr_country_flag = send_volunteers_UKR } }
-		if = { limit = { GEO = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_GEO else = { clr_country_flag = send_volunteers_GEO } }
-		if = { limit = { KAZ = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_KAZ else = { clr_country_flag = send_volunteers_KAZ } }
-		if = { limit = { AZR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_AZR else = { clr_country_flag = send_volunteers_AZR } }
-		if = { limit = { ARM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ARM else = { clr_country_flag = send_volunteers_ARM } }
-		if = { limit = { BLR = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BLR else = { clr_country_flag = send_volunteers_BLR } }
-		if = { limit = { ANG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ANG else = { clr_country_flag = send_volunteers_ANG } }
-		if = { limit = { MZB = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MZB else = { clr_country_flag = send_volunteers_MZB } }
-		if = { limit = { ZIM = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_ZIM else = { clr_country_flag = send_volunteers_ZIM } }
-		if = { limit = { COG = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_COG else = { clr_country_flag = send_volunteers_COG } }
-		if = { limit = { KEN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_KEN else = { clr_country_flag = send_volunteers_KEN } }
-		if = { limit = { PAK = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_PAK else = { clr_country_flag = send_volunteers_PAK } }
-		if = { limit = { BOT = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_BOT else = { clr_country_flag = send_volunteers_BOT } }
-		if = { limit = { MAN = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_MAN else = { clr_country_flag = send_volunteers_MAN } }
-		if = { limit = { D01 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D01 else = { clr_country_flag = send_volunteers_D01 } }
-		if = { limit = { D02 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D02 else = { clr_country_flag = send_volunteers_D02 } }
-		if = { limit = { D03 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D03 else = { clr_country_flag = send_volunteers_D03 } }
-		if = { limit = { D04 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D04 else = { clr_country_flag = send_volunteers_D04 } }
-		if = { limit = { D05 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D05 else = { clr_country_flag = send_volunteers_D05 } }
-		if = { limit = { D06 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D06 else = { clr_country_flag = send_volunteers_D06 } }
-		if = { limit = { D07 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D07 else = { clr_country_flag = send_volunteers_D07 } }
-		if = { limit = { D08 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D08 else = { clr_country_flag = send_volunteers_D08 } }
-		if = { limit = { D09 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D09 else = { clr_country_flag = send_volunteers_D09 } }
-		if = { limit = { D10 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D10 else = { clr_country_flag = send_volunteers_D10 } }
-		if = { limit = { D11 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D11 else = { clr_country_flag = send_volunteers_D11 } }
-		if = { limit = { D12 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D12 else = { clr_country_flag = send_volunteers_D12 } }
-		if = { limit = { D13 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D13 else = { clr_country_flag = send_volunteers_D13 } }
-		if = { limit = { D14 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D14 else = { clr_country_flag = send_volunteers_D14 } }
-		if = { limit = { D15 = { send_volunteers = yes NOT = { tag = ROOT } } } set_country_flag = send_volunteers_D15 else = { clr_country_flag = send_volunteers_D15 } }
+		EAI_naval_invasion_check = yes 
 		
-		if = { limit = { GER = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_GER else = { clr_country_flag = invite_to_faction_GER } }
-		if = { limit = { ENG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ENG else = { clr_country_flag = invite_to_faction_ENG } }
-		if = { limit = { SOV = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SOV else = { clr_country_flag = invite_to_faction_SOV } }
-		if = { limit = { SWE = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SWE else = { clr_country_flag = invite_to_faction_SWE } }
-		if = { limit = { FRA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_FRA else = { clr_country_flag = invite_to_faction_FRA } }
-		if = { limit = { LUX = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LUX else = { clr_country_flag = invite_to_faction_LUX } }
-		if = { limit = { BEL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BEL else = { clr_country_flag = invite_to_faction_BEL } }
-		if = { limit = { HOL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_HOL else = { clr_country_flag = invite_to_faction_HOL } }
-		if = { limit = { CZE = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CZE else = { clr_country_flag = invite_to_faction_CZE } }
-		if = { limit = { POL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_POL else = { clr_country_flag = invite_to_faction_POL } }
-		if = { limit = { AUS = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_AUS else = { clr_country_flag = invite_to_faction_AUS } }
-		if = { limit = { LIT = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LIT else = { clr_country_flag = invite_to_faction_LIT } }
-		if = { limit = { EST = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_EST else = { clr_country_flag = invite_to_faction_EST } }
-		if = { limit = { LAT = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LAT else = { clr_country_flag = invite_to_faction_LAT } }
-		if = { limit = { SPR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SPR else = { clr_country_flag = invite_to_faction_SPR } }
-		if = { limit = { ITA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ITA else = { clr_country_flag = invite_to_faction_ITA } }
-		if = { limit = { ROM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ROM else = { clr_country_flag = invite_to_faction_ROM } }
-		if = { limit = { YUG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_YUG else = { clr_country_flag = invite_to_faction_YUG } }
-		if = { limit = { SER = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SER else = { clr_country_flag = invite_to_faction_SER } }
-		if = { limit = { SWI = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SWI else = { clr_country_flag = invite_to_faction_SWI } }
-		if = { limit = { TUR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_TUR else = { clr_country_flag = invite_to_faction_TUR } }
-		if = { limit = { GRE = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_GRE else = { clr_country_flag = invite_to_faction_GRE } }
-		if = { limit = { ALB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ALB else = { clr_country_flag = invite_to_faction_ALB } }
-		if = { limit = { NOR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_NOR else = { clr_country_flag = invite_to_faction_NOR } }
-		if = { limit = { DEN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_DEN else = { clr_country_flag = invite_to_faction_DEN } }
-		if = { limit = { BUL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BUL else = { clr_country_flag = invite_to_faction_BUL } }
-		if = { limit = { POR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_POR else = { clr_country_flag = invite_to_faction_POR } }
-		if = { limit = { FIN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_FIN else = { clr_country_flag = invite_to_faction_FIN } }
-		if = { limit = { IRE = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_IRE else = { clr_country_flag = invite_to_faction_IRE } }
-		if = { limit = { HUN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_HUN else = { clr_country_flag = invite_to_faction_HUN } }
-		if = { limit = { AFG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_AFG else = { clr_country_flag = invite_to_faction_AFG } }
-		if = { limit = { ARG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ARG else = { clr_country_flag = invite_to_faction_ARG } }
-		if = { limit = { AST = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_AST else = { clr_country_flag = invite_to_faction_AST } }
-		if = { limit = { BHU = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BHU else = { clr_country_flag = invite_to_faction_BHU } }
-		if = { limit = { BOL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BOL else = { clr_country_flag = invite_to_faction_BOL } }
-		if = { limit = { BRA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BRA else = { clr_country_flag = invite_to_faction_BRA } }
-		if = { limit = { CAN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CAN else = { clr_country_flag = invite_to_faction_CAN } }
-		if = { limit = { CHI = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CHI else = { clr_country_flag = invite_to_faction_CHI } }
-		if = { limit = { CHL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CHL else = { clr_country_flag = invite_to_faction_CHL } }
-		if = { limit = { COL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_COL else = { clr_country_flag = invite_to_faction_COL } }
-		if = { limit = { COS = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_COS else = { clr_country_flag = invite_to_faction_COS } }
-		if = { limit = { ECU = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ECU else = { clr_country_flag = invite_to_faction_ECU } }
-		if = { limit = { ELS = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ELS else = { clr_country_flag = invite_to_faction_ELS } }
-		if = { limit = { ETH = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ETH else = { clr_country_flag = invite_to_faction_ETH } }
-		if = { limit = { GUA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_GUA else = { clr_country_flag = invite_to_faction_GUA } }
-		if = { limit = { HON = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_HON else = { clr_country_flag = invite_to_faction_HON } }
-		if = { limit = { IRQ = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_IRQ else = { clr_country_flag = invite_to_faction_IRQ } }
-		if = { limit = { JAP = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_JAP else = { clr_country_flag = invite_to_faction_JAP } }
-		if = { limit = { KOR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_KOR else = { clr_country_flag = invite_to_faction_KOR } }
-		if = { limit = { LIB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LIB else = { clr_country_flag = invite_to_faction_LIB } }
-		if = { limit = { MEX = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MEX else = { clr_country_flag = invite_to_faction_MEX } }
-		if = { limit = { MEN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MEN else = { clr_country_flag = invite_to_faction_MEN } }
-		if = { limit = { NEP = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_NEP else = { clr_country_flag = invite_to_faction_NEP } }
-		if = { limit = { NIC = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_NIC else = { clr_country_flag = invite_to_faction_NIC } }
-		if = { limit = { NZL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_NZL else = { clr_country_flag = invite_to_faction_NZL } }
-		if = { limit = { PER = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PER else = { clr_country_flag = invite_to_faction_PER } }
-		if = { limit = { PRU = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PRU else = { clr_country_flag = invite_to_faction_PRU } }
-		if = { limit = { SAF = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SAF else = { clr_country_flag = invite_to_faction_SAF } }
-		if = { limit = { SAU = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SAU else = { clr_country_flag = invite_to_faction_SAU } }
-		if = { limit = { SIA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SIA else = { clr_country_flag = invite_to_faction_SIA } }
-		if = { limit = { SIK = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SIK else = { clr_country_flag = invite_to_faction_SIK } }
-		if = { limit = { TIB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_TIB else = { clr_country_flag = invite_to_faction_TIB } }
-		if = { limit = { URG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_URG else = { clr_country_flag = invite_to_faction_URG } }
-		if = { limit = { VEN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_VEN else = { clr_country_flag = invite_to_faction_VEN } }
-		if = { limit = { YUN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_YUN else = { clr_country_flag = invite_to_faction_YUN } }
-		if = { limit = { USA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_USA else = { clr_country_flag = invite_to_faction_USA } }
-		if = { limit = { MON = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MON else = { clr_country_flag = invite_to_faction_MON } }
-		if = { limit = { TAN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_TAN else = { clr_country_flag = invite_to_faction_TAN } }
-		if = { limit = { PAR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PAR else = { clr_country_flag = invite_to_faction_PAR } }
-		if = { limit = { CUB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CUB else = { clr_country_flag = invite_to_faction_CUB } }
-		if = { limit = { DOM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_DOM else = { clr_country_flag = invite_to_faction_DOM } }
-		if = { limit = { HAI = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_HAI else = { clr_country_flag = invite_to_faction_HAI } }
-		if = { limit = { YEM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_YEM else = { clr_country_flag = invite_to_faction_YEM } }
-		if = { limit = { OMA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_OMA else = { clr_country_flag = invite_to_faction_OMA } }
-		if = { limit = { SLO = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SLO else = { clr_country_flag = invite_to_faction_SLO } }
-		if = { limit = { RAJ = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_RAJ else = { clr_country_flag = invite_to_faction_RAJ } }
-		if = { limit = { CRO = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CRO else = { clr_country_flag = invite_to_faction_CRO } }
-		if = { limit = { GXC = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_GXC else = { clr_country_flag = invite_to_faction_GXC } }
-		if = { limit = { PRC = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PRC else = { clr_country_flag = invite_to_faction_PRC } }
-		if = { limit = { SHX = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SHX else = { clr_country_flag = invite_to_faction_SHX } }
-		if = { limit = { XSM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_XSM else = { clr_country_flag = invite_to_faction_XSM } }
-		if = { limit = { ICE = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ICE else = { clr_country_flag = invite_to_faction_ICE } }
-		if = { limit = { LEB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LEB else = { clr_country_flag = invite_to_faction_LEB } }
-		if = { limit = { JOR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_JOR else = { clr_country_flag = invite_to_faction_JOR } }
-		if = { limit = { SYR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_SYR else = { clr_country_flag = invite_to_faction_SYR } }
-		if = { limit = { EGY = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_EGY else = { clr_country_flag = invite_to_faction_EGY } }
-		if = { limit = { LBA = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LBA else = { clr_country_flag = invite_to_faction_LBA } }
-		if = { limit = { WGR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_WGR else = { clr_country_flag = invite_to_faction_WGR } }
-		if = { limit = { DDR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_DDR else = { clr_country_flag = invite_to_faction_DDR } }
-		if = { limit = { PAL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PAL else = { clr_country_flag = invite_to_faction_PAL } }
-		if = { limit = { ISR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ISR else = { clr_country_flag = invite_to_faction_ISR } }
-		if = { limit = { VIN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_VIN else = { clr_country_flag = invite_to_faction_VIN } }
-		if = { limit = { CAM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_CAM else = { clr_country_flag = invite_to_faction_CAM } }
-		if = { limit = { MAL = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MAL else = { clr_country_flag = invite_to_faction_MAL } }
-		if = { limit = { INS = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_INS else = { clr_country_flag = invite_to_faction_INS } }
-		if = { limit = { LAO = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_LAO else = { clr_country_flag = invite_to_faction_LAO } }
-		if = { limit = { MNT = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MNT else = { clr_country_flag = invite_to_faction_MNT } }
-		if = { limit = { UKR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_UKR else = { clr_country_flag = invite_to_faction_UKR } }
-		if = { limit = { GEO = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_GEO else = { clr_country_flag = invite_to_faction_GEO } }
-		if = { limit = { KAZ = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_KAZ else = { clr_country_flag = invite_to_faction_KAZ } }
-		if = { limit = { AZR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_AZR else = { clr_country_flag = invite_to_faction_AZR } }
-		if = { limit = { ARM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ARM else = { clr_country_flag = invite_to_faction_ARM } }
-		if = { limit = { BLR = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BLR else = { clr_country_flag = invite_to_faction_BLR } }
-		if = { limit = { ANG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ANG else = { clr_country_flag = invite_to_faction_ANG } }
-		if = { limit = { MZB = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MZB else = { clr_country_flag = invite_to_faction_MZB } }
-		if = { limit = { ZIM = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_ZIM else = { clr_country_flag = invite_to_faction_ZIM } }
-		if = { limit = { COG = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_COG else = { clr_country_flag = invite_to_faction_COG } }
-		if = { limit = { KEN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_KEN else = { clr_country_flag = invite_to_faction_KEN } }
-		if = { limit = { PAK = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_PAK else = { clr_country_flag = invite_to_faction_PAK } }
-		if = { limit = { BOT = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_BOT else = { clr_country_flag = invite_to_faction_BOT } }
-		if = { limit = { MAN = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_MAN else = { clr_country_flag = invite_to_faction_MAN } }
-		if = { limit = { D01 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D01 else = { clr_country_flag = invite_to_faction_D01 } }
-		if = { limit = { D02 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D02 else = { clr_country_flag = invite_to_faction_D02 } }
-		if = { limit = { D03 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D03 else = { clr_country_flag = invite_to_faction_D03 } }
-		if = { limit = { D04 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D04 else = { clr_country_flag = invite_to_faction_D04 } }
-		if = { limit = { D05 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D05 else = { clr_country_flag = invite_to_faction_D05 } }
-		if = { limit = { D06 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D06 else = { clr_country_flag = invite_to_faction_D06 } }
-		if = { limit = { D07 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D07 else = { clr_country_flag = invite_to_faction_D07 } }
-		if = { limit = { D08 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D08 else = { clr_country_flag = invite_to_faction_D08 } }
-		if = { limit = { D09 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D09 else = { clr_country_flag = invite_to_faction_D09 } }
-		if = { limit = { D10 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D10 else = { clr_country_flag = invite_to_faction_D10 } }
-		if = { limit = { D11 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D11 else = { clr_country_flag = invite_to_faction_D11 } }
-		if = { limit = { D12 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D12 else = { clr_country_flag = invite_to_faction_D12 } }
-		if = { limit = { D13 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D13 else = { clr_country_flag = invite_to_faction_D13 } }
-		if = { limit = { D14 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D14 else = { clr_country_flag = invite_to_faction_D14 } }
-		if = { limit = { D15 = { invite_to_faction = yes NOT = { tag = ROOT } } } set_country_flag = invite_to_faction_D15 else = { clr_country_flag = invite_to_faction_D15 } }
+		EAI_lend_lease_check = yes
 		
-		if = { limit = { prioritise_capital_ships = yes } set_country_flag = prioritise_capital_ships else = { clr_country_flag = prioritise_capital_ships } }
-		if = { limit = { prioritise_screen_ships = yes } set_country_flag = prioritise_screen_ships else = { clr_country_flag = prioritise_screen_ships } }
+		EAI_volunteer_check = yes
+
+		####################################################################################################################################
+		
+		# check naval production prioritisation
+
+		if = { limit = { EAI_prioritise_capital_ships = yes } 		  set_country_flag = EAI_prioritise_capital_ships 		  else = { clr_country_flag = EAI_prioritise_capital_ships } }
+		
+		if = { limit = { EAI_prioritise_screen_ships = yes } 		  set_country_flag = EAI_prioritise_screen_ships 		  else = { clr_country_flag = EAI_prioritise_screen_ships } }
+
+		####################################################################################################################################
+
+		# check division limits
+
+		if = { limit = { OR = { EAI_infantry_division_limit = yes EAI_division_limit_MINORS = yes } } set_country_flag = EAI_infantry_division_limit else = { clr_country_flag = EAI_infantry_division_limit } }
+		
+		if = { limit = { EAI_armored_division_limit = yes } set_country_flag = EAI_armored_division_limit else = { clr_country_flag = EAI_armored_division_limit } }
+		
+		if = { limit = { EAI_motorized_division_limit = yes } set_country_flag = EAI_motorized_division_limit else = { clr_country_flag = EAI_motorized_division_limit } }
+
+		####################################################################################################################################
+		
+		# anti-aggression script
+		
+		if = { limit = { has_global_flag = EAI_anti_aggression_diplomacy }
+			
+			every_country = {
+				limit = { NOT = { EAI_invite_to_faction = yes } has_country_flag = EAI_invite_to_faction_@ROOT }
+				
+				clr_country_flag = EAI_invite_to_faction_@ROOT
+			}
+		
+			every_country = {
+				limit = { EAI_invite_to_faction = yes }
+				
+				set_country_flag = EAI_invite_to_faction_@ROOT
+			}
+		}
 	}
 	option = {}
+}
+country_event = { #AI weighs naval invasion targets based on distance
+	id = EAI_background.7
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = 1
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } }
+		ai_chance = { base = 1024 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = 6
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } }
+		ai_chance = { base = 512 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	
+	option = { name = 2
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } }
+		ai_chance = { base = 256 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = 7
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } }
+		ai_chance = { base = 128 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	
+	option = { name = 3
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } }
+		ai_chance = { base = 64 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = 8
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } }
+		ai_chance = { base = 32 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	
+	option = { name = 4
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } }
+		ai_chance = { base = 16 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = 9
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } }
+		ai_chance = { base = 8 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	
+	option = { name = 5
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } }
+		ai_chance = { base = 4 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = 10
+		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } }
+		ai_chance = { base = 2 }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes }
+	}
+	
+	# ANY
+	option = { name = 11
+		trigger = { any_country = { EAI_naval_invade = yes } }
+		ai_chance = { base = 1 }
+		random_country = { limit = { EAI_naval_invade = yes } EAI_create_naval_invasion_operation = yes }
+	}
 }
 
 ####################################################
 # DEBUG
 ####################################################
 
+add_namespace = EAI_debug
+
 country_event = {
-	id = EAI_M.11010
-	is_triggered_only = yes
-	title = ""
-	desc = ""
-	trigger = {
-		has_country_flag = mw_doctrine
-		has_country_flag = sf_doctrine
-		has_country_flag = gb_doctrine
-		has_country_flag = ma_doctrine
-
-		has_country_flag = infantry_army_focus
-		has_country_flag = marine_army_focus
-		has_country_flag = mountaineer_army_focus
-
-		has_country_flag = marm_army_focus
-		has_country_flag = harm_army_focus
-		has_country_flag = AT_army_focus
-
-		has_country_flag = mot_attachment
-		has_country_flag = harm_attachment
-		has_country_flag = marm_attachment
-	}
-	#immediate = {
-	#}
-
-	option = {  }
-}
-country_event = {
-	id = EAI_M.11011
-	is_triggered_only = yes
-	title = ""
-	desc = ""
-	trigger = {
-		has_country_flag = marm_design_A
-		has_country_flag = marm_design_B
-		has_country_flag = marm_design_C
-
-		has_country_flag = harm_design_A
-		has_country_flag = harm_design_B
-		has_country_flag = harm_design_C
-
-		has_country_flag = infantry_design_A
-		has_country_flag = infantry_design_B
-
-		has_country_flag = mot_design_A
-		has_country_flag = mot_design_B
-		has_country_flag = mot_design_C
-
-		has_country_flag = at_design_AT
-		has_country_flag = at_design_MTD
-		has_country_flag = at_design_HTD
-	}
-	#immediate = {
-	#}
-
-	option = {  }
-}
-country_event = {
-	id = EAI_M.11012
-	is_triggered_only = yes
-	title = ""
-	desc = ""
-	trigger = {
-		has_country_flag = FIB_doctrine
-		has_country_flag = TI_doctrine
-		has_country_flag = BS_doctrine
-
-		has_country_flag = SD_doctrine
-		has_country_flag = BFS_doctrine
-		has_country_flag = OI_doctrine
-
-		has_country_flag = infantry_attachment_0
-		has_country_flag = infantry_attachment_1
-		has_country_flag = infantry_attachment_2
-
-		has_country_flag = marine_attachment_0
-		has_country_flag = marine_attachment_1
-		has_country_flag = marine_attachment_2
-
-		has_country_flag = mountaineer_attachment_0
-		has_country_flag = mountaineer_attachment_1
-		has_country_flag = mountaineer_attachment_2
-
-		has_country_flag = cas_air_focus
-		has_country_flag = tac_air_focus
-		has_country_flag = nav_air_focus_1
-		has_country_flag = str_air_focus_1
-
-		has_country_flag = carrier_navy_focus_1
-		has_country_flag = capital_navy_focus_1
-	}
-	#immediate = {
-	#}
-
-	option = {  }
-}
-country_event = {
-	id = EAI_M.11005
+	id = EAI_debug.0
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 
 	trigger = {
-		ai_has_role_template = garrison
-
-		ai_has_role_template = infantry
-		ai_has_role_template = marine
-		ai_has_role_template = mountaineer
-
-		ai_has_role_template = at_infantry
-
-		ai_has_role_template = light_armor
-		ai_has_role_template = armor
-		ai_has_role_template = heavy_armor
-		ai_has_role_template = modern_armor
-
-		ai_has_role_template = motorized
 	}
 
-	option = {}
-}
-country_event = {
-	id = EAI_M.11006
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-
-	trigger = {
-		ai_has_role_division = garrison
-
-		ai_has_role_division = infantry
-		ai_has_role_division = marine
-		ai_has_role_division = mountaineer
-
-		ai_has_role_division = at_infantry
-
-		ai_has_role_division = light_armor
-		ai_has_role_division = armor
-		ai_has_role_division = heavy_armor
-		ai_has_role_division = modern_armor
-
-		ai_has_role_division = motorized
+	immediate = {
 	}
 
-	option = {}
+	option = { name = EAI_can_take_civilian_economy
+		trigger = { EAI_can_take_civilian_economy = yes }
+	}
+	option = { name = EAI_can_take_low_economic_mobilisation
+		trigger = { EAI_can_take_low_economic_mobilisation = yes }
+	}
+	option = { name = EAI_can_take_partial_economic_mobilisation
+		trigger = { EAI_can_take_partial_economic_mobilisation = yes }
+	}
+	option = { name = EAI_can_take_war_economy
+		trigger = { EAI_can_take_war_economy = yes }
+	}
+	option = { name = EAI_can_take_tot_economic_mobilisation
+		trigger = { EAI_can_take_tot_economic_mobilisation = yes }
+	}
+	
+	option = { name = EAI_can_take_volunteer_only
+		trigger = { EAI_can_take_volunteer_only = yes }
+	}
+	option = { name = EAI_can_take_limited_conscription
+		trigger = { EAI_can_take_limited_conscription = yes }
+	}
+	option = { name = EAI_can_take_extensive_conscription
+		trigger = { EAI_can_take_extensive_conscription = yes }
+	}
+	option = { name = EAI_can_take_service_by_requirement
+		trigger = { EAI_can_take_service_by_requirement = yes }
+	}
+	option = { name = EAI_can_take_all_adults_serve
+		trigger = { EAI_can_take_all_adults_serve = yes }
+	}
+	option = { name = EAI_can_take_scraping_the_barrel
+		trigger = { EAI_can_take_scraping_the_barrel = yes }
+	}
+	
+	option = { name = EAI_can_take_free_trade
+		trigger = { EAI_can_take_free_trade = yes }
+	}
+	option = { name = EAI_can_take_export_focus
+		trigger = { EAI_can_take_export_focus = yes }
+	}
+	option = { name = EAI_can_take_limited_exports
+		trigger = { EAI_can_take_limited_exports = yes }
+	}
+	option = { name = EAI_can_take_closed_economy
+		trigger = { EAI_can_take_closed_economy = yes }
+	}
 }
-country_event = {
-	id = EAI_M.11008
+
+country_event = { # aa
+	id = EAI_debug.5
 	title = ""
 	desc = ""
 	is_triggered_only = yes
@@ -3200,13 +339,13 @@ country_event = {
 	option = { name = "infamy added"
 		every_country = {
 			limit = { has_country_flag = EAI_infamy_added_at_@ROOT }
-			country_event = EAI_M.11009
+			country_event = EAI_debug.6
 		}
 	}
 	option = { name = "has infamy"
 		every_country = {
 			limit = { has_country_flag = EAI_infamy_count_@THIS }
-			country_event = EAI_M.11009
+			country_event = EAI_debug.6
 		}
 	}
 	option = { name = "seeks alliance"
@@ -3218,25 +357,24 @@ country_event = {
 					has_country_flag = EAI_seeks_alliance_communism
 				}
 			}
-			country_event = EAI_M.11009
+			country_event = EAI_debug.6
 		}
 	}
 	option = { name = "join faction warning"
 		every_country = {
 			limit = { has_country_flag = EAI_faction_join_warning_issued_at_@ROOT }
-			country_event = EAI_M.11009
+			country_event = EAI_debug.6
 		}
 	}
 	option = { name = "wargoal was illegally justified"
 		every_country = {
 			limit = { has_country_flag = EAI_illegal_wargoal_justified_by_@ROOT }
-			country_event = EAI_M.11009
+			country_event = EAI_debug.6
 		}
 	}
 }
-
 country_event = {
-	id = EAI_M.11009
+	id = EAI_debug.6
 	title = ""
 	desc = ""
 	is_triggered_only = yes
@@ -3245,38 +383,794 @@ country_event = {
 
 	option = {}
 }
+country_event = { # laws
+	id = EAI_debug.7
+	title = ""
+	desc = ""
+	is_triggered_only = yes
 
-country_event = {
-	id = EAI_M.11111
+	trigger = {
+	}
+
+	immediate = {
+	}
+
+	option = { name = EAI_mobilize_army
+		trigger = { EAI_mobilize_army = yes }
+	}
+	option = { name = is_major
+		trigger = { is_major = yes }
+	}
+	option = { name = EAI_can_upgrade_economy_law
+		trigger = { EAI_can_upgrade_economy_law = yes }
+	}
+	option = { name = EAI_can_upgrade_manpower_law
+		trigger = { EAI_can_upgrade_manpower_law = yes }
+	}
+	option = { name = EAI_can_upgrade_trade_law
+		trigger = { EAI_can_upgrade_trade_law = yes }
+	}
+	option = { name = EAI_prioritise_screen_ships
+		trigger = { EAI_prioritise_screen_ships = yes }
+	}
+	option = { name = EAI_prioritise_capital_ships
+		trigger = { EAI_prioritise_capital_ships = yes }
+	}
+}
+country_event = { # div spawning
+	id = EAI_debug.10
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+	}
+
+	option = { name = dd_reinforcements_enable
+		every_country = {
+			limit = { is_ai = yes }
+			set_country_flag = EAI_desperate_defense_2
+		}
+	}
+	option = { name = dd_reinforcements
+		every_country = {
+			limit = { check_variable = { EAI_dd_unit_count > 0 } }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = dd_spawn
+		EAI_dd_create_templates = yes
+		EAI_dd_spawn_unit = yes
+	}
+}
+country_event = { # div limits
+	id = EAI_debug.11
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+		num_of_controlled_states < 2	
+		num_of_controlled_states < 3	
+		num_of_controlled_states < 4	
+		num_of_controlled_states < 5	
+		num_of_controlled_states < 6	
+		num_of_controlled_states < 7	
+		num_of_controlled_states < 8	
+		num_of_controlled_states < 9	
+		num_of_controlled_states < 10	
+		num_of_controlled_states < 12	
+		num_of_controlled_states < 14	
+		num_of_controlled_states < 16	
+		num_of_controlled_states < 18	
+		num_of_controlled_states < 20	
+		num_of_controlled_states < 22	
+		num_of_controlled_states < 24	
+		num_of_controlled_states < 26	
+		num_of_controlled_states < 28 	
+		num_of_controlled_states < 30 	
+		num_of_controlled_states < 32 	
+		num_of_controlled_states < 34 	
+		num_of_controlled_states < 36 	
+		num_of_controlled_states < 38 	
+		num_of_controlled_states < 40	
+		num_of_controlled_states < 42	
+		num_of_controlled_states < 44 	
+		num_of_controlled_states < 46 	
+		num_of_controlled_states < 48 	
+		num_of_controlled_states < 50	
+		num_of_controlled_states < 52	
+		num_of_controlled_states < 54 	
+		num_of_controlled_states < 56 	
+		num_of_controlled_states < 58 	
+		num_of_controlled_states < 60	
+		num_of_controlled_states < 62	
+		num_of_controlled_states < 64 	
+		num_of_controlled_states < 66 	
+		num_of_controlled_states < 68 	
+		num_of_controlled_states < 70	
+		num_of_controlled_states < 72	
+		num_of_controlled_states < 74 	
+		num_of_controlled_states < 76 	
+		num_of_controlled_states < 78 	
+		num_of_controlled_states < 80	
+		num_of_controlled_states < 82	
+		num_of_controlled_states < 84 	
+		num_of_controlled_states < 86 	
+		num_of_controlled_states < 88 	
+		num_of_controlled_states < 90	
+		num_of_controlled_states < 92	
+		num_of_controlled_states < 94 	
+		num_of_controlled_states < 96 	
+		num_of_controlled_states < 98 	
+		num_of_controlled_states < 100 
+		num_of_controlled_states < 102 
+		num_of_controlled_states < 104 
+		num_of_controlled_states < 106 
+		num_of_controlled_states < 108 
+		num_of_controlled_states < 110 
+		num_of_controlled_states < 112 
+		num_of_controlled_states < 114 
+		num_of_controlled_states < 116 
+		num_of_controlled_states < 118 
+		num_of_controlled_states < 120 
+		num_of_controlled_states < 122 
+		num_of_controlled_states < 124 
+		num_of_controlled_states < 126 
+		num_of_controlled_states < 128 
+	}
+
+	option = { name = EAI_infantry_division_limit
+		trigger = { EAI_infantry_division_limit = yes }
+	}
+	
+	option = { name = EAI_division_limit_MINORS
+		trigger = { EAI_division_limit_MINORS = yes }
+	}
+}
+country_event = { # invasion
+	id = EAI_debug.14
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+	}
+
+	option = { name = 1
+		every_country = {
+			limit = {
+				EAI_naval_invade = yes
+			}
+			country_event = EAI_debug.6
+		}
+	}
+	
+	option = { name = 2
+		every_country = {
+			limit = {
+				has_country_flag = EAI_naval_invasion_from_@ROOT
+			}
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = { # alliance str
+	id = EAI_debug.15
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+		alliance_strength_ratio < 0.1
+		alliance_strength_ratio < 0.2
+		alliance_strength_ratio < 0.3
+		alliance_strength_ratio < 0.4
+		alliance_strength_ratio < 0.5
+		alliance_strength_ratio < 0.6
+		alliance_strength_ratio < 0.7
+		alliance_strength_ratio < 0.8
+		alliance_strength_ratio < 0.9
+		alliance_strength_ratio < 1.0
+		alliance_strength_ratio < 1.1
+		alliance_strength_ratio < 1.2
+		alliance_strength_ratio < 1.3
+		alliance_strength_ratio < 1.4
+		alliance_strength_ratio < 1.5
+		alliance_strength_ratio < 1.6
+		alliance_strength_ratio < 1.7
+		alliance_strength_ratio < 1.8
+		alliance_strength_ratio < 2.0
+	}
+
+	option = { name = 1
+	}
+}
+country_event = { # alliance nav str
+	id = EAI_debug.16
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+		alliance_naval_strength_ratio < 0.1
+		alliance_naval_strength_ratio < 0.2
+		alliance_naval_strength_ratio < 0.3
+		alliance_naval_strength_ratio < 0.4
+		alliance_naval_strength_ratio < 0.5
+		alliance_naval_strength_ratio < 0.6
+		alliance_naval_strength_ratio < 0.7
+		alliance_naval_strength_ratio < 0.8
+		alliance_naval_strength_ratio < 0.9
+		alliance_naval_strength_ratio < 1.0
+		alliance_naval_strength_ratio < 1.1
+		alliance_naval_strength_ratio < 1.2
+		alliance_naval_strength_ratio < 1.3
+		alliance_naval_strength_ratio < 1.4
+		alliance_naval_strength_ratio < 1.5
+		alliance_naval_strength_ratio < 1.6
+		alliance_naval_strength_ratio < 1.7
+		alliance_naval_strength_ratio < 1.8
+		alliance_naval_strength_ratio < 2.0
+	}
+
+	option = { name = 1
+	}
+}
+country_event = { # invasion
+	id = EAI_debug.17
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	trigger = {
+	}
+
+	option = { name = 1
+		trigger = {
+			CHI = {
+			any_state = { # target has a coastal state
+		is_controlled_by = PREV
+		is_coastal = yes
+	}
+			}
+		}
+	}
+
+	option = { name = 2
+		trigger = {
+			CHI = {
+			ROOT = {
+		has_tech = transport
+
+		has_manpower > 50000
+
+		has_army_manpower = { size > 250000 }
+
+		OR = {
+			has_navy_size = { size > 50 }
+
+			alliance_naval_strength_ratio > 1
+
+			PREV = { EAI_historical_invasion = yes }
+		}
+	}
+			}
+		}
+	}
+
+	option = { name = 3
+		trigger = {
+			CHI = {
+			if = { limit = { has_war_with = ROOT }
+
+		OR = {
+			alliance_strength_ratio < 0.8
+
+			EAI_historical_invasion = yes
+		}
+	}
+			}
+		}
+	}
+
+	option = { name = 4
+		trigger = {
+			CHI = {
+			if = {
+		limit = {
+			any_home_area_neighbor_country = {
+				tag = ROOT
+			}
+			ROOT = {
+				any_home_area_neighbor_country = {
+					tag = PREV
+				}
+			}
+		}
+		OR = {
+			strength_ratio = { tag = ROOT ratio < 0.5 }
+
+			ROOT = { alliance_strength_ratio > 1.5 }
+		}
+	}
+			}
+		}
+	}
+}
+country_event = { # armor
+	id = EAI_debug.18
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = "EAI_armor_intel_more_than_80"
+		trigger = {
+			EAI_armor_intel_more_than_80 = yes
+		}
+	}
+
+	option = { name = "EAI_armor_intel_more_than_70"
+		trigger = {
+			EAI_armor_intel_more_than_70 = yes
+		}
+	}
+
+	option = { name = "EAI_armor_intel_more_than_65"
+		trigger = {
+			EAI_armor_intel_more_than_65 = yes
+		}
+	}
+
+	option = { name = "EAI_armor_intel_between_60_70"
+		trigger = {
+			EAI_armor_intel_between_60_70 = yes
+		}
+	}
+	
+	option = { name = "EAI_armor_intel_less_than_60"
+		trigger = {
+			EAI_armor_intel_less_than_60 = yes
+		}
+	}
+}
+country_event = { # invasion
+	id = EAI_debug.19
 	title = ""
 	desc = ""
 	is_triggered_only = yes
 	
-	option = { name = dontinvade
-			every_country = {
-				limit = { has_country_flag = dont_invade_@ROOT }
-				country_event = EAI_M.11009
-			}
+	trigger  = {
+		any_home_area_neighbor_country = { has_war_with = ROOT }
+	}
+
+	option = { name = EAI_create_naval_invasion_operation
+		INS = { EAI_create_naval_invasion_operation = yes }
+	}
+	option = { name = EAI_clear_naval_invasion_operation
+		EAI_clear_naval_invasion_operation = yes
 	}
 	
-	option = { name = lendlease
-			every_country = {
-				limit = { has_country_flag = lend_lease_@ROOT }
-				country_event = EAI_M.11009
+	option = { name = checkvalidtarget
+		if = { #check the validity of current target
+			limit = { 
+				OR = {
+					#any_country = { #target country invalid
+					#	ROOT = { has_country_flag = EAI_naval_invasion_from_@PREV } 
+					#	
+					#	NOT = { EAI_naval_invade = yes }
+					#} 
+		
+					NOT = { #no successful landing anywhere
+						has_country_flag = EAI_invasion_operation_active
+					
+						NOT = {
+							any_state = {
+								has_state_flag = EAI_naval_invasion_target_state_@ROOT
+								
+								any_country = {
+									OR = {
+										tag = ROOT
+										is_in_faction_with = ROOT
+										is_subject_of = ROOT
+										ROOT = { is_subject_of = PREV }
+									}
+									
+									OR = {
+										divisions_in_state = { state = PREV size > 0 }
+										
+										controller = { NOT = { has_war_with = ROOT } }
+									}
+								}
+							}
+						}
+					}
+				}
 			}
+			EAI_clear_naval_invasion_operation = yes
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.20
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+		has_deployed_air_force_size = { size < 40 type = air_transport }
+		has_deployed_air_force_size = { size < 5000 type = strategic_bomber }
+		has_deployed_air_force_size = { size < 1500 type = naval_bomber }
+		has_deployed_air_force_size = { size < 3000 type = tactical_bomber }
+		has_deployed_air_force_size = { size < 5000 type = cas }
+		has_deployed_air_force_size = { size < 15000 type = interceptor }
+		has_deployed_air_force_size = { size < 15000 type = fighter }
+	}
+
+	option = { name = 1
+		trigger = { has_active_mission = GER_mefo_bills_mission }
+	}
+}
+country_event = { # ll, volunteers
+	id = EAI_debug.21
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = EAI_lend_lease
+		every_country = {
+			limit = { EAI_lend_lease = yes }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = EAI_lend_lease
+		every_country = {
+			limit = { has_country_flag = EAI_lend_lease_from_@ROOT }
+			country_event = EAI_debug.6
+		}
 	}
 	
-	option = { name = sendvol
-			every_country = {
-				limit = { has_country_flag = send_volunteers_@ROOT }
-				country_event = EAI_M.11009
-			}
+	option = { name = EAI_send_volunteers
+		every_country = {
+			limit = { EAI_send_volunteers = yes }
+			country_event = EAI_debug.6
+		}
 	}
+	option = { name = EAI_send_volunteers
+		every_country = {
+			limit = { has_country_flag = EAI_volunteers_from_@ROOT }
+			country_event = EAI_debug.6
+		}
+	}
+}
+
+country_event = { # check ai focuses
+	id = EAI_debug.22
+	title = ""
+	desc = ""
+	is_triggered_only = yes
 	
-	option = { name = invfaction
-			every_country = {
-				limit = { has_country_flag = invite_to_faction_@ROOT }
-				country_event = EAI_M.11009
+	trigger  = {
+
+	}
+
+	option = { name = armorfocus
+		country_event = EAI_debug.29
+	}
+	option = { name = attachment
+		country_event = EAI_debug.23
+	}
+	option = { name = infdesign
+		country_event = EAI_debug.24
+	}
+	option = { name = landdoctrine
+		country_event = EAI_debug.25
+	}
+	option = { name = air
+		country_event = EAI_debug.26
+	}
+	option = { name = navy
+		country_event = EAI_debug.27
+	}
+	option = { name = armordesign
+		country_event = EAI_debug.28
+	}
+}
+country_event = {
+	id = EAI_debug.23
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = marm_attachment
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/marm_attachment }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = harm_attachment
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/harm_attachment }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = larm_attachment
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = motorized_attachment
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/motorized_attachment }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.24
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = infantry_design_A
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_A }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = infantry_design_B
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_B }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = infantry_design_C
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_C }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = infantry_design_D
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_D }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = infantry_design_E
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_E }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.25
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = MW_doctrine
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/MW_doctrine }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = SF_doctrine
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/SF_doctrine }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = GB_doctrine
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/GB_doctrine }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = MA_doctrine
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.26
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = cas_air_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/cas_air_focus }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = tac_air_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/tac_air_focus }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = nav_air_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/nav_air_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = str_air_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/str_air_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = hftr_air_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/hftr_air_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.27
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = cv_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/cv_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = bb_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/bb_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = bc_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/bc_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = ca_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/ca_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = cl_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/cl_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = dd_navy_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/dd_navy_focus_1 }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.28
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = armor_design_A
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/armor_design_A }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = armor_design_B
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/armor_design_B }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = armor_design_C
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/armor_design_C }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = 40w_armor_design_1
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/40w_armor_design_1 }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = 40w_armor_design_0
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/40w_armor_design_0 }
+			country_event = EAI_debug.6
+		}
+	}
+}
+country_event = {
+	id = EAI_debug.29
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = marm_army_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = harm_army_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			country_event = EAI_debug.6
+		}
+	}
+	option = { name = anti_tank_army_focus
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
+			country_event = EAI_debug.6
+		}
+	}
+}
+
+country_event = {
+	id = EAI_debug.31
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	option = { name = war
+		trigger = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT
+				OR = {
+					strength_ratio = { tag = ROOT ratio > 0.5 }
+					ROOT = { alliance_strength_ratio < 1.5 }
+				}
 			}
+		}
+	}
+	option = { Name = no
 	}
 }

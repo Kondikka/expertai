@@ -1,387 +1,952 @@
-#old stuff, revisit
+############################################################################################################
+#	Expert AI mod - diplomacy
+############################################################################################################
 
-continuation_war = {
+EAI_GER_minor_allies = {
 	enable = {
-		OR = { tag = FIN tag = GER }
+		has_government = fascism
+		is_in_faction = no
+		GER = {
+			has_government = fascism
+		}
+		capital_scope = {
+			is_on_continent = europe
+		}
+	}
+	abort = {
+		GER = {
+			NOT = {
+				has_government = fascism
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = alliance
+		id = "JAP"
+		value = -1000
+	}
+}
+
+EAI_GER_minor_allies_2 = {
+	enable = {
+		has_government = fascism
+		original_tag = JAP
+	}
+	abort = {
+		NOT = {
+			has_government = fascism
+		}
+	}
+
+	ai_strategy = {
+		type = alliance
+		id = "ROM"
+		value = -1000
+	}
+	ai_strategy = {
+		type = alliance
+		id = "BUL"
+		value = -1000
+	}
+	ai_strategy = {
+		type = alliance
+		id = "HUN"
+		value = -1000
+	}
+}
+
+# GER/SOV NAP
+EAI_GER-SOV_NAP = { 
+	enable = {
+		original_tag = GER
+		
+		GER = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		GER = { has_completed_focus = GER_mol_rib_pact }
+		
+		NOT = {
+			GER = { has_completed_focus = GER_ussr_war_goal }
+		}
+		
+		NOT = {
+			GER = { has_war_with = SOV }
+			GER = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			GER = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				GER = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				GER = { has_completed_focus = GER_mol_rib_pact }
+				
+				NOT = {
+					GER = { has_completed_focus = GER_ussr_war_goal }
+				}
+				
+				NOT = {
+					GER = { has_war_with = SOV }
+					GER = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					GER = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "SOV"     value = 500 }
+}
+EAI_SOV-GER_NAP = { 
+	enable = {
+		original_tag = SOV
+		
+		GER = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		GER = { has_completed_focus = GER_mol_rib_pact }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_germany }
+		}
+		
+		NOT = {
+			GER = { has_war_with = SOV }
+			GER = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			GER = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				GER = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				GER = { has_completed_focus = GER_mol_rib_pact }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_germany }
+				}
+				
+				NOT = {
+					GER = { has_war_with = SOV }
+					GER = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					GER = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "GER"     value = 500 }
+}
+
+# JAP/SOV NAP incl. all minors
+EAI_SOV-JAP_NAP = { 
+	enable = {
+		OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "JAP"     value = 500 }
+}
+EAI_SOV-MEN_NAP = { 
+	enable = {
+		OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+		
+		MEN = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+				
+				MEN = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "MEN"     value = 500 }
+}
+EAI_SOV-MAN_NAP = { 
+	enable = {
+		OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+		
+		MAN = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+				
+				MAN = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "MAN"     value = 500 }
+}
+EAI_SOV-CHI_NAP = { 
+	enable = {
+		OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+		
+		CHI = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = SOV is_in_faction_with = SOV is_subject_of = SOV }
+				
+				CHI = { OR = { is_in_faction_with = JAP is_subject_of = JAP } }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "CHI"     value = 500 }
+}
+
+EAI_JAP-SOV_NAP = { 
+	enable = {
+		OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "SOV"     value = 500 }
+}
+EAI_JAP-MON_NAP = { 
+	enable = {
+		OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+		
+		MON = { OR = { is_in_faction_with = SOV is_subject_of = SOV } }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+		
+				MON = { OR = { is_in_faction_with = SOV is_subject_of = SOV } }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "MON"     value = 500 }
+}
+EAI_JAP-SIK_NAP = { 
+	enable = {
+		OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+		
+		SIK = { OR = { is_in_faction_with = SOV is_subject_of = SOV } }
+		
+		###################################################################################
+		
+		JAP = { has_government = fascism }
+		SOV = { has_government = communism }
+		
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+		
+		NOT = {
+			SOV = { has_completed_focus = SOV_war_with_japan }
+		}
+		
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = JAP is_in_faction_with = JAP is_subject_of = JAP }
+				
+				SIK = { OR = { is_in_faction_with = SOV is_subject_of = SOV } }
+				
+				###################################################################################
+				
+				JAP = { has_government = fascism }
+				SOV = { has_government = communism }
+				
+				JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+				
+				NOT = {
+					SOV = { has_completed_focus = SOV_war_with_japan }
+				}
+				
+				NOT = {
+					JAP = { has_war_with = SOV }
+					JAP = { has_capitulated = yes is_subject = yes }
+					SOV = { has_capitulated = yes is_subject = yes }
+					JAP = { is_in_faction_with = SOV }
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = befriend   	id = "SIK"     value = 500 }
+}
+
+# ignore swi
+EAI_ignore_SWI = { 
+	enable = {
+		SWI = { has_war = no }
+	}
+	abort = {
+		SWI = { has_war = yes }
+	}
+
+	ai_strategy = { type = ignore   	id = "SWI"     value = 500 }
+	ai_strategy = { type = conquer   	id = "SWI"     value = -500 }
+}
+
+# finland joins axis
+EAI_continuation_war = {
+	enable = {
 		is_historical_focus_on = yes
+	
+		OR = { tag = FIN tag = GER }
 
 		FIN = { has_war = no }
+		
 		NOT = { 146 = { is_controlled_by = FIN } }
 
 		OR = {
 			GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.5 } }
 			GER = { has_war_with = SOV }
 		}
+		
 		if = { limit = { GER = { has_war_with = NOR } }
 			OR = { #dont join if norway hasnt fallen - otherwise finland will throw its entire army against norway
 				NOR = { has_capitulated = yes }
 				NOR = { exists = no }
-				NOR = { is_puppet = yes }
+				NOR = { is_subject = yes }
 				NOR = { has_government = fascism }
 				is_in_faction_with = NOR
 				has_war_with = NOR
 			}
 		}
 	}
-	abort = {
-		always = no
-	}
 
 	ai_strategy = { type = alliance   	id = "GER"     value = 500 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = -135 }
-	ai_strategy = { type = ignore     	id = "GER"     value = -500 }
 
 	ai_strategy = { type = alliance   	id = "FIN"     value = 500 }
-	ai_strategy = { type = antagonize 	id = "FIN"     value = -135 }
-	ai_strategy = { type = ignore     	id = "FIN"     value = -500 }
 }
 
-#tripartite pact
-
-#romania joins axis
-rom_joins_axis_0 = {
+# romania joins axis
+EAI_ROM_joins_axis_0 = {
 	enable = {
-		GER = { is_ai = yes }
+		is_historical_focus_on = yes
+	
 		OR = { tag = ROM tag = GER }
-		is_historical_focus_on = yes
-		NOT = { date > 1940.11.20 }
+		
+		NOT = { ROM = { has_completed_focus = ROM_join_axis } }
+		
+		NOT = { 
+			ROM = { has_capitulated = yes }
+			ROM = { exists = no }
+			ROM = { is_subject = yes }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+		}
 	}
 	abort = {
-		date > 1940.11.20
-	}
-
-	ai_strategy = { type = ignore     	id = "GER"     value = 200 }
-	ai_strategy = { type = ignore     	id = "ROM"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "ROM"     value = 200 }
-}
-rom_joins_axis = {
-	enable = {
-		GER = { is_ai = yes }
-		OR = {
-			AND = {
-				tag = ROM
-				any_neighbor_country = { is_in_faction_with = GER }
-			}
-			tag = GER
-		}
-
-		is_historical_focus_on = yes
-
-		date > 1940.11.20
-		date < 1942.1.1
-
-		OR = {
-			AND = {
-				GER = { has_government = fascism }
-				NOT = {
-					GER = { has_capitulated = yes }
-					GER = { exists = no }
-					GER = { is_puppet = yes }
-				}
-			}
+		OR = { 
 			ROM = { has_completed_focus = ROM_join_axis }
+		
+			ROM = { has_capitulated = yes }
+			ROM = { exists = no }
+			ROM = { is_subject = yes }
+			ROM = { NOT = { has_government = fascism } }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
+		}
+	}
+
+	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
+	
+	ai_strategy = { type = alliance 	id = "ROM"     value = -500 }
+}
+EAI_ROM_joins_axis_1 = {
+	enable = {
+		is_historical_focus_on = yes
+	
+		OR = { tag = ROM tag = GER }
+		
+		ROM = { has_completed_focus = ROM_join_axis }
+		
+		NOT = { 
+			ROM = { has_capitulated = yes }
+			ROM = { exists = no }
+			ROM = { is_subject = yes }
+			ROM = { NOT = { has_government = fascism } }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
 	abort = {
-		OR = {
-			ROM = { is_in_faction_with = GER }
-			NOT = { date < 1942.1.1 }
-
-			NOT = { GER = { has_government = fascism } }
+		OR = { 
+			ROM = { has_capitulated = yes }
+			ROM = { exists = no }
+			ROM = { is_subject = yes }
+			ROM = { NOT = { has_government = fascism } }
+			
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
-			GER = { is_puppet = yes }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
 
-	ai_strategy = { type = befriend   	id = "GER"     value = 500 }
-	ai_strategy = { type = alliance   	id = "GER"     value = 500 }
-	ai_strategy = { type = ignore     	id = "GER"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = 1000 }
 
-	ai_strategy = { type = befriend   	id = "ROM"     value = 500 }
-	ai_strategy = { type = alliance   	id = "ROM"     value = 500 }
-	ai_strategy = { type = ignore     	id = "ROM"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "ROM"     value = -500 }
+	ai_strategy = { type = alliance   	id = "ROM"     value = 1000 }
 }
 
-#hungary joins axis
-hun_joins_axis_0 = {
+# hungary joins axis
+EAI_HUN_joins_axis_0 = {
 	enable = {
-		GER = { is_ai = yes }
+		is_historical_focus_on = yes
+	
 		OR = { tag = HUN tag = GER }
-		is_historical_focus_on = yes
-		NOT = { date > 1940.11.15 }
+		
+		NOT = { HUN = { has_completed_focus = HUN_join_axis } }
+		
+		NOT = { 
+			HUN = { has_capitulated = yes }
+			HUN = { exists = no }
+			HUN = { is_subject = yes }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+		}
 	}
 	abort = {
-		date > 1940.11.15
-	}
-
-	ai_strategy = { type = ignore     	id = "GER"     value = 200 }
-	ai_strategy = { type = ignore     	id = "HUN"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "HUN"     value = 200 }
-}
-hun_joins_axis = {
-	enable = {
-		GER = { is_ai = yes }
-		OR = {
-			AND = {
-				tag = HUN
-				any_neighbor_country = { is_in_faction_with = GER }
-			}
-			tag = GER
-		}
-
-		is_historical_focus_on = yes
-		
-		date < 1942.1.1
-		
-		OR = {
-			AND = {
-				date > 1940.11.15
-				GER = { has_government = fascism }
-				NOT = {
-					GER = { has_capitulated = yes }
-					GER = { exists = no }
-					GER = { is_puppet = yes }
-				}
-			}
+		OR = { 
 			HUN = { has_completed_focus = HUN_join_axis }
+		
+			HUN = { has_capitulated = yes }
+			HUN = { exists = no }
+			HUN = { is_subject = yes }
+			HUN = { NOT = { has_government = fascism } }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
+		}
+	}
+
+	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
+	
+	ai_strategy = { type = alliance 	id = "HUN"     value = -500 }
+}
+EAI_HUN_joins_axis_1 = {
+	enable = {
+		is_historical_focus_on = yes
+	
+		OR = { tag = HUN tag = GER }
+		
+		HUN = { has_completed_focus = HUN_join_axis }
+		
+		NOT = { 
+			HUN = { has_capitulated = yes }
+			HUN = { exists = no }
+			HUN = { is_subject = yes }
+			HUN = { NOT = { has_government = fascism } }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
 	abort = {
-		OR = {
-			HUN = { is_in_faction_with = GER }
-			NOT = { date < 1942.1.1 }
-
-			NOT = { GER = { has_government = fascism } }
+		OR = { 
+			HUN = { has_capitulated = yes }
+			HUN = { exists = no }
+			HUN = { is_subject = yes }
+			HUN = { NOT = { has_government = fascism } }
+			
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
-			GER = { is_puppet = yes }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
-	ai_strategy = { type = befriend   	id = "GER"     value = 500 }
-	ai_strategy = { type = alliance   	id = "GER"     value = 500 }
-	ai_strategy = { type = ignore     	id = "GER"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = -500 }
 
-	ai_strategy = { type = befriend   	id = "HUN"     value = 500 }
-	ai_strategy = { type = alliance   	id = "HUN"     value = 500 }
-	ai_strategy = { type = ignore     	id = "HUN"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "HUN"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = 1000 }
+
+	ai_strategy = { type = alliance   	id = "HUN"     value = 1000 }
 }
 
-#bulgaria joins axis
-bul_joins_axis_0 = {
+# bulgaria joins axis
+EAI_BUL_joins_axis_0 = {
 	enable = {
-		GER = { is_ai = yes }
+		is_historical_focus_on = yes
+	
 		OR = { tag = BUL tag = GER }
-		is_historical_focus_on = yes
-		NOT = { date > 1941.2.20 }
+
+		NOT = { 
+			BUL = { has_capitulated = yes }
+			BUL = { exists = no }
+			BUL = { is_subject = yes }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
+		}
 	}
 	abort = {
-		date > 1941.3.1
+		OR = { 
+			BUL = { has_capitulated = yes }
+			BUL = { exists = no }
+			BUL = { is_subject = yes }
+			
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
+		}
 	}
 
-	ai_strategy = { type = ignore     	id = "GER"     value = 200 }
-	ai_strategy = { type = ignore     	id = "BUL"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = 200 }
-	ai_strategy = { type = antagonize 	id = "BUL"     value = 200 }
+	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
+	
+	ai_strategy = { type = alliance 	id = "BUL"     value = -500 }
 }
-bul_joins_axis = {
+EAI_BUL_joins_axis_1 = {
 	enable = {
-		GER = { is_ai = yes }
-		OR = {
-			AND = {
-				tag = BUL
-				any_neighbor_country = { is_in_faction_with = GER }
-			}
-			tag = GER
-		}
-
 		is_historical_focus_on = yes
-
-		date > 1941.3.1
-		date < 1942.1.1
-
-		GER = { has_government = fascism }
-		NOT = {
+	
+		OR = { tag = BUL tag = GER }
+		
+		BUL = {
+			any_neighbor_country = {
+				is_in_faction_with = GER
+				has_war = yes
+			}
+		}
+		
+		NOT = { 
+			BUL = { has_capitulated = yes }
+			BUL = { exists = no }
+			BUL = { is_subject = yes }
+			BUL = { NOT = { has_government = fascism } }
+			
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
-			GER = { is_puppet = yes }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
 	abort = {
-		OR = {
-			BUL = { is_in_faction_with = GER }
-			NOT = { date < 1942.1.1 }
-
-			NOT = { GER = { has_government = fascism } }
+		OR = { 
+			BUL = { has_capitulated = yes }
+			BUL = { exists = no }
+			BUL = { is_subject = yes }
+			BUL = { NOT = { has_government = fascism } }
+			
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
-			GER = { is_puppet = yes }
+			GER = { is_subject = yes }
+			GER = { NOT = { has_government = fascism } }
 		}
 	}
 
-	ai_strategy = { type = befriend   	id = "GER"     value = 500 }
-	ai_strategy = { type = alliance   	id = "GER"     value = 500 }
-	ai_strategy = { type = ignore     	id = "GER"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "GER"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = 1000 }
 
-	ai_strategy = { type = befriend   	id = "BUL"     value = 500 }
-	ai_strategy = { type = alliance   	id = "BUL"     value = 500 }
-	ai_strategy = { type = ignore     	id = "BUL"     value = -500 }
-	ai_strategy = { type = antagonize 	id = "BUL"     value = -500 }
+	ai_strategy = { type = alliance   	id = "BUL"     value = 1000 }
 }
 
-bulgaria_stop_doing_crazy_things = {
+EAI_bulgaria_stop_doing_crazy_things = {
 	enable = { tag = BUL is_historical_focus_on = yes }
-	abort = { always = no }
 
 	ai_strategy = { type = ignore     	id = "GRE"     value = 1000 }
 	ai_strategy = { type = ignore     	id = "YUG"     value = 1000 }
 	ai_strategy = { type = ignore     	id = "ROM"     value = 1000 }
 	ai_strategy = { type = ignore     	id = "TUR"     value = 1000 }
+	
+	ai_strategy = { type = alliance     id = "JAP"     value = -1000 }
 }
 
 ###########################################################################
 #	LEND LEASE
 ###########################################################################
 
-lend_lease_GER = { enable = { has_country_flag = lend_lease_GER } abort = { NOT = { has_country_flag = lend_lease_GER } } ai_strategy = { type = support id = "GER" value = 500 } }
-lend_lease_ENG = { enable = { has_country_flag = lend_lease_ENG } abort = { NOT = { has_country_flag = lend_lease_ENG } } ai_strategy = { type = support id = "ENG" value = 500 } }
-lend_lease_SOV = { enable = { has_country_flag = lend_lease_SOV } abort = { NOT = { has_country_flag = lend_lease_SOV } } ai_strategy = { type = support id = "SOV" value = 500 } }
-lend_lease_SWE = { enable = { has_country_flag = lend_lease_SWE } abort = { NOT = { has_country_flag = lend_lease_SWE } } ai_strategy = { type = support id = "SWE" value = 500 } }
-lend_lease_FRA = { enable = { has_country_flag = lend_lease_FRA } abort = { NOT = { has_country_flag = lend_lease_FRA } } ai_strategy = { type = support id = "FRA" value = 500 } }
-lend_lease_LUX = { enable = { has_country_flag = lend_lease_LUX } abort = { NOT = { has_country_flag = lend_lease_LUX } } ai_strategy = { type = support id = "LUX" value = 500 } }
-lend_lease_BEL = { enable = { has_country_flag = lend_lease_BEL } abort = { NOT = { has_country_flag = lend_lease_BEL } } ai_strategy = { type = support id = "BEL" value = 500 } }
-lend_lease_HOL = { enable = { has_country_flag = lend_lease_HOL } abort = { NOT = { has_country_flag = lend_lease_HOL } } ai_strategy = { type = support id = "HOL" value = 500 } }
-lend_lease_CZE = { enable = { has_country_flag = lend_lease_CZE } abort = { NOT = { has_country_flag = lend_lease_CZE } } ai_strategy = { type = support id = "CZE" value = 500 } }
-lend_lease_POL = { enable = { has_country_flag = lend_lease_POL } abort = { NOT = { has_country_flag = lend_lease_POL } } ai_strategy = { type = support id = "POL" value = 500 } }
-lend_lease_AUS = { enable = { has_country_flag = lend_lease_AUS } abort = { NOT = { has_country_flag = lend_lease_AUS } } ai_strategy = { type = support id = "AUS" value = 500 } }
-lend_lease_LIT = { enable = { has_country_flag = lend_lease_LIT } abort = { NOT = { has_country_flag = lend_lease_LIT } } ai_strategy = { type = support id = "LIT" value = 500 } }
-lend_lease_EST = { enable = { has_country_flag = lend_lease_EST } abort = { NOT = { has_country_flag = lend_lease_EST } } ai_strategy = { type = support id = "EST" value = 500 } }
-lend_lease_LAT = { enable = { has_country_flag = lend_lease_LAT } abort = { NOT = { has_country_flag = lend_lease_LAT } } ai_strategy = { type = support id = "LAT" value = 500 } }
-lend_lease_SPR = { enable = { has_country_flag = lend_lease_SPR } abort = { NOT = { has_country_flag = lend_lease_SPR } } ai_strategy = { type = support id = "SPR" value = 500 } }
-lend_lease_ITA = { enable = { has_country_flag = lend_lease_ITA } abort = { NOT = { has_country_flag = lend_lease_ITA } } ai_strategy = { type = support id = "ITA" value = 500 } }
-lend_lease_ROM = { enable = { has_country_flag = lend_lease_ROM } abort = { NOT = { has_country_flag = lend_lease_ROM } } ai_strategy = { type = support id = "ROM" value = 500 } }
-lend_lease_YUG = { enable = { has_country_flag = lend_lease_YUG } abort = { NOT = { has_country_flag = lend_lease_YUG } } ai_strategy = { type = support id = "YUG" value = 500 } }
-lend_lease_SER = { enable = { has_country_flag = lend_lease_SER } abort = { NOT = { has_country_flag = lend_lease_SER } } ai_strategy = { type = support id = "SER" value = 500 } }
-lend_lease_SWI = { enable = { has_country_flag = lend_lease_SWI } abort = { NOT = { has_country_flag = lend_lease_SWI } } ai_strategy = { type = support id = "SWI" value = 500 } }
-lend_lease_TUR = { enable = { has_country_flag = lend_lease_TUR } abort = { NOT = { has_country_flag = lend_lease_TUR } } ai_strategy = { type = support id = "TUR" value = 500 } }
-lend_lease_GRE = { enable = { has_country_flag = lend_lease_GRE } abort = { NOT = { has_country_flag = lend_lease_GRE } } ai_strategy = { type = support id = "GRE" value = 500 } }
-lend_lease_ALB = { enable = { has_country_flag = lend_lease_ALB } abort = { NOT = { has_country_flag = lend_lease_ALB } } ai_strategy = { type = support id = "ALB" value = 500 } }
-lend_lease_NOR = { enable = { has_country_flag = lend_lease_NOR } abort = { NOT = { has_country_flag = lend_lease_NOR } } ai_strategy = { type = support id = "NOR" value = 500 } }
-lend_lease_DEN = { enable = { has_country_flag = lend_lease_DEN } abort = { NOT = { has_country_flag = lend_lease_DEN } } ai_strategy = { type = support id = "DEN" value = 500 } }
-lend_lease_BUL = { enable = { has_country_flag = lend_lease_BUL } abort = { NOT = { has_country_flag = lend_lease_BUL } } ai_strategy = { type = support id = "BUL" value = 500 } }
-lend_lease_POR = { enable = { has_country_flag = lend_lease_POR } abort = { NOT = { has_country_flag = lend_lease_POR } } ai_strategy = { type = support id = "POR" value = 500 } }
-lend_lease_FIN = { enable = { has_country_flag = lend_lease_FIN } abort = { NOT = { has_country_flag = lend_lease_FIN } } ai_strategy = { type = support id = "FIN" value = 500 } }
-lend_lease_IRE = { enable = { has_country_flag = lend_lease_IRE } abort = { NOT = { has_country_flag = lend_lease_IRE } } ai_strategy = { type = support id = "IRE" value = 500 } }
-lend_lease_HUN = { enable = { has_country_flag = lend_lease_HUN } abort = { NOT = { has_country_flag = lend_lease_HUN } } ai_strategy = { type = support id = "HUN" value = 500 } }
-lend_lease_AFG = { enable = { has_country_flag = lend_lease_AFG } abort = { NOT = { has_country_flag = lend_lease_AFG } } ai_strategy = { type = support id = "AFG" value = 500 } }
-lend_lease_ARG = { enable = { has_country_flag = lend_lease_ARG } abort = { NOT = { has_country_flag = lend_lease_ARG } } ai_strategy = { type = support id = "ARG" value = 500 } }
-lend_lease_AST = { enable = { has_country_flag = lend_lease_AST } abort = { NOT = { has_country_flag = lend_lease_AST } } ai_strategy = { type = support id = "AST" value = 500 } }
-lend_lease_BHU = { enable = { has_country_flag = lend_lease_BHU } abort = { NOT = { has_country_flag = lend_lease_BHU } } ai_strategy = { type = support id = "BHU" value = 500 } }
-lend_lease_BOL = { enable = { has_country_flag = lend_lease_BOL } abort = { NOT = { has_country_flag = lend_lease_BOL } } ai_strategy = { type = support id = "BOL" value = 500 } }
-lend_lease_BRA = { enable = { has_country_flag = lend_lease_BRA } abort = { NOT = { has_country_flag = lend_lease_BRA } } ai_strategy = { type = support id = "BRA" value = 500 } }
-lend_lease_CAN = { enable = { has_country_flag = lend_lease_CAN } abort = { NOT = { has_country_flag = lend_lease_CAN } } ai_strategy = { type = support id = "CAN" value = 500 } }
-lend_lease_CHI = { enable = { has_country_flag = lend_lease_CHI } abort = { NOT = { has_country_flag = lend_lease_CHI } } ai_strategy = { type = support id = "CHI" value = 500 } }
-lend_lease_CHL = { enable = { has_country_flag = lend_lease_CHL } abort = { NOT = { has_country_flag = lend_lease_CHL } } ai_strategy = { type = support id = "CHL" value = 500 } }
-lend_lease_COL = { enable = { has_country_flag = lend_lease_COL } abort = { NOT = { has_country_flag = lend_lease_COL } } ai_strategy = { type = support id = "COL" value = 500 } }
-lend_lease_COS = { enable = { has_country_flag = lend_lease_COS } abort = { NOT = { has_country_flag = lend_lease_COS } } ai_strategy = { type = support id = "COS" value = 500 } }
-lend_lease_ECU = { enable = { has_country_flag = lend_lease_ECU } abort = { NOT = { has_country_flag = lend_lease_ECU } } ai_strategy = { type = support id = "ECU" value = 500 } }
-lend_lease_ELS = { enable = { has_country_flag = lend_lease_ELS } abort = { NOT = { has_country_flag = lend_lease_ELS } } ai_strategy = { type = support id = "ELS" value = 500 } }
-lend_lease_ETH = { enable = { has_country_flag = lend_lease_ETH } abort = { NOT = { has_country_flag = lend_lease_ETH } } ai_strategy = { type = support id = "ETH" value = 500 } }
-lend_lease_GUA = { enable = { has_country_flag = lend_lease_GUA } abort = { NOT = { has_country_flag = lend_lease_GUA } } ai_strategy = { type = support id = "GUA" value = 500 } }
-lend_lease_HON = { enable = { has_country_flag = lend_lease_HON } abort = { NOT = { has_country_flag = lend_lease_HON } } ai_strategy = { type = support id = "HON" value = 500 } }
-lend_lease_IRQ = { enable = { has_country_flag = lend_lease_IRQ } abort = { NOT = { has_country_flag = lend_lease_IRQ } } ai_strategy = { type = support id = "IRQ" value = 500 } }
-lend_lease_JAP = { enable = { has_country_flag = lend_lease_JAP } abort = { NOT = { has_country_flag = lend_lease_JAP } } ai_strategy = { type = support id = "JAP" value = 500 } }
-lend_lease_KOR = { enable = { has_country_flag = lend_lease_KOR } abort = { NOT = { has_country_flag = lend_lease_KOR } } ai_strategy = { type = support id = "KOR" value = 500 } }
-lend_lease_LIB = { enable = { has_country_flag = lend_lease_LIB } abort = { NOT = { has_country_flag = lend_lease_LIB } } ai_strategy = { type = support id = "LIB" value = 500 } }
-lend_lease_MEX = { enable = { has_country_flag = lend_lease_MEX } abort = { NOT = { has_country_flag = lend_lease_MEX } } ai_strategy = { type = support id = "MEX" value = 500 } }
-lend_lease_MEN = { enable = { has_country_flag = lend_lease_MEN } abort = { NOT = { has_country_flag = lend_lease_MEN } } ai_strategy = { type = support id = "MEN" value = 500 } }
-lend_lease_NEP = { enable = { has_country_flag = lend_lease_NEP } abort = { NOT = { has_country_flag = lend_lease_NEP } } ai_strategy = { type = support id = "NEP" value = 500 } }
-lend_lease_NIC = { enable = { has_country_flag = lend_lease_NIC } abort = { NOT = { has_country_flag = lend_lease_NIC } } ai_strategy = { type = support id = "NIC" value = 500 } }
-lend_lease_NZL = { enable = { has_country_flag = lend_lease_NZL } abort = { NOT = { has_country_flag = lend_lease_NZL } } ai_strategy = { type = support id = "NZL" value = 500 } }
-lend_lease_PER = { enable = { has_country_flag = lend_lease_PER } abort = { NOT = { has_country_flag = lend_lease_PER } } ai_strategy = { type = support id = "PER" value = 500 } }
-lend_lease_PRU = { enable = { has_country_flag = lend_lease_PRU } abort = { NOT = { has_country_flag = lend_lease_PRU } } ai_strategy = { type = support id = "PRU" value = 500 } }
-lend_lease_SAF = { enable = { has_country_flag = lend_lease_SAF } abort = { NOT = { has_country_flag = lend_lease_SAF } } ai_strategy = { type = support id = "SAF" value = 500 } }
-lend_lease_SAU = { enable = { has_country_flag = lend_lease_SAU } abort = { NOT = { has_country_flag = lend_lease_SAU } } ai_strategy = { type = support id = "SAU" value = 500 } }
-lend_lease_SIA = { enable = { has_country_flag = lend_lease_SIA } abort = { NOT = { has_country_flag = lend_lease_SIA } } ai_strategy = { type = support id = "SIA" value = 500 } }
-lend_lease_SIK = { enable = { has_country_flag = lend_lease_SIK } abort = { NOT = { has_country_flag = lend_lease_SIK } } ai_strategy = { type = support id = "SIK" value = 500 } }
-lend_lease_TIB = { enable = { has_country_flag = lend_lease_TIB } abort = { NOT = { has_country_flag = lend_lease_TIB } } ai_strategy = { type = support id = "TIB" value = 500 } }
-lend_lease_URG = { enable = { has_country_flag = lend_lease_URG } abort = { NOT = { has_country_flag = lend_lease_URG } } ai_strategy = { type = support id = "URG" value = 500 } }
-lend_lease_VEN = { enable = { has_country_flag = lend_lease_VEN } abort = { NOT = { has_country_flag = lend_lease_VEN } } ai_strategy = { type = support id = "VEN" value = 500 } }
-lend_lease_YUN = { enable = { has_country_flag = lend_lease_YUN } abort = { NOT = { has_country_flag = lend_lease_YUN } } ai_strategy = { type = support id = "YUN" value = 500 } }
-lend_lease_USA = { enable = { has_country_flag = lend_lease_USA } abort = { NOT = { has_country_flag = lend_lease_USA } } ai_strategy = { type = support id = "USA" value = 500 } }
-lend_lease_MON = { enable = { has_country_flag = lend_lease_MON } abort = { NOT = { has_country_flag = lend_lease_MON } } ai_strategy = { type = support id = "MON" value = 500 } }
-lend_lease_TAN = { enable = { has_country_flag = lend_lease_TAN } abort = { NOT = { has_country_flag = lend_lease_TAN } } ai_strategy = { type = support id = "TAN" value = 500 } }
-lend_lease_PAR = { enable = { has_country_flag = lend_lease_PAR } abort = { NOT = { has_country_flag = lend_lease_PAR } } ai_strategy = { type = support id = "PAR" value = 500 } }
-lend_lease_CUB = { enable = { has_country_flag = lend_lease_CUB } abort = { NOT = { has_country_flag = lend_lease_CUB } } ai_strategy = { type = support id = "CUB" value = 500 } }
-lend_lease_DOM = { enable = { has_country_flag = lend_lease_DOM } abort = { NOT = { has_country_flag = lend_lease_DOM } } ai_strategy = { type = support id = "DOM" value = 500 } }
-lend_lease_HAI = { enable = { has_country_flag = lend_lease_HAI } abort = { NOT = { has_country_flag = lend_lease_HAI } } ai_strategy = { type = support id = "HAI" value = 500 } }
-lend_lease_YEM = { enable = { has_country_flag = lend_lease_YEM } abort = { NOT = { has_country_flag = lend_lease_YEM } } ai_strategy = { type = support id = "YEM" value = 500 } }
-lend_lease_OMA = { enable = { has_country_flag = lend_lease_OMA } abort = { NOT = { has_country_flag = lend_lease_OMA } } ai_strategy = { type = support id = "OMA" value = 500 } }
-lend_lease_SLO = { enable = { has_country_flag = lend_lease_SLO } abort = { NOT = { has_country_flag = lend_lease_SLO } } ai_strategy = { type = support id = "SLO" value = 500 } }
-lend_lease_RAJ = { enable = { has_country_flag = lend_lease_RAJ } abort = { NOT = { has_country_flag = lend_lease_RAJ } } ai_strategy = { type = support id = "RAJ" value = 500 } }
-lend_lease_CRO = { enable = { has_country_flag = lend_lease_CRO } abort = { NOT = { has_country_flag = lend_lease_CRO } } ai_strategy = { type = support id = "CRO" value = 500 } }
-lend_lease_GXC = { enable = { has_country_flag = lend_lease_GXC } abort = { NOT = { has_country_flag = lend_lease_GXC } } ai_strategy = { type = support id = "GXC" value = 500 } }
-lend_lease_PRC = { enable = { has_country_flag = lend_lease_PRC } abort = { NOT = { has_country_flag = lend_lease_PRC } } ai_strategy = { type = support id = "PRC" value = 500 } }
-lend_lease_SHX = { enable = { has_country_flag = lend_lease_SHX } abort = { NOT = { has_country_flag = lend_lease_SHX } } ai_strategy = { type = support id = "SHX" value = 500 } }
-lend_lease_XSM = { enable = { has_country_flag = lend_lease_XSM } abort = { NOT = { has_country_flag = lend_lease_XSM } } ai_strategy = { type = support id = "XSM" value = 500 } }
-lend_lease_ICE = { enable = { has_country_flag = lend_lease_ICE } abort = { NOT = { has_country_flag = lend_lease_ICE } } ai_strategy = { type = support id = "ICE" value = 500 } }
-lend_lease_LEB = { enable = { has_country_flag = lend_lease_LEB } abort = { NOT = { has_country_flag = lend_lease_LEB } } ai_strategy = { type = support id = "LEB" value = 500 } }
-lend_lease_JOR = { enable = { has_country_flag = lend_lease_JOR } abort = { NOT = { has_country_flag = lend_lease_JOR } } ai_strategy = { type = support id = "JOR" value = 500 } }
-lend_lease_SYR = { enable = { has_country_flag = lend_lease_SYR } abort = { NOT = { has_country_flag = lend_lease_SYR } } ai_strategy = { type = support id = "SYR" value = 500 } }
-lend_lease_EGY = { enable = { has_country_flag = lend_lease_EGY } abort = { NOT = { has_country_flag = lend_lease_EGY } } ai_strategy = { type = support id = "EGY" value = 500 } }
-lend_lease_LBA = { enable = { has_country_flag = lend_lease_LBA } abort = { NOT = { has_country_flag = lend_lease_LBA } } ai_strategy = { type = support id = "LBA" value = 500 } }
-lend_lease_WGR = { enable = { has_country_flag = lend_lease_WGR } abort = { NOT = { has_country_flag = lend_lease_WGR } } ai_strategy = { type = support id = "WGR" value = 500 } }
-lend_lease_DDR = { enable = { has_country_flag = lend_lease_DDR } abort = { NOT = { has_country_flag = lend_lease_DDR } } ai_strategy = { type = support id = "DDR" value = 500 } }
-lend_lease_PAL = { enable = { has_country_flag = lend_lease_PAL } abort = { NOT = { has_country_flag = lend_lease_PAL } } ai_strategy = { type = support id = "PAL" value = 500 } }
-lend_lease_ISR = { enable = { has_country_flag = lend_lease_ISR } abort = { NOT = { has_country_flag = lend_lease_ISR } } ai_strategy = { type = support id = "ISR" value = 500 } }
-lend_lease_VIN = { enable = { has_country_flag = lend_lease_VIN } abort = { NOT = { has_country_flag = lend_lease_VIN } } ai_strategy = { type = support id = "VIN" value = 500 } }
-lend_lease_CAM = { enable = { has_country_flag = lend_lease_CAM } abort = { NOT = { has_country_flag = lend_lease_CAM } } ai_strategy = { type = support id = "CAM" value = 500 } }
-lend_lease_MAL = { enable = { has_country_flag = lend_lease_MAL } abort = { NOT = { has_country_flag = lend_lease_MAL } } ai_strategy = { type = support id = "MAL" value = 500 } }
-lend_lease_INS = { enable = { has_country_flag = lend_lease_INS } abort = { NOT = { has_country_flag = lend_lease_INS } } ai_strategy = { type = support id = "INS" value = 500 } }
-lend_lease_LAO = { enable = { has_country_flag = lend_lease_LAO } abort = { NOT = { has_country_flag = lend_lease_LAO } } ai_strategy = { type = support id = "LAO" value = 500 } }
-lend_lease_MNT = { enable = { has_country_flag = lend_lease_MNT } abort = { NOT = { has_country_flag = lend_lease_MNT } } ai_strategy = { type = support id = "MNT" value = 500 } }
-lend_lease_UKR = { enable = { has_country_flag = lend_lease_UKR } abort = { NOT = { has_country_flag = lend_lease_UKR } } ai_strategy = { type = support id = "UKR" value = 500 } }
-lend_lease_GEO = { enable = { has_country_flag = lend_lease_GEO } abort = { NOT = { has_country_flag = lend_lease_GEO } } ai_strategy = { type = support id = "GEO" value = 500 } }
-lend_lease_KAZ = { enable = { has_country_flag = lend_lease_KAZ } abort = { NOT = { has_country_flag = lend_lease_KAZ } } ai_strategy = { type = support id = "KAZ" value = 500 } }
-lend_lease_AZR = { enable = { has_country_flag = lend_lease_AZR } abort = { NOT = { has_country_flag = lend_lease_AZR } } ai_strategy = { type = support id = "AZR" value = 500 } }
-lend_lease_ARM = { enable = { has_country_flag = lend_lease_ARM } abort = { NOT = { has_country_flag = lend_lease_ARM } } ai_strategy = { type = support id = "ARM" value = 500 } }
-lend_lease_BLR = { enable = { has_country_flag = lend_lease_BLR } abort = { NOT = { has_country_flag = lend_lease_BLR } } ai_strategy = { type = support id = "BLR" value = 500 } }
-lend_lease_ANG = { enable = { has_country_flag = lend_lease_ANG } abort = { NOT = { has_country_flag = lend_lease_ANG } } ai_strategy = { type = support id = "ANG" value = 500 } }
-lend_lease_MZB = { enable = { has_country_flag = lend_lease_MZB } abort = { NOT = { has_country_flag = lend_lease_MZB } } ai_strategy = { type = support id = "MZB" value = 500 } }
-lend_lease_ZIM = { enable = { has_country_flag = lend_lease_ZIM } abort = { NOT = { has_country_flag = lend_lease_ZIM } } ai_strategy = { type = support id = "ZIM" value = 500 } }
-lend_lease_COG = { enable = { has_country_flag = lend_lease_COG } abort = { NOT = { has_country_flag = lend_lease_COG } } ai_strategy = { type = support id = "COG" value = 500 } }
-lend_lease_KEN = { enable = { has_country_flag = lend_lease_KEN } abort = { NOT = { has_country_flag = lend_lease_KEN } } ai_strategy = { type = support id = "KEN" value = 500 } }
-lend_lease_PAK = { enable = { has_country_flag = lend_lease_PAK } abort = { NOT = { has_country_flag = lend_lease_PAK } } ai_strategy = { type = support id = "PAK" value = 500 } }
-lend_lease_BOT = { enable = { has_country_flag = lend_lease_BOT } abort = { NOT = { has_country_flag = lend_lease_BOT } } ai_strategy = { type = support id = "BOT" value = 500 } }
-lend_lease_MAN = { enable = { has_country_flag = lend_lease_MAN } abort = { NOT = { has_country_flag = lend_lease_MAN } } ai_strategy = { type = support id = "MAN" value = 500 } }
-lend_lease_D01 = { enable = { has_country_flag = lend_lease_D01 } abort = { NOT = { has_country_flag = lend_lease_D01 } } ai_strategy = { type = support id = "D01" value = 500 } }
-lend_lease_D02 = { enable = { has_country_flag = lend_lease_D02 } abort = { NOT = { has_country_flag = lend_lease_D02 } } ai_strategy = { type = support id = "D02" value = 500 } }
-lend_lease_D03 = { enable = { has_country_flag = lend_lease_D03 } abort = { NOT = { has_country_flag = lend_lease_D03 } } ai_strategy = { type = support id = "D03" value = 500 } }
-lend_lease_D04 = { enable = { has_country_flag = lend_lease_D04 } abort = { NOT = { has_country_flag = lend_lease_D04 } } ai_strategy = { type = support id = "D04" value = 500 } }
-lend_lease_D05 = { enable = { has_country_flag = lend_lease_D05 } abort = { NOT = { has_country_flag = lend_lease_D05 } } ai_strategy = { type = support id = "D05" value = 500 } }
-lend_lease_D06 = { enable = { has_country_flag = lend_lease_D06 } abort = { NOT = { has_country_flag = lend_lease_D06 } } ai_strategy = { type = support id = "D06" value = 500 } }
-lend_lease_D07 = { enable = { has_country_flag = lend_lease_D07 } abort = { NOT = { has_country_flag = lend_lease_D07 } } ai_strategy = { type = support id = "D07" value = 500 } }
-lend_lease_D08 = { enable = { has_country_flag = lend_lease_D08 } abort = { NOT = { has_country_flag = lend_lease_D08 } } ai_strategy = { type = support id = "D08" value = 500 } }
-lend_lease_D09 = { enable = { has_country_flag = lend_lease_D09 } abort = { NOT = { has_country_flag = lend_lease_D09 } } ai_strategy = { type = support id = "D09" value = 500 } }
-lend_lease_D10 = { enable = { has_country_flag = lend_lease_D10 } abort = { NOT = { has_country_flag = lend_lease_D10 } } ai_strategy = { type = support id = "D10" value = 500 } }
-lend_lease_D11 = { enable = { has_country_flag = lend_lease_D11 } abort = { NOT = { has_country_flag = lend_lease_D11 } } ai_strategy = { type = support id = "D11" value = 500 } }
-lend_lease_D12 = { enable = { has_country_flag = lend_lease_D12 } abort = { NOT = { has_country_flag = lend_lease_D12 } } ai_strategy = { type = support id = "D12" value = 500 } }
-lend_lease_D13 = { enable = { has_country_flag = lend_lease_D13 } abort = { NOT = { has_country_flag = lend_lease_D13 } } ai_strategy = { type = support id = "D13" value = 500 } }
-lend_lease_D14 = { enable = { has_country_flag = lend_lease_D14 } abort = { NOT = { has_country_flag = lend_lease_D14 } } ai_strategy = { type = support id = "D14" value = 500 } }
-lend_lease_D15 = { enable = { has_country_flag = lend_lease_D15 } abort = { NOT = { has_country_flag = lend_lease_D15 } } ai_strategy = { type = support id = "D15" value = 500 } }
+EAI_lend_lease_from_GER = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_GER } abort = { NOT = { has_country_flag = EAI_lend_lease_from_GER } } ai_strategy = { type = support id = "GER" value = 500 } } #MTS
+EAI_lend_lease_from_ENG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ENG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ENG } } ai_strategy = { type = support id = "ENG" value = 500 } }
+EAI_lend_lease_from_SOV = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SOV } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SOV } } ai_strategy = { type = support id = "SOV" value = 500 } }
+EAI_lend_lease_from_SWE = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SWE } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SWE } } ai_strategy = { type = support id = "SWE" value = 500 } }
+EAI_lend_lease_from_FRA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_FRA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_FRA } } ai_strategy = { type = support id = "FRA" value = 500 } }
+EAI_lend_lease_from_LUX = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LUX } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LUX } } ai_strategy = { type = support id = "LUX" value = 500 } }
+EAI_lend_lease_from_BEL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BEL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BEL } } ai_strategy = { type = support id = "BEL" value = 500 } }
+EAI_lend_lease_from_HOL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_HOL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_HOL } } ai_strategy = { type = support id = "HOL" value = 500 } }
+EAI_lend_lease_from_CZE = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CZE } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CZE } } ai_strategy = { type = support id = "CZE" value = 500 } }
+EAI_lend_lease_from_POL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_POL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_POL } } ai_strategy = { type = support id = "POL" value = 500 } }
+EAI_lend_lease_from_AUS = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_AUS } abort = { NOT = { has_country_flag = EAI_lend_lease_from_AUS } } ai_strategy = { type = support id = "AUS" value = 500 } }
+EAI_lend_lease_from_LIT = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LIT } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LIT } } ai_strategy = { type = support id = "LIT" value = 500 } }
+EAI_lend_lease_from_EST = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_EST } abort = { NOT = { has_country_flag = EAI_lend_lease_from_EST } } ai_strategy = { type = support id = "EST" value = 500 } }
+EAI_lend_lease_from_LAT = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LAT } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LAT } } ai_strategy = { type = support id = "LAT" value = 500 } }
+EAI_lend_lease_from_SPR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SPR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SPR } } ai_strategy = { type = support id = "SPR" value = 500 } }
+EAI_lend_lease_from_ITA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ITA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ITA } } ai_strategy = { type = support id = "ITA" value = 500 } }
+EAI_lend_lease_from_ROM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ROM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ROM } } ai_strategy = { type = support id = "ROM" value = 500 } }
+EAI_lend_lease_from_YUG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_YUG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_YUG } } ai_strategy = { type = support id = "YUG" value = 500 } }
+EAI_lend_lease_from_SER = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SER } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SER } } ai_strategy = { type = support id = "SER" value = 500 } }
+EAI_lend_lease_from_SWI = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SWI } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SWI } } ai_strategy = { type = support id = "SWI" value = 500 } }
+EAI_lend_lease_from_TUR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_TUR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_TUR } } ai_strategy = { type = support id = "TUR" value = 500 } }
+EAI_lend_lease_from_GRE = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_GRE } abort = { NOT = { has_country_flag = EAI_lend_lease_from_GRE } } ai_strategy = { type = support id = "GRE" value = 500 } }
+EAI_lend_lease_from_ALB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ALB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ALB } } ai_strategy = { type = support id = "ALB" value = 500 } }
+EAI_lend_lease_from_NOR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_NOR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_NOR } } ai_strategy = { type = support id = "NOR" value = 500 } }
+EAI_lend_lease_from_DEN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_DEN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_DEN } } ai_strategy = { type = support id = "DEN" value = 500 } }
+EAI_lend_lease_from_BUL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BUL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BUL } } ai_strategy = { type = support id = "BUL" value = 500 } }
+EAI_lend_lease_from_POR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_POR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_POR } } ai_strategy = { type = support id = "POR" value = 500 } }
+EAI_lend_lease_from_FIN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_FIN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_FIN } } ai_strategy = { type = support id = "FIN" value = 500 } }
+EAI_lend_lease_from_IRE = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_IRE } abort = { NOT = { has_country_flag = EAI_lend_lease_from_IRE } } ai_strategy = { type = support id = "IRE" value = 500 } }
+EAI_lend_lease_from_HUN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_HUN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_HUN } } ai_strategy = { type = support id = "HUN" value = 500 } }
+EAI_lend_lease_from_AFG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_AFG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_AFG } } ai_strategy = { type = support id = "AFG" value = 500 } }
+EAI_lend_lease_from_ARG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ARG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ARG } } ai_strategy = { type = support id = "ARG" value = 500 } }
+EAI_lend_lease_from_AST = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_AST } abort = { NOT = { has_country_flag = EAI_lend_lease_from_AST } } ai_strategy = { type = support id = "AST" value = 500 } }
+EAI_lend_lease_from_BHU = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BHU } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BHU } } ai_strategy = { type = support id = "BHU" value = 500 } }
+EAI_lend_lease_from_BOL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BOL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BOL } } ai_strategy = { type = support id = "BOL" value = 500 } }
+EAI_lend_lease_from_BRA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BRA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BRA } } ai_strategy = { type = support id = "BRA" value = 500 } }
+EAI_lend_lease_from_CAN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CAN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CAN } } ai_strategy = { type = support id = "CAN" value = 500 } }
+EAI_lend_lease_from_CHI = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CHI } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CHI } } ai_strategy = { type = support id = "CHI" value = 500 } }
+EAI_lend_lease_from_CHL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CHL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CHL } } ai_strategy = { type = support id = "CHL" value = 500 } }
+EAI_lend_lease_from_COL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_COL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_COL } } ai_strategy = { type = support id = "COL" value = 500 } }
+EAI_lend_lease_from_COS = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_COS } abort = { NOT = { has_country_flag = EAI_lend_lease_from_COS } } ai_strategy = { type = support id = "COS" value = 500 } }
+EAI_lend_lease_from_ECU = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ECU } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ECU } } ai_strategy = { type = support id = "ECU" value = 500 } }
+EAI_lend_lease_from_ELS = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ELS } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ELS } } ai_strategy = { type = support id = "ELS" value = 500 } }
+EAI_lend_lease_from_ETH = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ETH } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ETH } } ai_strategy = { type = support id = "ETH" value = 500 } }
+EAI_lend_lease_from_GUA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_GUA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_GUA } } ai_strategy = { type = support id = "GUA" value = 500 } }
+EAI_lend_lease_from_HON = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_HON } abort = { NOT = { has_country_flag = EAI_lend_lease_from_HON } } ai_strategy = { type = support id = "HON" value = 500 } }
+EAI_lend_lease_from_IRQ = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_IRQ } abort = { NOT = { has_country_flag = EAI_lend_lease_from_IRQ } } ai_strategy = { type = support id = "IRQ" value = 500 } }
+EAI_lend_lease_from_JAP = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_JAP } abort = { NOT = { has_country_flag = EAI_lend_lease_from_JAP } } ai_strategy = { type = support id = "JAP" value = 500 } }
+EAI_lend_lease_from_KOR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_KOR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_KOR } } ai_strategy = { type = support id = "KOR" value = 500 } }
+EAI_lend_lease_from_LIB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LIB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LIB } } ai_strategy = { type = support id = "LIB" value = 500 } }
+EAI_lend_lease_from_MEX = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MEX } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MEX } } ai_strategy = { type = support id = "MEX" value = 500 } }
+EAI_lend_lease_from_MEN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MEN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MEN } } ai_strategy = { type = support id = "MEN" value = 500 } }
+EAI_lend_lease_from_NEP = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_NEP } abort = { NOT = { has_country_flag = EAI_lend_lease_from_NEP } } ai_strategy = { type = support id = "NEP" value = 500 } }
+EAI_lend_lease_from_NIC = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_NIC } abort = { NOT = { has_country_flag = EAI_lend_lease_from_NIC } } ai_strategy = { type = support id = "NIC" value = 500 } }
+EAI_lend_lease_from_NZL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_NZL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_NZL } } ai_strategy = { type = support id = "NZL" value = 500 } }
+EAI_lend_lease_from_PER = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PER } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PER } } ai_strategy = { type = support id = "PER" value = 500 } }
+EAI_lend_lease_from_PRU = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PRU } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PRU } } ai_strategy = { type = support id = "PRU" value = 500 } }
+EAI_lend_lease_from_SAF = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SAF } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SAF } } ai_strategy = { type = support id = "SAF" value = 500 } }
+EAI_lend_lease_from_SAU = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SAU } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SAU } } ai_strategy = { type = support id = "SAU" value = 500 } }
+EAI_lend_lease_from_SIA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SIA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SIA } } ai_strategy = { type = support id = "SIA" value = 500 } }
+EAI_lend_lease_from_SIK = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SIK } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SIK } } ai_strategy = { type = support id = "SIK" value = 500 } }
+EAI_lend_lease_from_TIB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_TIB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_TIB } } ai_strategy = { type = support id = "TIB" value = 500 } }
+EAI_lend_lease_from_URG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_URG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_URG } } ai_strategy = { type = support id = "URG" value = 500 } }
+EAI_lend_lease_from_VEN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_VEN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_VEN } } ai_strategy = { type = support id = "VEN" value = 500 } }
+EAI_lend_lease_from_YUN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_YUN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_YUN } } ai_strategy = { type = support id = "YUN" value = 500 } }
+EAI_lend_lease_from_USA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_USA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_USA } } ai_strategy = { type = support id = "USA" value = 500 } }
+EAI_lend_lease_from_MON = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MON } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MON } } ai_strategy = { type = support id = "MON" value = 500 } }
+EAI_lend_lease_from_TAN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_TAN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_TAN } } ai_strategy = { type = support id = "TAN" value = 500 } }
+EAI_lend_lease_from_PAR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PAR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PAR } } ai_strategy = { type = support id = "PAR" value = 500 } }
+EAI_lend_lease_from_CUB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CUB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CUB } } ai_strategy = { type = support id = "CUB" value = 500 } }
+EAI_lend_lease_from_DOM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_DOM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_DOM } } ai_strategy = { type = support id = "DOM" value = 500 } }
+EAI_lend_lease_from_HAI = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_HAI } abort = { NOT = { has_country_flag = EAI_lend_lease_from_HAI } } ai_strategy = { type = support id = "HAI" value = 500 } }
+EAI_lend_lease_from_YEM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_YEM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_YEM } } ai_strategy = { type = support id = "YEM" value = 500 } }
+EAI_lend_lease_from_OMA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_OMA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_OMA } } ai_strategy = { type = support id = "OMA" value = 500 } }
+EAI_lend_lease_from_SLO = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SLO } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SLO } } ai_strategy = { type = support id = "SLO" value = 500 } }
+EAI_lend_lease_from_RAJ = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_RAJ } abort = { NOT = { has_country_flag = EAI_lend_lease_from_RAJ } } ai_strategy = { type = support id = "RAJ" value = 500 } }
+EAI_lend_lease_from_CRO = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CRO } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CRO } } ai_strategy = { type = support id = "CRO" value = 500 } }
+EAI_lend_lease_from_GXC = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_GXC } abort = { NOT = { has_country_flag = EAI_lend_lease_from_GXC } } ai_strategy = { type = support id = "GXC" value = 500 } }
+EAI_lend_lease_from_PRC = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PRC } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PRC } } ai_strategy = { type = support id = "PRC" value = 500 } }
+EAI_lend_lease_from_SHX = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SHX } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SHX } } ai_strategy = { type = support id = "SHX" value = 500 } }
+EAI_lend_lease_from_XSM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_XSM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_XSM } } ai_strategy = { type = support id = "XSM" value = 500 } }
+EAI_lend_lease_from_ICE = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ICE } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ICE } } ai_strategy = { type = support id = "ICE" value = 500 } }
+EAI_lend_lease_from_LEB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LEB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LEB } } ai_strategy = { type = support id = "LEB" value = 500 } }
+EAI_lend_lease_from_JOR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_JOR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_JOR } } ai_strategy = { type = support id = "JOR" value = 500 } }
+EAI_lend_lease_from_SYR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_SYR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_SYR } } ai_strategy = { type = support id = "SYR" value = 500 } }
+EAI_lend_lease_from_EGY = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_EGY } abort = { NOT = { has_country_flag = EAI_lend_lease_from_EGY } } ai_strategy = { type = support id = "EGY" value = 500 } }
+EAI_lend_lease_from_LBA = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LBA } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LBA } } ai_strategy = { type = support id = "LBA" value = 500 } }
+EAI_lend_lease_from_WGR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_WGR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_WGR } } ai_strategy = { type = support id = "WGR" value = 500 } }
+EAI_lend_lease_from_DDR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_DDR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_DDR } } ai_strategy = { type = support id = "DDR" value = 500 } }
+EAI_lend_lease_from_PAL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PAL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PAL } } ai_strategy = { type = support id = "PAL" value = 500 } }
+EAI_lend_lease_from_ISR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ISR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ISR } } ai_strategy = { type = support id = "ISR" value = 500 } }
+EAI_lend_lease_from_VIN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_VIN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_VIN } } ai_strategy = { type = support id = "VIN" value = 500 } }
+EAI_lend_lease_from_CAM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_CAM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_CAM } } ai_strategy = { type = support id = "CAM" value = 500 } }
+EAI_lend_lease_from_MAL = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MAL } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MAL } } ai_strategy = { type = support id = "MAL" value = 500 } }
+EAI_lend_lease_from_INS = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_INS } abort = { NOT = { has_country_flag = EAI_lend_lease_from_INS } } ai_strategy = { type = support id = "INS" value = 500 } }
+EAI_lend_lease_from_LAO = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_LAO } abort = { NOT = { has_country_flag = EAI_lend_lease_from_LAO } } ai_strategy = { type = support id = "LAO" value = 500 } }
+EAI_lend_lease_from_MNT = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MNT } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MNT } } ai_strategy = { type = support id = "MNT" value = 500 } }
+EAI_lend_lease_from_UKR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_UKR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_UKR } } ai_strategy = { type = support id = "UKR" value = 500 } }
+EAI_lend_lease_from_GEO = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_GEO } abort = { NOT = { has_country_flag = EAI_lend_lease_from_GEO } } ai_strategy = { type = support id = "GEO" value = 500 } }
+EAI_lend_lease_from_KAZ = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_KAZ } abort = { NOT = { has_country_flag = EAI_lend_lease_from_KAZ } } ai_strategy = { type = support id = "KAZ" value = 500 } }
+EAI_lend_lease_from_AZR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_AZR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_AZR } } ai_strategy = { type = support id = "AZR" value = 500 } }
+EAI_lend_lease_from_ARM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ARM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ARM } } ai_strategy = { type = support id = "ARM" value = 500 } }
+EAI_lend_lease_from_BLR = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BLR } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BLR } } ai_strategy = { type = support id = "BLR" value = 500 } }
+EAI_lend_lease_from_ANG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ANG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ANG } } ai_strategy = { type = support id = "ANG" value = 500 } }
+EAI_lend_lease_from_MZB = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MZB } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MZB } } ai_strategy = { type = support id = "MZB" value = 500 } }
+EAI_lend_lease_from_ZIM = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_ZIM } abort = { NOT = { has_country_flag = EAI_lend_lease_from_ZIM } } ai_strategy = { type = support id = "ZIM" value = 500 } }
+EAI_lend_lease_from_COG = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_COG } abort = { NOT = { has_country_flag = EAI_lend_lease_from_COG } } ai_strategy = { type = support id = "COG" value = 500 } }
+EAI_lend_lease_from_KEN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_KEN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_KEN } } ai_strategy = { type = support id = "KEN" value = 500 } }
+EAI_lend_lease_from_PAK = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_PAK } abort = { NOT = { has_country_flag = EAI_lend_lease_from_PAK } } ai_strategy = { type = support id = "PAK" value = 500 } }
+EAI_lend_lease_from_BOT = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_BOT } abort = { NOT = { has_country_flag = EAI_lend_lease_from_BOT } } ai_strategy = { type = support id = "BOT" value = 500 } }
+EAI_lend_lease_from_MAN = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_MAN } abort = { NOT = { has_country_flag = EAI_lend_lease_from_MAN } } ai_strategy = { type = support id = "MAN" value = 500 } }
+EAI_lend_lease_from_D01 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D01 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D01 } } ai_strategy = { type = support id = "D01" value = 500 } }
+EAI_lend_lease_from_D02 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D02 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D02 } } ai_strategy = { type = support id = "D02" value = 500 } }
+EAI_lend_lease_from_D03 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D03 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D03 } } ai_strategy = { type = support id = "D03" value = 500 } }
+EAI_lend_lease_from_D04 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D04 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D04 } } ai_strategy = { type = support id = "D04" value = 500 } }
+EAI_lend_lease_from_D05 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D05 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D05 } } ai_strategy = { type = support id = "D05" value = 500 } }
+EAI_lend_lease_from_D06 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D06 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D06 } } ai_strategy = { type = support id = "D06" value = 500 } }
+EAI_lend_lease_from_D07 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D07 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D07 } } ai_strategy = { type = support id = "D07" value = 500 } }
+EAI_lend_lease_from_D08 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D08 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D08 } } ai_strategy = { type = support id = "D08" value = 500 } }
+EAI_lend_lease_from_D09 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D09 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D09 } } ai_strategy = { type = support id = "D09" value = 500 } }
+EAI_lend_lease_from_D10 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D10 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D10 } } ai_strategy = { type = support id = "D10" value = 500 } }
+EAI_lend_lease_from_D11 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D11 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D11 } } ai_strategy = { type = support id = "D11" value = 500 } }
+EAI_lend_lease_from_D12 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D12 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D12 } } ai_strategy = { type = support id = "D12" value = 500 } }
+EAI_lend_lease_from_D13 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D13 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D13 } } ai_strategy = { type = support id = "D13" value = 500 } }
+EAI_lend_lease_from_D14 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D14 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D14 } } ai_strategy = { type = support id = "D14" value = 500 } }
+EAI_lend_lease_from_D15 = { reversed = yes enable = { has_country_flag = EAI_lend_lease_from_D15 } abort = { NOT = { has_country_flag = EAI_lend_lease_from_D15 } } ai_strategy = { type = support id = "D15" value = 500 } }
 
 ###########################################################################
 #	VOLUNTEERS
 ###########################################################################
 
-default_volunteers = {
+EAI_default_volunteers = { #MTS
 	enable = { always = yes }
 
 	ai_strategy = { type = send_volunteers_desire 	id = "GER" 		                value = -5000 }
@@ -512,260 +1077,260 @@ default_volunteers = {
 	ai_strategy = { type = send_volunteers_desire 	id = "D15" 		                value = -5000 }
 }
 
-send_volunteers_GER = { enable = { has_country_flag = send_volunteers_GER } abort = { NOT = { has_country_flag = send_volunteers_GER } } ai_strategy = { type = send_volunteers_desire id = "GER" value = 5500 } }
-send_volunteers_ENG = { enable = { has_country_flag = send_volunteers_ENG } abort = { NOT = { has_country_flag = send_volunteers_ENG } } ai_strategy = { type = send_volunteers_desire id = "ENG" value = 5500 } }
-send_volunteers_SOV = { enable = { has_country_flag = send_volunteers_SOV } abort = { NOT = { has_country_flag = send_volunteers_SOV } } ai_strategy = { type = send_volunteers_desire id = "SOV" value = 5500 } }
-send_volunteers_SWE = { enable = { has_country_flag = send_volunteers_SWE } abort = { NOT = { has_country_flag = send_volunteers_SWE } } ai_strategy = { type = send_volunteers_desire id = "SWE" value = 5500 } }
-send_volunteers_FRA = { enable = { has_country_flag = send_volunteers_FRA } abort = { NOT = { has_country_flag = send_volunteers_FRA } } ai_strategy = { type = send_volunteers_desire id = "FRA" value = 5500 } }
-send_volunteers_LUX = { enable = { has_country_flag = send_volunteers_LUX } abort = { NOT = { has_country_flag = send_volunteers_LUX } } ai_strategy = { type = send_volunteers_desire id = "LUX" value = 5500 } }
-send_volunteers_BEL = { enable = { has_country_flag = send_volunteers_BEL } abort = { NOT = { has_country_flag = send_volunteers_BEL } } ai_strategy = { type = send_volunteers_desire id = "BEL" value = 5500 } }
-send_volunteers_HOL = { enable = { has_country_flag = send_volunteers_HOL } abort = { NOT = { has_country_flag = send_volunteers_HOL } } ai_strategy = { type = send_volunteers_desire id = "HOL" value = 5500 } }
-send_volunteers_CZE = { enable = { has_country_flag = send_volunteers_CZE } abort = { NOT = { has_country_flag = send_volunteers_CZE } } ai_strategy = { type = send_volunteers_desire id = "CZE" value = 5500 } }
-send_volunteers_POL = { enable = { has_country_flag = send_volunteers_POL } abort = { NOT = { has_country_flag = send_volunteers_POL } } ai_strategy = { type = send_volunteers_desire id = "POL" value = 5500 } }
-send_volunteers_AUS = { enable = { has_country_flag = send_volunteers_AUS } abort = { NOT = { has_country_flag = send_volunteers_AUS } } ai_strategy = { type = send_volunteers_desire id = "AUS" value = 5500 } }
-send_volunteers_LIT = { enable = { has_country_flag = send_volunteers_LIT } abort = { NOT = { has_country_flag = send_volunteers_LIT } } ai_strategy = { type = send_volunteers_desire id = "LIT" value = 5500 } }
-send_volunteers_EST = { enable = { has_country_flag = send_volunteers_EST } abort = { NOT = { has_country_flag = send_volunteers_EST } } ai_strategy = { type = send_volunteers_desire id = "EST" value = 5500 } }
-send_volunteers_LAT = { enable = { has_country_flag = send_volunteers_LAT } abort = { NOT = { has_country_flag = send_volunteers_LAT } } ai_strategy = { type = send_volunteers_desire id = "LAT" value = 5500 } }
-send_volunteers_SPR = { enable = { has_country_flag = send_volunteers_SPR } abort = { NOT = { has_country_flag = send_volunteers_SPR } } ai_strategy = { type = send_volunteers_desire id = "SPR" value = 5500 } }
-send_volunteers_ITA = { enable = { has_country_flag = send_volunteers_ITA } abort = { NOT = { has_country_flag = send_volunteers_ITA } } ai_strategy = { type = send_volunteers_desire id = "ITA" value = 5500 } }
-send_volunteers_ROM = { enable = { has_country_flag = send_volunteers_ROM } abort = { NOT = { has_country_flag = send_volunteers_ROM } } ai_strategy = { type = send_volunteers_desire id = "ROM" value = 5500 } }
-send_volunteers_YUG = { enable = { has_country_flag = send_volunteers_YUG } abort = { NOT = { has_country_flag = send_volunteers_YUG } } ai_strategy = { type = send_volunteers_desire id = "YUG" value = 5500 } }
-send_volunteers_SER = { enable = { has_country_flag = send_volunteers_SER } abort = { NOT = { has_country_flag = send_volunteers_SER } } ai_strategy = { type = send_volunteers_desire id = "SER" value = 5500 } }
-send_volunteers_SWI = { enable = { has_country_flag = send_volunteers_SWI } abort = { NOT = { has_country_flag = send_volunteers_SWI } } ai_strategy = { type = send_volunteers_desire id = "SWI" value = 5500 } }
-send_volunteers_TUR = { enable = { has_country_flag = send_volunteers_TUR } abort = { NOT = { has_country_flag = send_volunteers_TUR } } ai_strategy = { type = send_volunteers_desire id = "TUR" value = 5500 } }
-send_volunteers_GRE = { enable = { has_country_flag = send_volunteers_GRE } abort = { NOT = { has_country_flag = send_volunteers_GRE } } ai_strategy = { type = send_volunteers_desire id = "GRE" value = 5500 } }
-send_volunteers_ALB = { enable = { has_country_flag = send_volunteers_ALB } abort = { NOT = { has_country_flag = send_volunteers_ALB } } ai_strategy = { type = send_volunteers_desire id = "ALB" value = 5500 } }
-send_volunteers_NOR = { enable = { has_country_flag = send_volunteers_NOR } abort = { NOT = { has_country_flag = send_volunteers_NOR } } ai_strategy = { type = send_volunteers_desire id = "NOR" value = 5500 } }
-send_volunteers_DEN = { enable = { has_country_flag = send_volunteers_DEN } abort = { NOT = { has_country_flag = send_volunteers_DEN } } ai_strategy = { type = send_volunteers_desire id = "DEN" value = 5500 } }
-send_volunteers_BUL = { enable = { has_country_flag = send_volunteers_BUL } abort = { NOT = { has_country_flag = send_volunteers_BUL } } ai_strategy = { type = send_volunteers_desire id = "BUL" value = 5500 } }
-send_volunteers_POR = { enable = { has_country_flag = send_volunteers_POR } abort = { NOT = { has_country_flag = send_volunteers_POR } } ai_strategy = { type = send_volunteers_desire id = "POR" value = 5500 } }
-send_volunteers_FIN = { enable = { has_country_flag = send_volunteers_FIN } abort = { NOT = { has_country_flag = send_volunteers_FIN } } ai_strategy = { type = send_volunteers_desire id = "FIN" value = 5500 } }
-send_volunteers_IRE = { enable = { has_country_flag = send_volunteers_IRE } abort = { NOT = { has_country_flag = send_volunteers_IRE } } ai_strategy = { type = send_volunteers_desire id = "IRE" value = 5500 } }
-send_volunteers_HUN = { enable = { has_country_flag = send_volunteers_HUN } abort = { NOT = { has_country_flag = send_volunteers_HUN } } ai_strategy = { type = send_volunteers_desire id = "HUN" value = 5500 } }
-send_volunteers_AFG = { enable = { has_country_flag = send_volunteers_AFG } abort = { NOT = { has_country_flag = send_volunteers_AFG } } ai_strategy = { type = send_volunteers_desire id = "AFG" value = 5500 } }
-send_volunteers_ARG = { enable = { has_country_flag = send_volunteers_ARG } abort = { NOT = { has_country_flag = send_volunteers_ARG } } ai_strategy = { type = send_volunteers_desire id = "ARG" value = 5500 } }
-send_volunteers_AST = { enable = { has_country_flag = send_volunteers_AST } abort = { NOT = { has_country_flag = send_volunteers_AST } } ai_strategy = { type = send_volunteers_desire id = "AST" value = 5500 } }
-send_volunteers_BHU = { enable = { has_country_flag = send_volunteers_BHU } abort = { NOT = { has_country_flag = send_volunteers_BHU } } ai_strategy = { type = send_volunteers_desire id = "BHU" value = 5500 } }
-send_volunteers_BOL = { enable = { has_country_flag = send_volunteers_BOL } abort = { NOT = { has_country_flag = send_volunteers_BOL } } ai_strategy = { type = send_volunteers_desire id = "BOL" value = 5500 } }
-send_volunteers_BRA = { enable = { has_country_flag = send_volunteers_BRA } abort = { NOT = { has_country_flag = send_volunteers_BRA } } ai_strategy = { type = send_volunteers_desire id = "BRA" value = 5500 } }
-send_volunteers_CAN = { enable = { has_country_flag = send_volunteers_CAN } abort = { NOT = { has_country_flag = send_volunteers_CAN } } ai_strategy = { type = send_volunteers_desire id = "CAN" value = 5500 } }
-send_volunteers_CHI = { enable = { has_country_flag = send_volunteers_CHI } abort = { NOT = { has_country_flag = send_volunteers_CHI } } ai_strategy = { type = send_volunteers_desire id = "CHI" value = 5500 } }
-send_volunteers_CHL = { enable = { has_country_flag = send_volunteers_CHL } abort = { NOT = { has_country_flag = send_volunteers_CHL } } ai_strategy = { type = send_volunteers_desire id = "CHL" value = 5500 } }
-send_volunteers_COL = { enable = { has_country_flag = send_volunteers_COL } abort = { NOT = { has_country_flag = send_volunteers_COL } } ai_strategy = { type = send_volunteers_desire id = "COL" value = 5500 } }
-send_volunteers_COS = { enable = { has_country_flag = send_volunteers_COS } abort = { NOT = { has_country_flag = send_volunteers_COS } } ai_strategy = { type = send_volunteers_desire id = "COS" value = 5500 } }
-send_volunteers_ECU = { enable = { has_country_flag = send_volunteers_ECU } abort = { NOT = { has_country_flag = send_volunteers_ECU } } ai_strategy = { type = send_volunteers_desire id = "ECU" value = 5500 } }
-send_volunteers_ELS = { enable = { has_country_flag = send_volunteers_ELS } abort = { NOT = { has_country_flag = send_volunteers_ELS } } ai_strategy = { type = send_volunteers_desire id = "ELS" value = 5500 } }
-send_volunteers_ETH = { enable = { has_country_flag = send_volunteers_ETH } abort = { NOT = { has_country_flag = send_volunteers_ETH } } ai_strategy = { type = send_volunteers_desire id = "ETH" value = 5500 } }
-send_volunteers_GUA = { enable = { has_country_flag = send_volunteers_GUA } abort = { NOT = { has_country_flag = send_volunteers_GUA } } ai_strategy = { type = send_volunteers_desire id = "GUA" value = 5500 } }
-send_volunteers_HON = { enable = { has_country_flag = send_volunteers_HON } abort = { NOT = { has_country_flag = send_volunteers_HON } } ai_strategy = { type = send_volunteers_desire id = "HON" value = 5500 } }
-send_volunteers_IRQ = { enable = { has_country_flag = send_volunteers_IRQ } abort = { NOT = { has_country_flag = send_volunteers_IRQ } } ai_strategy = { type = send_volunteers_desire id = "IRQ" value = 5500 } }
-send_volunteers_JAP = { enable = { has_country_flag = send_volunteers_JAP } abort = { NOT = { has_country_flag = send_volunteers_JAP } } ai_strategy = { type = send_volunteers_desire id = "JAP" value = 5500 } }
-send_volunteers_KOR = { enable = { has_country_flag = send_volunteers_KOR } abort = { NOT = { has_country_flag = send_volunteers_KOR } } ai_strategy = { type = send_volunteers_desire id = "KOR" value = 5500 } }
-send_volunteers_LIB = { enable = { has_country_flag = send_volunteers_LIB } abort = { NOT = { has_country_flag = send_volunteers_LIB } } ai_strategy = { type = send_volunteers_desire id = "LIB" value = 5500 } }
-send_volunteers_MEX = { enable = { has_country_flag = send_volunteers_MEX } abort = { NOT = { has_country_flag = send_volunteers_MEX } } ai_strategy = { type = send_volunteers_desire id = "MEX" value = 5500 } }
-send_volunteers_MEN = { enable = { has_country_flag = send_volunteers_MEN } abort = { NOT = { has_country_flag = send_volunteers_MEN } } ai_strategy = { type = send_volunteers_desire id = "MEN" value = 5500 } }
-send_volunteers_NEP = { enable = { has_country_flag = send_volunteers_NEP } abort = { NOT = { has_country_flag = send_volunteers_NEP } } ai_strategy = { type = send_volunteers_desire id = "NEP" value = 5500 } }
-send_volunteers_NIC = { enable = { has_country_flag = send_volunteers_NIC } abort = { NOT = { has_country_flag = send_volunteers_NIC } } ai_strategy = { type = send_volunteers_desire id = "NIC" value = 5500 } }
-send_volunteers_NZL = { enable = { has_country_flag = send_volunteers_NZL } abort = { NOT = { has_country_flag = send_volunteers_NZL } } ai_strategy = { type = send_volunteers_desire id = "NZL" value = 5500 } }
-send_volunteers_PER = { enable = { has_country_flag = send_volunteers_PER } abort = { NOT = { has_country_flag = send_volunteers_PER } } ai_strategy = { type = send_volunteers_desire id = "PER" value = 5500 } }
-send_volunteers_PRU = { enable = { has_country_flag = send_volunteers_PRU } abort = { NOT = { has_country_flag = send_volunteers_PRU } } ai_strategy = { type = send_volunteers_desire id = "PRU" value = 5500 } }
-send_volunteers_SAF = { enable = { has_country_flag = send_volunteers_SAF } abort = { NOT = { has_country_flag = send_volunteers_SAF } } ai_strategy = { type = send_volunteers_desire id = "SAF" value = 5500 } }
-send_volunteers_SAU = { enable = { has_country_flag = send_volunteers_SAU } abort = { NOT = { has_country_flag = send_volunteers_SAU } } ai_strategy = { type = send_volunteers_desire id = "SAU" value = 5500 } }
-send_volunteers_SIA = { enable = { has_country_flag = send_volunteers_SIA } abort = { NOT = { has_country_flag = send_volunteers_SIA } } ai_strategy = { type = send_volunteers_desire id = "SIA" value = 5500 } }
-send_volunteers_SIK = { enable = { has_country_flag = send_volunteers_SIK } abort = { NOT = { has_country_flag = send_volunteers_SIK } } ai_strategy = { type = send_volunteers_desire id = "SIK" value = 5500 } }
-send_volunteers_TIB = { enable = { has_country_flag = send_volunteers_TIB } abort = { NOT = { has_country_flag = send_volunteers_TIB } } ai_strategy = { type = send_volunteers_desire id = "TIB" value = 5500 } }
-send_volunteers_URG = { enable = { has_country_flag = send_volunteers_URG } abort = { NOT = { has_country_flag = send_volunteers_URG } } ai_strategy = { type = send_volunteers_desire id = "URG" value = 5500 } }
-send_volunteers_VEN = { enable = { has_country_flag = send_volunteers_VEN } abort = { NOT = { has_country_flag = send_volunteers_VEN } } ai_strategy = { type = send_volunteers_desire id = "VEN" value = 5500 } }
-send_volunteers_YUN = { enable = { has_country_flag = send_volunteers_YUN } abort = { NOT = { has_country_flag = send_volunteers_YUN } } ai_strategy = { type = send_volunteers_desire id = "YUN" value = 5500 } }
-send_volunteers_USA = { enable = { has_country_flag = send_volunteers_USA } abort = { NOT = { has_country_flag = send_volunteers_USA } } ai_strategy = { type = send_volunteers_desire id = "USA" value = 5500 } }
-send_volunteers_MON = { enable = { has_country_flag = send_volunteers_MON } abort = { NOT = { has_country_flag = send_volunteers_MON } } ai_strategy = { type = send_volunteers_desire id = "MON" value = 5500 } }
-send_volunteers_TAN = { enable = { has_country_flag = send_volunteers_TAN } abort = { NOT = { has_country_flag = send_volunteers_TAN } } ai_strategy = { type = send_volunteers_desire id = "TAN" value = 5500 } }
-send_volunteers_PAR = { enable = { has_country_flag = send_volunteers_PAR } abort = { NOT = { has_country_flag = send_volunteers_PAR } } ai_strategy = { type = send_volunteers_desire id = "PAR" value = 5500 } }
-send_volunteers_CUB = { enable = { has_country_flag = send_volunteers_CUB } abort = { NOT = { has_country_flag = send_volunteers_CUB } } ai_strategy = { type = send_volunteers_desire id = "CUB" value = 5500 } }
-send_volunteers_DOM = { enable = { has_country_flag = send_volunteers_DOM } abort = { NOT = { has_country_flag = send_volunteers_DOM } } ai_strategy = { type = send_volunteers_desire id = "DOM" value = 5500 } }
-send_volunteers_HAI = { enable = { has_country_flag = send_volunteers_HAI } abort = { NOT = { has_country_flag = send_volunteers_HAI } } ai_strategy = { type = send_volunteers_desire id = "HAI" value = 5500 } }
-send_volunteers_YEM = { enable = { has_country_flag = send_volunteers_YEM } abort = { NOT = { has_country_flag = send_volunteers_YEM } } ai_strategy = { type = send_volunteers_desire id = "YEM" value = 5500 } }
-send_volunteers_OMA = { enable = { has_country_flag = send_volunteers_OMA } abort = { NOT = { has_country_flag = send_volunteers_OMA } } ai_strategy = { type = send_volunteers_desire id = "OMA" value = 5500 } }
-send_volunteers_SLO = { enable = { has_country_flag = send_volunteers_SLO } abort = { NOT = { has_country_flag = send_volunteers_SLO } } ai_strategy = { type = send_volunteers_desire id = "SLO" value = 5500 } }
-send_volunteers_RAJ = { enable = { has_country_flag = send_volunteers_RAJ } abort = { NOT = { has_country_flag = send_volunteers_RAJ } } ai_strategy = { type = send_volunteers_desire id = "RAJ" value = 5500 } }
-send_volunteers_CRO = { enable = { has_country_flag = send_volunteers_CRO } abort = { NOT = { has_country_flag = send_volunteers_CRO } } ai_strategy = { type = send_volunteers_desire id = "CRO" value = 5500 } }
-send_volunteers_GXC = { enable = { has_country_flag = send_volunteers_GXC } abort = { NOT = { has_country_flag = send_volunteers_GXC } } ai_strategy = { type = send_volunteers_desire id = "GXC" value = 5500 } }
-send_volunteers_PRC = { enable = { has_country_flag = send_volunteers_PRC } abort = { NOT = { has_country_flag = send_volunteers_PRC } } ai_strategy = { type = send_volunteers_desire id = "PRC" value = 5500 } }
-send_volunteers_SHX = { enable = { has_country_flag = send_volunteers_SHX } abort = { NOT = { has_country_flag = send_volunteers_SHX } } ai_strategy = { type = send_volunteers_desire id = "SHX" value = 5500 } }
-send_volunteers_XSM = { enable = { has_country_flag = send_volunteers_XSM } abort = { NOT = { has_country_flag = send_volunteers_XSM } } ai_strategy = { type = send_volunteers_desire id = "XSM" value = 5500 } }
-send_volunteers_ICE = { enable = { has_country_flag = send_volunteers_ICE } abort = { NOT = { has_country_flag = send_volunteers_ICE } } ai_strategy = { type = send_volunteers_desire id = "ICE" value = 5500 } }
-send_volunteers_LEB = { enable = { has_country_flag = send_volunteers_LEB } abort = { NOT = { has_country_flag = send_volunteers_LEB } } ai_strategy = { type = send_volunteers_desire id = "LEB" value = 5500 } }
-send_volunteers_JOR = { enable = { has_country_flag = send_volunteers_JOR } abort = { NOT = { has_country_flag = send_volunteers_JOR } } ai_strategy = { type = send_volunteers_desire id = "JOR" value = 5500 } }
-send_volunteers_SYR = { enable = { has_country_flag = send_volunteers_SYR } abort = { NOT = { has_country_flag = send_volunteers_SYR } } ai_strategy = { type = send_volunteers_desire id = "SYR" value = 5500 } }
-send_volunteers_EGY = { enable = { has_country_flag = send_volunteers_EGY } abort = { NOT = { has_country_flag = send_volunteers_EGY } } ai_strategy = { type = send_volunteers_desire id = "EGY" value = 5500 } }
-send_volunteers_LBA = { enable = { has_country_flag = send_volunteers_LBA } abort = { NOT = { has_country_flag = send_volunteers_LBA } } ai_strategy = { type = send_volunteers_desire id = "LBA" value = 5500 } }
-send_volunteers_WGR = { enable = { has_country_flag = send_volunteers_WGR } abort = { NOT = { has_country_flag = send_volunteers_WGR } } ai_strategy = { type = send_volunteers_desire id = "WGR" value = 5500 } }
-send_volunteers_DDR = { enable = { has_country_flag = send_volunteers_DDR } abort = { NOT = { has_country_flag = send_volunteers_DDR } } ai_strategy = { type = send_volunteers_desire id = "DDR" value = 5500 } }
-send_volunteers_PAL = { enable = { has_country_flag = send_volunteers_PAL } abort = { NOT = { has_country_flag = send_volunteers_PAL } } ai_strategy = { type = send_volunteers_desire id = "PAL" value = 5500 } }
-send_volunteers_ISR = { enable = { has_country_flag = send_volunteers_ISR } abort = { NOT = { has_country_flag = send_volunteers_ISR } } ai_strategy = { type = send_volunteers_desire id = "ISR" value = 5500 } }
-send_volunteers_VIN = { enable = { has_country_flag = send_volunteers_VIN } abort = { NOT = { has_country_flag = send_volunteers_VIN } } ai_strategy = { type = send_volunteers_desire id = "VIN" value = 5500 } }
-send_volunteers_CAM = { enable = { has_country_flag = send_volunteers_CAM } abort = { NOT = { has_country_flag = send_volunteers_CAM } } ai_strategy = { type = send_volunteers_desire id = "CAM" value = 5500 } }
-send_volunteers_MAL = { enable = { has_country_flag = send_volunteers_MAL } abort = { NOT = { has_country_flag = send_volunteers_MAL } } ai_strategy = { type = send_volunteers_desire id = "MAL" value = 5500 } }
-send_volunteers_INS = { enable = { has_country_flag = send_volunteers_INS } abort = { NOT = { has_country_flag = send_volunteers_INS } } ai_strategy = { type = send_volunteers_desire id = "INS" value = 5500 } }
-send_volunteers_LAO = { enable = { has_country_flag = send_volunteers_LAO } abort = { NOT = { has_country_flag = send_volunteers_LAO } } ai_strategy = { type = send_volunteers_desire id = "LAO" value = 5500 } }
-send_volunteers_MNT = { enable = { has_country_flag = send_volunteers_MNT } abort = { NOT = { has_country_flag = send_volunteers_MNT } } ai_strategy = { type = send_volunteers_desire id = "MNT" value = 5500 } }
-send_volunteers_UKR = { enable = { has_country_flag = send_volunteers_UKR } abort = { NOT = { has_country_flag = send_volunteers_UKR } } ai_strategy = { type = send_volunteers_desire id = "UKR" value = 5500 } }
-send_volunteers_GEO = { enable = { has_country_flag = send_volunteers_GEO } abort = { NOT = { has_country_flag = send_volunteers_GEO } } ai_strategy = { type = send_volunteers_desire id = "GEO" value = 5500 } }
-send_volunteers_KAZ = { enable = { has_country_flag = send_volunteers_KAZ } abort = { NOT = { has_country_flag = send_volunteers_KAZ } } ai_strategy = { type = send_volunteers_desire id = "KAZ" value = 5500 } }
-send_volunteers_AZR = { enable = { has_country_flag = send_volunteers_AZR } abort = { NOT = { has_country_flag = send_volunteers_AZR } } ai_strategy = { type = send_volunteers_desire id = "AZR" value = 5500 } }
-send_volunteers_ARM = { enable = { has_country_flag = send_volunteers_ARM } abort = { NOT = { has_country_flag = send_volunteers_ARM } } ai_strategy = { type = send_volunteers_desire id = "ARM" value = 5500 } }
-send_volunteers_BLR = { enable = { has_country_flag = send_volunteers_BLR } abort = { NOT = { has_country_flag = send_volunteers_BLR } } ai_strategy = { type = send_volunteers_desire id = "BLR" value = 5500 } }
-send_volunteers_ANG = { enable = { has_country_flag = send_volunteers_ANG } abort = { NOT = { has_country_flag = send_volunteers_ANG } } ai_strategy = { type = send_volunteers_desire id = "ANG" value = 5500 } }
-send_volunteers_MZB = { enable = { has_country_flag = send_volunteers_MZB } abort = { NOT = { has_country_flag = send_volunteers_MZB } } ai_strategy = { type = send_volunteers_desire id = "MZB" value = 5500 } }
-send_volunteers_ZIM = { enable = { has_country_flag = send_volunteers_ZIM } abort = { NOT = { has_country_flag = send_volunteers_ZIM } } ai_strategy = { type = send_volunteers_desire id = "ZIM" value = 5500 } }
-send_volunteers_COG = { enable = { has_country_flag = send_volunteers_COG } abort = { NOT = { has_country_flag = send_volunteers_COG } } ai_strategy = { type = send_volunteers_desire id = "COG" value = 5500 } }
-send_volunteers_KEN = { enable = { has_country_flag = send_volunteers_KEN } abort = { NOT = { has_country_flag = send_volunteers_KEN } } ai_strategy = { type = send_volunteers_desire id = "KEN" value = 5500 } }
-send_volunteers_PAK = { enable = { has_country_flag = send_volunteers_PAK } abort = { NOT = { has_country_flag = send_volunteers_PAK } } ai_strategy = { type = send_volunteers_desire id = "PAK" value = 5500 } }
-send_volunteers_BOT = { enable = { has_country_flag = send_volunteers_BOT } abort = { NOT = { has_country_flag = send_volunteers_BOT } } ai_strategy = { type = send_volunteers_desire id = "BOT" value = 5500 } }
-send_volunteers_MAN = { enable = { has_country_flag = send_volunteers_MAN } abort = { NOT = { has_country_flag = send_volunteers_MAN } } ai_strategy = { type = send_volunteers_desire id = "MAN" value = 5500 } }
-send_volunteers_D01 = { enable = { has_country_flag = send_volunteers_D01 } abort = { NOT = { has_country_flag = send_volunteers_D01 } } ai_strategy = { type = send_volunteers_desire id = "D01" value = 5500 } }
-send_volunteers_D02 = { enable = { has_country_flag = send_volunteers_D02 } abort = { NOT = { has_country_flag = send_volunteers_D02 } } ai_strategy = { type = send_volunteers_desire id = "D02" value = 5500 } }
-send_volunteers_D03 = { enable = { has_country_flag = send_volunteers_D03 } abort = { NOT = { has_country_flag = send_volunteers_D03 } } ai_strategy = { type = send_volunteers_desire id = "D03" value = 5500 } }
-send_volunteers_D04 = { enable = { has_country_flag = send_volunteers_D04 } abort = { NOT = { has_country_flag = send_volunteers_D04 } } ai_strategy = { type = send_volunteers_desire id = "D04" value = 5500 } }
-send_volunteers_D05 = { enable = { has_country_flag = send_volunteers_D05 } abort = { NOT = { has_country_flag = send_volunteers_D05 } } ai_strategy = { type = send_volunteers_desire id = "D05" value = 5500 } }
-send_volunteers_D06 = { enable = { has_country_flag = send_volunteers_D06 } abort = { NOT = { has_country_flag = send_volunteers_D06 } } ai_strategy = { type = send_volunteers_desire id = "D06" value = 5500 } }
-send_volunteers_D07 = { enable = { has_country_flag = send_volunteers_D07 } abort = { NOT = { has_country_flag = send_volunteers_D07 } } ai_strategy = { type = send_volunteers_desire id = "D07" value = 5500 } }
-send_volunteers_D08 = { enable = { has_country_flag = send_volunteers_D08 } abort = { NOT = { has_country_flag = send_volunteers_D08 } } ai_strategy = { type = send_volunteers_desire id = "D08" value = 5500 } }
-send_volunteers_D09 = { enable = { has_country_flag = send_volunteers_D09 } abort = { NOT = { has_country_flag = send_volunteers_D09 } } ai_strategy = { type = send_volunteers_desire id = "D09" value = 5500 } }
-send_volunteers_D10 = { enable = { has_country_flag = send_volunteers_D10 } abort = { NOT = { has_country_flag = send_volunteers_D10 } } ai_strategy = { type = send_volunteers_desire id = "D10" value = 5500 } }
-send_volunteers_D11 = { enable = { has_country_flag = send_volunteers_D11 } abort = { NOT = { has_country_flag = send_volunteers_D11 } } ai_strategy = { type = send_volunteers_desire id = "D11" value = 5500 } }
-send_volunteers_D12 = { enable = { has_country_flag = send_volunteers_D12 } abort = { NOT = { has_country_flag = send_volunteers_D12 } } ai_strategy = { type = send_volunteers_desire id = "D12" value = 5500 } }
-send_volunteers_D13 = { enable = { has_country_flag = send_volunteers_D13 } abort = { NOT = { has_country_flag = send_volunteers_D13 } } ai_strategy = { type = send_volunteers_desire id = "D13" value = 5500 } }
-send_volunteers_D14 = { enable = { has_country_flag = send_volunteers_D14 } abort = { NOT = { has_country_flag = send_volunteers_D14 } } ai_strategy = { type = send_volunteers_desire id = "D14" value = 5500 } }
-send_volunteers_D15 = { enable = { has_country_flag = send_volunteers_D15 } abort = { NOT = { has_country_flag = send_volunteers_D15 } } ai_strategy = { type = send_volunteers_desire id = "D15" value = 5500 } }
+EAI_volunteers_GER = { enable = { GER = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { GER = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "GER" value = 5500 } } #MTS
+EAI_volunteers_ENG = { enable = { ENG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ENG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ENG" value = 5500 } }
+EAI_volunteers_SOV = { enable = { SOV = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SOV = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SOV" value = 5500 } }
+EAI_volunteers_SWE = { enable = { SWE = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SWE = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SWE" value = 5500 } }
+EAI_volunteers_FRA = { enable = { FRA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { FRA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "FRA" value = 5500 } }
+EAI_volunteers_LUX = { enable = { LUX = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LUX = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LUX" value = 5500 } }
+EAI_volunteers_BEL = { enable = { BEL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BEL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BEL" value = 5500 } }
+EAI_volunteers_HOL = { enable = { HOL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { HOL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "HOL" value = 5500 } }
+EAI_volunteers_CZE = { enable = { CZE = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CZE = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CZE" value = 5500 } }
+EAI_volunteers_POL = { enable = { POL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { POL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "POL" value = 5500 } }
+EAI_volunteers_AUS = { enable = { AUS = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { AUS = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "AUS" value = 5500 } }
+EAI_volunteers_LIT = { enable = { LIT = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LIT = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LIT" value = 5500 } }
+EAI_volunteers_EST = { enable = { EST = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { EST = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "EST" value = 5500 } }
+EAI_volunteers_LAT = { enable = { LAT = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LAT = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LAT" value = 5500 } }
+EAI_volunteers_SPR = { enable = { SPR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SPR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SPR" value = 5500 } }
+EAI_volunteers_ITA = { enable = { ITA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ITA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ITA" value = 5500 } }
+EAI_volunteers_ROM = { enable = { ROM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ROM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ROM" value = 5500 } }
+EAI_volunteers_YUG = { enable = { YUG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { YUG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "YUG" value = 5500 } }
+EAI_volunteers_SER = { enable = { SER = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SER = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SER" value = 5500 } }
+EAI_volunteers_SWI = { enable = { SWI = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SWI = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SWI" value = 5500 } }
+EAI_volunteers_TUR = { enable = { TUR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { TUR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "TUR" value = 5500 } }
+EAI_volunteers_GRE = { enable = { GRE = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { GRE = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "GRE" value = 5500 } }
+EAI_volunteers_ALB = { enable = { ALB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ALB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ALB" value = 5500 } }
+EAI_volunteers_NOR = { enable = { NOR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { NOR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "NOR" value = 5500 } }
+EAI_volunteers_DEN = { enable = { DEN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { DEN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "DEN" value = 5500 } }
+EAI_volunteers_BUL = { enable = { BUL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BUL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BUL" value = 5500 } }
+EAI_volunteers_POR = { enable = { POR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { POR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "POR" value = 5500 } }
+EAI_volunteers_FIN = { enable = { FIN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { FIN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "FIN" value = 5500 } }
+EAI_volunteers_IRE = { enable = { IRE = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { IRE = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "IRE" value = 5500 } }
+EAI_volunteers_HUN = { enable = { HUN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { HUN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "HUN" value = 5500 } }
+EAI_volunteers_AFG = { enable = { AFG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { AFG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "AFG" value = 5500 } }
+EAI_volunteers_ARG = { enable = { ARG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ARG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ARG" value = 5500 } }
+EAI_volunteers_AST = { enable = { AST = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { AST = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "AST" value = 5500 } }
+EAI_volunteers_BHU = { enable = { BHU = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BHU = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BHU" value = 5500 } }
+EAI_volunteers_BOL = { enable = { BOL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BOL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BOL" value = 5500 } }
+EAI_volunteers_BRA = { enable = { BRA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BRA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BRA" value = 5500 } }
+EAI_volunteers_CAN = { enable = { CAN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CAN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CAN" value = 5500 } }
+EAI_volunteers_CHI = { enable = { CHI = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CHI = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CHI" value = 5500 } }
+EAI_volunteers_CHL = { enable = { CHL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CHL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CHL" value = 5500 } }
+EAI_volunteers_COL = { enable = { COL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { COL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "COL" value = 5500 } }
+EAI_volunteers_COS = { enable = { COS = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { COS = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "COS" value = 5500 } }
+EAI_volunteers_ECU = { enable = { ECU = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ECU = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ECU" value = 5500 } }
+EAI_volunteers_ELS = { enable = { ELS = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ELS = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ELS" value = 5500 } }
+EAI_volunteers_ETH = { enable = { ETH = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ETH = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ETH" value = 5500 } }
+EAI_volunteers_GUA = { enable = { GUA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { GUA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "GUA" value = 5500 } }
+EAI_volunteers_HON = { enable = { HON = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { HON = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "HON" value = 5500 } }
+EAI_volunteers_IRQ = { enable = { IRQ = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { IRQ = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "IRQ" value = 5500 } }
+EAI_volunteers_JAP = { enable = { JAP = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { JAP = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "JAP" value = 5500 } }
+EAI_volunteers_KOR = { enable = { KOR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { KOR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "KOR" value = 5500 } }
+EAI_volunteers_LIB = { enable = { LIB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LIB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LIB" value = 5500 } }
+EAI_volunteers_MEX = { enable = { MEX = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MEX = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MEX" value = 5500 } }
+EAI_volunteers_MEN = { enable = { MEN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MEN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MEN" value = 5500 } }
+EAI_volunteers_NEP = { enable = { NEP = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { NEP = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "NEP" value = 5500 } }
+EAI_volunteers_NIC = { enable = { NIC = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { NIC = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "NIC" value = 5500 } }
+EAI_volunteers_NZL = { enable = { NZL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { NZL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "NZL" value = 5500 } }
+EAI_volunteers_PER = { enable = { PER = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PER = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PER" value = 5500 } }
+EAI_volunteers_PRU = { enable = { PRU = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PRU = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PRU" value = 5500 } }
+EAI_volunteers_SAF = { enable = { SAF = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SAF = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SAF" value = 5500 } }
+EAI_volunteers_SAU = { enable = { SAU = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SAU = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SAU" value = 5500 } }
+EAI_volunteers_SIA = { enable = { SIA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SIA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SIA" value = 5500 } }
+EAI_volunteers_SIK = { enable = { SIK = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SIK = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SIK" value = 5500 } }
+EAI_volunteers_TIB = { enable = { TIB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { TIB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "TIB" value = 5500 } }
+EAI_volunteers_URG = { enable = { URG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { URG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "URG" value = 5500 } }
+EAI_volunteers_VEN = { enable = { VEN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { VEN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "VEN" value = 5500 } }
+EAI_volunteers_YUN = { enable = { YUN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { YUN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "YUN" value = 5500 } }
+EAI_volunteers_USA = { enable = { USA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { USA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "USA" value = 5500 } }
+EAI_volunteers_MON = { enable = { MON = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MON = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MON" value = 5500 } }
+EAI_volunteers_TAN = { enable = { TAN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { TAN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "TAN" value = 5500 } }
+EAI_volunteers_PAR = { enable = { PAR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PAR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PAR" value = 5500 } }
+EAI_volunteers_CUB = { enable = { CUB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CUB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CUB" value = 5500 } }
+EAI_volunteers_DOM = { enable = { DOM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { DOM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "DOM" value = 5500 } }
+EAI_volunteers_HAI = { enable = { HAI = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { HAI = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "HAI" value = 5500 } }
+EAI_volunteers_YEM = { enable = { YEM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { YEM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "YEM" value = 5500 } }
+EAI_volunteers_OMA = { enable = { OMA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { OMA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "OMA" value = 5500 } }
+EAI_volunteers_SLO = { enable = { SLO = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SLO = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SLO" value = 5500 } }
+EAI_volunteers_RAJ = { enable = { RAJ = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { RAJ = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "RAJ" value = 5500 } }
+EAI_volunteers_CRO = { enable = { CRO = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CRO = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CRO" value = 5500 } }
+EAI_volunteers_GXC = { enable = { GXC = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { GXC = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "GXC" value = 5500 } }
+EAI_volunteers_PRC = { enable = { PRC = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PRC = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PRC" value = 5500 } }
+EAI_volunteers_SHX = { enable = { SHX = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SHX = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SHX" value = 5500 } }
+EAI_volunteers_XSM = { enable = { XSM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { XSM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "XSM" value = 5500 } }
+EAI_volunteers_ICE = { enable = { ICE = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ICE = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ICE" value = 5500 } }
+EAI_volunteers_LEB = { enable = { LEB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LEB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LEB" value = 5500 } }
+EAI_volunteers_JOR = { enable = { JOR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { JOR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "JOR" value = 5500 } }
+EAI_volunteers_SYR = { enable = { SYR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { SYR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "SYR" value = 5500 } }
+EAI_volunteers_EGY = { enable = { EGY = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { EGY = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "EGY" value = 5500 } }
+EAI_volunteers_LBA = { enable = { LBA = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LBA = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LBA" value = 5500 } }
+EAI_volunteers_WGR = { enable = { WGR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { WGR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "WGR" value = 5500 } }
+EAI_volunteers_DDR = { enable = { DDR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { DDR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "DDR" value = 5500 } }
+EAI_volunteers_PAL = { enable = { PAL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PAL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PAL" value = 5500 } }
+EAI_volunteers_ISR = { enable = { ISR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ISR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ISR" value = 5500 } }
+EAI_volunteers_VIN = { enable = { VIN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { VIN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "VIN" value = 5500 } }
+EAI_volunteers_CAM = { enable = { CAM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { CAM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "CAM" value = 5500 } }
+EAI_volunteers_MAL = { enable = { MAL = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MAL = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MAL" value = 5500 } }
+EAI_volunteers_INS = { enable = { INS = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { INS = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "INS" value = 5500 } }
+EAI_volunteers_LAO = { enable = { LAO = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { LAO = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "LAO" value = 5500 } }
+EAI_volunteers_MNT = { enable = { MNT = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MNT = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MNT" value = 5500 } }
+EAI_volunteers_UKR = { enable = { UKR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { UKR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "UKR" value = 5500 } }
+EAI_volunteers_GEO = { enable = { GEO = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { GEO = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "GEO" value = 5500 } }
+EAI_volunteers_KAZ = { enable = { KAZ = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { KAZ = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "KAZ" value = 5500 } }
+EAI_volunteers_AZR = { enable = { AZR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { AZR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "AZR" value = 5500 } }
+EAI_volunteers_ARM = { enable = { ARM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ARM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ARM" value = 5500 } }
+EAI_volunteers_BLR = { enable = { BLR = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BLR = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BLR" value = 5500 } }
+EAI_volunteers_ANG = { enable = { ANG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ANG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ANG" value = 5500 } }
+EAI_volunteers_MZB = { enable = { MZB = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MZB = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MZB" value = 5500 } }
+EAI_volunteers_ZIM = { enable = { ZIM = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { ZIM = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "ZIM" value = 5500 } }
+EAI_volunteers_COG = { enable = { COG = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { COG = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "COG" value = 5500 } }
+EAI_volunteers_KEN = { enable = { KEN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { KEN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "KEN" value = 5500 } }
+EAI_volunteers_PAK = { enable = { PAK = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { PAK = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "PAK" value = 5500 } }
+EAI_volunteers_BOT = { enable = { BOT = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { BOT = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "BOT" value = 5500 } }
+EAI_volunteers_MAN = { enable = { MAN = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { MAN = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "MAN" value = 5500 } }
+EAI_volunteers_D01 = { enable = { D01 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D01 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D01" value = 5500 } }
+EAI_volunteers_D02 = { enable = { D02 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D02 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D02" value = 5500 } }
+EAI_volunteers_D03 = { enable = { D03 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D03 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D03" value = 5500 } }
+EAI_volunteers_D04 = { enable = { D04 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D04 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D04" value = 5500 } }
+EAI_volunteers_D05 = { enable = { D05 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D05 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D05" value = 5500 } }
+EAI_volunteers_D06 = { enable = { D06 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D06 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D06" value = 5500 } }
+EAI_volunteers_D07 = { enable = { D07 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D07 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D07" value = 5500 } }
+EAI_volunteers_D08 = { enable = { D08 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D08 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D08" value = 5500 } }
+EAI_volunteers_D09 = { enable = { D09 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D09 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D09" value = 5500 } }
+EAI_volunteers_D10 = { enable = { D10 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D10 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D10" value = 5500 } }
+EAI_volunteers_D11 = { enable = { D11 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D11 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D11" value = 5500 } }
+EAI_volunteers_D12 = { enable = { D12 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D12 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D12" value = 5500 } }
+EAI_volunteers_D13 = { enable = { D13 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D13 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D13" value = 5500 } }
+EAI_volunteers_D14 = { enable = { D14 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D14 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D14" value = 5500 } }
+EAI_volunteers_D15 = { enable = { D15 = { has_country_flag = EAI_volunteers_from_@ROOT } } abort = { NOT = { D15 = { has_country_flag = EAI_volunteers_from_@ROOT } } } ai_strategy = { type = send_volunteers_desire id = "D15" value = 5500 } }
 
 ###########################################################################
 #	FACTION INVITE FOR ANTI-AGGRESSION SCRIPT
 ###########################################################################
 
-invite_to_faction_GER = { enable = { has_country_flag = invite_to_faction_GER } abort = { NOT = { has_country_flag = invite_to_faction_GER } } ai_strategy = { type = alliance id = "GER" value = 500 } }
-invite_to_faction_ENG = { enable = { has_country_flag = invite_to_faction_ENG } abort = { NOT = { has_country_flag = invite_to_faction_ENG } } ai_strategy = { type = alliance id = "ENG" value = 500 } }
-invite_to_faction_SOV = { enable = { has_country_flag = invite_to_faction_SOV } abort = { NOT = { has_country_flag = invite_to_faction_SOV } } ai_strategy = { type = alliance id = "SOV" value = 500 } }
-invite_to_faction_SWE = { enable = { has_country_flag = invite_to_faction_SWE } abort = { NOT = { has_country_flag = invite_to_faction_SWE } } ai_strategy = { type = alliance id = "SWE" value = 500 } }
-invite_to_faction_FRA = { enable = { has_country_flag = invite_to_faction_FRA } abort = { NOT = { has_country_flag = invite_to_faction_FRA } } ai_strategy = { type = alliance id = "FRA" value = 500 } }
-invite_to_faction_LUX = { enable = { has_country_flag = invite_to_faction_LUX } abort = { NOT = { has_country_flag = invite_to_faction_LUX } } ai_strategy = { type = alliance id = "LUX" value = 500 } }
-invite_to_faction_BEL = { enable = { has_country_flag = invite_to_faction_BEL } abort = { NOT = { has_country_flag = invite_to_faction_BEL } } ai_strategy = { type = alliance id = "BEL" value = 500 } }
-invite_to_faction_HOL = { enable = { has_country_flag = invite_to_faction_HOL } abort = { NOT = { has_country_flag = invite_to_faction_HOL } } ai_strategy = { type = alliance id = "HOL" value = 500 } }
-invite_to_faction_CZE = { enable = { has_country_flag = invite_to_faction_CZE } abort = { NOT = { has_country_flag = invite_to_faction_CZE } } ai_strategy = { type = alliance id = "CZE" value = 500 } }
-invite_to_faction_POL = { enable = { has_country_flag = invite_to_faction_POL } abort = { NOT = { has_country_flag = invite_to_faction_POL } } ai_strategy = { type = alliance id = "POL" value = 500 } }
-invite_to_faction_AUS = { enable = { has_country_flag = invite_to_faction_AUS } abort = { NOT = { has_country_flag = invite_to_faction_AUS } } ai_strategy = { type = alliance id = "AUS" value = 500 } }
-invite_to_faction_LIT = { enable = { has_country_flag = invite_to_faction_LIT } abort = { NOT = { has_country_flag = invite_to_faction_LIT } } ai_strategy = { type = alliance id = "LIT" value = 500 } }
-invite_to_faction_EST = { enable = { has_country_flag = invite_to_faction_EST } abort = { NOT = { has_country_flag = invite_to_faction_EST } } ai_strategy = { type = alliance id = "EST" value = 500 } }
-invite_to_faction_LAT = { enable = { has_country_flag = invite_to_faction_LAT } abort = { NOT = { has_country_flag = invite_to_faction_LAT } } ai_strategy = { type = alliance id = "LAT" value = 500 } }
-invite_to_faction_SPR = { enable = { has_country_flag = invite_to_faction_SPR } abort = { NOT = { has_country_flag = invite_to_faction_SPR } } ai_strategy = { type = alliance id = "SPR" value = 500 } }
-invite_to_faction_ITA = { enable = { has_country_flag = invite_to_faction_ITA } abort = { NOT = { has_country_flag = invite_to_faction_ITA } } ai_strategy = { type = alliance id = "ITA" value = 500 } }
-invite_to_faction_ROM = { enable = { has_country_flag = invite_to_faction_ROM } abort = { NOT = { has_country_flag = invite_to_faction_ROM } } ai_strategy = { type = alliance id = "ROM" value = 500 } }
-invite_to_faction_YUG = { enable = { has_country_flag = invite_to_faction_YUG } abort = { NOT = { has_country_flag = invite_to_faction_YUG } } ai_strategy = { type = alliance id = "YUG" value = 500 } }
-invite_to_faction_SER = { enable = { has_country_flag = invite_to_faction_SER } abort = { NOT = { has_country_flag = invite_to_faction_SER } } ai_strategy = { type = alliance id = "SER" value = 500 } }
-invite_to_faction_SWI = { enable = { has_country_flag = invite_to_faction_SWI } abort = { NOT = { has_country_flag = invite_to_faction_SWI } } ai_strategy = { type = alliance id = "SWI" value = 500 } }
-invite_to_faction_TUR = { enable = { has_country_flag = invite_to_faction_TUR } abort = { NOT = { has_country_flag = invite_to_faction_TUR } } ai_strategy = { type = alliance id = "TUR" value = 500 } }
-invite_to_faction_GRE = { enable = { has_country_flag = invite_to_faction_GRE } abort = { NOT = { has_country_flag = invite_to_faction_GRE } } ai_strategy = { type = alliance id = "GRE" value = 500 } }
-invite_to_faction_ALB = { enable = { has_country_flag = invite_to_faction_ALB } abort = { NOT = { has_country_flag = invite_to_faction_ALB } } ai_strategy = { type = alliance id = "ALB" value = 500 } }
-invite_to_faction_NOR = { enable = { has_country_flag = invite_to_faction_NOR } abort = { NOT = { has_country_flag = invite_to_faction_NOR } } ai_strategy = { type = alliance id = "NOR" value = 500 } }
-invite_to_faction_DEN = { enable = { has_country_flag = invite_to_faction_DEN } abort = { NOT = { has_country_flag = invite_to_faction_DEN } } ai_strategy = { type = alliance id = "DEN" value = 500 } }
-invite_to_faction_BUL = { enable = { has_country_flag = invite_to_faction_BUL } abort = { NOT = { has_country_flag = invite_to_faction_BUL } } ai_strategy = { type = alliance id = "BUL" value = 500 } }
-invite_to_faction_POR = { enable = { has_country_flag = invite_to_faction_POR } abort = { NOT = { has_country_flag = invite_to_faction_POR } } ai_strategy = { type = alliance id = "POR" value = 500 } }
-invite_to_faction_FIN = { enable = { has_country_flag = invite_to_faction_FIN } abort = { NOT = { has_country_flag = invite_to_faction_FIN } } ai_strategy = { type = alliance id = "FIN" value = 500 } }
-invite_to_faction_IRE = { enable = { has_country_flag = invite_to_faction_IRE } abort = { NOT = { has_country_flag = invite_to_faction_IRE } } ai_strategy = { type = alliance id = "IRE" value = 500 } }
-invite_to_faction_HUN = { enable = { has_country_flag = invite_to_faction_HUN } abort = { NOT = { has_country_flag = invite_to_faction_HUN } } ai_strategy = { type = alliance id = "HUN" value = 500 } }
-invite_to_faction_AFG = { enable = { has_country_flag = invite_to_faction_AFG } abort = { NOT = { has_country_flag = invite_to_faction_AFG } } ai_strategy = { type = alliance id = "AFG" value = 500 } }
-invite_to_faction_ARG = { enable = { has_country_flag = invite_to_faction_ARG } abort = { NOT = { has_country_flag = invite_to_faction_ARG } } ai_strategy = { type = alliance id = "ARG" value = 500 } }
-invite_to_faction_AST = { enable = { has_country_flag = invite_to_faction_AST } abort = { NOT = { has_country_flag = invite_to_faction_AST } } ai_strategy = { type = alliance id = "AST" value = 500 } }
-invite_to_faction_BHU = { enable = { has_country_flag = invite_to_faction_BHU } abort = { NOT = { has_country_flag = invite_to_faction_BHU } } ai_strategy = { type = alliance id = "BHU" value = 500 } }
-invite_to_faction_BOL = { enable = { has_country_flag = invite_to_faction_BOL } abort = { NOT = { has_country_flag = invite_to_faction_BOL } } ai_strategy = { type = alliance id = "BOL" value = 500 } }
-invite_to_faction_BRA = { enable = { has_country_flag = invite_to_faction_BRA } abort = { NOT = { has_country_flag = invite_to_faction_BRA } } ai_strategy = { type = alliance id = "BRA" value = 500 } }
-invite_to_faction_CAN = { enable = { has_country_flag = invite_to_faction_CAN } abort = { NOT = { has_country_flag = invite_to_faction_CAN } } ai_strategy = { type = alliance id = "CAN" value = 500 } }
-invite_to_faction_CHI = { enable = { has_country_flag = invite_to_faction_CHI } abort = { NOT = { has_country_flag = invite_to_faction_CHI } } ai_strategy = { type = alliance id = "CHI" value = 500 } }
-invite_to_faction_CHL = { enable = { has_country_flag = invite_to_faction_CHL } abort = { NOT = { has_country_flag = invite_to_faction_CHL } } ai_strategy = { type = alliance id = "CHL" value = 500 } }
-invite_to_faction_COL = { enable = { has_country_flag = invite_to_faction_COL } abort = { NOT = { has_country_flag = invite_to_faction_COL } } ai_strategy = { type = alliance id = "COL" value = 500 } }
-invite_to_faction_COS = { enable = { has_country_flag = invite_to_faction_COS } abort = { NOT = { has_country_flag = invite_to_faction_COS } } ai_strategy = { type = alliance id = "COS" value = 500 } }
-invite_to_faction_ECU = { enable = { has_country_flag = invite_to_faction_ECU } abort = { NOT = { has_country_flag = invite_to_faction_ECU } } ai_strategy = { type = alliance id = "ECU" value = 500 } }
-invite_to_faction_ELS = { enable = { has_country_flag = invite_to_faction_ELS } abort = { NOT = { has_country_flag = invite_to_faction_ELS } } ai_strategy = { type = alliance id = "ELS" value = 500 } }
-invite_to_faction_ETH = { enable = { has_country_flag = invite_to_faction_ETH } abort = { NOT = { has_country_flag = invite_to_faction_ETH } } ai_strategy = { type = alliance id = "ETH" value = 500 } }
-invite_to_faction_GUA = { enable = { has_country_flag = invite_to_faction_GUA } abort = { NOT = { has_country_flag = invite_to_faction_GUA } } ai_strategy = { type = alliance id = "GUA" value = 500 } }
-invite_to_faction_HON = { enable = { has_country_flag = invite_to_faction_HON } abort = { NOT = { has_country_flag = invite_to_faction_HON } } ai_strategy = { type = alliance id = "HON" value = 500 } }
-invite_to_faction_IRQ = { enable = { has_country_flag = invite_to_faction_IRQ } abort = { NOT = { has_country_flag = invite_to_faction_IRQ } } ai_strategy = { type = alliance id = "IRQ" value = 500 } }
-invite_to_faction_JAP = { enable = { has_country_flag = invite_to_faction_JAP } abort = { NOT = { has_country_flag = invite_to_faction_JAP } } ai_strategy = { type = alliance id = "JAP" value = 500 } }
-invite_to_faction_KOR = { enable = { has_country_flag = invite_to_faction_KOR } abort = { NOT = { has_country_flag = invite_to_faction_KOR } } ai_strategy = { type = alliance id = "KOR" value = 500 } }
-invite_to_faction_LIB = { enable = { has_country_flag = invite_to_faction_LIB } abort = { NOT = { has_country_flag = invite_to_faction_LIB } } ai_strategy = { type = alliance id = "LIB" value = 500 } }
-invite_to_faction_MEX = { enable = { has_country_flag = invite_to_faction_MEX } abort = { NOT = { has_country_flag = invite_to_faction_MEX } } ai_strategy = { type = alliance id = "MEX" value = 500 } }
-invite_to_faction_MEN = { enable = { has_country_flag = invite_to_faction_MEN } abort = { NOT = { has_country_flag = invite_to_faction_MEN } } ai_strategy = { type = alliance id = "MEN" value = 500 } }
-invite_to_faction_NEP = { enable = { has_country_flag = invite_to_faction_NEP } abort = { NOT = { has_country_flag = invite_to_faction_NEP } } ai_strategy = { type = alliance id = "NEP" value = 500 } }
-invite_to_faction_NIC = { enable = { has_country_flag = invite_to_faction_NIC } abort = { NOT = { has_country_flag = invite_to_faction_NIC } } ai_strategy = { type = alliance id = "NIC" value = 500 } }
-invite_to_faction_NZL = { enable = { has_country_flag = invite_to_faction_NZL } abort = { NOT = { has_country_flag = invite_to_faction_NZL } } ai_strategy = { type = alliance id = "NZL" value = 500 } }
-invite_to_faction_PER = { enable = { has_country_flag = invite_to_faction_PER } abort = { NOT = { has_country_flag = invite_to_faction_PER } } ai_strategy = { type = alliance id = "PER" value = 500 } }
-invite_to_faction_PRU = { enable = { has_country_flag = invite_to_faction_PRU } abort = { NOT = { has_country_flag = invite_to_faction_PRU } } ai_strategy = { type = alliance id = "PRU" value = 500 } }
-invite_to_faction_SAF = { enable = { has_country_flag = invite_to_faction_SAF } abort = { NOT = { has_country_flag = invite_to_faction_SAF } } ai_strategy = { type = alliance id = "SAF" value = 500 } }
-invite_to_faction_SAU = { enable = { has_country_flag = invite_to_faction_SAU } abort = { NOT = { has_country_flag = invite_to_faction_SAU } } ai_strategy = { type = alliance id = "SAU" value = 500 } }
-invite_to_faction_SIA = { enable = { has_country_flag = invite_to_faction_SIA } abort = { NOT = { has_country_flag = invite_to_faction_SIA } } ai_strategy = { type = alliance id = "SIA" value = 500 } }
-invite_to_faction_SIK = { enable = { has_country_flag = invite_to_faction_SIK } abort = { NOT = { has_country_flag = invite_to_faction_SIK } } ai_strategy = { type = alliance id = "SIK" value = 500 } }
-invite_to_faction_TIB = { enable = { has_country_flag = invite_to_faction_TIB } abort = { NOT = { has_country_flag = invite_to_faction_TIB } } ai_strategy = { type = alliance id = "TIB" value = 500 } }
-invite_to_faction_URG = { enable = { has_country_flag = invite_to_faction_URG } abort = { NOT = { has_country_flag = invite_to_faction_URG } } ai_strategy = { type = alliance id = "URG" value = 500 } }
-invite_to_faction_VEN = { enable = { has_country_flag = invite_to_faction_VEN } abort = { NOT = { has_country_flag = invite_to_faction_VEN } } ai_strategy = { type = alliance id = "VEN" value = 500 } }
-invite_to_faction_YUN = { enable = { has_country_flag = invite_to_faction_YUN } abort = { NOT = { has_country_flag = invite_to_faction_YUN } } ai_strategy = { type = alliance id = "YUN" value = 500 } }
-invite_to_faction_USA = { enable = { has_country_flag = invite_to_faction_USA } abort = { NOT = { has_country_flag = invite_to_faction_USA } } ai_strategy = { type = alliance id = "USA" value = 500 } }
-invite_to_faction_MON = { enable = { has_country_flag = invite_to_faction_MON } abort = { NOT = { has_country_flag = invite_to_faction_MON } } ai_strategy = { type = alliance id = "MON" value = 500 } }
-invite_to_faction_TAN = { enable = { has_country_flag = invite_to_faction_TAN } abort = { NOT = { has_country_flag = invite_to_faction_TAN } } ai_strategy = { type = alliance id = "TAN" value = 500 } }
-invite_to_faction_PAR = { enable = { has_country_flag = invite_to_faction_PAR } abort = { NOT = { has_country_flag = invite_to_faction_PAR } } ai_strategy = { type = alliance id = "PAR" value = 500 } }
-invite_to_faction_CUB = { enable = { has_country_flag = invite_to_faction_CUB } abort = { NOT = { has_country_flag = invite_to_faction_CUB } } ai_strategy = { type = alliance id = "CUB" value = 500 } }
-invite_to_faction_DOM = { enable = { has_country_flag = invite_to_faction_DOM } abort = { NOT = { has_country_flag = invite_to_faction_DOM } } ai_strategy = { type = alliance id = "DOM" value = 500 } }
-invite_to_faction_HAI = { enable = { has_country_flag = invite_to_faction_HAI } abort = { NOT = { has_country_flag = invite_to_faction_HAI } } ai_strategy = { type = alliance id = "HAI" value = 500 } }
-invite_to_faction_YEM = { enable = { has_country_flag = invite_to_faction_YEM } abort = { NOT = { has_country_flag = invite_to_faction_YEM } } ai_strategy = { type = alliance id = "YEM" value = 500 } }
-invite_to_faction_OMA = { enable = { has_country_flag = invite_to_faction_OMA } abort = { NOT = { has_country_flag = invite_to_faction_OMA } } ai_strategy = { type = alliance id = "OMA" value = 500 } }
-invite_to_faction_SLO = { enable = { has_country_flag = invite_to_faction_SLO } abort = { NOT = { has_country_flag = invite_to_faction_SLO } } ai_strategy = { type = alliance id = "SLO" value = 500 } }
-invite_to_faction_RAJ = { enable = { has_country_flag = invite_to_faction_RAJ } abort = { NOT = { has_country_flag = invite_to_faction_RAJ } } ai_strategy = { type = alliance id = "RAJ" value = 500 } }
-invite_to_faction_CRO = { enable = { has_country_flag = invite_to_faction_CRO } abort = { NOT = { has_country_flag = invite_to_faction_CRO } } ai_strategy = { type = alliance id = "CRO" value = 500 } }
-invite_to_faction_GXC = { enable = { has_country_flag = invite_to_faction_GXC } abort = { NOT = { has_country_flag = invite_to_faction_GXC } } ai_strategy = { type = alliance id = "GXC" value = 500 } }
-invite_to_faction_PRC = { enable = { has_country_flag = invite_to_faction_PRC } abort = { NOT = { has_country_flag = invite_to_faction_PRC } } ai_strategy = { type = alliance id = "PRC" value = 500 } }
-invite_to_faction_SHX = { enable = { has_country_flag = invite_to_faction_SHX } abort = { NOT = { has_country_flag = invite_to_faction_SHX } } ai_strategy = { type = alliance id = "SHX" value = 500 } }
-invite_to_faction_XSM = { enable = { has_country_flag = invite_to_faction_XSM } abort = { NOT = { has_country_flag = invite_to_faction_XSM } } ai_strategy = { type = alliance id = "XSM" value = 500 } }
-invite_to_faction_ICE = { enable = { has_country_flag = invite_to_faction_ICE } abort = { NOT = { has_country_flag = invite_to_faction_ICE } } ai_strategy = { type = alliance id = "ICE" value = 500 } }
-invite_to_faction_LEB = { enable = { has_country_flag = invite_to_faction_LEB } abort = { NOT = { has_country_flag = invite_to_faction_LEB } } ai_strategy = { type = alliance id = "LEB" value = 500 } }
-invite_to_faction_JOR = { enable = { has_country_flag = invite_to_faction_JOR } abort = { NOT = { has_country_flag = invite_to_faction_JOR } } ai_strategy = { type = alliance id = "JOR" value = 500 } }
-invite_to_faction_SYR = { enable = { has_country_flag = invite_to_faction_SYR } abort = { NOT = { has_country_flag = invite_to_faction_SYR } } ai_strategy = { type = alliance id = "SYR" value = 500 } }
-invite_to_faction_EGY = { enable = { has_country_flag = invite_to_faction_EGY } abort = { NOT = { has_country_flag = invite_to_faction_EGY } } ai_strategy = { type = alliance id = "EGY" value = 500 } }
-invite_to_faction_LBA = { enable = { has_country_flag = invite_to_faction_LBA } abort = { NOT = { has_country_flag = invite_to_faction_LBA } } ai_strategy = { type = alliance id = "LBA" value = 500 } }
-invite_to_faction_WGR = { enable = { has_country_flag = invite_to_faction_WGR } abort = { NOT = { has_country_flag = invite_to_faction_WGR } } ai_strategy = { type = alliance id = "WGR" value = 500 } }
-invite_to_faction_DDR = { enable = { has_country_flag = invite_to_faction_DDR } abort = { NOT = { has_country_flag = invite_to_faction_DDR } } ai_strategy = { type = alliance id = "DDR" value = 500 } }
-invite_to_faction_PAL = { enable = { has_country_flag = invite_to_faction_PAL } abort = { NOT = { has_country_flag = invite_to_faction_PAL } } ai_strategy = { type = alliance id = "PAL" value = 500 } }
-invite_to_faction_ISR = { enable = { has_country_flag = invite_to_faction_ISR } abort = { NOT = { has_country_flag = invite_to_faction_ISR } } ai_strategy = { type = alliance id = "ISR" value = 500 } }
-invite_to_faction_VIN = { enable = { has_country_flag = invite_to_faction_VIN } abort = { NOT = { has_country_flag = invite_to_faction_VIN } } ai_strategy = { type = alliance id = "VIN" value = 500 } }
-invite_to_faction_CAM = { enable = { has_country_flag = invite_to_faction_CAM } abort = { NOT = { has_country_flag = invite_to_faction_CAM } } ai_strategy = { type = alliance id = "CAM" value = 500 } }
-invite_to_faction_MAL = { enable = { has_country_flag = invite_to_faction_MAL } abort = { NOT = { has_country_flag = invite_to_faction_MAL } } ai_strategy = { type = alliance id = "MAL" value = 500 } }
-invite_to_faction_INS = { enable = { has_country_flag = invite_to_faction_INS } abort = { NOT = { has_country_flag = invite_to_faction_INS } } ai_strategy = { type = alliance id = "INS" value = 500 } }
-invite_to_faction_LAO = { enable = { has_country_flag = invite_to_faction_LAO } abort = { NOT = { has_country_flag = invite_to_faction_LAO } } ai_strategy = { type = alliance id = "LAO" value = 500 } }
-invite_to_faction_MNT = { enable = { has_country_flag = invite_to_faction_MNT } abort = { NOT = { has_country_flag = invite_to_faction_MNT } } ai_strategy = { type = alliance id = "MNT" value = 500 } }
-invite_to_faction_UKR = { enable = { has_country_flag = invite_to_faction_UKR } abort = { NOT = { has_country_flag = invite_to_faction_UKR } } ai_strategy = { type = alliance id = "UKR" value = 500 } }
-invite_to_faction_GEO = { enable = { has_country_flag = invite_to_faction_GEO } abort = { NOT = { has_country_flag = invite_to_faction_GEO } } ai_strategy = { type = alliance id = "GEO" value = 500 } }
-invite_to_faction_KAZ = { enable = { has_country_flag = invite_to_faction_KAZ } abort = { NOT = { has_country_flag = invite_to_faction_KAZ } } ai_strategy = { type = alliance id = "KAZ" value = 500 } }
-invite_to_faction_AZR = { enable = { has_country_flag = invite_to_faction_AZR } abort = { NOT = { has_country_flag = invite_to_faction_AZR } } ai_strategy = { type = alliance id = "AZR" value = 500 } }
-invite_to_faction_ARM = { enable = { has_country_flag = invite_to_faction_ARM } abort = { NOT = { has_country_flag = invite_to_faction_ARM } } ai_strategy = { type = alliance id = "ARM" value = 500 } }
-invite_to_faction_BLR = { enable = { has_country_flag = invite_to_faction_BLR } abort = { NOT = { has_country_flag = invite_to_faction_BLR } } ai_strategy = { type = alliance id = "BLR" value = 500 } }
-invite_to_faction_ANG = { enable = { has_country_flag = invite_to_faction_ANG } abort = { NOT = { has_country_flag = invite_to_faction_ANG } } ai_strategy = { type = alliance id = "ANG" value = 500 } }
-invite_to_faction_MZB = { enable = { has_country_flag = invite_to_faction_MZB } abort = { NOT = { has_country_flag = invite_to_faction_MZB } } ai_strategy = { type = alliance id = "MZB" value = 500 } }
-invite_to_faction_ZIM = { enable = { has_country_flag = invite_to_faction_ZIM } abort = { NOT = { has_country_flag = invite_to_faction_ZIM } } ai_strategy = { type = alliance id = "ZIM" value = 500 } }
-invite_to_faction_COG = { enable = { has_country_flag = invite_to_faction_COG } abort = { NOT = { has_country_flag = invite_to_faction_COG } } ai_strategy = { type = alliance id = "COG" value = 500 } }
-invite_to_faction_KEN = { enable = { has_country_flag = invite_to_faction_KEN } abort = { NOT = { has_country_flag = invite_to_faction_KEN } } ai_strategy = { type = alliance id = "KEN" value = 500 } }
-invite_to_faction_PAK = { enable = { has_country_flag = invite_to_faction_PAK } abort = { NOT = { has_country_flag = invite_to_faction_PAK } } ai_strategy = { type = alliance id = "PAK" value = 500 } }
-invite_to_faction_BOT = { enable = { has_country_flag = invite_to_faction_BOT } abort = { NOT = { has_country_flag = invite_to_faction_BOT } } ai_strategy = { type = alliance id = "BOT" value = 500 } }
-invite_to_faction_MAN = { enable = { has_country_flag = invite_to_faction_MAN } abort = { NOT = { has_country_flag = invite_to_faction_MAN } } ai_strategy = { type = alliance id = "MAN" value = 500 } }
-invite_to_faction_D01 = { enable = { has_country_flag = invite_to_faction_D01 } abort = { NOT = { has_country_flag = invite_to_faction_D01 } } ai_strategy = { type = alliance id = "D01" value = 500 } }
-invite_to_faction_D02 = { enable = { has_country_flag = invite_to_faction_D02 } abort = { NOT = { has_country_flag = invite_to_faction_D02 } } ai_strategy = { type = alliance id = "D02" value = 500 } }
-invite_to_faction_D03 = { enable = { has_country_flag = invite_to_faction_D03 } abort = { NOT = { has_country_flag = invite_to_faction_D03 } } ai_strategy = { type = alliance id = "D03" value = 500 } }
-invite_to_faction_D04 = { enable = { has_country_flag = invite_to_faction_D04 } abort = { NOT = { has_country_flag = invite_to_faction_D04 } } ai_strategy = { type = alliance id = "D04" value = 500 } }
-invite_to_faction_D05 = { enable = { has_country_flag = invite_to_faction_D05 } abort = { NOT = { has_country_flag = invite_to_faction_D05 } } ai_strategy = { type = alliance id = "D05" value = 500 } }
-invite_to_faction_D06 = { enable = { has_country_flag = invite_to_faction_D06 } abort = { NOT = { has_country_flag = invite_to_faction_D06 } } ai_strategy = { type = alliance id = "D06" value = 500 } }
-invite_to_faction_D07 = { enable = { has_country_flag = invite_to_faction_D07 } abort = { NOT = { has_country_flag = invite_to_faction_D07 } } ai_strategy = { type = alliance id = "D07" value = 500 } }
-invite_to_faction_D08 = { enable = { has_country_flag = invite_to_faction_D08 } abort = { NOT = { has_country_flag = invite_to_faction_D08 } } ai_strategy = { type = alliance id = "D08" value = 500 } }
-invite_to_faction_D09 = { enable = { has_country_flag = invite_to_faction_D09 } abort = { NOT = { has_country_flag = invite_to_faction_D09 } } ai_strategy = { type = alliance id = "D09" value = 500 } }
-invite_to_faction_D10 = { enable = { has_country_flag = invite_to_faction_D10 } abort = { NOT = { has_country_flag = invite_to_faction_D10 } } ai_strategy = { type = alliance id = "D10" value = 500 } }
-invite_to_faction_D11 = { enable = { has_country_flag = invite_to_faction_D11 } abort = { NOT = { has_country_flag = invite_to_faction_D11 } } ai_strategy = { type = alliance id = "D11" value = 500 } }
-invite_to_faction_D12 = { enable = { has_country_flag = invite_to_faction_D12 } abort = { NOT = { has_country_flag = invite_to_faction_D12 } } ai_strategy = { type = alliance id = "D12" value = 500 } }
-invite_to_faction_D13 = { enable = { has_country_flag = invite_to_faction_D13 } abort = { NOT = { has_country_flag = invite_to_faction_D13 } } ai_strategy = { type = alliance id = "D13" value = 500 } }
-invite_to_faction_D14 = { enable = { has_country_flag = invite_to_faction_D14 } abort = { NOT = { has_country_flag = invite_to_faction_D14 } } ai_strategy = { type = alliance id = "D14" value = 500 } }
-invite_to_faction_D15 = { enable = { has_country_flag = invite_to_faction_D15 } abort = { NOT = { has_country_flag = invite_to_faction_D15 } } ai_strategy = { type = alliance id = "D15" value = 500 } }
+EAI_invite_to_faction_GER = { enable = { GER = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { GER = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "GER" value = 500 } } #MTS
+EAI_invite_to_faction_ENG = { enable = { ENG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ENG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ENG" value = 500 } }
+EAI_invite_to_faction_SOV = { enable = { SOV = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SOV = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SOV" value = 500 } }
+EAI_invite_to_faction_SWE = { enable = { SWE = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SWE = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SWE" value = 500 } }
+EAI_invite_to_faction_FRA = { enable = { FRA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { FRA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "FRA" value = 500 } }
+EAI_invite_to_faction_LUX = { enable = { LUX = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LUX = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LUX" value = 500 } }
+EAI_invite_to_faction_BEL = { enable = { BEL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BEL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BEL" value = 500 } }
+EAI_invite_to_faction_HOL = { enable = { HOL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { HOL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "HOL" value = 500 } }
+EAI_invite_to_faction_CZE = { enable = { CZE = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CZE = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CZE" value = 500 } }
+EAI_invite_to_faction_POL = { enable = { POL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { POL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "POL" value = 500 } }
+EAI_invite_to_faction_AUS = { enable = { AUS = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { AUS = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "AUS" value = 500 } }
+EAI_invite_to_faction_LIT = { enable = { LIT = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LIT = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LIT" value = 500 } }
+EAI_invite_to_faction_EST = { enable = { EST = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { EST = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "EST" value = 500 } }
+EAI_invite_to_faction_LAT = { enable = { LAT = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LAT = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LAT" value = 500 } }
+EAI_invite_to_faction_SPR = { enable = { SPR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SPR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SPR" value = 500 } }
+EAI_invite_to_faction_ITA = { enable = { ITA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ITA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ITA" value = 500 } }
+EAI_invite_to_faction_ROM = { enable = { ROM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ROM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ROM" value = 500 } }
+EAI_invite_to_faction_YUG = { enable = { YUG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { YUG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "YUG" value = 500 } }
+EAI_invite_to_faction_SER = { enable = { SER = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SER = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SER" value = 500 } }
+EAI_invite_to_faction_SWI = { enable = { SWI = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SWI = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SWI" value = 500 } }
+EAI_invite_to_faction_TUR = { enable = { TUR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { TUR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "TUR" value = 500 } }
+EAI_invite_to_faction_GRE = { enable = { GRE = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { GRE = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "GRE" value = 500 } }
+EAI_invite_to_faction_ALB = { enable = { ALB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ALB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ALB" value = 500 } }
+EAI_invite_to_faction_NOR = { enable = { NOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { NOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "NOR" value = 500 } }
+EAI_invite_to_faction_DEN = { enable = { DEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { DEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "DEN" value = 500 } }
+EAI_invite_to_faction_BUL = { enable = { BUL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BUL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BUL" value = 500 } }
+EAI_invite_to_faction_POR = { enable = { POR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { POR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "POR" value = 500 } }
+EAI_invite_to_faction_FIN = { enable = { FIN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { FIN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "FIN" value = 500 } }
+EAI_invite_to_faction_IRE = { enable = { IRE = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { IRE = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "IRE" value = 500 } }
+EAI_invite_to_faction_HUN = { enable = { HUN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { HUN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "HUN" value = 500 } }
+EAI_invite_to_faction_AFG = { enable = { AFG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { AFG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "AFG" value = 500 } }
+EAI_invite_to_faction_ARG = { enable = { ARG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ARG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ARG" value = 500 } }
+EAI_invite_to_faction_AST = { enable = { AST = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { AST = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "AST" value = 500 } }
+EAI_invite_to_faction_BHU = { enable = { BHU = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BHU = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BHU" value = 500 } }
+EAI_invite_to_faction_BOL = { enable = { BOL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BOL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BOL" value = 500 } }
+EAI_invite_to_faction_BRA = { enable = { BRA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BRA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BRA" value = 500 } }
+EAI_invite_to_faction_CAN = { enable = { CAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CAN" value = 500 } }
+EAI_invite_to_faction_CHI = { enable = { CHI = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CHI = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CHI" value = 500 } }
+EAI_invite_to_faction_CHL = { enable = { CHL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CHL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CHL" value = 500 } }
+EAI_invite_to_faction_COL = { enable = { COL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { COL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "COL" value = 500 } }
+EAI_invite_to_faction_COS = { enable = { COS = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { COS = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "COS" value = 500 } }
+EAI_invite_to_faction_ECU = { enable = { ECU = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ECU = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ECU" value = 500 } }
+EAI_invite_to_faction_ELS = { enable = { ELS = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ELS = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ELS" value = 500 } }
+EAI_invite_to_faction_ETH = { enable = { ETH = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ETH = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ETH" value = 500 } }
+EAI_invite_to_faction_GUA = { enable = { GUA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { GUA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "GUA" value = 500 } }
+EAI_invite_to_faction_HON = { enable = { HON = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { HON = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "HON" value = 500 } }
+EAI_invite_to_faction_IRQ = { enable = { IRQ = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { IRQ = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "IRQ" value = 500 } }
+EAI_invite_to_faction_JAP = { enable = { JAP = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { JAP = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "JAP" value = 500 } }
+EAI_invite_to_faction_KOR = { enable = { KOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { KOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "KOR" value = 500 } }
+EAI_invite_to_faction_LIB = { enable = { LIB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LIB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LIB" value = 500 } }
+EAI_invite_to_faction_MEX = { enable = { MEX = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MEX = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MEX" value = 500 } }
+EAI_invite_to_faction_MEN = { enable = { MEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MEN" value = 500 } }
+EAI_invite_to_faction_NEP = { enable = { NEP = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { NEP = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "NEP" value = 500 } }
+EAI_invite_to_faction_NIC = { enable = { NIC = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { NIC = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "NIC" value = 500 } }
+EAI_invite_to_faction_NZL = { enable = { NZL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { NZL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "NZL" value = 500 } }
+EAI_invite_to_faction_PER = { enable = { PER = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PER = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PER" value = 500 } }
+EAI_invite_to_faction_PRU = { enable = { PRU = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PRU = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PRU" value = 500 } }
+EAI_invite_to_faction_SAF = { enable = { SAF = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SAF = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SAF" value = 500 } }
+EAI_invite_to_faction_SAU = { enable = { SAU = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SAU = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SAU" value = 500 } }
+EAI_invite_to_faction_SIA = { enable = { SIA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SIA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SIA" value = 500 } }
+EAI_invite_to_faction_SIK = { enable = { SIK = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SIK = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SIK" value = 500 } }
+EAI_invite_to_faction_TIB = { enable = { TIB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { TIB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "TIB" value = 500 } }
+EAI_invite_to_faction_URG = { enable = { URG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { URG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "URG" value = 500 } }
+EAI_invite_to_faction_VEN = { enable = { VEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { VEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "VEN" value = 500 } }
+EAI_invite_to_faction_YUN = { enable = { YUN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { YUN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "YUN" value = 500 } }
+EAI_invite_to_faction_USA = { enable = { USA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { USA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "USA" value = 500 } }
+EAI_invite_to_faction_MON = { enable = { MON = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MON = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MON" value = 500 } }
+EAI_invite_to_faction_TAN = { enable = { TAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { TAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "TAN" value = 500 } }
+EAI_invite_to_faction_PAR = { enable = { PAR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PAR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PAR" value = 500 } }
+EAI_invite_to_faction_CUB = { enable = { CUB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CUB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CUB" value = 500 } }
+EAI_invite_to_faction_DOM = { enable = { DOM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { DOM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "DOM" value = 500 } }
+EAI_invite_to_faction_HAI = { enable = { HAI = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { HAI = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "HAI" value = 500 } }
+EAI_invite_to_faction_YEM = { enable = { YEM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { YEM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "YEM" value = 500 } }
+EAI_invite_to_faction_OMA = { enable = { OMA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { OMA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "OMA" value = 500 } }
+EAI_invite_to_faction_SLO = { enable = { SLO = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SLO = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SLO" value = 500 } }
+EAI_invite_to_faction_RAJ = { enable = { RAJ = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { RAJ = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "RAJ" value = 500 } }
+EAI_invite_to_faction_CRO = { enable = { CRO = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CRO = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CRO" value = 500 } }
+EAI_invite_to_faction_GXC = { enable = { GXC = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { GXC = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "GXC" value = 500 } }
+EAI_invite_to_faction_PRC = { enable = { PRC = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PRC = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PRC" value = 500 } }
+EAI_invite_to_faction_SHX = { enable = { SHX = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SHX = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SHX" value = 500 } }
+EAI_invite_to_faction_XSM = { enable = { XSM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { XSM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "XSM" value = 500 } }
+EAI_invite_to_faction_ICE = { enable = { ICE = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ICE = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ICE" value = 500 } }
+EAI_invite_to_faction_LEB = { enable = { LEB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LEB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LEB" value = 500 } }
+EAI_invite_to_faction_JOR = { enable = { JOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { JOR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "JOR" value = 500 } }
+EAI_invite_to_faction_SYR = { enable = { SYR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { SYR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "SYR" value = 500 } }
+EAI_invite_to_faction_EGY = { enable = { EGY = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { EGY = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "EGY" value = 500 } }
+EAI_invite_to_faction_LBA = { enable = { LBA = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LBA = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LBA" value = 500 } }
+EAI_invite_to_faction_WGR = { enable = { WGR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { WGR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "WGR" value = 500 } }
+EAI_invite_to_faction_DDR = { enable = { DDR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { DDR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "DDR" value = 500 } }
+EAI_invite_to_faction_PAL = { enable = { PAL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PAL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PAL" value = 500 } }
+EAI_invite_to_faction_ISR = { enable = { ISR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ISR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ISR" value = 500 } }
+EAI_invite_to_faction_VIN = { enable = { VIN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { VIN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "VIN" value = 500 } }
+EAI_invite_to_faction_CAM = { enable = { CAM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { CAM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "CAM" value = 500 } }
+EAI_invite_to_faction_MAL = { enable = { MAL = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MAL = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MAL" value = 500 } }
+EAI_invite_to_faction_INS = { enable = { INS = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { INS = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "INS" value = 500 } }
+EAI_invite_to_faction_LAO = { enable = { LAO = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { LAO = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "LAO" value = 500 } }
+EAI_invite_to_faction_MNT = { enable = { MNT = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MNT = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MNT" value = 500 } }
+EAI_invite_to_faction_UKR = { enable = { UKR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { UKR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "UKR" value = 500 } }
+EAI_invite_to_faction_GEO = { enable = { GEO = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { GEO = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "GEO" value = 500 } }
+EAI_invite_to_faction_KAZ = { enable = { KAZ = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { KAZ = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "KAZ" value = 500 } }
+EAI_invite_to_faction_AZR = { enable = { AZR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { AZR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "AZR" value = 500 } }
+EAI_invite_to_faction_ARM = { enable = { ARM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ARM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ARM" value = 500 } }
+EAI_invite_to_faction_BLR = { enable = { BLR = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BLR = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BLR" value = 500 } }
+EAI_invite_to_faction_ANG = { enable = { ANG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ANG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ANG" value = 500 } }
+EAI_invite_to_faction_MZB = { enable = { MZB = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MZB = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MZB" value = 500 } }
+EAI_invite_to_faction_ZIM = { enable = { ZIM = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { ZIM = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "ZIM" value = 500 } }
+EAI_invite_to_faction_COG = { enable = { COG = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { COG = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "COG" value = 500 } }
+EAI_invite_to_faction_KEN = { enable = { KEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { KEN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "KEN" value = 500 } }
+EAI_invite_to_faction_PAK = { enable = { PAK = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { PAK = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "PAK" value = 500 } }
+EAI_invite_to_faction_BOT = { enable = { BOT = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { BOT = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "BOT" value = 500 } }
+EAI_invite_to_faction_MAN = { enable = { MAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { MAN = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "MAN" value = 500 } }
+EAI_invite_to_faction_D01 = { enable = { D01 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D01 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D01" value = 500 } }
+EAI_invite_to_faction_D02 = { enable = { D02 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D02 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D02" value = 500 } }
+EAI_invite_to_faction_D03 = { enable = { D03 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D03 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D03" value = 500 } }
+EAI_invite_to_faction_D04 = { enable = { D04 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D04 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D04" value = 500 } }
+EAI_invite_to_faction_D05 = { enable = { D05 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D05 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D05" value = 500 } }
+EAI_invite_to_faction_D06 = { enable = { D06 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D06 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D06" value = 500 } }
+EAI_invite_to_faction_D07 = { enable = { D07 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D07 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D07" value = 500 } }
+EAI_invite_to_faction_D08 = { enable = { D08 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D08 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D08" value = 500 } }
+EAI_invite_to_faction_D09 = { enable = { D09 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D09 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D09" value = 500 } }
+EAI_invite_to_faction_D10 = { enable = { D10 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D10 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D10" value = 500 } }
+EAI_invite_to_faction_D11 = { enable = { D11 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D11 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D11" value = 500 } }
+EAI_invite_to_faction_D12 = { enable = { D12 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D12 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D12" value = 500 } }
+EAI_invite_to_faction_D13 = { enable = { D13 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D13 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D13" value = 500 } }
+EAI_invite_to_faction_D14 = { enable = { D14 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D14 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D14" value = 500 } }
+EAI_invite_to_faction_D15 = { enable = { D15 = { has_country_flag = EAI_invite_to_faction_@ROOT } } abort = { NOT = { D15 = { has_country_flag = EAI_invite_to_faction_@ROOT } } } ai_strategy = { type = alliance id = "D15" value = 500 } }

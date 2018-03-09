@@ -1,5 +1,35 @@
 ﻿add_namespace = EAI_L
 
+############################################################################################################
+# Expert AI mod - law events
+############################################################################################################
+
+country_event = { # STORE PP FOR LAW CHANGES
+	id = EAI_L.0
+	hidden = yes
+
+	mean_time_to_happen = { days = 2 }
+
+	trigger = {
+		is_ai = yes
+
+		has_political_power > 50
+
+		check_variable = { EAI_stored_PP < 150 }
+	}
+
+	option = {
+		add_political_power = -50
+
+		if = { limit = { NOT = { has_variable = EAI_stored_PP } }
+
+			set_variable = { EAI_stored_PP = 50 }
+
+			else = { add_to_variable = { EAI_stored_PP = 50 } }
+		}
+	}
+}
+
 ################################
 #	ECONOMY LAWS
 ################################
@@ -14,26 +44,23 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		has_political_power > 120
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
 
 		################### requirements
 
-		can_take_partial_economic_mobilisation = yes
-		
+		EAI_can_take_partial_economic_mobilisation = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
-				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-				}
+
+				NOT = { EAI_can_upgrade_manpower_law = yes }
 			}
 			AND = {
 				has_war = no
@@ -41,7 +68,16 @@ country_event = {
 		}
 	}
 
-	option = { add_political_power = -150 add_ideas = partial_economic_mobilisation }
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = partial_economic_mobilisation
+	}
 }
 
 #WAR ECONOMY
@@ -54,26 +90,23 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		has_political_power > 120
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
 
 		################### requirements
 
-		can_take_war_economy = yes
-		
+		EAI_can_take_war_economy = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
-				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-				}
+
+				NOT = { EAI_can_upgrade_manpower_law = yes }
 			}
 			AND = {
 				has_war = no
@@ -81,7 +114,16 @@ country_event = {
 		}
 	}
 
-	option = { add_political_power = -150 add_ideas = war_economy }
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = war_economy
+	}
 }
 
 #TOTAL MOBILIZATION
@@ -94,34 +136,40 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		has_political_power > 120
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
 
 		################### requirements
 
-		can_take_tot_economic_mobilisation = yes
-		
+		EAI_can_take_tot_economic_mobilisation = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
-				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-				}
+
+				NOT = { EAI_can_upgrade_manpower_law = yes }
 			}
 			AND = {
 				has_war = no
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = tot_economic_mobilisation }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = tot_economic_mobilisation
+	}
 }
 
 ################################
@@ -137,36 +185,45 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_volunteer_only = yes
-		
+
+		EAI_can_take_volunteer_only = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = volunteer_only }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = volunteer_only
+	}
 }
 
 #LIMITED CONSCRIPTION
@@ -178,36 +235,45 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_limited_conscription = yes
-		
+
+		EAI_can_take_limited_conscription = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = limited_conscription }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = limited_conscription
+	}
 }
 
 #EXTENSIVE CONSCRIPTION
@@ -220,35 +286,44 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		has_political_power > 120
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_extensive_conscription = yes
-		
+
+		EAI_can_take_extensive_conscription = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = extensive_conscription }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = extensive_conscription
+	}
 }
 
 #SERVICE BY REQUIREMENT
@@ -260,36 +335,45 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_service_by_requirement = yes
-		
+
+		EAI_can_take_service_by_requirement = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = service_by_requirement }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = service_by_requirement
+	}
 }
 
 #ALL ADULTS SERVE
@@ -301,36 +385,45 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-	
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_all_adults_serve = yes
-		
+
+		EAI_can_take_all_adults_serve = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = all_adults_serve }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = all_adults_serve
+	}
 }
 
 #SCRAPING THE BARREL
@@ -343,35 +436,44 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		has_political_power > 120
+		OR = {
+			has_political_power > 130
+
+			NOT = { check_variable = { EAI_stored_PP < 150 } }
+		}
 
 		################### requirements
-		
-		can_take_scraping_the_barrel = yes
-		
+
+		EAI_can_take_scraping_the_barrel = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
 			}
 			AND = {
 				has_war = no
-				
+
 				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-					
-					can_take_free_trade = yes
-					can_take_export_focus = yes
-					can_take_limited_exports = yes
+					EAI_can_upgrade_economy_law = yes
+
+					EAI_can_upgrade_trade_law = yes
 				}
 			}
 		}
 	}
-	
-	option = { add_political_power = -150 add_ideas = scraping_the_barrel }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = scraping_the_barrel
+	}
 }
 
 ################################
@@ -386,45 +488,47 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
 
 		################### requirements
-		
-		can_take_free_trade = yes
-		
+
+		EAI_can_take_free_trade = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
+
 				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-					
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
+					EAI_can_upgrade_manpower_law = yes
+
+					EAI_can_upgrade_economy_law = yes
 				}
 			}
 			AND = {
 				has_war = no
-				
-				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-				}
+
+				NOT = { EAI_can_upgrade_economy_law = yes }
 			}
 		}
 	}
-	
-	option = { add_ideas = free_trade add_political_power = -150 }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = free_trade
+	}
 }
 
 #EXPORT FOCUS
@@ -435,45 +539,47 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
+
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
 
 		################### requirements
-		
-		can_take_export_focus = yes
-		
+
+		EAI_can_take_export_focus = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
+
 				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-					
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
+					EAI_can_upgrade_manpower_law = yes
+
+					EAI_can_upgrade_economy_law = yes
 				}
 			}
 			AND = {
 				has_war = no
-				
-				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-				}
+
+				NOT = { EAI_can_upgrade_economy_law = yes }
 			}
 		}
 	}
-	
-	option = { add_ideas = export_focus add_political_power = -150 }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = export_focus
+	}
 }
 
 #LIMITED EXPORT
@@ -484,43 +590,45 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		
-		has_political_power > 120
-		
+
+		OR = {
+			has_political_power > 130
+
+			AND = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+		}
+
 		################### requirements
-		
-		can_take_limited_exports = yes
-		
+
+		EAI_can_take_limited_exports = yes
+
 		################### law priorities
-		
+
 		OR = {
 			AND = {
 				has_war = yes
-				
+
 				NOT = {
-					can_take_volunteer_only = yes
-					can_take_limited_conscription = yes
-					can_take_extensive_conscription = yes
-					can_take_service_by_requirement = yes
-					can_take_all_adults_serve = yes
-					can_take_scraping_the_barrel = yes
-					
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
+					EAI_can_upgrade_manpower_law = yes
+
+					EAI_can_upgrade_economy_law = yes
 				}
 			}
 			AND = {
 				has_war = no
-				
-				NOT = {
-					can_take_partial_economic_mobilisation = yes
-					can_take_war_economy = yes
-					can_take_tot_economic_mobilisation = yes
-				}
+
+				NOT = { EAI_can_upgrade_economy_law = yes }
 			}
 		}
 	}
-	
-	option = { add_ideas = limited_exports add_political_power = -150 }
+
+	option = {
+		if = { limit = { NOT = { check_variable = { EAI_stored_PP < 150 } } NOT = { EAI_prioritise_conscription_law = yes } }
+
+			add_to_variable = { EAI_stored_PP = -150 }
+
+			else = { add_political_power = -150 }
+		}
+
+		add_ideas = limited_exports
+	}
 }

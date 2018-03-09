@@ -1,350 +1,8 @@
 ﻿add_namespace = EAI_T
 
-######################################################
-# AI templates
-######################################################
-
-# the AI likes to get stuck while designing divisions or is otherwise inefficient especially when creating completely new templates
-# so a basic template is created for the AI when it fills the requirements before it is allowed to update designs on its own
-# also controls the design priorities for various army focus setups
-
-############# infantry
-
-country_event = {
-	id = EAI_T.9
-	hidden = yes
-
-	mean_time_to_happen = { days = 2 }
-
-	trigger = {
-		is_ai = yes
-
-		NOT = { has_country_flag = cheap_infantry_template }
-
-		use_cheap_infantry = yes
-
-		has_army_experience > 25
-	}
-
-	immediate = {
-		set_country_flag = cheap_infantry_template
-		set_country_flag = infantry_template
-
-		army_experience = -25
-
-		division_template = {
-			name = "Infantry Division"
-			priority = 1
-
-			regiments = {
-				infantry = { x = 0 y = 0 }
-				infantry = { x = 0 y = 1 }
-				infantry = { x = 0 y = 2 }
-				infantry = { x = 0 y = 3 }
-				infantry = { x = 0 y = 4 }
-
-				infantry = { x = 1 y = 0 }
-				infantry = { x = 1 y = 1 }
-				infantry = { x = 1 y = 2 }
-				infantry = { x = 1 y = 3 }
-				infantry = { x = 1 y = 4 }
-			}
-		}
-	}
-
-	option = {}
-}
-
-country_event = {
-	id = EAI_T.10
-	hidden = yes
-
-	mean_time_to_happen = { days = 2 }
-
-	trigger = {
-		is_ai = yes
-
-		NOT = { has_country_flag = infantry_template }
-
-		############ special rules
-
-		if = { limit = { OR = { tag = CHI tag = PRC } } #for balancing reasons, prevent China from upgrades against AI JAP
-			OR = {
-				JAP = { is_ai = no }
-				is_puppet = yes
-				date > 1945.1.1
-				has_country_flag = EAI_country_difficulty
-				has_country_flag = EAI_desperate_defense
-			}
-		}
-
-		############ industry req
-
-		NOT = { use_cheap_infantry = yes }
-
-		############ xp req
-
-		if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-			has_army_experience > 20
-		}
-
-		if = { limit = { has_country_flag = infantry_design_B }
-			has_army_experience > 30
-		}
-
-		if = { limit = { has_country_flag = ma_doctrine }
-			has_army_experience > 50
-		}
-
-		############ tech req
-
-		if = {
-			limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-			has_tech = gw_artillery
-		}
-
-		############ template priorities
-
-		if = { #prioritise main infantry role
-			limit = { has_country_flag = marine_army_focus }
-			has_country_flag = marine_template
-		}
-		if = {
-			limit = { has_country_flag = mountaineer_army_focus }
-			has_country_flag = mountaineer_template
-		}
-
-		if = { #prioritise main spec ops role
-			limit = { has_country_flag = marine_attachment_2 NOT = { has_country_flag = infantry_army_focus } }
-			has_country_flag = marine_template
-		}
-		if = {
-			limit = { has_country_flag = mountaineer_attachment_2 NOT = { has_country_flag = infantry_army_focus } }
-			has_country_flag = mountaineer_template
-		}
-
-		if = { #prioritise armor role
-			limit = { armor_tech_focus = yes NOT = { has_country_flag = infantry_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
-		}
-	}
-
-	immediate = {
-		set_country_flag = infantry_template
-
-		if = { limit = { NOT = { has_country_flag = ma_doctrine } }
-
-			if = { limit = { prefer_artillery_design = yes }
-
-				if = { limit = { has_country_flag = infantry_design_A }
-
-					army_experience = -20
-
-					division_template = {
-						name = "Infantry Division"
-						priority = 1
-
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
-
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
-
-							artillery_brigade = { x = 2 y = 0 }
-							artillery_brigade = { x = 2 y = 1 }
-							artillery_brigade = { x = 2 y = 2 }
-							artillery_brigade = { x = 2 y = 3 }
-							artillery_brigade = { x = 2 y = 4 }
-						}
-
-						support = {
-							engineer = { x = 0 y = 0 }
-						}
-					}
-				}
-
-				if = { limit = { has_country_flag = infantry_design_B }
-
-					army_experience = -30
-
-					division_template = {
-						name = "Infantry Division"
-						priority = 1
-
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
-							infantry = { x = 0 y = 3 }
-							infantry = { x = 0 y = 4 }
-
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
-							infantry = { x = 1 y = 3 }
-							infantry = { x = 1 y = 4 }
-
-							infantry = { x = 2 y = 0 }
-							infantry = { x = 2 y = 1 }
-							infantry = { x = 2 y = 2 }
-							infantry = { x = 2 y = 3 }
-						}
-
-						support = {
-							engineer = { x = 0 y = 0 }
-						}
-					}
-				}
-
-				if = { limit = { has_country_flag = infantry_design_C }
-
-					army_experience = -20
-
-					division_template = {
-						name = "Infantry Division"
-						priority = 1
-
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
-
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
-
-							infantry = { x = 2 y = 0 }
-							infantry = { x = 2 y = 1 }
-							infantry = { x = 2 y = 2 }
-
-							artillery_brigade = { x = 3 y = 0 }
-							artillery_brigade = { x = 3 y = 1 }
-						}
-
-						support = {
-							engineer = { x = 0 y = 0 }
-						}
-					}
-				}
-			}
-
-			if = { limit = { NOT = { prefer_artillery_design = yes } }
-
-				if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-
-					army_experience = -20
-
-					division_template = {
-						name = "Infantry Division"
-						priority = 1
-
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
-
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
-
-							infantry = { x = 2 y = 0 }
-							infantry = { x = 2 y = 1 }
-							infantry = { x = 2 y = 2 }
-
-							artillery_brigade = { x = 3 y = 0 }
-							artillery_brigade = { x = 3 y = 1 }
-						}
-
-						support = {
-							engineer = { x = 0 y = 0 }
-						}
-					}
-				}
-
-				if = { limit = { has_country_flag = infantry_design_B }
-
-					army_experience = -30
-
-					division_template = {
-						name = "Infantry Division"
-						priority = 1
-
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
-							infantry = { x = 0 y = 3 }
-							infantry = { x = 0 y = 4 }
-
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
-							infantry = { x = 1 y = 3 }
-							infantry = { x = 1 y = 4 }
-
-							infantry = { x = 2 y = 0 }
-							infantry = { x = 2 y = 1 }
-							infantry = { x = 2 y = 2 }
-							infantry = { x = 2 y = 3 }
-						}
-
-						support = {
-							engineer = { x = 0 y = 0 }
-						}
-					}
-				}
-			}
-		}
-
-		if = { limit = { has_country_flag = ma_doctrine }
-
-			army_experience = -50
-
-			division_template = {
-				name = "Infantry Division"
-				priority = 1
-
-				regiments = {
-					infantry = { x = 0 y = 0 }
-					infantry = { x = 0 y = 1 }
-					infantry = { x = 0 y = 2 }
-					infantry = { x = 0 y = 3 }
-
-					infantry = { x = 1 y = 0 }
-					infantry = { x = 1 y = 1 }
-					infantry = { x = 1 y = 2 }
-					infantry = { x = 1 y = 3 }
-
-					infantry = { x = 2 y = 0 }
-					infantry = { x = 2 y = 1 }
-					infantry = { x = 2 y = 2 }
-					infantry = { x = 2 y = 3 }
-
-					infantry = { x = 3 y = 0 }
-					infantry = { x = 3 y = 1 }
-					infantry = { x = 3 y = 2 }
-					infantry = { x = 3 y = 3 }
-
-					artillery_brigade = { x = 4 y = 0 }
-					artillery_brigade = { x = 4 y = 1 }
-					artillery_brigade = { x = 4 y = 2 }
-				}
-
-				support = {
-					engineer = { x = 0 y = 0 }
-				}
-			}
-		}
-	}
-
-	option = {}
-}
+############################################################################################################
+# Expert AI mod - AI template events
+############################################################################################################
 
 ############# marine
 
@@ -357,232 +15,45 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = marine_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_marine_template_upgrade }
 
 		############ industry req
 
-		num_of_military_factories > 4
+		num_of_military_factories > 10
 
-		############ xp req
+		############ focus req
 
-		if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-			has_army_experience > 20
-		}
-
-		if = { limit = { has_country_flag = infantry_design_B }
-			has_army_experience > 30
-		}
-
-		############ tech/focus req
+		has_country_flag = EAI_FOCUS/marine_spec_ops
+		
+		############ tech req
 
 		has_tech = marines
 
-		OR = {
-			has_country_flag = marine_army_focus
-			AND = { has_country_flag = marine_attachment_1 has_tech = interwar_antitank }
-			AND = { has_country_flag = marine_attachment_2 has_tech = interwar_antitank }
-		}
-
 		############ template priorities
 
-		if = { #prioritise main infantry role
-			limit = { has_country_flag = infantry_army_focus }
-			has_country_flag = infantry_template
+		has_army_experience > 100
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 200 }
 		}
-		if = {
-			limit = { has_country_flag = mountaineer_army_focus }
-			has_country_flag = mountaineer_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 200 }
 		}
-
-		if = { #prioritise main spec ops role
-			limit = { has_country_flag = infantry_attachment_2 NOT = { has_country_flag = marine_army_focus } }
-			has_country_flag = infantry_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 200 }
 		}
-		if = {
-			limit = { has_country_flag = mountaineer_attachment_2 NOT = { has_country_flag = marine_army_focus } }
-			has_country_flag = mountaineer_template
-		}
-
-		if = { #prioritise armor role
-			limit = { armor_tech_focus = yes NOT = { has_country_flag = marine_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
-		}
-
-		if = { #prioritise AT role
-			limit = { NOT = { armor_tech_focus = yes } NOT = { has_country_flag = marine_army_focus } has_country_flag = AT_army_focus }
-			has_country_flag = at_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
+			OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 200 }
 		}
 	}
 
 	immediate = {
-		set_country_flag = marine_template
-
-		if = { limit = { prefer_artillery_design = yes }
-
-			if = { limit = { has_country_flag = infantry_design_A }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Marine Division"
-					priority = 1
-
-					regiments = {
-						marine = { x = 0 y = 0 }
-						marine = { x = 0 y = 1 }
-						marine = { x = 0 y = 2 }
-
-						marine = { x = 1 y = 0 }
-						marine = { x = 1 y = 1 }
-						marine = { x = 1 y = 2 }
-
-						artillery_brigade = { x = 2 y = 0 }
-						artillery_brigade = { x = 2 y = 1 }
-						artillery_brigade = { x = 2 y = 2 }
-						artillery_brigade = { x = 2 y = 3 }
-						artillery_brigade = { x = 2 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_B }
-
-				army_experience = -30
-
-				division_template = {
-					name = "Marine Division"
-					priority = 1
-
-					regiments = {
-						marine = { x = 0 y = 0 }
-						marine = { x = 0 y = 1 }
-						marine = { x = 0 y = 2 }
-						marine = { x = 0 y = 3 }
-						marine = { x = 0 y = 4 }
-
-						marine = { x = 1 y = 0 }
-						marine = { x = 1 y = 1 }
-						marine = { x = 1 y = 2 }
-						marine = { x = 1 y = 3 }
-						marine = { x = 1 y = 4 }
-
-						marine = { x = 2 y = 0 }
-						marine = { x = 2 y = 1 }
-						marine = { x = 2 y = 2 }
-						marine = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_C }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Marine Division"
-					priority = 1
-
-					regiments = {
-						marine = { x = 0 y = 0 }
-						marine = { x = 0 y = 1 }
-						marine = { x = 0 y = 2 }
-
-						marine = { x = 1 y = 0 }
-						marine = { x = 1 y = 1 }
-						marine = { x = 1 y = 2 }
-
-						marine = { x = 2 y = 0 }
-						marine = { x = 2 y = 1 }
-						marine = { x = 2 y = 2 }
-
-						artillery_brigade = { x = 3 y = 0 }
-						artillery_brigade = { x = 3 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
-
-		if = { limit = { NOT = { prefer_artillery_design = yes } }
-
-			if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Marine Division"
-					priority = 1
-
-					regiments = {
-						marine = { x = 0 y = 0 }
-						marine = { x = 0 y = 1 }
-						marine = { x = 0 y = 2 }
-
-						marine = { x = 1 y = 0 }
-						marine = { x = 1 y = 1 }
-						marine = { x = 1 y = 2 }
-
-						marine = { x = 2 y = 0 }
-						marine = { x = 2 y = 1 }
-						marine = { x = 2 y = 2 }
-
-						artillery_brigade = { x = 3 y = 0 }
-						artillery_brigade = { x = 3 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_B }
-
-				army_experience = -30
-
-				division_template = {
-					name = "Marine Division"
-					priority = 1
-
-					regiments = {
-						marine = { x = 0 y = 0 }
-						marine = { x = 0 y = 1 }
-						marine = { x = 0 y = 2 }
-						marine = { x = 0 y = 3 }
-						marine = { x = 0 y = 4 }
-
-						marine = { x = 1 y = 0 }
-						marine = { x = 1 y = 1 }
-						marine = { x = 1 y = 2 }
-						marine = { x = 1 y = 3 }
-						marine = { x = 1 y = 4 }
-
-						marine = { x = 2 y = 0 }
-						marine = { x = 2 y = 1 }
-						marine = { x = 2 y = 2 }
-						marine = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
+		set_country_flag = EAI_marine_template_upgrade
 	}
 
 	option = {}
@@ -599,238 +70,51 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = mountaineer_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_mountaineer_template_upgrade }
 
 		############ industry req
 
-		num_of_military_factories > 4
+		num_of_military_factories > 10
 
-		############ xp req
+		############ focus req
 
-		if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-			has_army_experience > 20
-		}
-
-		if = { limit = { has_country_flag = infantry_design_B }
-			has_army_experience > 30
-		}
-
-		############ tech/focus req
+		has_country_flag = EAI_FOCUS/mountaineer_spec_ops
+		
+		############ tech req
 
 		has_tech = tech_mountaineers
 
-		OR = {
-			has_country_flag = mountaineer_army_focus
-			AND = { has_country_flag = mountaineer_attachment_1 has_tech = interwar_antitank }
-			AND = { has_country_flag = mountaineer_attachment_2 has_tech = interwar_antitank }
-		}
-
 		############ template priorities
 
-		if = { #prioritise main infantry role
-			limit = { has_country_flag = infantry_army_focus }
-			has_country_flag = infantry_template
+		has_army_experience > 100
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 200 }
 		}
-		if = {
-			limit = { has_country_flag = marine_army_focus }
-			has_country_flag = marine_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 200 }
 		}
-
-		if = { #prioritise main spec ops role
-			limit = { has_country_flag = infantry_attachment_2 NOT = { has_country_flag = mountaineer_army_focus } }
-			has_country_flag = infantry_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 200 }
 		}
-		if = {
-			limit = { has_country_flag = marine_attachment_2 NOT = { has_country_flag = mountaineer_army_focus } }
-			has_country_flag = marine_template
-		}
-
-		if = { #prioritise armor role
-			limit = { armor_tech_focus = yes NOT = { has_country_flag = mountaineer_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
-		}
-
-		if = { #prioritise AT role
-			limit = { NOT = { armor_tech_focus = yes } NOT = { has_country_flag = mountaineer_army_focus } has_country_flag = AT_army_focus }
-			has_country_flag = at_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
+			OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 200 }
 		}
 	}
 
 	immediate = {
-		set_country_flag = mountaineer_template
-
-		if = { limit = { prefer_artillery_design = yes }
-
-			if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Mountain Division"
-					priority = 1
-
-					regiments = {
-						mountaineers = { x = 0 y = 0 }
-						mountaineers = { x = 0 y = 1 }
-						mountaineers = { x = 0 y = 2 }
-
-						mountaineers = { x = 1 y = 0 }
-						mountaineers = { x = 1 y = 1 }
-						mountaineers = { x = 1 y = 2 }
-
-						artillery_brigade = { x = 2 y = 0 }
-						artillery_brigade = { x = 2 y = 1 }
-						artillery_brigade = { x = 2 y = 2 }
-						artillery_brigade = { x = 2 y = 3 }
-						artillery_brigade = { x = 2 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_B }
-
-				army_experience = -30
-
-				division_template = {
-					name = "Mountain Division"
-					priority = 1
-
-					regiments = {
-						mountaineers = { x = 0 y = 0 }
-						mountaineers = { x = 0 y = 1 }
-						mountaineers = { x = 0 y = 2 }
-						mountaineers = { x = 0 y = 3 }
-						mountaineers = { x = 0 y = 4 }
-
-						mountaineers = { x = 1 y = 0 }
-						mountaineers = { x = 1 y = 1 }
-						mountaineers = { x = 1 y = 2 }
-						mountaineers = { x = 1 y = 3 }
-						mountaineers = { x = 1 y = 4 }
-
-						mountaineers = { x = 2 y = 0 }
-						mountaineers = { x = 2 y = 1 }
-						mountaineers = { x = 2 y = 2 }
-						mountaineers = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_C }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Mountain Division"
-					priority = 1
-
-					regiments = {
-						mountaineers = { x = 0 y = 0 }
-						mountaineers = { x = 0 y = 1 }
-						mountaineers = { x = 0 y = 2 }
-
-						mountaineers = { x = 1 y = 0 }
-						mountaineers = { x = 1 y = 1 }
-						mountaineers = { x = 1 y = 2 }
-
-						mountaineers = { x = 2 y = 0 }
-						mountaineers = { x = 2 y = 1 }
-						mountaineers = { x = 2 y = 2 }
-
-						artillery_brigade = { x = 3 y = 0 }
-						artillery_brigade = { x = 3 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
-
-		if = { limit = { NOT = { prefer_artillery_design = yes } }
-
-			if = { limit = { OR = { has_country_flag = infantry_design_A has_country_flag = infantry_design_C } }
-
-				army_experience = -20
-
-				division_template = {
-					name = "Mountain Division"
-					priority = 1
-
-					regiments = {
-						mountaineers = { x = 0 y = 0 }
-						mountaineers = { x = 0 y = 1 }
-						mountaineers = { x = 0 y = 2 }
-
-						mountaineers = { x = 1 y = 0 }
-						mountaineers = { x = 1 y = 1 }
-						mountaineers = { x = 1 y = 2 }
-
-						mountaineers = { x = 2 y = 0 }
-						mountaineers = { x = 2 y = 1 }
-						mountaineers = { x = 2 y = 2 }
-
-						artillery_brigade = { x = 3 y = 0 }
-						artillery_brigade = { x = 3 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = infantry_design_B }
-
-				army_experience = -30
-
-				division_template = {
-					name = "Mountain Division"
-					priority = 1
-
-					regiments = {
-						mountaineers = { x = 0 y = 0 }
-						mountaineers = { x = 0 y = 1 }
-						mountaineers = { x = 0 y = 2 }
-						mountaineers = { x = 0 y = 3 }
-						mountaineers = { x = 0 y = 4 }
-
-						mountaineers = { x = 1 y = 0 }
-						mountaineers = { x = 1 y = 1 }
-						mountaineers = { x = 1 y = 2 }
-						mountaineers = { x = 1 y = 3 }
-						mountaineers = { x = 1 y = 4 }
-
-						mountaineers = { x = 2 y = 0 }
-						mountaineers = { x = 2 y = 1 }
-						mountaineers = { x = 2 y = 2 }
-						mountaineers = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
+		set_country_flag = EAI_mountaineer_template_upgrade
 	}
 
 	option = {}
 }
 
-############# at_infantry
+############# anti_tank
 
 country_event = {
 	id = EAI_T.13
@@ -841,1541 +125,1246 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = at_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_anti_tank_template_upgrade }
 
 		############ industry req
 
-		num_of_military_factories > 15
-
-		############ xp req
-
-		if = { limit = { has_country_flag = infantry_design_C }
-			has_army_experience > 40
-
-			else = { has_army_experience > 20 }
-		}
+		num_of_military_factories > 10
 
 		############ tech req
+		
+		has_tech = tech_engineers
 
 		OR = {
-			AND = { has_country_flag = at_design_AT has_tech = interwar_antitank }
 			AND = {
-				has_country_flag = at_design_MTD
+				has_country_flag = EAI_FOCUS/MW_doctrine
+
 				OR = {
-					AND = { NOT = { has_country_flag = mw_doctrine } OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td } }
-					AND = { has_country_flag = mw_doctrine OR = { has_tech = basic_medium_spaa has_tech = improved_medium_spaa has_tech = advanced_medium_spaa } }
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_AT
+						
+						has_tech = interwar_antitank
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_MTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_medium_spaa has_tech = improved_medium_spaa has_tech = advanced_medium_spaa }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_HTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_heavy_spaa has_tech = improved_heavy_spaa has_tech = advanced_heavy_spaa }
+					}
 				}
 			}
 			AND = {
-				has_country_flag = at_design_HTD
+				has_country_flag = EAI_FOCUS/SF_doctrine
+
 				OR = {
-					AND = { NOT = { has_country_flag = mw_doctrine } OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td } }
-					AND = { has_country_flag = mw_doctrine OR = { has_tech = basic_heavy_spaa has_tech = improved_heavy_spaa has_tech = advanced_heavy_spaa } }
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_AT
+						
+						has_tech = interwar_antitank
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_MTD
+						
+						has_tech = motorised_infantry
+						
+						OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_HTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+					}
+				}
+			}
+			AND = {
+				has_country_flag = EAI_FOCUS/GB_doctrine
+
+				OR = {
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_AT
+						
+						has_tech = interwar_antitank
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_MTD
+						
+						has_tech = motorised_infantry
+						
+						OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_HTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+					}
+				}
+			}
+			AND = {
+				has_country_flag = EAI_FOCUS/MA_doctrine
+
+				OR = {
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_AT
+						
+						has_tech = interwar_antitank
+						
+						has_tech = gw_artillery
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_MTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+					}
+					AND = {
+						has_country_flag = EAI_FOCUS/anti_tank_design_HTD
+						
+						has_tech = gw_artillery
+						
+						OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+					}
 				}
 			}
 		}
 
 		############ template priorities
-
-		OR = { #prioritise main infantry role
-			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
-			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
-			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		
+		has_army_experience > 25
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 75 }
 		}
-
-		if = { #prioritise armor role
-			limit = { armor_tech_focus = yes NOT = { has_country_flag = AT_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 75 }
+		}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 200 }
 		}
 	}
 
 	immediate = {
-		set_country_flag = at_template
-
-		army_experience = -20
-
-		if = { limit = { NOT = { has_country_flag = infantry_design_C } }
-
-			################# infantry
-
-			if = { limit = { has_country_flag = infantry_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = ma_doctrine has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank = { x = 0 y = 1 }
-							}
+		set_country_flag = EAI_anti_tank_template_upgrade
+		
+		############################################################################################################################
+		if = { limit = { OR = { has_country_flag = EAI_FOCUS/infantry_design_A has_country_flag = EAI_FOCUS/infantry_design_B } }
+			
+			army_experience = -20
+			
+			if = { limit = { has_country_flag = EAI_FOCUS/MW_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-
-								motorized = { x = 3 y = 0 }
-								motorized = { x = 3 y = 1 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-								medium_tank_destroyer_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = ma_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-								anti_tank_brigade = { x = 4 y = 2 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+				
+							medium_sp_anti_air_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-								artillery_brigade = { x = 3 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-								medium_tank_destroyer_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-								artillery_brigade = { x = 3 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+				
+							heavy_sp_anti_air_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
 			}
-
-			################# marine
-
-			if = { limit = { has_country_flag = marine_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+			if = { limit = { has_country_flag = EAI_FOCUS/SF_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-
-								motorized = { x = 3 y = 0 }
-								motorized = { x = 3 y = 1 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-								medium_tank_destroyer_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
 				}
-			}
-
-			################# mountaineer
-
-			if = { limit = { has_country_flag = mountaineer_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							artillery_brigade = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							artillery_brigade = { x = 2 y = 2 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-
-								motorized = { x = 3 y = 0 }
-								motorized = { x = 3 y = 1 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-								medium_tank_destroyer_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								artillery_brigade = { x = 2 y = 0 }
-								artillery_brigade = { x = 2 y = 1 }
-								anti_tank_brigade = { x = 2 y = 2 }
-								anti_tank_brigade = { x = 2 y = 3 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+			}
+			if = { limit = { has_country_flag = EAI_FOCUS/GB_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							artillery_brigade = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							artillery_brigade = { x = 2 y = 2 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
 			}
 		}
-
-		if = { limit = { has_country_flag = infantry_design_C }
-
+		
+		############################################################################################################################
+		if = { limit = { has_country_flag = EAI_FOCUS/infantry_design_C }
+			
 			army_experience = -20
-
-			################# infantry
-
-			if = { limit = { has_country_flag = infantry_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = ma_doctrine has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank = { x = 0 y = 1 }
-							}
+			
+			if = { limit = { has_country_flag = EAI_FOCUS/MW_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-								motorized = { x = 0 y = 3 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-								motorized = { x = 1 y = 2 }
-								motorized = { x = 1 y = 3 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-								motorized = { x = 2 y = 2 }
-								motorized = { x = 2 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 3 y = 0 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = ma_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-								anti_tank_brigade = { x = 4 y = 2 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							medium_sp_anti_air_brigade = { x = 4 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-								artillery_brigade = { x = 3 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-								medium_tank_destroyer_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-								infantry = { x = 0 y = 4 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-								infantry = { x = 1 y = 4 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-								artillery_brigade = { x = 3 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_sp_anti_air_brigade = { x = 4 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Infantry Division"
-							priority = 2
-
-							regiments = {
-								infantry = { x = 0 y = 0 }
-								infantry = { x = 0 y = 1 }
-								infantry = { x = 0 y = 2 }
-								infantry = { x = 0 y = 3 }
-
-								infantry = { x = 1 y = 0 }
-								infantry = { x = 1 y = 1 }
-								infantry = { x = 1 y = 2 }
-								infantry = { x = 1 y = 3 }
-
-								infantry = { x = 2 y = 0 }
-								infantry = { x = 2 y = 1 }
-								infantry = { x = 2 y = 2 }
-								infantry = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
 			}
-
-			################# marine
-
-			if = { limit = { has_country_flag = marine_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-								marine = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+			if = { limit = { has_country_flag = EAI_FOCUS/SF_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 4 y = 0 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-								motorized = { x = 0 y = 3 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-								motorized = { x = 1 y = 2 }
-								motorized = { x = 1 y = 3 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-								motorized = { x = 2 y = 2 }
-								motorized = { x = 2 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 3 y = 0 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-								marine = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+							motorized = { x = 1 y = 4 }
+				
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+				
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-								marine = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Marine Division"
-							priority = 2
-
-							regiments = {
-								marine = { x = 0 y = 0 }
-								marine = { x = 0 y = 1 }
-								marine = { x = 0 y = 2 }
-								marine = { x = 0 y = 3 }
-
-								marine = { x = 1 y = 0 }
-								marine = { x = 1 y = 1 }
-								marine = { x = 1 y = 2 }
-								marine = { x = 1 y = 3 }
-
-								marine = { x = 2 y = 0 }
-								marine = { x = 2 y = 1 }
-								marine = { x = 2 y = 2 }
-								marine = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+			}
+			if = { limit = { has_country_flag = EAI_FOCUS/GB_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+							motorized = { x = 1 y = 4 }
+				
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+				
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
 				}
 			}
-
-			################# mountaineer
-
-			if = { limit = { has_country_flag = mountaineer_army_focus }
-
-				if = { limit = { NOT = { has_country_flag = mw_doctrine } }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-								mountaineers = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+			if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+							artillery_brigade = { x = 3 y = 4 }
 						}
-					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Motorized Division"
-							priority = 2
-
-							regiments = {
-								motorized = { x = 0 y = 0 }
-								motorized = { x = 0 y = 1 }
-								motorized = { x = 0 y = 2 }
-								motorized = { x = 0 y = 3 }
-
-								motorized = { x = 1 y = 0 }
-								motorized = { x = 1 y = 1 }
-								motorized = { x = 1 y = 2 }
-								motorized = { x = 1 y = 3 }
-
-								motorized = { x = 2 y = 0 }
-								motorized = { x = 2 y = 1 }
-								motorized = { x = 2 y = 2 }
-								motorized = { x = 2 y = 3 }
-
-								medium_tank_destroyer_brigade = { x = 3 y = 0 }
-
-								medium_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
-						}
-					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_tank_destroyer_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
-
-				if = { limit = { has_country_flag = mw_doctrine }
-
-					if = { limit = { has_country_flag = at_design_AT }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-								mountaineers = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-
-								anti_tank_brigade = { x = 4 y = 0 }
-								anti_tank_brigade = { x = 4 y = 1 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-								anti_tank  = { x = 0 y = 1 }
-							}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+							medium_tank_destroyer_brigade = { x = 4 y = 1 }
+							medium_tank_destroyer_brigade = { x = 4 y = 2 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_MTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-								mountaineers = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								medium_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+							artillery_brigade = { x = 3 y = 4 }
+							
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
-
-					if = { limit = { has_country_flag = at_design_HTD }
-
-						division_template = {
-							name = "Mountain Division"
-							priority = 2
-
-							regiments = {
-								mountaineers = { x = 0 y = 0 }
-								mountaineers = { x = 0 y = 1 }
-								mountaineers = { x = 0 y = 2 }
-								mountaineers = { x = 0 y = 3 }
-
-								mountaineers = { x = 1 y = 0 }
-								mountaineers = { x = 1 y = 1 }
-								mountaineers = { x = 1 y = 2 }
-								mountaineers = { x = 1 y = 3 }
-
-								mountaineers = { x = 2 y = 0 }
-								mountaineers = { x = 2 y = 1 }
-								mountaineers = { x = 2 y = 2 }
-								mountaineers = { x = 2 y = 3 }
-
-								artillery_brigade = { x = 3 y = 0 }
-								artillery_brigade = { x = 3 y = 1 }
-								artillery_brigade = { x = 3 y = 2 }
-
-								heavy_sp_anti_air_brigade = { x = 4 y = 0 }
-							}
-
-							support = {
-								engineer = { x = 0 y = 0 }
-							}
+				}
+			}
+		}
+		
+		############################################################################################################################
+		if = { limit = { OR = { has_country_flag = EAI_FOCUS/infantry_design_D has_country_flag = EAI_FOCUS/infantry_design_E } }
+			
+			army_experience = -20
+			
+			if = { limit = { has_country_flag = EAI_FOCUS/MW_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							artillery_brigade = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							artillery_brigade = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							medium_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							artillery_brigade = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							artillery_brigade = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							heavy_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+			}
+			if = { limit = { has_country_flag = EAI_FOCUS/SF_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							artillery_brigade = { x = 2 y = 0 }
+							artillery_brigade = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+			}
+			if = { limit = { has_country_flag = EAI_FOCUS/GB_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							artillery_brigade = { x = 2 y = 0 }
+							artillery_brigade = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+			}
+			if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+				
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_AT }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							artillery_brigade = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							artillery_brigade = { x = 2 y = 2 }
+				
+							anti_tank_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_MTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+						
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							artillery_brigade = { x = 2 y = 0 }
+							artillery_brigade = { x = 2 y = 1 }
+				
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
+						}
+					}
+				}
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_design_HTD }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							artillery_brigade = { x = 2 y = 0 }
+							artillery_brigade = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+				
+						support = {
+							engineer = { x = 0 y = 0 }
 						}
 					}
 				}
@@ -2397,7 +1386,9 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = Larm_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_larm_template_upgrade }
 
 		############ industry req
 
@@ -2405,211 +1396,49 @@ country_event = {
 
 		############ focus req
 
-		larm_army_focus = yes
-
-		OR = {
-			has_country_flag = marm_army_focus has_country_flag = harm_army_focus
-			has_country_flag = marm_attachment has_country_flag = harm_attachment
-		}
-
-		############ xp req
-
-		if = { limit = { has_country_flag = infantry_design_C }
-			has_army_experience > 35
-
-			else = { has_army_experience > 20 }
-		}
+		has_country_flag = EAI_FOCUS/larm_attachment
 
 		############ tech req
+		
+		has_tech = tech_engineers
+		
+		has_tech = motorised_infantry
 
 		OR = { has_tech = basic_light_tank has_tech = improved_light_tank has_tech = advanced_light_tank }
 
 		############ template priorities
 
-		OR = { #prioritise main infantry role
-			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
-			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
-			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
-		}
+		has_army_experience > 25
 	}
 
 	immediate = {
-		set_country_flag = larm_template
+		set_country_flag = EAI_larm_template_upgrade
 
-		army_experience = -20
-
-		if = { limit = { NOT = { has_country_flag = infantry_design_C } }
-
-			if = { limit = { has_country_flag = sf_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
-						light_armor = { x = 0 y = 3 }
-						light_armor = { x = 0 y = 4 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-						motorized = { x = 1 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
-
-						light_armor = { x = 1 y = 0 }
-						light_armor = { x = 1 y = 1 }
-						light_armor = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-						motorized = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
-						light_armor = { x = 0 y = 3 }
-						light_armor = { x = 0 y = 4 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-						motorized = { x = 1 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
+		if = { limit = { NOT = { ai_has_role_template = light_armor } }
+			army_experience = -25
 		}
 
-		if = { limit = { has_country_flag = infantry_design_C }
+		division_template = {
+			name = "Light Armor Template"
 
-			army_experience = -15
+			priority = 4
 
-			if = { limit = { has_country_flag = sf_doctrine }
+			regiments = {
+				motorized = { x = 0 y = 0 }
+				motorized = { x = 0 y = 1 }
+				motorized = { x = 0 y = 2 }
+				
+				light_armor = { x = 1 y = 0 }
 
-				division_template = {
-					name = "Armored Division"
-					priority = 2
+				light_armor = { x = 2 y = 0 }
 
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
+				light_armor = { x = 3 y = 0 }
 
-						light_armor = { x = 1 y = 0 }
-						light_armor = { x = 1 y = 1 }
-						light_armor = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						motorized = { x = 3 y = 0 }
-						motorized = { x = 3 y = 1 }
-						motorized = { x = 3 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
+				light_armor = { x = 4 y = 0 }
 			}
 
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
-
-						light_armor = { x = 1 y = 0 }
-						light_armor = { x = 1 y = 1 }
-						light_armor = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						motorized = { x = 3 y = 0 }
-						motorized = { x = 3 y = 1 }
-						motorized = { x = 3 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						light_armor = { x = 0 y = 0 }
-						light_armor = { x = 0 y = 1 }
-						light_armor = { x = 0 y = 2 }
-
-						light_armor = { x = 1 y = 0 }
-						light_armor = { x = 1 y = 1 }
-						light_armor = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						motorized = { x = 3 y = 0 }
-						motorized = { x = 3 y = 1 }
-						motorized = { x = 3 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
+			support = {
+				engineer = { x = 0 y = 0 }
 			}
 		}
 	}
@@ -2628,293 +1457,103 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = marm_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_marm_template_upgrade }
 
 		############ industry req
-
-		num_of_military_factories > 35
+		
+		OR = {
+			AND = { has_country_flag = EAI_FOCUS/marm_army_focus num_of_military_factories > 20 }
+			AND = { has_country_flag = EAI_FOCUS/marm_attachment num_of_military_factories > 75 }
+		}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			num_of_military_factories > 75
+		}
 
 		############ focus req
 
-		OR = {
-			has_country_flag = marm_army_focus
-			AND = { has_country_flag = marm_attachment date > 1942.1.1 }
-		}
+		OR = { has_country_flag = EAI_FOCUS/marm_army_focus has_country_flag = EAI_FOCUS/marm_attachment }
 
-		############ xp req
-
-		if = { limit = { has_country_flag = EAI_upgrade_medium_armor_width }
-			has_army_experience > 40
-
-			else = { has_army_experience > 35 }
+		if = { limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			date > 1943.1.1
 		}
 
 		############ tech req
+		
+		has_tech = tech_engineers
+		
+		has_tech = motorised_infantry
 
 		OR = { has_tech = basic_medium_tank has_tech = improved_medium_tank has_tech = advanced_medium_tank }
 
 		############ template priorities
 
-		if = { #prioritise AT role
-			limit = { OR = { NOT = { armor_tech_focus = yes } has_country_flag = AT_army_focus } }
-			has_country_flag = at_template
+		OR = {
+			AND = { has_country_flag = EAI_FOCUS/marm_army_focus has_army_experience > 25 }
+		
+			AND = { has_country_flag = EAI_FOCUS/marm_attachment has_army_experience > 100 } 
+			
+			has_army_experience > 450
 		}
 	}
 
 	immediate = {
-		set_country_flag = marm_template
+		set_country_flag = EAI_marm_template_upgrade
 
-		army_experience = -35
+		army_experience = -25
 
-		if = { limit = { NOT = { has_country_flag = EAI_upgrade_medium_armor_width } }
+		####################################################################
+		if = { limit = { NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } }
+			division_template = {
+				name = "Medium Armor Template"
 
-			if = { limit = { has_country_flag = sf_doctrine }
+				priority = 6
 
-				division_template = {
-					name = "Armored Division"
-					priority = 2
+				regiments = {
+					motorized = { x = 0 y = 0 }
+					motorized = { x = 0 y = 1 }
+					motorized = { x = 0 y = 2 }
+					
+					medium_armor = { x = 1 y = 0 }
 
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
+					medium_armor = { x = 2 y = 0 }
 
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
+					medium_armor = { x = 3 y = 0 }
 
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+					medium_armor = { x = 4 y = 0 }
 				}
-			}
 
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-						medium_armor = { x = 3 y = 1 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
 
-		if = { limit = { has_country_flag = EAI_upgrade_medium_armor_width }
+		####################################################################
+		if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+			division_template = {
+				name = "Medium Armor Template"
 
-			army_experience = -5
+				priority = 6
 
-			if = { limit = { has_country_flag = sf_doctrine }
+				regiments = {
+					infantry = { x = 0 y = 0 }
 
-				division_template = {
-					name = "Armored Division"
-					priority = 2
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
 
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
+					medium_armor = { x = 3 y = 0 }
+					medium_armor = { x = 3 y = 1 }
 
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+					medium_armor = { x = 4 y = 0 }
+					medium_armor = { x = 4 y = 1 }
 				}
-			}
 
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						medium_armor = { x = 0 y = 0 }
-						medium_armor = { x = 0 y = 1 }
-
-						medium_armor = { x = 1 y = 0 }
-						medium_armor = { x = 1 y = 1 }
-
-						medium_armor = { x = 2 y = 0 }
-						medium_armor = { x = 2 y = 1 }
-
-						medium_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
@@ -2934,296 +1573,101 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = harm_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_harm_template_upgrade }
 
 		############ industry req
 
-		num_of_military_factories > 35
+		OR = {
+			AND = { has_country_flag = EAI_FOCUS/harm_army_focus num_of_military_factories > 20 }
+			AND = { has_country_flag = EAI_FOCUS/harm_attachment num_of_military_factories > 75 }
+		}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			num_of_military_factories > 75
+		}
 
 		############ focus req
 
-		OR = {
-			has_country_flag = harm_army_focus
-			AND = { has_country_flag = harm_attachment date > 1942.1.1 }
-		}
+		OR = { has_country_flag = EAI_FOCUS/harm_army_focus has_country_flag = EAI_FOCUS/harm_attachment }
 
-		############ xp req
-
-		if = { limit = { has_country_flag = EAI_upgrade_heavy_armor_width }
-			has_army_experience > 40
-
-			else = { has_army_experience > 35 }
+		if = { limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			date > 1943.1.1
 		}
 
 		############ tech req
+		
+		has_tech = tech_engineers
 
-		#tech req
 		OR = { has_tech = basic_heavy_tank has_tech = improved_heavy_tank has_tech = advanced_heavy_tank }
-		OR = { has_tech = basic_heavy_art has_tech = improved_heavy_art has_tech = advanced_heavy_art }
 
 		############ template priorities
 
-		if = { #prioritise AT role
-			limit = { OR = { NOT = { armor_tech_focus = yes } has_country_flag = AT_army_focus } }
-			has_country_flag = at_template
+		OR = {
+			AND = { has_country_flag = EAI_FOCUS/harm_army_focus has_army_experience > 25 }
+		
+			AND = { has_country_flag = EAI_FOCUS/harm_attachment has_army_experience > 100 }
+			
+			has_army_experience > 450
 		}
 	}
 
 	immediate = {
-		set_country_flag = harm_template
+		set_country_flag = EAI_harm_template_upgrade
 
-		army_experience = -35
+		army_experience = -25
 
-		if = { limit = { NOT = { has_country_flag = EAI_upgrade_heavy_armor_width } }
-
-			if = { limit = { has_country_flag = sf_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+		####################################################################
+		if = { limit = { NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } }
+			division_template = {
+				name = "Heavy Armor Template"
+	
+				priority = 5
+	
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+					infantry = { x = 0 y = 2 }
+				
+					heavy_armor = { x = 1 y = 0 }
+	
+					heavy_armor = { x = 2 y = 0 }
+	
+					heavy_armor = { x = 3 y = 0 }
+	
+					heavy_armor = { x = 4 y = 0 }
 				}
-			}
-
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-						heavy_armor = { x = 1 y = 2 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
-
-		if = { limit = { has_country_flag = EAI_upgrade_heavy_armor_width }
-
-			army_experience = -5
-
-			if = { limit = { has_country_flag = sf_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-						infantry = { x = 0 y = 4 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+		
+		####################################################################
+		if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+			division_template = {
+				name = "Heavy Armor Template"
+	
+				priority = 5
+	
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
+					
+					heavy_armor = { x = 3 y = 0 }
+					heavy_armor = { x = 3 y = 1 }
+	
+					heavy_armor = { x = 4 y = 0 }
+					heavy_armor = { x = 4 y = 1 }
 				}
-			}
-
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-						infantry = { x = 0 y = 4 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-						heavy_armor = { x = 1 y = 2 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-						infantry = { x = 0 y = 4 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-						heavy_sp_artillery_brigade = { x = 3 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						infantry = { x = 0 y = 0 }
-						infantry = { x = 0 y = 1 }
-						infantry = { x = 0 y = 2 }
-						infantry = { x = 0 y = 3 }
-						infantry = { x = 0 y = 4 }
-
-						heavy_armor = { x = 1 y = 0 }
-						heavy_armor = { x = 1 y = 1 }
-
-						heavy_armor = { x = 2 y = 0 }
-						heavy_armor = { x = 2 y = 1 }
-
-						heavy_sp_artillery_brigade = { x = 3 y = 0 }
-
-						heavy_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
@@ -3243,279 +1687,82 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = mod_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_mod_template_upgrade }
 
 		############ industry req
 
 		num_of_military_factories > 35
 
-		############ xp req
-
-		if = { limit = { has_country_flag = EAI_upgrade_modern_armor_width }
-			has_army_experience > 55
-
-			else = { has_army_experience > 50 }
-		}
-
 		############ tech req
 
+		has_tech = tech_engineers
+		
+		has_tech = motorised_infantry
+		
 		has_tech = main_battle_tank
+		
+		############ xp req
+		
+		has_army_experience > 25
 	}
 
 	immediate = {
-		set_country_flag = mod_template
+		set_country_flag = EAI_mod_template_upgrade
 
-		army_experience = -50
+		army_experience = -25
 
-		if = { limit = { NOT = { has_country_flag = EAI_upgrade_modern_armor_width } }
+		####################################################################
+		if = { limit = { NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } }
+			division_template = {
+				name = "Modern Armor Template"
 
-			if = { limit = { has_country_flag = sf_doctrine }
+				priority = 7
 
-				division_template = {
-					name = "Armored Division"
-					priority = 2
+				regiments = {
+					motorized = { x = 0 y = 0 }
+					motorized = { x = 0 y = 1 }
+					motorized = { x = 0 y = 2 }
+				
+					modern_armor = { x = 1 y = 0 }
 
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
+					modern_armor = { x = 2 y = 0 }
 
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
+					modern_armor = { x = 3 y = 0 }
 
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+					modern_armor = { x = 4 y = 0 }
 				}
-			}
 
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-						modern_armor = { x = 3 y = 1 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
 
-		if = { limit = { has_country_flag = EAI_upgrade_modern_armor_width }
+		####################################################################
+		if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
+			division_template = {
+				name = "Modern Armor Template"
 
-			army_experience = -5
+				priority = 7
+				
+				regiments = {
+					infantry = { x = 0 y = 0 }
 
-			if = { limit = { has_country_flag = sf_doctrine }
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
 
-				division_template = {
-					name = "Armored Division"
-					priority = 2
+					modern_armor = { x = 3 y = 0 }
+					modern_armor = { x = 3 y = 1 }
 
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						artillery = { x = 0 y = 1 }
-					}
+					modern_armor = { x = 4 y = 0 }
+					modern_armor = { x = 4 y = 1 }
 				}
-			}
 
-			if = { limit = { has_country_flag = mw_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-						recon = { x = 0 y = 1 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = gb_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = ma_doctrine }
-
-				division_template = {
-					name = "Armored Division"
-					priority = 2
-
-					regiments = {
-						modern_armor = { x = 0 y = 0 }
-						modern_armor = { x = 0 y = 1 }
-
-						modern_armor = { x = 1 y = 0 }
-						modern_armor = { x = 1 y = 1 }
-
-						modern_armor = { x = 2 y = 0 }
-						modern_armor = { x = 2 y = 1 }
-
-						modern_armor = { x = 3 y = 0 }
-
-						motorized = { x = 4 y = 0 }
-						motorized = { x = 4 y = 1 }
-						motorized = { x = 4 y = 2 }
-						motorized = { x = 4 y = 3 }
-						motorized = { x = 4 y = 4 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
+				support = {
+					engineer = { x = 0 y = 0 }
 				}
 			}
 		}
@@ -3525,6 +1772,7 @@ country_event = {
 }
 
 ############# motorized
+
 country_event = {
 	id = EAI_T.18
 	hidden = yes
@@ -3534,7 +1782,9 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = mot_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_mot_template_upgrade }
 
 		############ industry req
 
@@ -3542,251 +1792,52 @@ country_event = {
 
 		############ focus req
 
-		has_country_flag = mot_attachment
-
-		############ xp req
-
-		if = { limit = { has_country_flag = infantry_design_C }
-			has_army_experience > 35
-
-			else = { has_army_experience > 25 }
-		}
+		has_country_flag = EAI_FOCUS/motorized_attachment
 
 		############ tech req
-
+		
 		has_tech = motorised_infantry
 
 		OR = {
-			AND = { has_country_flag = mot_design_A OR = { has_tech = basic_medium_art has_tech = improved_medium_art has_tech = advanced_medium_art } }
-			AND = { has_country_flag = mot_design_B has_tech = motorized_rocket_unit }
-			AND = { has_country_flag = mot_design_C OR = { has_tech = basic_light_art has_tech = improved_light_art has_tech = advanced_light_art } }
+			AND = {
+				has_country_flag = EAI_FOCUS/motorized_design_A
+				OR = { has_tech = basic_medium_art has_tech = improved_medium_art has_tech = advanced_medium_art }
+			}
+
+			AND = {
+				has_country_flag = EAI_FOCUS/motorized_design_B
+				has_tech = motorized_rocket_unit
+			}
+
+			AND = {
+				has_country_flag = EAI_FOCUS/motorized_design_C
+				OR = { has_tech = basic_light_art has_tech = improved_light_art has_tech = advanced_light_art }
+			}
 		}
 
 		############ template priorities
 
-		OR = { #prioritise main infantry
-			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
-			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
-			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		has_army_experience > 100
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/marm_army_focus }
+			OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 200 }
 		}
-
-		if = { #prioritise armor role
-			limit = { OR = { has_country_flag = marm_army_focus has_country_flag = harm_army_focus } }
-			OR = {
-				AND = { has_country_flag = marm_army_focus has_country_flag = marm_template }
-				AND = { has_country_flag = harm_army_focus has_country_flag = harm_template }
-			}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/harm_army_focus }
+			OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 200 }
 		}
-
-		#prioritise AT role
-		has_country_flag = at_template
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/larm_attachment }
+			OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 200 }
+		}
+		
+		if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
+			OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 200 }
+		}
 	}
 
 	immediate = {
-		set_country_flag = mot_template
-
-		army_experience = -25
-
-		if = { limit = { NOT = { has_country_flag = infantry_design_C } }
-
-			if = { limit = { has_country_flag = mot_design_A }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						medium_sp_artillery_brigade = { x = 3 y = 0 }
-						medium_sp_artillery_brigade = { x = 3 y = 1 }
-
-						medium_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_B }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-						motorized = { x = 0 y = 3 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-						motorized = { x = 1 y = 3 }
-
-						motorized_rocket_brigade = { x = 2 y = 0 }
-						motorized_rocket_brigade = { x = 2 y = 1 }
-						motorized_rocket_brigade = { x = 2 y = 2 }
-						motorized_rocket_brigade = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_C }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						light_sp_artillery_brigade = { x = 3 y = 0 }
-						light_sp_artillery_brigade = { x = 3 y = 1 }
-
-						light_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
-
-		if = { limit = { has_country_flag = infantry_design_C }
-
-			army_experience = -10
-
-			if = { limit = { has_country_flag = mot_design_A }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-						motorized = { x = 0 y = 3 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-						motorized = { x = 1 y = 3 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-						motorized = { x = 2 y = 3 }
-
-						medium_sp_artillery_brigade = { x = 3 y = 0 }
-						medium_sp_artillery_brigade = { x = 3 y = 1 }
-
-						medium_sp_artillery_brigade = { x = 4 y = 0 }
-						medium_sp_artillery_brigade = { x = 4 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_B }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-						motorized = { x = 0 y = 3 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-
-						motorized_rocket_brigade = { x = 3 y = 0 }
-						motorized_rocket_brigade = { x = 3 y = 1 }
-						motorized_rocket_brigade = { x = 3 y = 2 }
-						motorized_rocket_brigade = { x = 3 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_C }
-
-				division_template = {
-					name = "Motorized Division"
-					priority = 1
-
-					regiments = {
-						motorized = { x = 0 y = 0 }
-						motorized = { x = 0 y = 1 }
-						motorized = { x = 0 y = 2 }
-						motorized = { x = 0 y = 3 }
-
-						motorized = { x = 1 y = 0 }
-						motorized = { x = 1 y = 1 }
-						motorized = { x = 1 y = 2 }
-						motorized = { x = 1 y = 3 }
-
-						motorized = { x = 2 y = 0 }
-						motorized = { x = 2 y = 1 }
-						motorized = { x = 2 y = 2 }
-						motorized = { x = 2 y = 3 }
-
-						light_sp_artillery_brigade = { x = 3 y = 0 }
-						light_sp_artillery_brigade = { x = 3 y = 1 }
-
-						light_sp_artillery_brigade = { x = 4 y = 0 }
-						light_sp_artillery_brigade = { x = 4 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
+		set_country_flag = EAI_mot_template_upgrade
 	}
 
 	option = {}
@@ -3801,7 +1852,9 @@ country_event = { #mech type
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = mech_template }
+		has_country_flag = EAI_army_config_triggered
+
+		NOT = { has_country_flag = EAI_mech_template_upgrade }
 
 		############ industry req
 
@@ -3809,232 +1862,17 @@ country_event = { #mech type
 
 		############ focus req
 
-		has_country_flag = mot_attachment
-
-		############ xp req
-
-		if = { limit = { has_country_flag = infantry_design_C }
-			has_army_experience > 35
-
-			else = { has_army_experience > 25 }
-		}
+		has_country_flag = EAI_FOCUS/motorized_attachment
 
 		############ tech req
 
-		has_tech = mechanised_infantry2
+		has_tech = mechanised_infantry
 
-		OR = {
-			AND = { has_country_flag = mot_design_A OR = { has_tech = basic_medium_art has_tech = improved_medium_art has_tech = advanced_medium_art } }
-			AND = { has_country_flag = mot_design_B has_tech = motorized_rocket_unit }
-			AND = { has_country_flag = mot_design_C OR = { has_tech = basic_light_art has_tech = improved_light_art has_tech = advanced_light_art } }
-		}
+		has_country_flag = EAI_mot_template_upgrade
 	}
 
 	immediate = {
-		set_country_flag = mech_template
-
-		army_experience = -25
-
-		if = { limit = { NOT = { has_country_flag = infantry_design_C } }
-
-			if = { limit = { has_country_flag = mot_design_A }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-
-						mechanized = { x = 2 y = 0 }
-						mechanized = { x = 2 y = 1 }
-						mechanized = { x = 2 y = 2 }
-
-						medium_sp_artillery_brigade = { x = 3 y = 0 }
-						medium_sp_artillery_brigade = { x = 3 y = 1 }
-
-						medium_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_B }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-						mechanized = { x = 0 y = 3 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-						mechanized = { x = 1 y = 3 }
-
-						motorized_rocket_brigade = { x = 2 y = 0 }
-						motorized_rocket_brigade = { x = 2 y = 1 }
-						motorized_rocket_brigade = { x = 2 y = 2 }
-						motorized_rocket_brigade = { x = 2 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_C }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-
-						mechanized = { x = 2 y = 0 }
-						mechanized = { x = 2 y = 1 }
-						mechanized = { x = 2 y = 2 }
-
-						light_sp_artillery_brigade = { x = 3 y = 0 }
-						light_sp_artillery_brigade = { x = 3 y = 1 }
-
-						light_sp_artillery_brigade = { x = 4 y = 0 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
-
-		if = { limit = { has_country_flag = infantry_design_C }
-
-			army_experience = -10
-
-			if = { limit = { has_country_flag = mot_design_A }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-						mechanized = { x = 0 y = 3 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-						mechanized = { x = 1 y = 3 }
-
-						mechanized = { x = 2 y = 0 }
-						mechanized = { x = 2 y = 1 }
-						mechanized = { x = 2 y = 2 }
-						mechanized = { x = 2 y = 3 }
-
-						medium_sp_artillery_brigade = { x = 3 y = 0 }
-						medium_sp_artillery_brigade = { x = 3 y = 1 }
-
-						medium_sp_artillery_brigade = { x = 4 y = 0 }
-						medium_sp_artillery_brigade = { x = 4 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_B }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-						mechanized = { x = 0 y = 3 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-
-						mechanized = { x = 2 y = 0 }
-						mechanized = { x = 2 y = 1 }
-						mechanized = { x = 2 y = 2 }
-
-						motorized_rocket_brigade = { x = 3 y = 0 }
-						motorized_rocket_brigade = { x = 3 y = 1 }
-						motorized_rocket_brigade = { x = 3 y = 2 }
-						motorized_rocket_brigade = { x = 3 y = 3 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = mot_design_C }
-
-				division_template = {
-					name = "Mechanized Division"
-					priority = 1
-
-					regiments = {
-						mechanized = { x = 0 y = 0 }
-						mechanized = { x = 0 y = 1 }
-						mechanized = { x = 0 y = 2 }
-						mechanized = { x = 0 y = 3 }
-
-						mechanized = { x = 1 y = 0 }
-						mechanized = { x = 1 y = 1 }
-						mechanized = { x = 1 y = 2 }
-						mechanized = { x = 1 y = 3 }
-
-						mechanized = { x = 2 y = 0 }
-						mechanized = { x = 2 y = 1 }
-						mechanized = { x = 2 y = 2 }
-						mechanized = { x = 2 y = 3 }
-
-						light_sp_artillery_brigade = { x = 3 y = 0 }
-						light_sp_artillery_brigade = { x = 3 y = 1 }
-
-						light_sp_artillery_brigade = { x = 4 y = 0 }
-						light_sp_artillery_brigade = { x = 4 y = 1 }
-					}
-
-					support = {
-						engineer = { x = 0 y = 0 }
-					}
-				}
-			}
-		}
+		set_country_flag = EAI_mech_template_upgrade
 	}
 
 	option = {}
@@ -4051,48 +1889,71 @@ country_event = {
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = garrison_template }
+		has_country_flag = EAI_army_config_triggered
 
-		############ tech req
+		NOT = { has_country_flag = EAI_garrison_template_upgrade }
 
-		has_tech = tech_engineers
+		date > 1938.1.1
+		
 		has_tech = gw_artillery
+		
+		has_tech = tech_engineers
 
-		############ xp req
-
-		has_army_experience > 10
-
-		############ template priorities
-
-		OR = { #prioritise main infantry role
-			AND = { has_country_flag = infantry_army_focus has_country_flag = infantry_template }
-			AND = { has_country_flag = marine_army_focus has_country_flag = marine_template }
-			AND = { has_country_flag = mountaineer_army_focus has_country_flag = mountaineer_template }
+		OR = {
+			AND = {
+				has_army_experience > 50
+		
+				if = { limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
+					has_country_flag = EAI_anti_tank_template_upgrade
+				}
+				
+				if = { limit = { EAI_armor_tech_focus = yes OR = { has_country_flag = EAI_FOCUS/marm_army_focus has_country_flag = EAI_FOCUS/harm_army_focus } }
+					OR = {
+						has_country_flag = EAI_marm_template_upgrade
+						has_country_flag = EAI_harm_template_upgrade
+					}
+				}
+			}
+			
+			has_army_experience > 100
 		}
 	}
 
 	immediate = {
-		set_country_flag = garrison_template
-
-		army_experience = -10
-
+		set_country_flag = EAI_garrison_template_upgrade
+		
+		army_experience = -20
+		
 		division_template = {
-			name = "Garrison Division"
+			name = "Garrison Template"
+
 			priority = 0
 
 			regiments = {
 				infantry = { x = 0 y = 0 }
 				infantry = { x = 0 y = 1 }
 				infantry = { x = 0 y = 2 }
-
-				infantry = { x = 1 y = 0 }
-				infantry = { x = 1 y = 1 }
-				infantry = { x = 1 y = 2 }
+				infantry = { x = 0 y = 3 }
+				infantry = { x = 0 y = 4 }
 			}
 
 			support = {
 				engineer = { x = 0 y = 0 }
 				artillery = { x = 0 y = 1 }
+			}
+		}
+		
+		division_template = {
+			name = "Suppression Template"
+	
+			priority = 0
+	
+			regiments = {
+				cavalry = { x = 0 y = 0 }
+				cavalry = { x = 0 y = 1 }
+				cavalry = { x = 0 y = 2 }
+				cavalry = { x = 0 y = 3 }
+				cavalry = { x = 0 y = 4 }
 			}
 		}
 	}

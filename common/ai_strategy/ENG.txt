@@ -10,41 +10,142 @@
 # protect
 # influence
 
-ENG_war_against_ITA = {
+EAI_CW_ignore_BNL = {
+	enable = {
+		OR = { original_tag = ENG is_subject_of = ENG }
+		
+		has_war_with = GER
+		
+		is_in_faction_with = FRA
+		
+		date < 1941.1.1
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { original_tag = ENG is_subject_of = ENG }
+		
+				has_war_with = GER
+				
+				is_in_faction_with = FRA
+				
+				date < 1941.1.1
+			}
+		}
+	}
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "BEL" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "HOL" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "LUX" value = 500 }
+}
+
+EAI_ENG_ignore_RAJ = {
+	enable = {
+		original_tag = ENG
+	}
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "RAJ" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "AST" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "INS" value = 500 }
+}
+
+EAI_RAJ_ignore_ENG = {
+	enable = {
+		original_tag = RAJ
+	}
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "ENG" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "FRA" value = 500 }
+}
+
+EAI_ENG_warprep_ITA = {
 	enable = {
 		tag = ENG
 		has_government = democratic
 		is_historical_focus_on = yes
-		has_war_with = ITA
-		NOT = { 
-			ITA = { has_capitulated = yes }
-			ITA = { exists = no }
-			ITA = { is_puppet = yes }
-			is_in_faction_with = ITA
-		}
+		has_war_with = GER
+		NOT = { has_war_with = ITA }
 		ITA = { has_government = fascism }
 	}
 	abort = {
-		OR = { 
-			ITA = { has_capitulated = yes }
-			ITA = { exists = no }
-			ITA = { is_puppet = yes }
-			is_in_faction_with = ITA
-			NOT = { ITA = { has_government = fascism } }
-			
-			NOT = { has_war_with = ITA }
-			NOT = { has_government = democratic }
+		NOT = {
+			AND = {
+				tag = ENG
+				has_government = democratic
+				is_historical_focus_on = yes
+				has_war_with = GER
+				NOT = { has_war_with = ITA }
+				ITA = { has_government = fascism }
+			}
 		}
 	}
 	
 	ai_strategy = {
 		type = conquer
 		id = "ITA"
-		value = 1000
+		value = 100
 	}
 }
 
-i_fin_eng = {
+EAI_ENG_warprep_ETH = {
+	enable = {
+		tag = ENG
+		has_government = democratic
+		is_historical_focus_on = yes
+		NOT = { 
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_subject = yes }
+		}
+		GER = { has_war_with = FRA }
+		NOT = { 
+			ITA = { has_capitulated = yes }
+			ITA = { exists = no }
+			ITA = { is_subject = yes }
+			is_in_faction_with = ITA
+			has_war_with = ITA
+		}
+		ITA = { has_government = fascism }
+		
+		ETH = { is_subject_of = ITA }
+		
+		date < 1941.1.1
+	}
+	abort = {
+		NOT = {
+			AND = {
+				has_government = democratic
+				is_historical_focus_on = yes
+				NOT = { 
+					FRA = { has_capitulated = yes }
+					FRA = { exists = no }
+					FRA = { is_subject = yes }
+				}
+				GER = { has_war_with = FRA }
+				NOT = { 
+					ITA = { has_capitulated = yes }
+					ITA = { exists = no }
+					ITA = { is_subject = yes }
+					is_in_faction_with = ITA
+					has_war_with = ITA
+				}
+				ITA = { has_government = fascism }
+				
+				ETH = { is_subject_of = ITA }
+				
+				date < 1941.1.1
+			}
+		}
+	}
+	
+	ai_strategy = {
+		type = conquer
+		id = "ETH"
+		value = 100
+	}
+}
+
+EAI_i_fin_eng = {
 	enable = {
 		tag = ENG
 		country_exists = FIN
@@ -64,7 +165,7 @@ i_fin_eng = {
 	}
 }
 
-i_fin_eng2 = {
+EAI_i_fin_eng2 = {
 	enable = {
 		tag = FIN
 		country_exists = ENG

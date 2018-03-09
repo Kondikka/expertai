@@ -1,0 +1,470 @@
+############################################################################################################
+#	Expert AI mod - decisions
+############################################################################################################
+
+EAI_diplomacy_DECISIONS = {
+
+	EAI_diplomacy_open_army_priorities_DECISION = {
+		allowed = {}
+    
+		available = {
+
+		}
+    
+		visible = {
+			is_ai = no
+			NOT = { has_country_flag = EAI_show_army_priorities_decisions }
+			any_other_country = {
+				is_ai = yes
+				OR = {
+					is_in_faction_with = ROOT
+					is_subject_of = ROOT
+					ROOT = { is_subject_of = FROM }
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = { flag = EAI_show_army_priorities_decisions value = 1 days = 2 }
+				every_other_country = {
+					limit = {
+						is_ai = yes
+						OR = {
+							is_in_faction_with = ROOT
+							is_subject_of = ROOT
+							ROOT = { is_subject_of = FROM }
+						}
+					}
+					
+					EAI_calculate_config_cp_cost = yes
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	EAI_diplomacy_open_naval_invasion_DECISION = {
+		allowed = {}
+    
+		available = {
+
+		}
+    
+		visible = {
+			is_ai = no
+			NOT = { has_country_flag = EAI_show_naval_invasion_decisions }
+			any_other_country = {
+				has_war_together_with = ROOT
+			}
+			any_other_country = {
+				has_war_with = ROOT
+				any_state = {
+					is_controlled_by = PREV
+					is_coastal = yes
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = { flag = EAI_show_naval_invasion_decisions value = 1 days = 2 }
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	EAI_diplomacy_open_lend_lease_DECISION = {
+		allowed = {}
+    
+		available = {
+
+		}
+    
+		visible = {
+			is_ai = no
+			NOT = { has_country_flag = EAI_show_lend_lease_decisions }
+			any_other_country = {
+				OR = {
+					AND = { has_war = yes NOT = { has_war_with = ROOT } }
+					is_subject_of = ROOT
+				}
+			}
+			any_other_country = {
+				OR = {
+					is_in_faction_with = ROOT
+					is_subject_of = ROOT
+				}
+			}
+			OR = {
+				has_government = fascism
+				has_government = communism
+				AND = {
+					has_government = neutrality
+					threat > 0.4
+				}
+				AND = {
+					has_government = democratic
+					threat > 0.5
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = { flag = EAI_show_lend_lease_decisions value = 1 days = 2 }
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}
+
+EAI_diplomacy_army_priorities_DECISIONS = {
+	
+	EAI_diplomacy_army_priorities_DECISION = {
+		allowed = {}
+    
+		available = {
+			FROM = {
+				OR = {
+					has_opinion = { target = ROOT value > 49 }
+    
+					is_subject_of = ROOT
+				}
+			}
+
+			custom_trigger_tooltip = {
+				tooltip = EAI_diplomacy_army_priorities_DECISION_trigger
+				always = yes			
+			}
+			
+			hidden_trigger = { 
+				NOT = {
+					has_country_flag = EAI_player_has_AI_army_config_open 
+					has_country_flag = EAI_player_has_AI_army_config_open_DIPLOMATIC 
+				} 
+			}
+			
+			FROM = {
+				NOT = { has_country_flag = EAI_AI_is_configuring_this_country has_country_flag = EAI_player_is_configuring_this_country }
+			}
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_army_priorities_decisions FROM = { exists = yes }
+		}
+    
+		target_trigger = {
+			is_ai = no
+    
+			FROM = {
+				is_ai = yes
+    
+				OR = {
+					is_in_faction_with = ROOT 
+					ROOT = { is_subject_of = FROM }
+					is_subject_of = ROOT
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = EAI_player_has_AI_army_config_open_DIPLOMATIC
+		
+				FROM = { save_event_target_as = EAI_AI_customisation set_country_flag = EAI_player_is_configuring_this_country }
+				
+				country_event = EAI.100
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}
+
+EAI_diplomacy_naval_invasion_DECISIONS = {
+	
+	EAI_diplomacy_naval_invasion_target_DECISION = {
+		allowed = {}
+    
+		available = {
+			NOT = { command_power < 100 }
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_naval_invasion_decisions
+			has_war = yes
+			any_other_country = {
+				is_ai = yes
+				
+				OR = {
+					is_in_faction_with = ROOT
+					is_subject_of = ROOT
+					ROOT = { is_subject_of = PREV }
+				}
+			}
+			NOT = { FROM = { has_country_flag = EAI_coordinate_invasion_target_by_@ROOT } }
+		}
+    
+		target_trigger = {
+			is_ai = no
+    
+			FROM = {
+				has_war_with = ROOT
+				any_state = {
+					is_controlled_by = FROM
+					is_coastal = yes
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			add_command_power = -100
+			
+			hidden_effect = {
+				set_country_flag = { flag = EAI_coordinated_naval_invasion_by_@ROOT value = 1 days = 180 }
+
+				every_country = {
+					limit = {
+						is_ai = yes
+						
+						NOT = { tag = ROOT tag = FROM }
+						
+						OR = {
+							is_in_faction_with = ROOT
+							is_subject_of = ROOT
+							ROOT = { is_subject_of = PREV }
+						}
+					}
+					
+					clr_country_flag = EAI_invasion_operation_active
+					
+					every_country = { # clear old invasion
+						limit = { has_country_flag = EAI_naval_invasion_from_@PREV }
+						
+						clr_country_flag = EAI_naval_invasion_from_@PREV 
+					}
+					
+					every_state = { # clear old invasion
+						limit = { has_state_flag = EAI_naval_invasion_target_state_@PREV }
+						
+						clr_state_flag = EAI_naval_invasion_target_state_@PREV
+					}
+					
+					FROM = { set_country_flag = { flag = EAI_coordinated_naval_invasion_from_@PREV value = 1 days = 180 } }
+					
+					country_event = EAI_background.6 #refresh strategies
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	EAI_diplomacy_cancel_naval_invasion_target_DECISION = {
+		allowed = {}
+    
+		available = {
+			
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_naval_invasion_decisions
+			has_country_flag = EAI_coordinate_invasion_by_@ROOT
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				clr_country_flag = EAI_coordinated_naval_invasion_by_@ROOT
+			
+				every_other_country = {
+					limit = { any_country = { has_country_flag = EAI_coordinated_naval_invasion_from_@PREV } }
+					
+					every_country = {
+						limit = { has_country_flag = EAI_coordinated_naval_invasion_from_@PREV }
+						
+						clr_country_flag = EAI_coordinated_naval_invasion_from_@PREV
+					}
+					
+					country_event = EAI_background.6 #refresh strategies
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}
+
+EAI_diplomacy_lend_lease_DECISIONS = {
+	
+	EAI_diplomacy_lend_lease_DECISION = {
+		allowed = {}
+    
+		available = {
+			NOT = { command_power < 50 }
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_lend_lease_decisions
+			
+			NOT = { has_country_flag = EAI_coordinate_lend_lease_by_@ROOT }
+			
+			any_other_country = {
+				is_ai = yes
+				
+				OR = {
+					is_subject_of = ROOT
+					is_in_faction_with = ROOT
+					ROOT = { is_subject_of = PREV }
+				}
+			}
+			
+			# LEND LEASING IS POSSIBLE
+			any_other_country = { 
+				OR = { 
+					AND = {
+						has_war = yes 
+						ROOT = {
+							OR = {
+								AND = { has_government = neutrality NOT = { threat < 0.4 } }
+								AND = { has_government = fascism }
+								AND = { has_government = communism }
+								AND = { has_government = democratic NOT = { threat < 0.5 } }
+							}
+						}
+					}
+					is_subject_of = ROOT
+				} 
+			}
+		}
+    
+		target_trigger = {
+			is_ai = no
+    
+			FROM = {
+				OR = {
+					AND = { has_war = yes NOT = { has_war_with = ROOT } }
+					is_subject_of = ROOT
+				}
+			}
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			add_command_power = -50
+
+			hidden_effect = {
+				set_country_flag = { flag = EAI_coordinate_lend_lease_by_@ROOT value = 1 days = 365 }
+			
+				every_country = {
+					limit = {
+						is_ai = yes
+						
+						NOT = { tag = ROOT tag = FROM }
+						
+						OR = {
+							is_in_faction_with = ROOT
+							is_subject_of = ROOT
+							ROOT = { is_subject_of = PREV }
+						}
+					}
+					
+					FROM = { set_country_flag = { flag = EAI_coordinated_lend_lease_from_@PREV value = 1 days = 365 } }
+					
+					country_event = EAI_background.6 #refresh strategies
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	EAI_diplomacy_cancel_lend_lease_DECISION = {
+		allowed = {}
+    
+		available = {
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_lend_lease_decisions
+			
+			has_country_flag = EAI_coordinate_lend_lease_by_@ROOT
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			hidden_effect = {
+				clr_country_flag = EAI_coordinate_lend_lease_by_@ROOT
+			
+				every_other_country = {
+					limit = {
+						is_ai = yes
+						
+						OR = {
+							is_in_faction_with = ROOT
+							is_subject_of = ROOT
+							ROOT = { is_subject_of = PREV }
+						}
+					
+						any_country = { has_country_flag = EAI_coordinated_lend_lease_from_@PREV }
+					}
+					
+					every_country = {
+						limit = { has_country_flag = EAI_coordinated_lend_lease_from_@PREV }
+						
+						clr_country_flag = EAI_coordinated_lend_lease_from_@PREV
+					}
+					
+					country_event = EAI_background.6 #refresh strategies
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+}

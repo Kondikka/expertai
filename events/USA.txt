@@ -102,13 +102,64 @@ country_event = {
 
 	option = {
 		name = usa.3.a
+		USA = {
+			add_war_support = 0.5
+		}
 		create_wargoal = {
 			type = take_state
 			target = USA
 			generator = { 629 } # Hawaii
 		}
-		hidden_effect = {
-			if = { limit = { is_ai = yes is_historical_focus_on = yes NOT = { surrender_progress > 0 } has_government = fascism OR = { has_war_with = ENG has_war = no } }
+		hidden_effect = { #EAI
+			if = { 
+				limit = { 
+					is_ai = yes 
+					is_historical_focus_on = yes 
+					
+					date > 1941.1.1
+					has_army_manpower = { size > 1500000 }
+					OR = {
+						CHI = { has_capitulated = yes }
+						CHI = { exists = no }
+						CHI = { is_subject_of = ROOT }
+						CHI = { has_government = fascism }
+						AND = {
+							date > 1941.9.1
+							CHI = { surrender_progress > 0.75 }
+						}
+						NOT = { has_War_with = CHI }
+					}
+					OR = {
+						date > 1941.9.1
+						
+						USA = { has_completed_focus = USA_embargo_japan }
+						
+						AND = {
+							OR = { 
+								FRA = { has_capitulated = yes }
+								FRA = { exists = no }
+								FRA = { is_subject = yes }
+								FRA = { has_government = fascism }
+								GER = { is_in_faction_with = FRA }
+							}
+						
+							OR = { 
+								SIA = { has_capitulated = yes }
+								SIA = { exists = no }
+								SIA = { is_subject = yes }
+								SIA = { has_government = fascism }
+								JAP = { is_in_faction_with = SIA }
+								CHI = { surrender_progress > 0.9 }
+							}
+						}
+					}
+					NOT = {
+						any_neighbor_country = {
+							has_war_with = ROOT
+							strength_ratio = { tag = ROOT ratio > 0.75 }
+						}
+					}
+				}
 				declare_war_on = { target = USA type = take_state }
 			}
 		}
@@ -281,7 +332,6 @@ country_event = {
 			factor = 75
 		}
 		add_political_power = 40
-		add_national_unity = -0.15
 		remove_ideas = great_depression
 	}
 
@@ -331,7 +381,6 @@ country_event = {
 	option = { 
 		name = usa.8.a
 		add_political_power = -40
-		add_national_unity = 0.1
 		remove_ideas = great_depression
 	}
 
@@ -574,6 +623,7 @@ country_event = {
 			popularity = 0.5
 		}
 		remove_ideas = great_depression
+		add_war_support = 0.2
 		add_timed_idea = { idea = fascism_defeated days = 730 }
 		if = {
 			limit = {
@@ -601,7 +651,7 @@ country_event = {
 }
 
 #DO NOT USE USA.15 AS EVENT ID
-#It will make the event text pop up as the name or requirement for two radar technologies for Finland if they are Fascist.
+#It will make the event text pop up as the name or requirement for two radar technologies for Finland if they are Fascist due to a hash conflict.
 
 
 # USA option to intervene in war
@@ -868,6 +918,7 @@ country_event = {
 			popularity = 0.5
 		}
 		remove_ideas = great_depression
+		add_war_support = 0.2
 		add_timed_idea = { idea = communism_defeated days = 730 }
 		if = {
 			limit = {

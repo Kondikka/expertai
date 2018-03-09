@@ -1,8 +1,8 @@
-######################################################
-#	RESEARCH PRIORITY MACROS
-######################################################
+############################################################################
+#	Expert AI mod - tech prio triggers
+############################################################################################################
 
-prioritise_main_industry = {
+EAI_prioritise_main_industry = {
 	OR = {
 		AND = { date > 1942.4.1 OR = { can_research = concentrated_industry5 can_research = dispersed_industry5 } 	NOT = { has_tech = concentrated_industry5 is_researching_technology = concentrated_industry5 has_tech = dispersed_industry5 is_researching_technology = dispersed_industry5 } }
 
@@ -11,41 +11,142 @@ prioritise_main_industry = {
 		AND = { date > 1938.4.1 OR = { can_research = concentrated_industry3 can_research = dispersed_industry3 }	NOT = { has_tech = concentrated_industry3 is_researching_technology = concentrated_industry3 has_tech = dispersed_industry3 is_researching_technology = dispersed_industry3 } }
 
 		AND = { date > 1936.1.1 OR = { can_research = concentrated_industry2 can_research = dispersed_industry2 }	NOT = { has_tech = concentrated_industry2 is_researching_technology = concentrated_industry2 has_tech = dispersed_industry2 is_researching_technology = dispersed_industry2 } }
-		
+
 		AND = { date > 1936.1.1 OR = { can_research = concentrated_industry can_research = dispersed_industry }		NOT = { has_tech = concentrated_industry is_researching_technology = concentrated_industry has_tech = dispersed_industry is_researching_technology = dispersed_industry } }
 	}
 }
 
-prioritise_land_doctrine = {
+EAI_prioritise_land_doctrine = {
 	if = { limit = { has_global_flag = EAI_limit_research } #with limited research, dont rush land doctrine
 		OR = {
-			major_country = yes
-			land_doctrine_tech_focus = yes
+			EAI_major_country = yes
+			EAI_land_doctrine_tech_focus = yes
 			date > 1939.1.1
 		}
 	}
 
+	if = { limit = { OR = { original_tag = HOL original_tag = BEL original_tag = LUX } }
+		always = no
+	}
+
 	OR = {
-		land_doctrine_tech_focus = yes
+		EAI_land_doctrine_tech_focus = yes
 
 		has_war = yes
-		
-		mobilize_army = yes
+
+		EAI_mobilize_army = yes
 
 		AND = {
-			NOT = { land_doctrine_tech_focus = yes }
+			NOT = { EAI_land_doctrine_tech_focus = yes }
 			date > 1937.6.1
 		}
-		
+
 		original_tag = RAJ
 	}
 
 	NOT = { has_idea = FRA_victors_of_wwi } #FRA has a land doctrine debuff
-	
+
 	if = { limit = { original_tag = USA } #lower prio for USA
 		OR = {
 			date > 1938.6.1
 			has_war = yes
+		}
+	}
+}
+
+EAI_prioritise_infantry_techs = {
+	NOT = {
+		AND = {
+			OR = { has_tech = artillery1 is_researching_technology = artillery1 }
+
+			OR = { has_tech = improved_infantry_weapons is_researching_technology = improved_infantry_weapons }
+
+			if = { limit = { date > 1940.1.1 OR = { EAI_medium_armor_production = yes EAI_light_armor_attachment_production = yes EAI_motorized_attachment_production = yes } }
+				OR = { has_tech = mechanised_infantry is_researching_technology = mechanised_infantry }
+			}
+		}
+	}
+}
+
+EAI_prioritise_air_doctrine = {
+	OR = {
+		AND = {
+			has_country_flag = EAI_FOCUS/SD_doctrine
+
+			NOT = {
+				is_researching_technology = air_superiority
+				is_researching_technology = infrastructure_destruction
+				is_researching_technology = naval_strike_tactics
+				is_researching_technology = dogfighting_experience
+				is_researching_technology = multialtitude_flying
+				is_researching_technology = logistical_bombing
+
+				AND = { has_tech = logistical_bombing }
+			}
+		}
+
+		AND = {
+			has_country_flag = EAI_FOCUS/BFS_doctrine
+
+			NOT = {
+				is_researching_technology = formation_flying
+				is_researching_technology = dive_bombing
+				is_researching_technology = direct_ground_support
+				is_researching_technology = formation_fighting
+				is_researching_technology = hunt_and_destroy
+				is_researching_technology = combat_unit_destruction
+				is_researching_technology = battlefield_support
+				is_researching_technology = ground_support_integration
+
+				AND = { has_tech = battlefield_support has_tech = ground_support_integration }
+			}
+		}
+
+		AND = {
+			has_country_flag = EAI_FOCUS/OI_doctrine
+
+			NOT = {
+				is_researching_technology = force_rotation
+				is_researching_technology = fighter_baiting
+				is_researching_technology = low_echelon_support
+				is_researching_technology = dispersed_fighting
+				is_researching_technology = operational_destruction
+				is_researching_technology = fighter_veteran_initiative
+
+				AND = { has_tech = fighter_veteran_initiative }
+			}
+		}
+	}
+}
+
+EAI_prioritise_naval_doctrine = {
+	OR = {
+		#AND = {
+		#	has_country_flag = EAI_FOCUS/FIB_doctrine
+		#
+		#	NOT = {
+		#		is_researching_technology = fleet_in_being
+		#		is_researching_technology = battlefleet_concentration
+		#		is_researching_technology = subsidiary_carrier_role
+		#		is_researching_technology = hunter_killer_groups
+		#		is_researching_technology = floating_fortress
+		#
+		#		AND = { has_tech = floating_fortress }
+		#	}
+		#}
+
+		AND = {
+			has_country_flag = EAI_FOCUS/BS_doctrine
+
+			NOT = {
+				is_researching_technology = base_strike
+				is_researching_technology = carrier_primacy
+				is_researching_technology = carrier_task_forces
+				is_researching_technology = floating_airfield_bs
+				is_researching_technology = massed_strikes
+
+				AND = { has_tech = massed_strikes }
+			}
 		}
 	}
 }

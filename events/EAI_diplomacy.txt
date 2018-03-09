@@ -1,18 +1,22 @@
 ﻿add_namespace = EAI_DM
 
+############################################################################################################
+# Expert AI mod - diplomacy events
+############################################################################################################
+
 country_event = {
 	id = EAI_DM.0
 	hidden = yes
 	is_triggered_only = yes
 	immediate = {
 		if = { limit = { is_historical_focus_on = yes }
-			every_country = { limit = { tag = USA is_ai = yes } add_ideas = EAI_USA_neutrality }
+			every_country = { limit = { tag = USA is_ai = yes } add_ideas = EAI_neutrality_idea_USA }
 		}
 	}
 	option = { name = "OK" }
 }
 
-country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension - force it)
+country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension - force it) # old
 	id = EAI_DM.2
 	hidden = yes
 	fire_only_once = yes
@@ -26,7 +30,7 @@ country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension -
 		NOT = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { is_in_faction_with = GER }
 			is_in_faction_with = SOV
 		}
@@ -38,54 +42,6 @@ country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension -
 	}
 	immediate = {
 		country_event = finland.1
-	}
-	option = { name = "OK" }
-}
-
-country_event = { #JAP joins axis
-	id = EAI_DM.3
-	hidden = yes
-	fire_only_once = yes
-	trigger = {
-		tag = JAP is_ai = yes is_historical_focus_on = yes
-
-		OR = {
-			AND = {
-				OR = {
-					CHI = { has_capitulated = yes }
-					CHI = { exists = no }
-					CHI = { is_puppet = yes }
-					CHI = { is_in_faction_with = GER }
-					CHI = { has_government = fascism }
-					CHI = { surrender_progress > 0.75 }
-					is_in_faction_with = CHI
-				}
-				OR = {
-					FRA = { has_capitulated = yes }
-					FRA = { exists = no }
-					FRA = { is_puppet = yes }
-					FRA = { is_in_faction_with = GER }
-					FRA = { has_government = fascism }
-					is_in_faction_with = FRA
-				}
-				OR = {
-					SOV = { surrender_progress > 0.75 }
-					RAJ = { has_capitulated = yes }
-				}
-			}
-			OR = {
-				SOV = { has_capitulated = yes }
-				SOV = { exists = no }
-				SOV = { is_puppet = yes }
-				SOV = { is_in_faction_with = GER }
-				SOV = { has_government = fascism }
-				is_in_faction_with = SOV
-			}
-		}
-		has_idea = neutrality_idea3
-	}
-	immediate = {
-		remove_ideas = neutrality_idea3
 	}
 	option = { name = "OK" }
 }
@@ -104,7 +60,7 @@ country_event = { #GER: force wardec on SOV
 		NOT = {
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
-			GER = { is_puppet = yes }
+			GER = { is_subject = yes }
 		}
 
 		has_army_manpower = { size > 2000000 }
@@ -120,7 +76,7 @@ country_event = { #GER: force wardec on SOV
 		NOT = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			is_in_faction_with = SOV
 			has_war_with = SOV
 		}
@@ -172,7 +128,7 @@ country_event = { #SOV: force wardec on JAP
 		NOT = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 		}
 
 		has_army_manpower = { size > 2000000 }
@@ -188,7 +144,7 @@ country_event = { #SOV: force wardec on JAP
 		NOT = {
 			JAP = { has_capitulated = yes }
 			JAP = { exists = no }
-			JAP = { is_puppet = yes }
+			JAP = { is_subject = yes }
 			is_in_faction_with = JAP
 			has_war_with = JAP
 		}
@@ -202,7 +158,7 @@ country_event = { #SOV: force wardec on JAP
 	option = { name = "OK" }
 }
 
-country_event = { #immediate call to arms for AI on war declarations, otherwise the AI fronts get messed up
+country_event = { #immediate call to arms for AI on war declarations, otherwise the AI fronts get messed up # old
 	id = EAI_DM.5
 	is_triggered_only = yes
 	hidden = yes
@@ -227,15 +183,15 @@ country_event = { #SPR neutrality
 	hidden = yes
 	fire_only_once = yes
 	trigger = {
-		tag = SPR is_ai = yes is_historical_focus_on = yes
+		tag = SPR is_ai = yes
 		has_global_flag = spanish_civil_war
 		has_global_flag = EAI_neutral_spr
 	}
 	immediate = {
-		add_ideas = neutrality_idea3
+		add_ideas = EAI_neutrality_idea_SPR
 		every_country = {
 			limit = { is_ai = yes original_tag = SPR }
-			add_ideas = neutrality_idea3
+			add_ideas = EAI_neutrality_idea_SPR
 		}
 	}
 	option = { name = "OK" }
@@ -246,7 +202,7 @@ country_event = { #remove SPR neutrality
 	hidden = yes
 	fire_only_once = yes
 	trigger = {
-		original_tag = SPR is_ai = yes is_historical_focus_on = yes
+		original_tag = SPR is_ai = yes
 		has_global_flag = scw_over
 
 		OR = {
@@ -256,9 +212,12 @@ country_event = { #remove SPR neutrality
 				OR = {
 					SOV = { has_capitulated = yes }
 					SOV = { exists = no }
-					SOV = { is_puppet = yes }
+					SOV = { is_subject = yes }
 					SOV = { has_government = fascism }
 					GER = { is_in_faction_with = SOV }
+					
+					POR = { is_in_faction_with = ENG }
+					POR = { has_war_with = ENG }
 				}
 			}
 			AND = {
@@ -266,7 +225,7 @@ country_event = { #remove SPR neutrality
 				OR = {
 					GER = { has_capitulated = yes }
 					GER = { exists = no }
-					GER = { is_puppet = yes }
+					GER = { is_subject = yes }
 					GER = { has_government = communism }
 					SOV = { is_in_faction_with = GER }
 				}
@@ -274,12 +233,12 @@ country_event = { #remove SPR neutrality
 		}
 	}
 	immediate = {
-		remove_ideas = neutrality_idea3
+		remove_ideas = EAI_neutrality_idea_SPR
 	}
 	option = { name = "OK" }
 }
 
-country_event = { #usa joins allies
+country_event = { #usa joins allies #old
 	id = EAI_DM.15
 	hidden = yes
 	fire_only_once = yes
@@ -305,7 +264,7 @@ country_event = { #usa joins allies
 
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { is_in_faction_with = GER }
 			SOV = { has_war_with = ENG }
 
@@ -324,30 +283,7 @@ country_event = { #usa joins allies
 		}
 	}
 	immediate = {
-		add_ideas = usa_idea
-	}
-	option = { name = "OK" }
-}
-
-country_event = { #JAP: force wardec on CHI (unnecessary?)
-	id = EAI_DM.18
-	hidden = yes
-	fire_only_once = yes
-	mean_time_to_happen = { days = 5 }
-	trigger = {
-		tag = JAP is_ai = yes
-		has_completed_focus = chinese_war_focus
-
-		NOT = {
-			CHI = { has_capitulated = yes }
-			CHI = { exists = no }
-			CHI = { is_puppet = yes }
-			has_war_with = CHI
-			is_in_faction_with = CHI
-		}
-	}
-	immediate = {
-		if = { limit = { has_wargoal_against = CHI NOT = { has_war_with = CHI } NOT = { is_in_faction_with = CHI } } declare_war_on = { target = CHI type = take_state_focus } }
+		add_ideas = EAI_usa_idea
 	}
 	option = { name = "OK" }
 }
@@ -362,25 +298,34 @@ country_event = { #usa joins allies 2
 			factor = 0.1
 			OR = {
 				has_war = yes
-				any_state = {
-					OR = { region = 1 region = 2 region = 3 }
-					NOT = { is_controlled_by = ENG }
+				
+				AND = {
+					ENG = { has_government = democratic }
+					any_state = {
+						OR = { region = 1 region = 2 region = 3 }
+						NOT = { is_controlled_by = ENG }
+					}
 				}
 			}
 		}
 	}
 	trigger = {
-		is_ai = yes tag = USA is_historical_focus_on = yes
-		has_idea = EAI_USA_neutrality
+		is_ai = yes 
+		tag = USA 
+		is_historical_focus_on = yes
+		has_idea = EAI_neutrality_idea_USA
+		has_government = democratic
 
 		OR = {
 			has_war = yes
 
 			NOT = { has_government = democratic }
+			
+			NOT = { ENG = { has_government = democratic } }
 
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { is_in_faction_with = GER }
 			SOV = { has_war_with = ENG }
 
@@ -399,24 +344,40 @@ country_event = { #usa joins allies 2
 		}
 	}
 	immediate = {
-		remove_ideas = EAI_USA_neutrality
+		remove_ideas = EAI_neutrality_idea_USA
 	}
 	option = { name = "OK" }
 }
 
 ################### clean up some borders
 
+add_namespace = EAI_DM_borders
+
 country_event = { #give germany northern france
-	id = EAI_DM.51
+	id = EAI_DM_borders.1
 	hidden = yes
 	mean_time_to_happen = { days = 20 }
 	trigger = {
-		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
-		has_war_with = FRA FRA = { has_capitulated = yes }
+		tag = GER
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
+		has_war_with = FRA 
+		
+		FRA = { has_capitulated = yes }
+		
 		any_state = { #GER doesnt control historical states
 			OR = { region = 19 region = 20 region = 5 }
 			NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-			controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV }
+			
+			controller = { 
+				NOT = { tag = GER }
+				is_in_faction_with = GER 
+				is_ai = yes 
+				has_full_control_of_state = PREV 
+			}
 		}
 	}
 	immediate = {
@@ -424,7 +385,13 @@ country_event = { #give germany northern france
 			limit = {
 				OR = { region = 19 region = 20 region = 5 }
 				NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-				controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes has_full_control_of_state = PREV }
+				
+				controller = { 
+					NOT = { tag = GER }
+					is_in_faction_with = GER 
+					is_ai = yes 
+					has_full_control_of_state = PREV 
+				}
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -433,25 +400,44 @@ country_event = { #give germany northern france
 }
 
 country_event = { #yugoslavia invasion AI fix
-	id = EAI_DM.53
+	id = EAI_DM_borders.2
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
+		tag = GER
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
 		has_war_with = YUG
 
 		any_state = {
-			OR = { state = 102 state = 731 state = 185 state = 47 region = 24 }
+			OR = { state = 102 state = 731 region = 24 }
 			NOT = { state = 103 state = 163 state = 44 }
-			controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes }
+			
+			controller = {
+				NOT = { tag = GER owns_state = PREV } 
+				is_in_faction_with = GER 
+				is_ai = yes
+				has_full_control_of_state = PREV
+				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+			}
 		}
 	}
 	immediate = {
 		every_state = {
 			limit = {
-				OR = { state = 102 state = 731 state = 185 state = 47 region = 24 }
+				OR = { state = 102 state = 731 region = 24 }
 				NOT = { state = 103 state = 163 state = 44 }
-				controller = { NOT = { tag = GER owns_state = PREV } is_in_faction_with = GER is_ai = yes }
+				
+				controller = {
+					NOT = { tag = GER owns_state = PREV } 
+					is_in_faction_with = GER 
+					is_ai = yes 
+					has_full_control_of_state = PREV
+					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+				}
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -460,24 +446,45 @@ country_event = { #yugoslavia invasion AI fix
 }
 
 country_event = { #greece
-	id = EAI_DM.54
+	id = EAI_DM_borders.3
 	hidden = yes
-	fire_only_once = yes
+	mean_time_to_happen = { days = 2 }
 	trigger = {
-		tag = ITA ITA = { is_ai = yes } is_historical_focus_on = yes
-		has_war_with = GRE GRE = { has_capitulated = yes }
-		any_state = { region = 25 NOT = { state = 731 } controller = { NOT = { tag = ITA owns_state = PREV } is_in_faction_with = ITA is_ai = yes } }
-
-		NOT = { #all combat has ceased
-			any_state = {
-				region = 25
-				controller = { has_war_with = ITA }
+		tag = ITA
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
+		has_war_with = GRE 
+		
+		GRE = { has_capitulated = yes }
+		
+		any_state = {
+			is_core_of = GRE
+			
+			controller = { 
+				NOT = { tag = ROOT } 
+				has_full_control_of_state = PREV 
+				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+				is_ai = yes 
+				is_in_faction_with = ITA
 			}
 		}
 	}
 	immediate = {
 		every_state = {
-			limit = { region = 25 NOT = { state = 731 } controller = { NOT = { tag = ITA owns_state = PREV } is_in_faction_with = ITA is_ai = yes } }
+			limit = { 
+				is_core_of = GRE
+			
+				controller = { 
+					NOT = { tag = ROOT } 
+					has_full_control_of_state = PREV 
+					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+					is_ai = yes 
+					is_in_faction_with = ITA
+				}
+			}
 			ROOT = { set_state_controller = PREV }
 		}
 	}
@@ -485,15 +492,29 @@ country_event = { #greece
 }
 
 country_event = { #norway
-	id = EAI_DM.55
+	id = EAI_DM_borders.4
 	hidden = yes
 	fire_only_once = yes
 	trigger = {
-		tag = GER GER = { is_ai = yes } is_historical_focus_on = yes
-		has_war_with = NOR NOR = { has_capitulated = yes }
+		tag = GER 
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
+		has_war_with = NOR 
+		
+		NOR = { has_capitulated = yes }
+		
 		any_state = {
 			OR = { state = 142 state = 110 state = 143 state = 144 }
-			controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes }
+			
+			controller = {
+				has_full_control_of_state = PREV 
+				NOT = { tag = ROOT } 
+				is_in_faction_with = GER 
+				is_ai = yes 
+			}
 		}
 
 		NOT = { #all combat has ceased
@@ -507,7 +528,13 @@ country_event = { #norway
 		every_state = {
 			limit = {
 				OR = { state = 142 state = 110 state = 143 state = 144 }
-				controller = { NOT = { tag = GER } is_in_faction_with = GER is_ai = yes }
+			
+				controller = {
+					has_full_control_of_state = PREV 
+					NOT = { tag = ROOT } 
+					is_in_faction_with = GER 
+					is_ai = yes 
+				}
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -516,24 +543,46 @@ country_event = { #norway
 }
 
 country_event = { #give italy vichy france
-	id = EAI_DM.56
+	id = EAI_DM_borders.5
 	hidden = yes
 	fire_only_once = yes
 	trigger = {
 		has_global_flag = EAI_aggressive_GER
-		tag = ITA ITA = { is_ai = yes } is_historical_focus_on = yes
+		
+		tag = ITA
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
 		is_in_faction_with = GER
-		has_war_with = FRA FRA = { has_capitulated = yes }
+		
+		has_war_with = FRA
+		
+		FRA = { has_capitulated = yes }
+		
 		any_state = {
 			OR = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-			controller = { NOT = { tag = ITA } is_in_faction_with = GER is_ai = yes }
+			
+			controller = { 
+				has_full_control_of_state = PREV 
+				NOT = { tag = ROOT } 
+				is_in_faction_with = GER 
+				is_ai = yes
+			}
 		}
 	}
 	immediate = {
 		every_state = {
 			limit = {
 				OR = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-				controller = { NOT = { tag = ITA } is_in_faction_with = GER is_ai = yes }
+			
+				controller = { 
+					has_full_control_of_state = PREV 
+					NOT = { tag = ROOT } 
+					is_in_faction_with = GER 
+					is_ai = yes
+				}
 			}
 			ROOT = { set_state_controller = PREV }
 		}
@@ -541,72 +590,60 @@ country_event = { #give italy vichy france
 	option = { name = "OK" }
 }
 
-#country_event = { #create puppets after GER annexes SOV
-#	id = EAI_DM.57
-#	hidden = yes
-#	
-#	fire_only_once = yes
-#	
-#	mean_time_to_happen = { days = 2 }
-#	
-#	trigger = {
-#		tag = GER
-#		is_ai = yes
-#		has_government = fascism
-#		219 = { is_owned_by = GER }
-#	}
-#	
-#	immediate = {
-#		country_event = EAI_DM.59
-#	}
-#	option = { name = "OK" }
-#}
-#
-#country_event = { #create puppets after GER annexes SOV
-#	id = EAI_DM.59
-#	hidden = yes
-#	
-#	is_triggered_only = yes
-#	
-#	immediate = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_1/7 } }
-#			set_country_flag = GER_puppets_created_1/7
-#			if = { limit = { FIN = { exists = no } } release = FIN puppet = FIN }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_2/7 } }
-#			set_country_flag = GER_puppets_created_2/7
-#			if = { limit = { LIT = { exists = no } } release = LIT puppet = LIT }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_3/7 } }
-#			set_country_flag = GER_puppets_created_3/7
-#			if = { limit = { LAT = { exists = no } } release = LAT puppet = LAT }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_4/7 } }
-#			set_country_flag = GER_puppets_created_4/7
-#			if = { limit = { EST = { exists = no } } release = EST puppet = EST }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_5/7 } }
-#			set_country_flag = GER_puppets_created_5/7
-#			if = { limit = { UKR = { exists = no } } release = UKR puppet = UKR }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_6/7 } }
-#			set_country_flag = GER_puppets_created_6/7
-#			if = { limit = { BLR = { exists = no } } release = BLR puppet = BLR }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		else = {
-#		if = { limit = { NOT = { has_country_flag = GER_puppets_created_7/7 } }
-#			set_country_flag = GER_puppets_created_7/7
-#			if = { limit = { SOV = { exists = no } } release = SOV puppet = SOV }
-#			country_event = { id = EAI_DM.59 hours = 12 }
-#		}}}}}}}}}}}}}
-#	}
-#	option = { name = "OK" }
-#}
+country_event = { #east front: stop GER minors from taking over the east front states
+	id = EAI_DM_borders.6
+	hidden = yes
+	mean_time_to_happen = { days = 20 }
+	trigger = {
+		original_tag = GER
+		
+		is_faction_leader = yes
+		
+		is_major = yes
+		
+		is_ai = yes
+		
+		is_historical_focus_on = yes
+		
+		has_war_with = SOV
+		
+		any_state = {
+			is_core_of = SOV
+			
+			any_neighbor_state = { is_controlled_by = GER }
+			
+			controller = { 
+				NOT = { tag = ROOT } 
+				has_full_control_of_state = PREV 
+				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+				is_ai = yes 
+				is_in_faction_with = GER
+			}
+		}
+	}
+	immediate = {
+		every_state = {
+			limit = {
+				is_core_of = SOV
+			
+				any_neighbor_state = { is_controlled_by = GER }
+				
+				controller = { 
+					NOT = { tag = ROOT } 
+					has_full_control_of_state = PREV 
+					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+					is_ai = yes 
+					is_in_faction_with = GER
+				}
+			}
+			
+			GER = { set_state_controller = PREV }
+		}
+	}
+	option = { name = "OK" }
+}
+
+#################
 
 country_event = { #creation of italian east africa
 	id = EAI_DM.58
@@ -648,127 +685,7 @@ country_event = { #creation of italian east africa
 	}
 }
 
-################### wargoals
-
-#swi
-country_event = {
-	id = EAI_DM.130
-	hidden = yes
-	fire_only_once = yes
-	trigger = {
-		date > 1939.8.1
-		has_global_flag = EAI_aggressive_GER
-		tag = GER is_ai = yes is_historical_focus_on = yes has_government = fascism has_war = yes
-
-		NOT = {
-			GER = { has_capitulated = yes }
-			GER = { exists = no }
-			GER = { is_puppet = yes }
-		}
-
-		NOT = {
-			SWI = { has_capitulated = yes }
-			SWI = { exists = no }
-			SWI = { is_puppet = yes }
-			SWI = { has_government = fascism }
-			is_in_faction_with = SWI
-			has_war_with = SWI
-		}
-
-		OR = {
-			POL = { has_capitulated = yes }
-			POL = { exists = no }
-			POL = { is_puppet = yes }
-			POL = { has_government = fascism }
-			is_in_faction_with = POL
-		}
-
-		OR = {
-			FRA = { has_capitulated = yes }
-			FRA = { exists = no }
-			FRA = { is_puppet = yes }
-			FRA = { has_government = fascism }
-			is_in_faction_with = FRA
-		}
-
-		OR = {
-			DEN = { has_capitulated = yes }
-			DEN = { exists = no }
-			DEN = { is_puppet = yes }
-			DEN = { has_government = fascism }
-			is_in_faction_with = DEN
-		}
-
-		OR = {
-			AND = {
-				NOT = { GER = { has_completed_focus = GER_ussr_war_goal } }
-				NOT = { GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } } }
-			}
-			AND = {
-				OR = {
-					GER = { has_completed_focus = GER_ussr_war_goal }
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.01 } }
-				}
-				OR = {
-					SOV = { has_capitulated = yes }
-					SOV = { exists = no }
-					SOV = { is_puppet = yes }
-					SOV = { has_government = fascism }
-					is_in_faction_with = SOV
-				}
-			}
-		}
-
-		OR = {
-			NOT = { has_war_with = SOV }
-			AND = {
-				has_war_with = SOV
-				SOV = { has_capitulated = yes }
-			}
-		}
-
-		NOT = {
-			any_state = {
-				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 27 state = 161 state = 162 }
-				controller = { has_war_with = GER }
-			}
-		}
-	}
-	immediate = {
-		country_event = { id = EAI_DM.131 days = 25 }
-		add_political_power = -5
-		set_country_flag = GER_invade_SWI
-
-		every_country = { limit = { is_ai = no OR = { tag = SWI } } country_event = EAI_DM.1000 }
-	}
-	option = { name = "OK" }
-}
-
-country_event = {
-	id = EAI_DM.131
-	hidden = yes
-	is_triggered_only = yes
-	immediate = {
-		if = { limit = { NOT = { has_wargoal_against = SWI } }
-			create_wargoal = {
-				type = take_state
-				target = SWI
-				generator = { 3 }
-			}
-		}
-		country_event = { id = EAI_DM.132 days = 3 }
-	}
-	option = { name = "OK" }
-}
-
-country_event = {
-	id = EAI_DM.132
-	hidden = yes
-	is_triggered_only = yes
-	immediate = { if = { limit = { NOT = { has_war_with = SWI } } declare_war_on = { target = SWI type = take_state_focus } } }
-	option = { name = "OK" }
-}
-
+################### wargoals # old stuff
 
 #nep
 country_event = {
@@ -782,13 +699,13 @@ country_event = {
 		NOT = {
 			JAP = { has_capitulated = yes }
 			JAP = { exists = no }
-			JAP = { is_puppet = yes }
+			JAP = { is_subject = yes }
 		}
 
 		NOT = {
 			NEP = { has_capitulated = yes }
 			NEP = { exists = no }
-			NEP = { is_puppet = yes }
+			NEP = { is_subject = yes }
 			NEP = { has_government = fascism }
 			is_in_faction_with = NEP
 			has_war_with = NEP
@@ -797,7 +714,7 @@ country_event = {
 		OR = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { has_government = fascism }
 			is_in_faction_with = SOV
 		}
@@ -805,7 +722,7 @@ country_event = {
 		OR = {
 			CHI = { has_capitulated = yes }
 			CHI = { exists = no }
-			CHI = { is_puppet = yes }
+			CHI = { is_subject = yes }
 			CHI = { has_government = fascism }
 			is_in_faction_with = CHI
 		}
@@ -813,7 +730,7 @@ country_event = {
 		OR = {
 			RAJ = { has_capitulated = yes }
 			RAJ = { exists = no }
-			#RAJ = { is_puppet = yes }
+			#RAJ = { is_subject = yes }
 			RAJ = { has_government = fascism }
 			is_in_faction_with = RAJ
 		}
@@ -821,7 +738,7 @@ country_event = {
 	immediate = {
 		country_event = { id = EAI_DM.161 days = 25 }
 		add_political_power = -5
-		set_country_flag = JAP_invade_NEP
+		set_country_flag = EAI_JAP_invade_NEP
 
 		every_country = { limit = { is_ai = no OR = { tag = NEP } } country_event = EAI_DM.1000 }
 	}
@@ -854,33 +771,6 @@ country_event = {
 }
 
 
-#unused
-country_event = {
-	id = EAI_DM.141
-	hidden = yes
-	is_triggered_only = yes
-	immediate = {
-		if = { limit = { NOT = { has_wargoal_against = POR } }
-			create_wargoal = {
-				type = take_state
-				target = POR
-				generator = { 180 }
-			}
-		}
-		country_event = { id = EAI_DM.142 days = 3 }
-	}
-	option = { name = "OK" }
-}
-
-country_event = {
-	id = EAI_DM.142
-	hidden = yes
-	is_triggered_only = yes
-	immediate = { if = { limit = { NOT = { has_war_with = POR } } declare_war_on = { target = POR type = annex_everything } } }
-	option = { name = "OK" }
-}
-
-
 #bhu
 country_event = {
 	id = EAI_DM.170
@@ -893,13 +783,13 @@ country_event = {
 		NOT = {
 			JAP = { has_capitulated = yes }
 			JAP = { exists = no }
-			JAP = { is_puppet = yes }
+			JAP = { is_subject = yes }
 		}
 
 		NOT = {
 			BHU = { has_capitulated = yes }
 			BHU = { exists = no }
-			BHU = { is_puppet = yes }
+			BHU = { is_subject = yes }
 			BHU = { has_government = fascism }
 			is_in_faction_with = BHU
 			has_war_with = BHU
@@ -908,7 +798,7 @@ country_event = {
 		OR = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { has_government = fascism }
 			is_in_faction_with = SOV
 		}
@@ -916,7 +806,7 @@ country_event = {
 		OR = {
 			CHI = { has_capitulated = yes }
 			CHI = { exists = no }
-			CHI = { is_puppet = yes }
+			CHI = { is_subject = yes }
 			CHI = { has_government = fascism }
 			is_in_faction_with = CHI
 		}
@@ -924,7 +814,7 @@ country_event = {
 		OR = {
 			RAJ = { has_capitulated = yes }
 			RAJ = { exists = no }
-			#RAJ = { is_puppet = yes }
+			#RAJ = { is_subject = yes }
 			RAJ = { has_government = fascism }
 			is_in_faction_with = RAJ
 		}
@@ -932,7 +822,7 @@ country_event = {
 	immediate = {
 		country_event = { id = EAI_DM.171 days = 25 }
 		add_political_power = -5
-		set_country_flag = JAP_invade_BHU
+		set_country_flag = EAI_JAP_invade_BHU
 
 		every_country = { limit = { is_ai = no OR = { tag = BHU } } country_event = EAI_DM.1000 }
 	}
@@ -977,13 +867,13 @@ country_event = {
 		NOT = {
 			JAP = { has_capitulated = yes }
 			JAP = { exists = no }
-			JAP = { is_puppet = yes }
+			JAP = { is_subject = yes }
 		}
 
 		NOT = {
 			TIB = { has_capitulated = yes }
 			TIB = { exists = no }
-			TIB = { is_puppet = yes }
+			TIB = { is_subject = yes }
 			TIB = { has_government = fascism }
 			is_in_faction_with = TIB
 			has_war_with = TIB
@@ -992,7 +882,7 @@ country_event = {
 		OR = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 			SOV = { has_government = fascism }
 			is_in_faction_with = SOV
 		}
@@ -1000,7 +890,7 @@ country_event = {
 		OR = {
 			CHI = { has_capitulated = yes }
 			CHI = { exists = no }
-			CHI = { is_puppet = yes }
+			CHI = { is_subject = yes }
 			CHI = { has_government = fascism }
 			is_in_faction_with = CHI
 		}
@@ -1008,7 +898,7 @@ country_event = {
 		OR = {
 			RAJ = { has_capitulated = yes }
 			RAJ = { exists = no }
-			#RAJ = { is_puppet = yes }
+			#RAJ = { is_subject = yes }
 			RAJ = { has_government = fascism }
 			is_in_faction_with = RAJ
 		}
@@ -1016,7 +906,7 @@ country_event = {
 	immediate = {
 		country_event = { id = EAI_DM.181 days = 25 }
 		add_political_power = -5
-		set_country_flag = JAP_invade_TIB
+		set_country_flag = EAI_JAP_invade_TIB
 
 		every_country = { limit = { is_ai = no OR = { tag = TIB } } country_event = EAI_DM.1000 }
 	}
@@ -1063,13 +953,13 @@ country_event = {
 		NOT = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
-			SOV = { is_puppet = yes }
+			SOV = { is_subject = yes }
 		}
 
 		NOT = {
 			FIN = { has_capitulated = yes }
 			FIN = { exists = no }
-			FIN = { is_puppet = yes }
+			FIN = { is_subject = yes }
 			FIN = { has_government = communism }
 			FIN = { is_in_faction = yes }
 			is_in_faction_with = FIN
@@ -1120,28 +1010,28 @@ news_event = { # AI warns a country on illegal justification
 		
 		# DEMOCRATIC
 		every_country = {
-			limit = { democratic_willing_to_guarantee_nation = yes }
+			limit = { EAI_democratic_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10001
 		}
 
 		# COMMUNIST
 		every_country = {
-			limit = { communism_willing_to_guarantee_nation = yes }
+			limit = { EAI_communism_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10001
 		}
 
 		# FASCIST
 		every_country = {
-			limit = { fascism_willing_to_guarantee_nation = yes }
+			limit = { EAI_fascism_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10001
 		}
 
 		# NEUTRALITY
 		every_country = {
-			limit = { neutrality_willing_to_guarantee_nation = yes }
+			limit = { EAI_neutrality_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10001
 		}
@@ -1165,11 +1055,11 @@ country_event = { # add strategies on failure
 	is_triggered_only = yes
 
 	immediate = { # ROOT = DEFENDER FROM = INVADER
-		set_country_flag = mobilize_army
+		set_country_flag = EAI_mobilize_army
 
 		set_country_flag = { flag = EAI_guarantee_workaround value = 20 } #workaround
 
-		if = { limit = { event_target:EAI_illegal_wargoal_target = { tag = GER } } set_country_flag = EAI_supports_GER GER = { set_country_flag = EAI_receives_support_GER } add_ai_strategy = { type = alliance id = "GER" value = 500 } GER = { country_event = { id = EAI_DM.10005 days = 5 random = 5 } } }
+		if = { limit = { event_target:EAI_illegal_wargoal_target = { tag = GER } } set_country_flag = EAI_supports_GER GER = { set_country_flag = EAI_receives_support_GER } add_ai_strategy = { type = alliance id = "GER" value = 500 } GER = { country_event = { id = EAI_DM.10005 days = 5 random = 5 } } } #MTS
 		if = { limit = { event_target:EAI_illegal_wargoal_target = { tag = ENG } } set_country_flag = EAI_supports_ENG ENG = { set_country_flag = EAI_receives_support_ENG } add_ai_strategy = { type = alliance id = "ENG" value = 500 } ENG = { country_event = { id = EAI_DM.10005 days = 5 random = 5 } } }
 		if = { limit = { event_target:EAI_illegal_wargoal_target = { tag = SOV } } set_country_flag = EAI_supports_SOV SOV = { set_country_flag = EAI_receives_support_SOV } add_ai_strategy = { type = alliance id = "SOV" value = 500 } SOV = { country_event = { id = EAI_DM.10005 days = 5 random = 5 } } }
 		if = { limit = { event_target:EAI_illegal_wargoal_target = { tag = SWE } } set_country_flag = EAI_supports_SWE SWE = { set_country_flag = EAI_receives_support_SWE } add_ai_strategy = { type = alliance id = "SWE" value = 500 } SWE = { country_event = { id = EAI_DM.10005 days = 5 random = 5 } } }
@@ -1298,7 +1188,7 @@ country_event = { # add strategies on failure
 
 		#########################################################################################################################################
 
-		if = { limit = { event_target:EAI_illegal_wargoal_invader = { tag = GER } } add_ai_strategy = { type = antagonize id = "GER" value = 50 } }
+		if = { limit = { event_target:EAI_illegal_wargoal_invader = { tag = GER } } add_ai_strategy = { type = antagonize id = "GER" value = 50 } } #MTS
 		if = { limit = { event_target:EAI_illegal_wargoal_invader = { tag = ENG } } add_ai_strategy = { type = antagonize id = "ENG" value = 50 } }
 		if = { limit = { event_target:EAI_illegal_wargoal_invader = { tag = SOV } } add_ai_strategy = { type = antagonize id = "SOV" value = 50 } }
 		if = { limit = { event_target:EAI_illegal_wargoal_invader = { tag = SWE } } add_ai_strategy = { type = antagonize id = "SWE" value = 50 } }
@@ -1482,28 +1372,28 @@ news_event = { # failed
 
 		# DEMOCRATIC
 		every_country = {
-			limit = { democratic_willing_to_guarantee_nation = yes }
+			limit = { EAI_democratic_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10002
 		}
 
 		# COMMUNIST
 		every_country = {
-			limit = { communism_willing_to_guarantee_nation = yes }
+			limit = { EAI_communism_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10002
 		}
 
 		# FASCIST
 		every_country = {
-			limit = { fascism_willing_to_guarantee_nation = yes }
+			limit = { EAI_fascism_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10002
 		}
 
 		# NEUTRALITY
 		every_country = {
-			limit = { neutrality_willing_to_guarantee_nation = yes }
+			limit = { EAI_neutrality_willing_to_guarantee_nation = yes }
 
 			country_event = EAI_DM.10002
 		}
@@ -1560,15 +1450,15 @@ country_event = { # guarantee workaround 2
 			clr_country_flag = EAI_guarantee_workaround
 
 			else = {
-				if = { #try again later
-					limit = { has_country_flag = { flag = EAI_guarantee_workaround value > 0 } }
-
-					modify_country_flag = { flag = EAI_guarantee_workaround value = -1 }
-
-					FROM = { country_event = EAI_DM.10005 }
-
-					else = { clr_country_flag = EAI_guarantee_workaround }
-				}
+				#if = { #try again later
+				#	limit = { has_country_flag = { flag = EAI_guarantee_workaround value > 0 } }
+                #
+				#	modify_country_flag = { flag = EAI_guarantee_workaround value = -1 }
+                #
+				#	FROM = { country_event = EAI_DM.10005 }
+                #
+				#	else = { clr_country_flag = EAI_guarantee_workaround }
+				#}
 			}
 		}
 	}
@@ -1625,7 +1515,6 @@ country_event = { # lowers infamy if justification was cancelled
 
 			if = {
 				limit = { FROM = { has_country_flag = { flag = EAI_infamy_count_@THIS value > 1 } } }
-				
 				
 				FROM = { modify_country_flag = { flag = EAI_infamy_count_@THIS value = -1 } }
 				
@@ -1740,9 +1629,9 @@ country_event = { # add ai strategies on wardec
 	is_triggered_only = yes
 
 	immediate = {
-		set_country_flag = mobilize_army
+		set_country_flag = EAI_mobilize_army
 
-		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = GER } } set_country_flag = EAI_supports_GER GER = { set_country_flag = EAI_receives_support_GER } }
+		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = GER } } set_country_flag = EAI_supports_GER GER = { set_country_flag = EAI_receives_support_GER } } #MTS
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = ENG } } set_country_flag = EAI_supports_ENG GER = { set_country_flag = EAI_receives_support_ENG } }
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = SOV } } set_country_flag = EAI_supports_SOV GER = { set_country_flag = EAI_receives_support_SOV } }
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = SWE } } set_country_flag = EAI_supports_SWE GER = { set_country_flag = EAI_receives_support_SWE } }
@@ -1871,7 +1760,7 @@ country_event = { # add ai strategies on wardec
 
 		########################################################################################################
 
-		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = GER } } add_ai_strategy = { type = send_volunteers_desire id = "GER" value = 200 } }
+		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = GER } } add_ai_strategy = { type = send_volunteers_desire id = "GER" value = 200 } } #MTS
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = ENG } } add_ai_strategy = { type = send_volunteers_desire id = "ENG" value = 200 } }
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = SOV } } add_ai_strategy = { type = send_volunteers_desire id = "SOV" value = 200 } }
 		if = { limit = { event_target:EAI_illegal_wardec_target = { tag = SWE } } add_ai_strategy = { type = send_volunteers_desire id = "SWE" value = 200 } }
@@ -2000,7 +1889,7 @@ country_event = { # add ai strategies on wardec
 
 		########################################################################################################
 
-		if = { limit = { GER = { tag = FROM } } add_ai_strategy = { type = antagonize id = "GER" value = 100 } }
+		if = { limit = { GER = { tag = FROM } } add_ai_strategy = { type = antagonize id = "GER" value = 100 } } #MTS
 		if = { limit = { ENG = { tag = FROM } } add_ai_strategy = { type = antagonize id = "ENG" value = 100 } }
 		if = { limit = { SOV = { tag = FROM } } add_ai_strategy = { type = antagonize id = "SOV" value = 100 } }
 		if = { limit = { SWE = { tag = FROM } } add_ai_strategy = { type = antagonize id = "SWE" value = 100 } }
@@ -2129,7 +2018,7 @@ country_event = { # add ai strategies on wardec
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_democratic }
 
-			if = { limit = { GER = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } }
+			if = { limit = { GER = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } } #MTS
 			if = { limit = { ENG = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 500 } }
 			if = { limit = { SOV = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 500 } }
 			if = { limit = { SWE = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 500 } }
@@ -2259,7 +2148,7 @@ country_event = { # add ai strategies on wardec
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_communism }
 
-			if = { limit = { GER = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } }
+			if = { limit = { GER = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } } #MTS
 			if = { limit = { ENG = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 500 } }
 			if = { limit = { SOV = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 500 } }
 			if = { limit = { SWE = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 500 } }
@@ -2389,7 +2278,7 @@ country_event = { # add ai strategies on wardec
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_fascism }
 
-			if = { limit = { GER = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } }
+			if = { limit = { GER = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } } #MTS
 			if = { limit = { ENG = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 500 } }
 			if = { limit = { SOV = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 500 } }
 			if = { limit = { SWE = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 500 } }
@@ -2528,11 +2417,11 @@ country_event = { # add ai strategies on wardec
 	is_triggered_only = yes
 
 	immediate = {
-		set_country_flag = mobilize_army
+		set_country_flag = EAI_mobilize_army
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_democratic }
 
-			if = { limit = { GER = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } }
+			if = { limit = { GER = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 500 } } #MTS
 			if = { limit = { ENG = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 500 } }
 			if = { limit = { SOV = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 500 } }
 			if = { limit = { SWE = { has_government = democratic is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 500 } }
@@ -2662,7 +2551,7 @@ country_event = { # add ai strategies on wardec
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_communism }
 
-			if = { limit = { GER = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 200 } }
+			if = { limit = { GER = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 200 } } #MTS
 			if = { limit = { ENG = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 200 } }
 			if = { limit = { SOV = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 200 } }
 			if = { limit = { SWE = { has_government = communism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 200 } }
@@ -2792,7 +2681,7 @@ country_event = { # add ai strategies on wardec
 
 		if = { limit = { has_country_flag = EAI_seeks_alliance_fascism }
 
-			if = { limit = { GER = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 200 } }
+			if = { limit = { GER = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "GER" value = 200 } } #MTS
 			if = { limit = { ENG = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "ENG" value = 200 } }
 			if = { limit = { SOV = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SOV" value = 200 } }
 			if = { limit = { SWE = { has_government = fascism is_faction_leader = yes } } add_ai_strategy = { type = alliance id = "SWE" value = 200 } }
