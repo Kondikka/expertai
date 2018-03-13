@@ -1445,6 +1445,15 @@ focus_tree = {
 		ai_will_do = {
 			factor = 1
 		}
+
+		bypass = {
+			HUN = {
+				OR = {
+					exists = no
+					is_subject = yes				
+				}
+			}
+		}
 		
 		completion_reward = {
 			if = {
@@ -1490,6 +1499,15 @@ focus_tree = {
 		cost = 10
 		ai_will_do = {
 			factor = 1
+		}
+
+		bypass = {
+			ROM = {
+				OR = {
+					exists = no
+					is_subject = yes				
+				}
+			}
 		}
 		
 		completion_reward = {
@@ -1542,6 +1560,19 @@ focus_tree = {
 			modifier = { #EAI
 				factor = 0
 				is_historical_focus_on = yes
+			}
+		}
+
+		available = {
+			OR = {
+				HUN = {
+					is_in_faction_with = ROOT
+					is_free_or_subject_of_root = yes
+				}
+				ROM = {
+					is_in_faction_with = ROOT
+					is_free_or_subject_of_root = yes
+				}
 			}
 		}
 
@@ -1625,6 +1656,7 @@ focus_tree = {
 				limit = {
 					HUN = {
 						is_in_faction_with = GER
+						is_free_or_subject_of_root = yes
 					}
 				}
 				random_owned_controlled_state = {
@@ -1664,6 +1696,7 @@ focus_tree = {
 				limit = {
 					ROM = {
 						is_in_faction_with = GER
+						is_free_or_subject_of_root = yes
 					}
 				}
 				random_owned_controlled_state = {
@@ -1703,6 +1736,7 @@ focus_tree = {
 				limit = {
 					HUN = {
 						is_in_faction_with = GER
+						is_free_or_subject_of_root = yes
 					}
 				}
 				HUN = {
@@ -1738,13 +1772,13 @@ focus_tree = {
 						}
 						set_state_flag = GER_integrate_war_economies_2
 					}
-					country_event = { id = wtt_germany.7 days = 1 }
 				}
 			}
 			if = {
 				limit = {
 					ROM = {
 						is_in_faction_with = GER
+						is_free_or_subject_of_root = yes
 					}
 				}
 				ROM = {
@@ -1784,7 +1818,7 @@ focus_tree = {
 				}
 			}
 			if = {
-				limit = { 
+				limit = {
 					has_dlc = "Death or Dishonor" 
 					HUN = {
 						is_in_faction_with = GER
@@ -2637,6 +2671,7 @@ focus_tree = {
 					NOT = { tag = GER }
 					NOT = { has_war_with = GER }
 					NOT = { is_in_faction_with = SOV }
+					is_subject = no
 					OR = {
 						capital_scope = {
 								is_on_continent = europe
@@ -3246,7 +3281,7 @@ focus_tree = {
 				factor = 0
 				is_historical_focus_on = yes
 			}
-		}
+		}	
 		completion_reward = {
 			add_named_threat = { threat = 5 name = GER_danzig_or_war }
 			if = {
@@ -3437,7 +3472,7 @@ focus_tree = {
 				factor = 0
 				is_historical_focus_on = yes				
 			}
-		}
+		}	
 		completion_reward = {
 
 			if = {
@@ -6572,7 +6607,13 @@ focus_tree = {
 		prerequisite = { focus = GER_break_the_anglo_french_colonial_hegemony }
 		available = {
 			is_puppet = no
-			has_war_with = FRA
+			OR = {
+				has_war_with = FRA
+				AND = {
+					has_war_with = ENG
+					has_global_flag = flag_franco_british_union
+				}
+			}
 			NOT = { is_in_faction_with = BEL }
 			NOT = { is_in_faction_with = LUX }
 		}
@@ -7141,8 +7182,6 @@ focus_tree = {
 		completion_reward = {
 			add_state_core = 28
 			FRA = {
-				remove_state_core = 28
-				add_state_claim = 28
 				country_event = { id = wtt_germany.63 }
 			}
 		}
@@ -7240,6 +7279,19 @@ focus_tree = {
 			NOT = { has_war_with = POL }
 			NOT = { is_in_faction_with = POL }
 		}
+		bypass = {
+			OR = {
+				AND = {
+					POL = { has_war = yes }
+					NOT = { has_war_with = POL }
+				}
+				AND = {
+					POL = { is_subject = yes }
+					NOT = { POL = { is_subject_of = GER } }
+				}
+				POL = { exists = no }
+			}
+		}
 		cancel_if_invalid = yes
 		x = 2
 		y = 2
@@ -7268,14 +7320,38 @@ focus_tree = {
 			OR = {
 				has_guaranteed = EST
 				NOT = { country_exists = EST }
+				AND = {
+					EST = { has_war = yes }
+					NOT = { has_war_with = EST }
+				}
+				AND = {
+					EST = { is_subject = yes }
+					NOT = { EST = { is_subject_of = GER } }
+				}
 			}
 			OR = {
 				has_guaranteed = LAT
 				NOT = { country_exists = LAT }
+				AND = {
+					LAT = { has_war = yes }
+					NOT = { has_war_with = LAT }
+				}
+				AND = {
+					LAT = { is_subject = yes }
+					NOT = { LAT = { is_subject_of = GER } }
+				}
 			}
 			OR = {
 				has_guaranteed = LIT
 				NOT = { country_exists = LIT }
+				AND = {
+					LIT = { has_war = yes }
+					NOT = { has_war_with = LIT }
+				}
+				AND = {
+					LIT = { is_subject = yes }
+					NOT = { LIT = { is_subject_of = GER } }
+				}
 			}
 		}
 		cancel_if_invalid = yes
@@ -7326,6 +7402,19 @@ focus_tree = {
 			is_puppet = no
 			NOT = { has_war_with = FIN }
 		}
+		bypass = {
+			OR = {
+				AND = {
+					FIN = { has_war = yes }
+					NOT = { has_war_with = FIN }
+				}
+				AND = {
+					FIN = { is_subject = yes }
+					NOT = { FIN = { is_subject_of = GER } }
+				}
+				FIN = { exists = no }
+			}
+		}
 		cancel_if_invalid = yes
 		x = 0
 		y = 1
@@ -7372,12 +7461,16 @@ focus_tree = {
 					NOT = { tag = GER }
 					NOT = { has_war_with = GER }
 					NOT = { is_in_faction_with = SOV }
+					is_subject = no
 					OR = {
 						capital_scope = {
 								is_on_continent = europe
 						}
-						capital_scope = {
-								is_on_continent = asia
+						AND = {
+							capital_scope = {
+									is_on_continent = asia
+							}
+							is_neighbor_of = SOV
 						}
 						num_of_factories > 30
 					}
