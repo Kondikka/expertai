@@ -4,168 +4,159 @@
 # Expert AI mod - difficulty events
 ############################################################################################################
 
-############# dynamic bonus
+############# difficulty bonus
 
-country_event = { # hard
-	id = EAI_H.1010
+country_event = {
+	id = EAI_H.0
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		has_global_flag = EAI_dynamic_hard_enemies
-		
 		is_ai = yes
 		
-		any_enemy_country = { 
-			is_ai = no 
+		OR = { 
+			has_country_flag = EAI_country_bonus_HARD 
+			has_country_flag = EAI_country_bonus_VERY_HARD 
+			has_country_flag = EAI_country_bonus_INSANE
 			
-			OR = {
-				is_neighbor_of = ROOT 
+			AND = { 
+				NOT = { has_country_flag = EAI_country_bonus }
+			
+				OR = {
+					has_global_flag = EAI_dynamic_hard_enemies 
+					has_global_flag = EAI_dynamic_very_hard_enemies
+					has_global_flag = EAI_dynamic_insane_enemies
+				}
 				
-				any_state = { 
-					is_controlled_by = PREV 
-					
-					any_state = {
-						is_controlled_by = ROOT 
-						distance_to = { target = PREV value < 1000 } 
-					} 
-				} 
-				
-				any_state = { 
-					is_owned_by = ROOT 
-					is_controlled_by = PREV
-				} 
-			}
-		}
-
-		NOT = { has_country_flag = EAI_dynamic_bonus has_country_flag = EAI_country_bonus }
-		NOT = { has_idea = EAI_hard_mode has_idea = EAI_very_hard_mode has_idea = EAI_insane_mode }
+				EAI_dynamic_bonus_trigger = yes 
+			} 
+		} 
 	}
 	immediate = {
-		set_country_flag = EAI_dynamic_bonus
-		add_ideas = EAI_hard_mode add_ideas = EAI_hard_mode_hidden
-	}
-	option = {}
-}
-country_event = { # very hard
-	id = EAI_H.1011
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		has_global_flag = EAI_dynamic_very_hard_enemies
+		set_country_flag = EAI_country_bonus_active
 		
-		is_ai = yes
-		
-		any_enemy_country = { 
-			is_ai = no 
+		if = {
+			limit = {
+				NOT = { has_country_flag = EAI_country_bonus }
 			
-			OR = {
-				is_neighbor_of = ROOT 
+				OR = {
+					has_global_flag = EAI_dynamic_hard_enemies 
+					has_global_flag = EAI_dynamic_very_hard_enemies
+					has_global_flag = EAI_dynamic_insane_enemies
+				}
 				
-				any_state = { 
-					is_controlled_by = PREV 
+				EAI_dynamic_bonus_trigger = yes 
+			}
+			
+			set_country_flag = EAI_dynamic_country_bonus_active
+		}
+		
+		if = { 
+			limit = { 
+				OR = { 
+					has_country_flag = EAI_country_bonus_HARD 
 					
-					any_state = {
-						is_controlled_by = ROOT 
-						distance_to = { target = PREV value < 1000 } 
+					AND = { 
+						NOT = { has_country_flag = EAI_country_bonus }
+					
+						has_global_flag = EAI_dynamic_hard_enemies 
 					} 
 				} 
-				
-				any_state = { 
-					is_owned_by = ROOT 
-					is_controlled_by = PREV
-				} 
 			}
-		}
-
-		NOT = { has_country_flag = EAI_dynamic_bonus has_country_flag = EAI_country_bonus }
-		NOT = { has_idea = EAI_hard_mode has_idea = EAI_very_hard_mode has_idea = EAI_insane_mode }
-	}
-	immediate = {
-		set_country_flag = EAI_dynamic_bonus
-		add_ideas = EAI_very_hard_mode add_ideas = EAI_very_hard_mode_hidden
-	}
-	option = {}
-}
-country_event = { # insane
-	id = EAI_H.1012
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		has_global_flag = EAI_dynamic_insane_enemies
-		
-		is_ai = yes
-		
-		any_enemy_country = { 
-			is_ai = no 
 			
-			OR = {
-				is_neighbor_of = ROOT 
-				
-				any_state = { 
-					is_controlled_by = PREV 
-					
-					any_state = {
-						is_controlled_by = ROOT 
-						distance_to = { target = PREV value < 1000 } 
-					} 
-				} 
-				
-				any_state = { 
-					is_owned_by = ROOT 
-					is_controlled_by = PREV
-				} 
-			}
+			add_ideas = EAI_hard_mode
+		
+			EAI_apply_difficulty_HARD = yes
 		}
 
-		NOT = { has_country_flag = EAI_dynamic_bonus has_country_flag = EAI_country_bonus }
-		NOT = { has_idea = EAI_hard_mode has_idea = EAI_very_hard_mode has_idea = EAI_insane_mode }
-	}
-	immediate = {
-		set_country_flag = EAI_dynamic_bonus
-		add_ideas = EAI_insane_mode add_ideas = EAI_insane_mode_hidden
-	}
-	option = {}
-}
-country_event = { # remove
-	id = EAI_H.1013
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		is_ai = yes
-
-		OR = {
-			has_country_flag = EAI_country_bonus
-
-			NOT = {
-				any_enemy_country = { 
-					is_ai = no 
+		if = { 
+			limit = { 
+				OR = { 
+					has_country_flag = EAI_country_bonus_VERY_HARD 
 					
-					OR = {
-						is_neighbor_of = ROOT 
+					AND = { 
+						NOT = { has_country_flag = EAI_country_bonus }
 						
-						any_state = { 
-							is_controlled_by = PREV 
-							
-							any_state = {
-								is_controlled_by = ROOT 
-								distance_to = { target = PREV value < 500 } 
-							} 
-						} 
-					}
+						has_global_flag = EAI_dynamic_very_hard_enemies 
+						
+						EAI_dynamic_bonus_trigger = yes 
+					} 
+				} 
+			}
+			
+			add_ideas = EAI_very_hard_mode
+		
+			EAI_apply_difficulty_VERY_HARD = yes
+		}
+		
+		if = { 
+			limit = { 
+				OR = { 
+					has_country_flag = EAI_country_bonus_INSANE 
+					
+					AND = {
+						NOT = { has_country_flag = EAI_country_bonus }
+						
+						has_global_flag = EAI_dynamic_insane_enemies 
+						
+						EAI_dynamic_bonus_trigger = yes 
+					} 
+				} 
+			}
+			
+			add_ideas = EAI_insane_mode
+		
+			EAI_apply_difficulty_INSANE = yes
+		}
+		
+		#only one equipment production boost can be active at any time
+		EAI_fix_production_boost = yes
+	}
+	option = {}
+}
+
+country_event = { # remove difficulty bonus
+	id = EAI_H.1
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		OR = {
+			AND = {
+				is_ai = no
+			
+				has_country_flag = EAI_country_bonus_active
+			}
+		
+			has_country_flag = EAI_dynamic_country_bonus_active
+		}
+	
+		OR  = {
+			AND = {
+				is_ai = no
+			}
+			
+			AND = {
+				is_ai = yes
+		
+				NOT = {
+					AND = { 
+						NOT = { has_country_flag = EAI_country_bonus }
+					
+						OR = {
+							has_global_flag = EAI_dynamic_hard_enemies 
+							has_global_flag = EAI_dynamic_very_hard_enemies
+							has_global_flag = EAI_dynamic_insane_enemies
+						}
+						
+						EAI_dynamic_bonus_trigger = yes 
+					} 
 				}
 			}
 		}
-
-		has_country_flag = EAI_dynamic_bonus
 	}
 	immediate = {
-		if = { limit = { has_country_flag = EAI_country_bonus }
-			clr_country_flag = EAI_dynamic_bonus
-
-			else = {
-				EAI_clear_difficulty = yes
-			}
-		}
+		EAI_clear_difficulty = yes
+		
+		clr_country_flag = EAI_dynamic_country_bonus_active
 	}
 	option = {}
 }
@@ -218,55 +209,54 @@ country_event = { # normal
 		
 		OR = { 
 			has_country_flag = EAI_desperate_defense_NORMAL
+			
 			AND = { 
-				has_global_flag = EAI_dynamic_desperate_defense_NORMAL
-				any_enemy_country = { is_ai = no } 
 				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_NORMAL
+				
+				any_enemy_country = { is_ai = no } 
 			} 
-		}
-
-		OR = {
-			AND = { NOT = { has_idea = EAI_desperate_defense_0 } 	surrender_progress > 0.00 NOT = { surrender_progress > 0.03 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_1 } 	surrender_progress > 0.03 NOT = { surrender_progress > 0.06 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_2 } 	surrender_progress > 0.06 NOT = { surrender_progress > 0.09 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_3 } 	surrender_progress > 0.09 NOT = { surrender_progress > 0.12 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_4 } 	surrender_progress > 0.12 NOT = { surrender_progress > 0.15 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_5 } 	surrender_progress > 0.15 NOT = { surrender_progress > 0.18 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_6 } 	surrender_progress > 0.18 NOT = { surrender_progress > 0.21 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_7 } 	surrender_progress > 0.21 NOT = { surrender_progress > 0.24 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_8 } 	surrender_progress > 0.24 NOT = { surrender_progress > 0.27 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_9 } 	surrender_progress > 0.27 NOT = { surrender_progress > 0.30 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_10 } 	surrender_progress > 0.30 NOT = { surrender_progress > 0.33 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_11 } 	surrender_progress > 0.33 NOT = { surrender_progress > 0.36 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_12 } 	surrender_progress > 0.36 NOT = { surrender_progress > 0.39 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_13 } 	surrender_progress > 0.39 NOT = { surrender_progress > 0.42 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_14 } 	surrender_progress > 0.42 NOT = { surrender_progress > 0.45 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_15 } 	surrender_progress > 0.45 NOT = { surrender_progress > 0.48 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_16 } 	surrender_progress > 0.48 NOT = { surrender_progress > 0.51 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_17 } 	surrender_progress > 0.51 }
 		}
 	}
 	immediate = {
-		EAI_clear_desperate_defense = yes
-
-		if = { 		limit = { surrender_progress > 0.00 NOT = { surrender_progress > 0.03 } } add_ideas = EAI_desperate_defense_0  	add_ideas = EAI_desperate_defense_0_hidden }
-		else_if = { limit = { surrender_progress > 0.03 NOT = { surrender_progress > 0.06 } } add_ideas = EAI_desperate_defense_1  	add_ideas = EAI_desperate_defense_1_hidden }
-		else_if = { limit = { surrender_progress > 0.06 NOT = { surrender_progress > 0.09 } } add_ideas = EAI_desperate_defense_2  	add_ideas = EAI_desperate_defense_2_hidden }
-		else_if = { limit = { surrender_progress > 0.09 NOT = { surrender_progress > 0.12 } } add_ideas = EAI_desperate_defense_3  	add_ideas = EAI_desperate_defense_3_hidden }
-		else_if = { limit = { surrender_progress > 0.12 NOT = { surrender_progress > 0.15 } } add_ideas = EAI_desperate_defense_4  	add_ideas = EAI_desperate_defense_4_hidden }
-		else_if = { limit = { surrender_progress > 0.15 NOT = { surrender_progress > 0.18 } } add_ideas = EAI_desperate_defense_5  	add_ideas = EAI_desperate_defense_5_hidden }
-		else_if = { limit = { surrender_progress > 0.18 NOT = { surrender_progress > 0.21 } } add_ideas = EAI_desperate_defense_6  	add_ideas = EAI_desperate_defense_6_hidden }
-		else_if = { limit = { surrender_progress > 0.21 NOT = { surrender_progress > 0.24 } } add_ideas = EAI_desperate_defense_7  	add_ideas = EAI_desperate_defense_7_hidden }
-		else_if = { limit = { surrender_progress > 0.24 NOT = { surrender_progress > 0.27 } } add_ideas = EAI_desperate_defense_8  	add_ideas = EAI_desperate_defense_8_hidden }
-		else_if = { limit = { surrender_progress > 0.27 NOT = { surrender_progress > 0.30 } } add_ideas = EAI_desperate_defense_9  	add_ideas = EAI_desperate_defense_9_hidden }
-		else_if = { limit = { surrender_progress > 0.30 NOT = { surrender_progress > 0.33 } } add_ideas = EAI_desperate_defense_10 	add_ideas = EAI_desperate_defense_10_hidden }
-		else_if = { limit = { surrender_progress > 0.33 NOT = { surrender_progress > 0.36 } } add_ideas = EAI_desperate_defense_11 	add_ideas = EAI_desperate_defense_11_hidden }
-		else_if = { limit = { surrender_progress > 0.36 NOT = { surrender_progress > 0.39 } } add_ideas = EAI_desperate_defense_12 	add_ideas = EAI_desperate_defense_12_hidden }
-		else_if = { limit = { surrender_progress > 0.39 NOT = { surrender_progress > 0.42 } } add_ideas = EAI_desperate_defense_13 	add_ideas = EAI_desperate_defense_13_hidden }
-		else_if = { limit = { surrender_progress > 0.42 NOT = { surrender_progress > 0.45 } } add_ideas = EAI_desperate_defense_14 	add_ideas = EAI_desperate_defense_14_hidden }
-		else_if = { limit = { surrender_progress > 0.45 NOT = { surrender_progress > 0.48 } } add_ideas = EAI_desperate_defense_15 	add_ideas = EAI_desperate_defense_15_hidden }
-		else_if = { limit = { surrender_progress > 0.48 NOT = { surrender_progress > 0.51 } } add_ideas = EAI_desperate_defense_16 	add_ideas = EAI_desperate_defense_16_hidden }
-		else_if = { limit = { surrender_progress > 0.51  								    } add_ideas = EAI_desperate_defense_17 	add_ideas = EAI_desperate_defense_17_hidden }
+		set_country_flag = EAI_desperate_defense_active
+		
+		if = {
+			limit = {
+				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_NORMAL
+				
+				any_enemy_country = { is_ai = no } 
+			}
+			
+			set_country_flag = EAI_dynamic_desperate_defense_active
+		}
+	
+		if = { limit = { surrender_progress > 0.025 NOT = { surrender_progress > 0.050 } } add_ideas = EAI_desperate_defense_1  EAI_apply_desperate_defense_1 = yes  else = { remove_ideas = EAI_desperate_defense_1  EAI_clear_desperate_defense_1 = yes } }
+		if = { limit = { surrender_progress > 0.050 NOT = { surrender_progress > 0.075 } } add_ideas = EAI_desperate_defense_2  EAI_apply_desperate_defense_2 = yes  else = { remove_ideas = EAI_desperate_defense_2  EAI_clear_desperate_defense_2 = yes } }
+		if = { limit = { surrender_progress > 0.075 NOT = { surrender_progress > 0.100 } } add_ideas = EAI_desperate_defense_3  EAI_apply_desperate_defense_3 = yes  else = { remove_ideas = EAI_desperate_defense_3  EAI_clear_desperate_defense_3 = yes } }
+		if = { limit = { surrender_progress > 0.100 NOT = { surrender_progress > 0.125 } } add_ideas = EAI_desperate_defense_4  EAI_apply_desperate_defense_4 = yes  else = { remove_ideas = EAI_desperate_defense_4  EAI_clear_desperate_defense_4 = yes } }
+		if = { limit = { surrender_progress > 0.125 NOT = { surrender_progress > 0.150 } } add_ideas = EAI_desperate_defense_5  EAI_apply_desperate_defense_5 = yes  else = { remove_ideas = EAI_desperate_defense_5  EAI_clear_desperate_defense_5 = yes } }
+		if = { limit = { surrender_progress > 0.150 NOT = { surrender_progress > 0.175 } } add_ideas = EAI_desperate_defense_6  EAI_apply_desperate_defense_6 = yes  else = { remove_ideas = EAI_desperate_defense_6  EAI_clear_desperate_defense_6 = yes } }
+		if = { limit = { surrender_progress > 0.175 NOT = { surrender_progress > 0.200 } } add_ideas = EAI_desperate_defense_7  EAI_apply_desperate_defense_7 = yes  else = { remove_ideas = EAI_desperate_defense_7  EAI_clear_desperate_defense_7 = yes } }
+		if = { limit = { surrender_progress > 0.200 NOT = { surrender_progress > 0.225 } } add_ideas = EAI_desperate_defense_8  EAI_apply_desperate_defense_8 = yes  else = { remove_ideas = EAI_desperate_defense_8  EAI_clear_desperate_defense_8 = yes } }
+		if = { limit = { surrender_progress > 0.225 NOT = { surrender_progress > 0.250 } } add_ideas = EAI_desperate_defense_9  EAI_apply_desperate_defense_9 = yes  else = { remove_ideas = EAI_desperate_defense_9  EAI_clear_desperate_defense_9 = yes } }
+		if = { limit = { surrender_progress > 0.250 NOT = { surrender_progress > 0.275 } } add_ideas = EAI_desperate_defense_10 EAI_apply_desperate_defense_10 = yes else = { remove_ideas = EAI_desperate_defense_10 EAI_clear_desperate_defense_10 = yes } }
+		if = { limit = { surrender_progress > 0.275 NOT = { surrender_progress > 0.300 } } add_ideas = EAI_desperate_defense_11 EAI_apply_desperate_defense_11 = yes else = { remove_ideas = EAI_desperate_defense_11 EAI_clear_desperate_defense_11 = yes } }
+		if = { limit = { surrender_progress > 0.300 NOT = { surrender_progress > 0.325 } } add_ideas = EAI_desperate_defense_12 EAI_apply_desperate_defense_12 = yes else = { remove_ideas = EAI_desperate_defense_12 EAI_clear_desperate_defense_12 = yes } }
+		if = { limit = { surrender_progress > 0.325 NOT = { surrender_progress > 0.350 } } add_ideas = EAI_desperate_defense_13 EAI_apply_desperate_defense_13 = yes else = { remove_ideas = EAI_desperate_defense_13 EAI_clear_desperate_defense_13 = yes } }
+		if = { limit = { surrender_progress > 0.350 NOT = { surrender_progress > 0.375 } } add_ideas = EAI_desperate_defense_14 EAI_apply_desperate_defense_14 = yes else = { remove_ideas = EAI_desperate_defense_14 EAI_clear_desperate_defense_14 = yes } }
+		if = { limit = { surrender_progress > 0.375 NOT = { surrender_progress > 0.400 } } add_ideas = EAI_desperate_defense_15 EAI_apply_desperate_defense_15 = yes else = { remove_ideas = EAI_desperate_defense_15 EAI_clear_desperate_defense_15 = yes } }
+		if = { limit = { surrender_progress > 0.400 NOT = { surrender_progress > 0.425 } } add_ideas = EAI_desperate_defense_16 EAI_apply_desperate_defense_16 = yes else = { remove_ideas = EAI_desperate_defense_16 EAI_clear_desperate_defense_16 = yes } }
+		if = { limit = { surrender_progress > 0.425 NOT = { surrender_progress > 0.450 } } add_ideas = EAI_desperate_defense_17 EAI_apply_desperate_defense_17 = yes else = { remove_ideas = EAI_desperate_defense_17 EAI_clear_desperate_defense_17 = yes } }
+		if = { limit = { surrender_progress > 0.450 NOT = { surrender_progress > 0.475 } } add_ideas = EAI_desperate_defense_18 EAI_apply_desperate_defense_18 = yes else = { remove_ideas = EAI_desperate_defense_18 EAI_clear_desperate_defense_18 = yes } }
+		if = { limit = { surrender_progress > 0.475 NOT = { surrender_progress > 0.500 } } add_ideas = EAI_desperate_defense_19 EAI_apply_desperate_defense_19 = yes else = { remove_ideas = EAI_desperate_defense_19 EAI_clear_desperate_defense_19 = yes } }
+		if = { limit = { surrender_progress > 0.500                                      } add_ideas = EAI_desperate_defense_20 EAI_apply_desperate_defense_20 = yes else = { remove_ideas = EAI_desperate_defense_20 EAI_clear_desperate_defense_20 = yes } }
+	
+		#only one equipment production boost can be active at any time
+		EAI_fix_production_boost = yes
 	}
 	
 	option = {}
@@ -283,37 +273,45 @@ country_event = { # high
 		
 		OR = { 
 			has_country_flag = EAI_desperate_defense_HIGH
+			
 			AND = { 
-				has_global_flag = EAI_dynamic_desperate_defense_HIGH
-				any_enemy_country = { is_ai = no } 
 				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_HIGH
+				
+				any_enemy_country = { is_ai = no } 
 			} 
-		}
-
-		OR = {
-			AND = { NOT = { has_idea = EAI_desperate_defense_9 } 	surrender_progress > 0.00 NOT = { surrender_progress > 0.06 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_10 } 	surrender_progress > 0.06 NOT = { surrender_progress > 0.12 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_11 } 	surrender_progress > 0.12 NOT = { surrender_progress > 0.18 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_12 } 	surrender_progress > 0.18 NOT = { surrender_progress > 0.24 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_13 } 	surrender_progress > 0.24 NOT = { surrender_progress > 0.30 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_14 } 	surrender_progress > 0.30 NOT = { surrender_progress > 0.36 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_15 } 	surrender_progress > 0.36 NOT = { surrender_progress > 0.42 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_16 } 	surrender_progress > 0.42 NOT = { surrender_progress > 0.48 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_17 } 	surrender_progress > 0.48 }
 		}
 	}
 	immediate = {
-		EAI_clear_desperate_defense = yes
+		set_country_flag = EAI_desperate_defense_active
 		
-		if = {      limit = { surrender_progress > 0.00 NOT = { surrender_progress > 0.06 } } add_ideas = EAI_desperate_defense_9  	add_ideas = EAI_desperate_defense_9_hidden }
-		else_if = { limit = { surrender_progress > 0.06 NOT = { surrender_progress > 0.12 } } add_ideas = EAI_desperate_defense_10 	add_ideas = EAI_desperate_defense_10_hidden }
-		else_if = { limit = { surrender_progress > 0.12 NOT = { surrender_progress > 0.18 } } add_ideas = EAI_desperate_defense_11 	add_ideas = EAI_desperate_defense_11_hidden }
-		else_if = { limit = { surrender_progress > 0.18 NOT = { surrender_progress > 0.24 } } add_ideas = EAI_desperate_defense_12 	add_ideas = EAI_desperate_defense_12_hidden }
-		else_if = { limit = { surrender_progress > 0.24 NOT = { surrender_progress > 0.30 } } add_ideas = EAI_desperate_defense_13 	add_ideas = EAI_desperate_defense_13_hidden }
-		else_if = { limit = { surrender_progress > 0.30 NOT = { surrender_progress > 0.36 } } add_ideas = EAI_desperate_defense_14 	add_ideas = EAI_desperate_defense_14_hidden }
-		else_if = { limit = { surrender_progress > 0.36 NOT = { surrender_progress > 0.42 } } add_ideas = EAI_desperate_defense_15 	add_ideas = EAI_desperate_defense_15_hidden }
-		else_if = { limit = { surrender_progress > 0.42 NOT = { surrender_progress > 0.48 } } add_ideas = EAI_desperate_defense_16 	add_ideas = EAI_desperate_defense_16_hidden }
-		else_if = { limit = { surrender_progress > 0.48 	   							    } add_ideas = EAI_desperate_defense_17 	add_ideas = EAI_desperate_defense_17_hidden }
+		if = {
+			limit = {
+				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_HIGH
+				
+				any_enemy_country = { is_ai = no } 
+			}
+			
+			set_country_flag = EAI_dynamic_desperate_defense_active
+		}
+	
+		if = { limit = { surrender_progress > 0.000 NOT = { surrender_progress > 0.050 } } add_ideas = EAI_desperate_defense_10 EAI_apply_desperate_defense_10 = yes else = { remove_ideas = EAI_desperate_defense_10 EAI_clear_desperate_defense_10 = yes } }
+		if = { limit = { surrender_progress > 0.050 NOT = { surrender_progress > 0.100 } } add_ideas = EAI_desperate_defense_11 EAI_apply_desperate_defense_11 = yes else = { remove_ideas = EAI_desperate_defense_11 EAI_clear_desperate_defense_11 = yes } }
+		if = { limit = { surrender_progress > 0.100 NOT = { surrender_progress > 0.150 } } add_ideas = EAI_desperate_defense_12 EAI_apply_desperate_defense_12 = yes else = { remove_ideas = EAI_desperate_defense_12 EAI_clear_desperate_defense_12 = yes } }
+		if = { limit = { surrender_progress > 0.150 NOT = { surrender_progress > 0.200 } } add_ideas = EAI_desperate_defense_13 EAI_apply_desperate_defense_13 = yes else = { remove_ideas = EAI_desperate_defense_13 EAI_clear_desperate_defense_13 = yes } }
+		if = { limit = { surrender_progress > 0.200 NOT = { surrender_progress > 0.250 } } add_ideas = EAI_desperate_defense_14 EAI_apply_desperate_defense_14 = yes else = { remove_ideas = EAI_desperate_defense_14 EAI_clear_desperate_defense_14 = yes } }
+		if = { limit = { surrender_progress > 0.250 NOT = { surrender_progress > 0.300 } } add_ideas = EAI_desperate_defense_15 EAI_apply_desperate_defense_15 = yes else = { remove_ideas = EAI_desperate_defense_15 EAI_clear_desperate_defense_15 = yes } }
+		if = { limit = { surrender_progress > 0.300 NOT = { surrender_progress > 0.350 } } add_ideas = EAI_desperate_defense_16 EAI_apply_desperate_defense_16 = yes else = { remove_ideas = EAI_desperate_defense_16 EAI_clear_desperate_defense_16 = yes } }
+		if = { limit = { surrender_progress > 0.350 NOT = { surrender_progress > 0.400 } } add_ideas = EAI_desperate_defense_17 EAI_apply_desperate_defense_17 = yes else = { remove_ideas = EAI_desperate_defense_17 EAI_clear_desperate_defense_17 = yes } }
+		if = { limit = { surrender_progress > 0.400 NOT = { surrender_progress > 0.450 } } add_ideas = EAI_desperate_defense_18 EAI_apply_desperate_defense_18 = yes else = { remove_ideas = EAI_desperate_defense_18 EAI_clear_desperate_defense_18 = yes } }
+		if = { limit = { surrender_progress > 0.450 NOT = { surrender_progress > 0.500 } } add_ideas = EAI_desperate_defense_19 EAI_apply_desperate_defense_19 = yes else = { remove_ideas = EAI_desperate_defense_19 EAI_clear_desperate_defense_19 = yes } }
+		if = { limit = { surrender_progress > 0.500                                      } add_ideas = EAI_desperate_defense_20 EAI_apply_desperate_defense_20 = yes else = { remove_ideas = EAI_desperate_defense_20 EAI_clear_desperate_defense_20 = yes } }
+	
+		#only one equipment production boost can be active at any time
+		EAI_fix_production_boost = yes
 	}
 	
 	option = {}
@@ -330,101 +328,75 @@ country_event = { # low
 		
 		OR = { 
 			has_country_flag = EAI_desperate_defense_LOW
+			
 			AND = { 
-				has_global_flag = EAI_dynamic_desperate_defense_LOW
-				any_enemy_country = { is_ai = no } 
 				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_LOW
+				
+				any_enemy_country = { is_ai = no } 
 			} 
-		}
-
-		OR = {
-			AND = { NOT = { has_idea = EAI_desperate_defense_0 } 	surrender_progress > 0.00 NOT = { surrender_progress > 0.10 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_1 } 	surrender_progress > 0.10 NOT = { surrender_progress > 0.20 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_2 } 	surrender_progress > 0.20 NOT = { surrender_progress > 0.30 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_3 } 	surrender_progress > 0.30 NOT = { surrender_progress > 0.40 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_4 } 	surrender_progress > 0.40 NOT = { surrender_progress > 0.50 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_5 } 	surrender_progress > 0.50 NOT = { surrender_progress > 0.60 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_6 } 	surrender_progress > 0.60 NOT = { surrender_progress > 0.70 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_7 } 	surrender_progress > 0.70 NOT = { surrender_progress > 0.80 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_8 } 	surrender_progress > 0.80 NOT = { surrender_progress > 0.90 } }
-			AND = { NOT = { has_idea = EAI_desperate_defense_9 } 	surrender_progress > 0.90 }
 		}
 	}
 	immediate = {
-		EAI_clear_desperate_defense = yes
+		set_country_flag = EAI_desperate_defense_active
+		
+		if = {
+			limit = {
+				NOT = { has_country_flag = EAI_desperate_defense }
+			
+				has_global_flag = EAI_dynamic_desperate_defense_LOW
+				
+				any_enemy_country = { is_ai = no } 
+			}
+			
+			set_country_flag = EAI_dynamic_desperate_defense_active
+		}
 
-		if = { 		limit = { surrender_progress > 0.00 NOT = { surrender_progress > 0.10 } } add_ideas = EAI_desperate_defense_0  	add_ideas = EAI_desperate_defense_0_hidden }
-		else_if = { limit = { surrender_progress > 0.10 NOT = { surrender_progress > 0.20 } } add_ideas = EAI_desperate_defense_1  	add_ideas = EAI_desperate_defense_1_hidden }
-		else_if = { limit = { surrender_progress > 0.20 NOT = { surrender_progress > 0.30 } } add_ideas = EAI_desperate_defense_2  	add_ideas = EAI_desperate_defense_2_hidden }
-		else_if = { limit = { surrender_progress > 0.30 NOT = { surrender_progress > 0.40 } } add_ideas = EAI_desperate_defense_3  	add_ideas = EAI_desperate_defense_3_hidden }
-		else_if = { limit = { surrender_progress > 0.40 NOT = { surrender_progress > 0.50 } } add_ideas = EAI_desperate_defense_4  	add_ideas = EAI_desperate_defense_4_hidden }
-		else_if = { limit = { surrender_progress > 0.50 NOT = { surrender_progress > 0.60 } } add_ideas = EAI_desperate_defense_5  	add_ideas = EAI_desperate_defense_5_hidden }
-		else_if = { limit = { surrender_progress > 0.60 NOT = { surrender_progress > 0.70 } } add_ideas = EAI_desperate_defense_6  	add_ideas = EAI_desperate_defense_6_hidden }
-		else_if = { limit = { surrender_progress > 0.70 NOT = { surrender_progress > 0.80 } } add_ideas = EAI_desperate_defense_7  	add_ideas = EAI_desperate_defense_7_hidden }
-		else_if = { limit = { surrender_progress > 0.80 NOT = { surrender_progress > 0.90 } } add_ideas = EAI_desperate_defense_8  	add_ideas = EAI_desperate_defense_8_hidden }
-		else_if = { limit = { surrender_progress > 0.90  								    } add_ideas = EAI_desperate_defense_9 	add_ideas = EAI_desperate_defense_9_hidden }
+		if = { limit = { surrender_progress > 0.000 NOT = { surrender_progress > 0.010 } } add_ideas = EAI_desperate_defense_1  EAI_apply_desperate_defense_1 = yes  else = { remove_ideas = EAI_desperate_defense_1  EAI_clear_desperate_defense_1 = yes } }
+		if = { limit = { surrender_progress > 0.010 NOT = { surrender_progress > 0.020 } } add_ideas = EAI_desperate_defense_2  EAI_apply_desperate_defense_2 = yes  else = { remove_ideas = EAI_desperate_defense_2  EAI_clear_desperate_defense_2 = yes } }
+		if = { limit = { surrender_progress > 0.020 NOT = { surrender_progress > 0.030 } } add_ideas = EAI_desperate_defense_3  EAI_apply_desperate_defense_3 = yes  else = { remove_ideas = EAI_desperate_defense_3  EAI_clear_desperate_defense_3 = yes } }
+		if = { limit = { surrender_progress > 0.030 NOT = { surrender_progress > 0.040 } } add_ideas = EAI_desperate_defense_4  EAI_apply_desperate_defense_4 = yes  else = { remove_ideas = EAI_desperate_defense_4  EAI_clear_desperate_defense_4 = yes } }
+		if = { limit = { surrender_progress > 0.040 NOT = { surrender_progress > 0.050 } } add_ideas = EAI_desperate_defense_5  EAI_apply_desperate_defense_5 = yes  else = { remove_ideas = EAI_desperate_defense_5  EAI_clear_desperate_defense_5 = yes } }
+		if = { limit = { surrender_progress > 0.050 NOT = { surrender_progress > 0.060 } } add_ideas = EAI_desperate_defense_6  EAI_apply_desperate_defense_6 = yes  else = { remove_ideas = EAI_desperate_defense_6  EAI_clear_desperate_defense_6 = yes } }
+		if = { limit = { surrender_progress > 0.060 NOT = { surrender_progress > 0.070 } } add_ideas = EAI_desperate_defense_7  EAI_apply_desperate_defense_7 = yes  else = { remove_ideas = EAI_desperate_defense_7  EAI_clear_desperate_defense_7 = yes } }
+		if = { limit = { surrender_progress > 0.070 NOT = { surrender_progress > 0.080 } } add_ideas = EAI_desperate_defense_8  EAI_apply_desperate_defense_8 = yes  else = { remove_ideas = EAI_desperate_defense_8  EAI_clear_desperate_defense_8 = yes } }
+		if = { limit = { surrender_progress > 0.080 NOT = { surrender_progress > 0.090 } } add_ideas = EAI_desperate_defense_9  EAI_apply_desperate_defense_9 = yes  else = { remove_ideas = EAI_desperate_defense_9  EAI_clear_desperate_defense_9 = yes } }
+		if = { limit = { surrender_progress > 0.090                                      } add_ideas = EAI_desperate_defense_10 EAI_apply_desperate_defense_10 = yes else = { remove_ideas = EAI_desperate_defense_10 EAI_clear_desperate_defense_10 = yes } }
+	
+		#only one equipment production boost can be active at any time
+		EAI_fix_production_boost = yes
 	}
 	
 	option = {}
 }
 
-# remove desperate defense
-country_event = {
+country_event = { # remove desperate defense
 	id = EAI_H.218
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
+		has_country_flag = EAI_desperate_defense_active
+	
 		OR = {
-			AND = { 
-				has_country_flag = EAI_desperate_defense 
-				
-				OR = {
-					NOT = { surrender_progress > 0 }
-					has_capitulated = yes
-				}
+			AND = {
+				is_ai = no
 			}
+			
+			AND = {
+				is_ai = yes
 				
-			AND = { 
-				has_global_flag = EAI_dynamic_desperate_defense NOT = { has_country_flag = EAI_desperate_defense } 
-				
-				OR = {
-					NOT = { surrender_progress > 0 }
-					has_capitulated = yes
-					NOT = { any_enemy_country = { is_ai = no } }
-				}
+				has_capitulated = yes
 			}
-				
-			AND = { 
-				NOT = { has_global_flag = EAI_dynamic_desperate_defense has_country_flag = EAI_desperate_defense } 	
-			}
-		}
-		
-		OR = {
-			has_idea = EAI_desperate_defense_0
-			has_idea = EAI_desperate_defense_1
-			has_idea = EAI_desperate_defense_2
-			has_idea = EAI_desperate_defense_3
-			has_idea = EAI_desperate_defense_4
-			has_idea = EAI_desperate_defense_5
-			has_idea = EAI_desperate_defense_6
-			has_idea = EAI_desperate_defense_7
-			has_idea = EAI_desperate_defense_8
-			has_idea = EAI_desperate_defense_9
-			has_idea = EAI_desperate_defense_10
-			has_idea = EAI_desperate_defense_11
-			has_idea = EAI_desperate_defense_12
-			has_idea = EAI_desperate_defense_13
-			has_idea = EAI_desperate_defense_14
-			has_idea = EAI_desperate_defense_15
-			has_idea = EAI_desperate_defense_16
-			has_idea = EAI_desperate_defense_17
 		}
 	}
-	immediate = { EAI_clear_desperate_defense = yes }
+	immediate = {
+		EAI_clear_desperate_defense = yes
+	}
 	option = {}
 }
 
-# division spawning
+############# reinforcements
 country_event = {
 	id = EAI_H.300
 	hidden = yes
