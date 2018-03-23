@@ -847,8 +847,6 @@ EAI_naval_invasion_check = {
 				has_tech = transport
 			
 				has_manpower > 50000
-				
-				has_army_manpower = { size > 250000 }
 
 				OR = { 
 					NOT = { # DOES NOT BORDER A POWERFUL ENEMY AT HOME
@@ -878,7 +876,7 @@ EAI_naval_invasion_check = {
 			
 			###################################################################
 		
-			if = { # IF A PLAYER HAS INITIATED A COORDINATED INVASION, TAKE ITS TARGET
+			if = { # PLAYER TARGET
 				limit = { any_enemy_country = { has_country_flag = EAI_coordinated_naval_invasion_from_@ROOT } }
 				
 				EAI_clear_naval_invasion_operation = yes
@@ -892,13 +890,17 @@ EAI_naval_invasion_check = {
 			
 			###################################################################
 			
-			else_if = { # IF AI FACTION LEADER OR OVERLORD HAS A TARGET, TAKE ITS TARGET
+			else_if = { # FACTION LEADER TARGET
 				limit = {
+					has_army_manpower = { size > 250000 }
+				
 					any_enemy_country = {
 						any_other_country = {
 							is_ai = yes
 						
 							NOT = { tag = ROOT }
+							
+							has_capitulated = no
 							
 							OR = {
 								AND = { is_in_faction_with = ROOT is_faction_leader = yes }
@@ -922,6 +924,8 @@ EAI_naval_invasion_check = {
 						
 							NOT = { tag = ROOT }
 							
+							has_capitulated = no
+							
 							OR = {
 								AND = { is_in_faction_with = ROOT is_faction_leader = yes }
 								
@@ -939,8 +943,74 @@ EAI_naval_invasion_check = {
 			}
 			
 			###################################################################
+			
+			else_if = { # STRONGEST FACTION MEMBER TARGET
+				limit = {
+					has_army_manpower = { size > 250000 }
+				
+					OR = {
+						is_faction_leader = no
+						has_capitulated = yes
+					}
+				
+					any_enemy_country = {
+						any_other_country = {
+							is_ai = yes
+						
+							NOT = { tag = ROOT }
+							
+							is_in_faction_with = ROOT
+							
+							NOT = {
+								any_allied_country = {
+									strength_ratio = { tag = ROOT ratio > 1.0 }
+								}
+							}
+							
+							PREV = { has_country_flag = EAI_naval_invasion_from_@PREV }
+						}
+						
+						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+					}
+				}
+				
+				EAI_clear_naval_invasion_operation = yes
+				
+				random_enemy_country = {
+					limit = {
+						any_other_country = {
+							is_ai = yes
+						
+							NOT = { tag = ROOT }
+							
+							is_in_faction_with = ROOT
+							
+							NOT = {
+								any_allied_country = {
+									strength_ratio = { tag = ROOT ratio > 1.0 }
+								}
+							}
+							
+							PREV = { has_country_flag = EAI_naval_invasion_from_@PREV }
+						}
+						
+						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+					}
+					
+					EAI_create_naval_invasion_operation = yes
+				}
+			}
+			
+			###################################################################
 		
-			else_if = { limit = { any_other_country = { EAI_naval_invade = yes } NOT = { any_other_country = { has_country_flag = EAI_naval_invasion_from_@ROOT } } } # AVAILABLE INVASION TARGET EXISTS
+			else_if = { # AVAILABLE INVASION TARGET EXISTS
+				limit = { 
+					has_army_manpower = { size > 250000 }
+				
+					any_other_country = { EAI_naval_invade = yes } 
+					
+					NOT = { any_other_country = { has_country_flag = EAI_naval_invasion_from_@ROOT } } 
+				} 
 	
 				if = { limit = { any_other_country = { EAI_naval_invade = yes EAI_historical_invasion = yes } } # HISTORICAL INVASIONS TAKE PRIORITY
 					
@@ -950,7 +1020,9 @@ EAI_naval_invasion_check = {
 						EAI_create_naval_invasion_operation = yes
 					}
 					
-					else = { country_event = EAI_background.7 } # CHOOSE A TARGET WITH WEIGHING BASED ON DISTANCE
+					else = {  # CHOOSE A TARGET WITH WEIGHING BASED ON DISTANCE
+						country_event = EAI_background.7 
+					}
 				}
 			}
 		}

@@ -423,7 +423,7 @@ NDefines.NAI.LAND_COMBAT_MIN_EXCORT_WINGS = 10 --2					-- Min amount of airwings
 --NDefines.NAI.STR_BOMB_INFRA_IMPORTANCE_FACTOR = 0.25			-- Factor of infrastructure influence on strategic importance ( 0.0 - 1.0 )
 --NDefines.NAI.STR_BOMB_IMPORTANCE_SCALE = 1.0					-- str bombing total importance scale (every str bombing score get's multiplied by it)
 
---NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 100			-- If amount of enemy fighters is higher than this mission won't perform
+NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 400			-- If amount of enemy fighters is higher than this mission won't perform
 --NDefines.NAI.STR_BOMB_FIGHTERS_PER_PLANE = 1.1					-- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 20				-- Amount of planes requested per enemy civ factory
 --NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 25				-- Amount of planes requested per enemy military factory
