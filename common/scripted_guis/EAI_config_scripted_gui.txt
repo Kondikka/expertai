@@ -1,0 +1,72 @@
+scripted_gui = {
+
+	EAI_open_config = {
+
+		context_type = player_context
+
+		window_name = "EAI_open_config"
+
+		visible = {
+			is_ai = no
+		}
+
+		effects = {
+			EAI_open_config_button_click = {
+				country_event = EAI.0
+			}
+		}
+
+		triggers = {
+			EAI_open_config_button_click_enabled = {
+				NOT = {  
+					any_country = {
+						OR = {
+							has_country_flag = EAI_advanced_config_active 
+							has_country_flag = EAI_startup_config_active
+						}
+					}
+				}
+			}
+		}
+	}
+
+	EAI_open_country_config = {
+
+		context_type = selected_country_context
+
+		window_name = "EAI_open_country_config"
+
+		visible = {
+			ROOT = { OR = { has_country_flag = EAI_startup_config_active has_country_flag = EAI_advanced_config_active } }
+		}
+
+		effects = {
+			EAI_open_country_config_button_click = {
+				ROOT = {
+					set_country_flag = EAI_player_has_AI_army_config_open
+
+					PREV = {
+						save_event_target_as = EAI_AI_customisation 
+					
+						set_country_flag = EAI_player_is_configuring_this_country
+					}
+
+					country_event = EAI.10
+				}
+			}
+		}
+
+		triggers = {
+			EAI_open_country_config_button_click_enabled = {
+				is_ai = yes
+				
+				NOT = { tag = ROOT }
+
+				NOT = { has_country_flag = EAI_player_is_configuring_this_country has_country_flag = EAI_AI_is_configuring_this_country }
+
+				NOT = { ROOT = { has_country_flag = EAI_player_has_AI_army_config_open } }
+			}
+		}
+	}
+}
+

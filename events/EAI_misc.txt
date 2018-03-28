@@ -2,6 +2,27 @@
 # Expert AI mod - background events
 ############################################################################################################
 
+add_namespace = EAI_news
+
+news_event = {
+	id = EAI_news.0
+	title = "Expert AI"
+	desc = EAI_news.0.d
+	picture = GFX_news_event_001
+	
+	fire_only_once = yes
+	
+	major = yes
+	
+	trigger = { is_ai = no NOT = { has_global_flag = EAI_VERSION/4.04 } }
+	
+	immediate = { set_global_flag = EAI_VERSION/4.04 }
+	
+	option = { name = "OK" }
+}
+
+############################################################################################################
+
 add_namespace = EAI_background
 
 country_event = { #resistance modifier for new countries
@@ -28,7 +49,7 @@ country_event = { #free convoys for the AI
 		has_equipment = { convoy < 50 }
 	}
 	immediate = {
-		add_equipment_to_stockpile = { type = convoy_1 amount = 100 }
+		add_equipment_to_stockpile = { type = convoy_1 amount = 50 }
 	}
 	option = {}
 }
@@ -689,87 +710,6 @@ country_event = { # alliance nav str
 	option = { name = 1
 	}
 }
-country_event = { # invasion
-	id = EAI_debug.17
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-
-	trigger = {
-	}
-
-	option = { name = 1
-		trigger = {
-			CHI = {
-			any_state = { # target has a coastal state
-		is_controlled_by = PREV
-		is_coastal = yes
-	}
-			}
-		}
-	}
-
-	option = { name = 2
-		trigger = {
-			CHI = {
-			ROOT = {
-		has_tech = transport
-
-		has_manpower > 50000
-
-		has_army_manpower = { size > 250000 }
-
-		OR = {
-			has_navy_size = { size > 50 }
-
-			alliance_naval_strength_ratio > 1
-
-			PREV = { EAI_historical_invasion = yes }
-		}
-	}
-			}
-		}
-	}
-
-	option = { name = 3
-		trigger = {
-			CHI = {
-			if = { limit = { has_war_with = ROOT }
-
-		OR = {
-			alliance_strength_ratio < 0.8
-
-			EAI_historical_invasion = yes
-		}
-	}
-			}
-		}
-	}
-
-	option = { name = 4
-		trigger = {
-			CHI = {
-			if = {
-		limit = {
-			any_home_area_neighbor_country = {
-				tag = ROOT
-			}
-			ROOT = {
-				any_home_area_neighbor_country = {
-					tag = PREV
-				}
-			}
-		}
-		OR = {
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-
-			ROOT = { alliance_strength_ratio > 1.5 }
-		}
-	}
-			}
-		}
-	}
-}
 country_event = { # armor
 	id = EAI_debug.18
 	title = ""
@@ -804,83 +744,6 @@ country_event = { # armor
 		trigger = {
 			EAI_armor_intel_less_than_60 = yes
 		}
-	}
-}
-country_event = { # invasion
-	id = EAI_debug.19
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-	
-	trigger  = {
-		any_home_area_neighbor_country = { has_war_with = ROOT }
-	}
-
-	option = { name = EAI_create_naval_invasion_operation
-		INS = { EAI_create_naval_invasion_operation = yes }
-	}
-	option = { name = EAI_clear_naval_invasion_operation
-		EAI_clear_naval_invasion_operation = yes
-	}
-	
-	option = { name = checkvalidtarget
-		if = { #check the validity of current target
-			limit = { 
-				OR = {
-					#any_country = { #target country invalid
-					#	ROOT = { has_country_flag = EAI_naval_invasion_from_@PREV } 
-					#	
-					#	NOT = { EAI_naval_invade = yes }
-					#} 
-		
-					NOT = { #no successful landing anywhere
-						has_country_flag = EAI_invasion_operation_active
-					
-						NOT = {
-							any_state = {
-								has_state_flag = EAI_naval_invasion_target_state_@ROOT
-								
-								any_country = {
-									OR = {
-										tag = ROOT
-										is_in_faction_with = ROOT
-										is_subject_of = ROOT
-										ROOT = { is_subject_of = PREV }
-									}
-									
-									OR = {
-										divisions_in_state = { state = PREV size > 0 }
-										
-										controller = { NOT = { has_war_with = ROOT } }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			EAI_clear_naval_invasion_operation = yes
-		}
-	}
-}
-country_event = {
-	id = EAI_debug.20
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-	
-	trigger  = {
-		has_deployed_air_force_size = { size < 40 type = air_transport }
-		has_deployed_air_force_size = { size < 5000 type = strategic_bomber }
-		has_deployed_air_force_size = { size < 1500 type = naval_bomber }
-		has_deployed_air_force_size = { size < 3000 type = tactical_bomber }
-		has_deployed_air_force_size = { size < 5000 type = cas }
-		has_deployed_air_force_size = { size < 15000 type = interceptor }
-		has_deployed_air_force_size = { size < 15000 type = fighter }
-	}
-
-	option = { name = 1
-		trigger = { has_active_mission = GER_mefo_bills_mission }
 	}
 }
 country_event = { # ll, volunteers
@@ -1219,26 +1082,5 @@ country_event = {
 			limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus }
 			country_event = EAI_debug.6
 		}
-	}
-}
-
-country_event = { # ll, volunteers
-	id = EAI_debug.33
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-	
-	trigger  = {
-
-	}
-
-	option = { name = y
-		every_country = {
-			limit = { has_war_with = ROOT has_deployed_air_force_size = { size > 500 type = strategic_bomber } }
-			
-			country_event = EAI_debug.6
-		}
-	}
-	option = { name = n
 	}
 }
