@@ -4,6 +4,7 @@
 # Expert AI mod - scriptable construction logic for the AI
 ############################################################################################################
 
+# EAI_queue_AIR
 # EAI_queue_INF: queue INF anywhere possible
 # EAI_queue_INF_2: see if there is a good place for infrastructure, else queue factories
 # EAI_queue_INF_resource: for building INF to increase resource extraction
@@ -26,6 +27,10 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		set_variable = { EAI_ratio_CIC = num_of_civilian_factories_available_for_projects }
+
+		divide_variable = { EAI_ratio_CIC = num_of_factories }
+	
 		####################################################################################################################################################
 		#	ENG
 		####################################################################################################################################################
@@ -225,13 +230,13 @@ country_event = {
 
 			set_country_flag = { flag = EAI_construction_timer days = 360 value = 1 }
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+			EAI_queue_MIC_2 = yes
+			EAI_queue_MIC_2 = yes
+			EAI_queue_MIC_2 = yes
+			EAI_queue_MIC_2 = yes
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+			EAI_queue_MIC_2 = yes
+			EAI_queue_MIC_2 = yes
 		}
 
 		####################################################################################################################################################
@@ -246,23 +251,47 @@ country_event = {
 				}
 			}
 
-			if = { limit = { num_of_civilian_factories < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 720 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 660 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 600 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 540 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 510 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 12 } 		set_country_flag = { flag = EAI_construction_timer days = 480 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 14 } 		set_country_flag = { flag = EAI_construction_timer days = 450 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 420 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 18 } 		set_country_flag = { flag = EAI_construction_timer days = 390 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 360 value = 1 } else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 330 value = 1 }
-			} } } } } } } } } } } } } } } } } } } }
+			if = { limit = { num_of_civilian_factories_available_for_projects < 2 } 			set_country_flag = { flag = EAI_construction_timer days = 720 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 660 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 600 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 540 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 510 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 12 } 		set_country_flag = { flag = EAI_construction_timer days = 480 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 } 		set_country_flag = { flag = EAI_construction_timer days = 450 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 420 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 } 		set_country_flag = { flag = EAI_construction_timer days = 390 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 360 	value = 1 } }
+			else_if = { limit = {}																set_country_flag = { flag = EAI_construction_timer days = 330 	value = 1 } }
 
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
+				EAI_queue_CIC = yes
+				EAI_queue_CIC = yes
+			}
+			else_if = { limit = {}
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
+			
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
+				EAI_queue_CIC = yes
+				EAI_queue_CIC = yes
+			}
+			else_if = { limit = {}
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
+			
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
+				EAI_queue_CIC = yes
+				EAI_queue_CIC = yes
+			}
+			else_if = { limit = {}
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
 		}
 	}
 	option = {}
@@ -283,109 +312,135 @@ country_event = { # queue up more factories periodically, scale roughly with con
 	immediate = {
 		if = { limit = { OR = { has_idea = isolation has_idea = undisturbed_isolation } }
 
-			if = { limit = { num_of_civilian_factories < 5  } 		set_country_flag = { flag = EAI_construction_timer days = 3000 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 1500 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		set_country_flag = { flag = EAI_construction_timer days = 1154 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 938 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 750 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 23 } 		set_country_flag = { flag = EAI_construction_timer days = 652 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 27 } 		set_country_flag = { flag = EAI_construction_timer days = 557 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 32 } 		set_country_flag = { flag = EAI_construction_timer days = 469 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 40 } 		set_country_flag = { flag = EAI_construction_timer days = 375 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 44 } 		set_country_flag = { flag = EAI_construction_timer days = 341 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 300 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 57 } 		set_country_flag = { flag = EAI_construction_timer days = 263 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 66 } 		set_country_flag = { flag = EAI_construction_timer days = 227 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 80 } 		set_country_flag = { flag = EAI_construction_timer days = 188 value = 1 }  else = {
-			if = { limit = { num_of_civilian_factories < 100 } 		set_country_flag = { flag = EAI_construction_timer days = 150 value = 1 }  else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 136 value = 1 }
-			} } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 3000 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 1500 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 1000 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 750	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 }		set_country_flag = { flag = EAI_construction_timer days = 600	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 }		set_country_flag = { flag = EAI_construction_timer days = 429	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 }		set_country_flag = { flag = EAI_construction_timer days = 333	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 22 }		set_country_flag = { flag = EAI_construction_timer days = 273	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 26 }		set_country_flag = { flag = EAI_construction_timer days = 231	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 30 }		set_country_flag = { flag = EAI_construction_timer days = 200	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 34 }		set_country_flag = { flag = EAI_construction_timer days = 176	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 38 }		set_country_flag = { flag = EAI_construction_timer days = 158	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 42 }		set_country_flag = { flag = EAI_construction_timer days = 143	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 46 }		set_country_flag = { flag = EAI_construction_timer days = 130	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 120	value = 1 } }
+			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 111	value = 1 } }
 		}
-
+		
 		if = { limit = { has_idea = civilian_economy }
 
-			if = { limit = { num_of_civilian_factories < 5  } 		set_country_flag = { flag = EAI_construction_timer days = 1600 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 800 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		set_country_flag = { flag = EAI_construction_timer days = 615 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 500 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 300 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 23 } 		set_country_flag = { flag = EAI_construction_timer days = 400 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 27 } 		set_country_flag = { flag = EAI_construction_timer days = 358 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 32 } 		set_country_flag = { flag = EAI_construction_timer days = 250 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 40 } 		set_country_flag = { flag = EAI_construction_timer days = 200 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 44 } 		set_country_flag = { flag = EAI_construction_timer days = 182 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 160 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 57 } 		set_country_flag = { flag = EAI_construction_timer days = 140 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 66 } 		set_country_flag = { flag = EAI_construction_timer days = 121 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 80 } 		set_country_flag = { flag = EAI_construction_timer days = 100 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 100 } 		set_country_flag = { flag = EAI_construction_timer days = 80 value = 1 } else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 73 value = 1 }
-			} } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 2000 value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 1000 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 667 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 500 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 }		set_country_flag = { flag = EAI_construction_timer days = 400 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 }		set_country_flag = { flag = EAI_construction_timer days = 286 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 }		set_country_flag = { flag = EAI_construction_timer days = 222 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 22 }		set_country_flag = { flag = EAI_construction_timer days = 182 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 26 }		set_country_flag = { flag = EAI_construction_timer days = 154 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 30 }		set_country_flag = { flag = EAI_construction_timer days = 133 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 34 }		set_country_flag = { flag = EAI_construction_timer days = 118 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 38 }		set_country_flag = { flag = EAI_construction_timer days = 105 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 42 }		set_country_flag = { flag = EAI_construction_timer days = 95 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 46 }		set_country_flag = { flag = EAI_construction_timer days = 87 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 80 	value = 1 } }
+			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 74 	value = 1 } }
 		}
 
 		if = { limit = { has_idea = low_economic_mobilisation }
 
-			if = { limit = { num_of_civilian_factories < 5  } 		set_country_flag = { flag = EAI_construction_timer days = 1400 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 700 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		set_country_flag = { flag = EAI_construction_timer days = 539 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 438 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 350 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 23 } 		set_country_flag = { flag = EAI_construction_timer days = 304 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 27 } 		set_country_flag = { flag = EAI_construction_timer days = 259 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 32 } 		set_country_flag = { flag = EAI_construction_timer days = 219 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 40 } 		set_country_flag = { flag = EAI_construction_timer days = 175 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 44 } 		set_country_flag = { flag = EAI_construction_timer days = 159 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 140 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 57 } 		set_country_flag = { flag = EAI_construction_timer days = 123 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 66 } 		set_country_flag = { flag = EAI_construction_timer days = 106 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 80 } 		set_country_flag = { flag = EAI_construction_timer days = 88 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 100 } 		set_country_flag = { flag = EAI_construction_timer days = 70 value = 1 } else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 64 value = 1 }
-			} } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1800 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 900	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 600	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 450	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 }		set_country_flag = { flag = EAI_construction_timer days = 360	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 }		set_country_flag = { flag = EAI_construction_timer days = 257	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 }		set_country_flag = { flag = EAI_construction_timer days = 200	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 22 }		set_country_flag = { flag = EAI_construction_timer days = 164	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 26 }		set_country_flag = { flag = EAI_construction_timer days = 138	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 30 }		set_country_flag = { flag = EAI_construction_timer days = 120	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 34 }		set_country_flag = { flag = EAI_construction_timer days = 106	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 38 }		set_country_flag = { flag = EAI_construction_timer days = 95	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 42 }		set_country_flag = { flag = EAI_construction_timer days = 86	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 46 }		set_country_flag = { flag = EAI_construction_timer days = 78	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 72	value = 1 } }
+			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 67	value = 1 } }
 		}
 
 		if = { limit = { has_idea = partial_economic_mobilisation }
 
-			if = { limit = { num_of_civilian_factories < 5  } 		set_country_flag = { flag = EAI_construction_timer days = 1200 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 600 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		set_country_flag = { flag = EAI_construction_timer days = 462 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 375 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 300 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 23 } 		set_country_flag = { flag = EAI_construction_timer days = 261 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 27 } 		set_country_flag = { flag = EAI_construction_timer days = 222 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 32 } 		set_country_flag = { flag = EAI_construction_timer days = 188 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 40 } 		set_country_flag = { flag = EAI_construction_timer days = 150 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 44 } 		set_country_flag = { flag = EAI_construction_timer days = 136 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 120 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 57 } 		set_country_flag = { flag = EAI_construction_timer days = 105 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 66 } 		set_country_flag = { flag = EAI_construction_timer days = 91 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 80 } 		set_country_flag = { flag = EAI_construction_timer days = 75 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 100 } 		set_country_flag = { flag = EAI_construction_timer days = 60 value = 1 } else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 55 value = 1 }
-			} } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1600 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 800	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 533	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 400	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 }		set_country_flag = { flag = EAI_construction_timer days = 320	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 }		set_country_flag = { flag = EAI_construction_timer days = 229	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 }		set_country_flag = { flag = EAI_construction_timer days = 178	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 22 }		set_country_flag = { flag = EAI_construction_timer days = 145	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 26 }		set_country_flag = { flag = EAI_construction_timer days = 123	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 30 }		set_country_flag = { flag = EAI_construction_timer days = 107	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 34 }		set_country_flag = { flag = EAI_construction_timer days = 94	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 38 }		set_country_flag = { flag = EAI_construction_timer days = 84	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 42 }		set_country_flag = { flag = EAI_construction_timer days = 76	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 46 }		set_country_flag = { flag = EAI_construction_timer days = 70	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 64	value = 1 } }
+			else_if = {	limit = {} 																set_country_flag = { flag = EAI_construction_timer days = 59	value = 1 } }
 		}
 
 		if = { limit = { OR = { has_idea = war_economy has_idea = tot_economic_mobilisation } }
 
-			if = { limit = { num_of_civilian_factories < 5  } 		set_country_flag = { flag = EAI_construction_timer days = 1000 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 500 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 13 } 		set_country_flag = { flag = EAI_construction_timer days = 385 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 16 } 		set_country_flag = { flag = EAI_construction_timer days = 313 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 20 } 		set_country_flag = { flag = EAI_construction_timer days = 250 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 23 } 		set_country_flag = { flag = EAI_construction_timer days = 217 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 27 } 		set_country_flag = { flag = EAI_construction_timer days = 185 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 32 } 		set_country_flag = { flag = EAI_construction_timer days = 156 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 40 } 		set_country_flag = { flag = EAI_construction_timer days = 125 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 44 } 		set_country_flag = { flag = EAI_construction_timer days = 114 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 100 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 57 } 		set_country_flag = { flag = EAI_construction_timer days = 88 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 66 } 		set_country_flag = { flag = EAI_construction_timer days = 76 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 80 } 		set_country_flag = { flag = EAI_construction_timer days = 63 value = 1 } else = {
-			if = { limit = { num_of_civilian_factories < 100 } 		set_country_flag = { flag = EAI_construction_timer days = 50 value = 1 } else = {
-																	set_country_flag = { flag = EAI_construction_timer days = 46 value = 1 }
-			} } } } } } } } } } } } } } } } } } } } } } } } } } } } } }
+			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1400 	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 700	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 6 } 		set_country_flag = { flag = EAI_construction_timer days = 467	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 8 } 		set_country_flag = { flag = EAI_construction_timer days = 350	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 10 } 		set_country_flag = { flag = EAI_construction_timer days = 280	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 14 } 		set_country_flag = { flag = EAI_construction_timer days = 200	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 18 } 		set_country_flag = { flag = EAI_construction_timer days = 156	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 22 } 		set_country_flag = { flag = EAI_construction_timer days = 127	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 26 } 		set_country_flag = { flag = EAI_construction_timer days = 108	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 30 } 		set_country_flag = { flag = EAI_construction_timer days = 93	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 34 } 		set_country_flag = { flag = EAI_construction_timer days = 82	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 38 } 		set_country_flag = { flag = EAI_construction_timer days = 74	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 42 } 		set_country_flag = { flag = EAI_construction_timer days = 67	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 46 } 		set_country_flag = { flag = EAI_construction_timer days = 61	value = 1 } }
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 50 } 		set_country_flag = { flag = EAI_construction_timer days = 56 	value = 1 } }
+			else_if = {	limit = {} 																set_country_flag = { flag = EAI_construction_timer days = 52 	value = 1 } }
 		}
 
+		####################################################################################################################################################
+		#	COMMON
+		####################################################################################################################################################
+		
+		if = {
+			limit = { has_deployed_air_force_size = { size > 1000 } num_of_civilian_factories_available_for_projects > 25 }
+			
+			EAI_queue_AIR = yes
+		}
+		if = {
+			limit = { has_deployed_air_force_size = { size > 1000 } num_of_civilian_factories_available_for_projects > 50 }
+			
+			EAI_queue_AIR = yes
+		}
+		if = {
+			limit = { has_deployed_air_force_size = { size > 1000 } num_of_civilian_factories_available_for_projects > 75 }
+			
+			EAI_queue_AIR = yes
+		}
+		if = {
+			limit = { has_deployed_air_force_size = { size > 1000 } num_of_civilian_factories_available_for_projects > 100 }
+			
+			EAI_queue_AIR = yes
+		}
+		
+		#########
+		
+		set_variable = { EAI_ratio_CIC = num_of_civilian_factories_available_for_projects }
+
+		divide_variable = { EAI_ratio_CIC = num_of_factories }
+		
 		####################################################################################################################################################
 		#	ENG
 		####################################################################################################################################################
@@ -393,7 +448,33 @@ country_event = { # queue up more factories periodically, scale roughly with con
 		if = { limit = { original_tag = ENG }
 
 			# CONSTRUCTION SCRIPT
-			EAI_queue_AA = yes
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+			}
+			
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
+				EAI_queue_CIC = yes
+			}
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
@@ -403,7 +484,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
-
+				
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
@@ -414,11 +495,6 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 				EAI_queue_RADAR = yes
 				EAI_queue_RADAR = yes
-
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
-				EAI_queue_MIC = yes
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -433,11 +509,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 				EAI_queue_NIC = yes
 
-				EAI_queue_CIC = yes
-
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
+				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -455,14 +527,35 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
-
-			if = { limit = { synthetic_refinery < 2 }
-				EAI_queue_REF = yes
+			
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
 			}
 
-			if = { limit = { num_of_civilian_factories < 50 }
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
 				EAI_queue_CIC = yes
+			}
 
+			if = { limit = { date < 1938.1.1 }
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -481,7 +574,6 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
 			}
 			else_if = { limit = {}
 				EAI_queue_INF_resource = yes
@@ -490,11 +582,9 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
-
 				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
-				EAI_queue_REF = yes
+				
+				EAI_queue_NIC = yes
 			}
 		}
 
@@ -511,21 +601,42 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
 
-			EAI_queue_AA = yes
-			EAI_queue_AA = yes
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+				EAI_queue_AA = yes
+			}
+			
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+			}
 
 			if = { limit = { date < 1939.1.1 }
-				EAI_queue_REF = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
 
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
 			}
 			else_if = { limit = {}
 				EAI_queue_INF_resource = yes
@@ -573,15 +684,42 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			EAI_queue_RADAR = yes
 			EAI_queue_RADAR = yes
 
-			EAI_queue_AA = yes
-			EAI_queue_AA = yes
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+				EAI_queue_AA = yes
+			}
+			
+			if = { 
+				limit = { 
+					NOT = { synthetic_refinery < 50 }
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
+				EAI_queue_CIC = yes
+			}
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
 
-			if = { limit = { date < 1936.6.1 has_war = no num_of_civilian_factories < 80 }
+			if = { limit = { date < 1936.6.1 has_war = no num_of_civilian_factories_available_for_projects < 80 }
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
@@ -592,7 +730,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
 			}
-			else_if = { limit = { date < 1937.1.1 has_war = no num_of_civilian_factories < 80 }
+			else_if = { limit = { date < 1938.1.1 has_war = no num_of_civilian_factories_available_for_projects < 80 }
 				EAI_queue_REF = yes
 				EAI_queue_REF = yes
 				
@@ -616,26 +754,45 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
 			}
-			else_if = { limit = { oil < 220 }
+			else_if = { limit = { num_of_military_factories < 450 synthetic_refinery < 50 }
+				EAI_queue_INF_resource = yes
+				EAI_queue_INF_resource = yes
+
 				EAI_queue_REF = yes
 				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-				
-				EAI_queue_MIC = yes
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 			}
 			else_if = { limit = { num_of_military_factories < 450 }
 				EAI_queue_INF_resource = yes
 				EAI_queue_INF_resource = yes
 
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
+			}
+			else_if = { limit = { synthetic_refinery < 50 }
+				EAI_queue_INF_resource = yes
+				EAI_queue_INF_resource = yes
+
 				EAI_queue_REF = yes
 				EAI_queue_REF = yes
 
@@ -644,25 +801,21 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
 			}
 			else_if = { limit = {}
 				EAI_queue_INF_resource = yes
 				EAI_queue_INF_resource = yes
 
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
 				EAI_queue_NIC = yes
@@ -681,33 +834,53 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			# CONSTRUCTION SCRIPT
 			EAI_queue_RADAR = yes
 
-			EAI_queue_AA = yes
-
-			EAI_queue_INF_supply = yes
-			EAI_queue_INF_supply = yes
-
-			if = { limit = { has_war = no date < 1938.1.1 num_of_civilian_factories < 40 }
-				EAI_queue_CIC = yes
-				EAI_queue_CIC = yes
-				EAI_queue_CIC = yes
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+			}
+			
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
 				EAI_queue_CIC = yes
 			}
-			else_if = { limit = { num_of_civilian_factories < 40 }
-				EAI_queue_REF = yes
 
+			EAI_queue_INF_supply = yes
+			EAI_queue_INF_supply = yes
+
+			if = { limit = { has_war = no date < 1938.1.1 num_of_civilian_factories_available_for_projects < 40 }
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
+				
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
+			else_if = { limit = { num_of_civilian_factories_available_for_projects < 40 }
+				EAI_queue_CIC = yes
 
+				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 			}
 			else_if = { limit = { num_of_military_factories < 150 }
 				EAI_queue_INF_resource = yes
-
-				EAI_queue_REF = yes
-
-				EAI_queue_CIC = yes
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -716,10 +889,6 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			}
 			else_if = { limit = {}
 				EAI_queue_INF_resource = yes
-	
-				EAI_queue_REF = yes
-	
-				EAI_queue_CIC = yes
 	
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -736,15 +905,40 @@ country_event = { # queue up more factories periodically, scale roughly with con
 		if = { limit = { original_tag = JAP }
 
 			# CONSTRUCTION SCRIPT
-			if = { limit = { num_of_civilian_factories > 35 }
+			if = { limit = { num_of_civilian_factories_available_for_projects > 35 }
 				EAI_queue_RADAR = yes
-
-				EAI_queue_AA = yes
-
 				EAI_queue_INF_supply = yes
 			}
+			
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+			}
+			
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
+				EAI_queue_CIC = yes
+			}
 
-			if = { limit = { num_of_civilian_factories < 25 }
+			if = { limit = { num_of_civilian_factories_available_for_projects < 25 }
 				EAI_queue_CIC_2 = yes
 
 				EAI_queue_MIC_2 = yes
@@ -752,26 +946,22 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 
-				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 			}
 			else_if = { limit = { num_of_military_factories < 150 }
-				EAI_queue_REF = yes
-
-				EAI_queue_CIC_2 = yes
-
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
+				EAI_queue_MIC_2 = yes
+				
+				EAI_queue_NIC = yes
 			}
 			else_if = { limit = {}
 				EAI_queue_NIC = yes
+				EAI_queue_NIC = yes
 
-				EAI_queue_CIC_2 = yes
-
-				EAI_queue_REF = yes
-
+				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
 				EAI_queue_MIC_2 = yes
@@ -786,8 +976,34 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 			# CONSTRUCTION SCRIPT
 			EAI_queue_RADAR = yes
+			
+			if = { 
+				limit = { 	
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
+				EAI_queue_REF = yes
+				EAI_queue_REF = yes
+			}
 
-			EAI_queue_AA = yes
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
+			}
+			
+			if = { limit = { date > 1940.1.1 check_variable = { EAI_ratio_CIC < 0.25 } }
+			
+				EAI_queue_CIC = yes
+			}
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
@@ -803,11 +1019,8 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
 				EAI_queue_CIC = yes
-				EAI_queue_CIC = yes
 			}
 			else_if = { limit = { num_of_military_factories < 300 }
-				EAI_queue_AA = yes
-
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
@@ -815,9 +1028,6 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 			}
@@ -825,19 +1035,11 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_INF_resource = yes
 				EAI_queue_INF_resource = yes
 
-				EAI_queue_AA = yes
-				EAI_queue_AA = yes
-
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 			}
@@ -845,19 +1047,11 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_INF_resource = yes
 				EAI_queue_INF_resource = yes
 
-				EAI_queue_AA = yes
-				EAI_queue_AA = yes
-
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 
-				EAI_queue_NIC = yes
-				EAI_queue_NIC = yes
 				EAI_queue_NIC = yes
 				EAI_queue_NIC = yes
 			}
@@ -870,8 +1064,17 @@ country_event = { # queue up more factories periodically, scale roughly with con
 		if = { limit = { original_tag = CHI }
 
 			# CONSTRUCTION SCRIPT
-			if = { limit = { num_of_civilian_factories > 35 }
+			if = { limit = { num_of_civilian_factories_available_for_projects > 35 }
 				EAI_queue_INF_supply = yes
+			}
+			
+			if = { 
+				limit = { 
+					num_of_civilian_factories_available_for_projects > 40
+					any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
+					is_major = yes
+				} 
+				EAI_queue_AA = yes
 			}
 
 			if = { limit = { is_subject = no }
@@ -888,7 +1091,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 			}
-			else_if = { limit = { is_subject = no num_of_civilian_factories < 30 }
+			else_if = { limit = { is_subject = no num_of_civilian_factories_available_for_projects < 30 }
 				EAI_queue_REF = yes
 
 				EAI_queue_CIC = yes
@@ -935,41 +1138,52 @@ country_event = { # queue up more factories periodically, scale roughly with con
 				EAI_queue_INF_resource = yes
 			}
 
-			if = { limit = { synthetic_refinery < 2 has_tech = synth_oil_experiments }
+			if = { 
+				limit = { 
+					OR = { check_variable = { resource_consumed@oil > 8 } check_variable = { resource_consumed@rubber > 8 } }
+					OR = { 
+						check_variable = { resource@oil < 8 } check_variable = { resource_imported@oil > 8 } 
+						check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } 
+					} 
+					
+					has_tech = synth_oil_experiments 
+				}
 				EAI_queue_REF = yes
 			}
-
-			if = { limit = { num_of_civilian_factories < 40 }
+			
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
 				EAI_queue_CIC = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-			}
-			else_if = { limit = { num_of_military_factories < 70 }
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
-				EAI_queue_MIC = yes
+				EAI_queue_CIC = yes
 			}
 			else_if = { limit = {}
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
 				EAI_queue_MIC = yes
+			}
+			
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
+				EAI_queue_CIC = yes
+				EAI_queue_CIC = yes
+			}
+			else_if = { limit = {}
 				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
+			
+			if = { limit = { check_variable = { EAI_ratio_CIC < 0.25 } }
+				EAI_queue_CIC = yes
+				EAI_queue_CIC = yes
+			}
+			else_if = { limit = {}
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+				EAI_queue_MIC = yes
+			}
+			
+			if = { limit = { any_owned_state = { is_controlled_by = ROOT is_coastal = yes } num_of_naval_factories < 1 }
 
 				EAI_queue_NIC = yes
-				EAI_queue_NIC = yes
-
-				EAI_queue_REF = yes
 			}
 		}
 	}

@@ -37,6 +37,116 @@ EAI_add_AA = {
 
 ######################################################
 
+EAI_queue_AIR = {
+	if = {
+		limit = {
+			any_state = {
+				EAI_available_AIR = yes
+				
+				air_base > 0
+				
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+		}
+		
+		random_state = {
+			limit = {
+				EAI_available_AIR = yes
+				
+				air_base > 0
+				
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+			
+			EAI_add_AIR = yes
+		}
+	}
+	
+	else_if = {
+		limit = {
+			any_state = {
+				EAI_available_AIR = yes
+				
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+		}
+	
+		random_state = {
+			limit = {
+				EAI_available_AIR = yes
+				
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+			
+			EAI_add_AIR = yes
+		}
+	}
+	
+	else_if = {
+		limit = {
+			any_state = {
+				EAI_available_AIR = yes
+				
+				any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } }
+			}
+		}
+	
+		random_state = {
+			limit = {
+				EAI_available_AIR = yes
+				
+				any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } }
+			}
+			
+			EAI_add_AIR = yes
+		}
+	}
+	
+	else_if = {
+		limit = {
+			any_state = {
+				EAI_available_AIR = yes
+				
+				any_state = { 
+					CONTROLLER = { 
+						OR = {
+							AND = { EAI_communist_nation = yes ROOT = { NOT = { EAI_communist_nation = yes } } }
+							AND = { EAI_fascist_nation = yes ROOT = { NOT = { EAI_fascist_nation = yes } } }
+							AND = { EAI_democratic_nation = yes ROOT = { NOT = { EAI_democratic_nation = yes } } }
+						}
+						
+						has_deployed_air_force_size = { size > 1000 }
+					} 
+					
+					distance_to = { target = PREV value < 500 }
+				}
+			}
+		}
+	
+		random_state = {
+			limit = {
+				EAI_available_AIR = yes
+				
+				any_state = { 
+					CONTROLLER = { 
+						OR = {
+							AND = { EAI_communist_nation = yes ROOT = { NOT = { EAI_communist_nation = yes } } }
+							AND = { EAI_fascist_nation = yes ROOT = { NOT = { EAI_fascist_nation = yes } } }
+							AND = { EAI_democratic_nation = yes ROOT = { NOT = { EAI_democratic_nation = yes } } }
+						}
+						
+						has_deployed_air_force_size = { size > 1000 }
+					} 
+					
+					distance_to = { target = PREV value < 500 }
+				}
+			}
+			
+			EAI_add_AIR = yes
+		}
+	}
+}
+
 EAI_queue_INF = { # queue INF anywhere possible
 	if = {
 		limit = { any_state = { EAI_available_INF = yes } }
@@ -545,10 +655,6 @@ EAI_queue_RADAR_random = { # queue radar in a good random location
 EAI_queue_AA = { # build AA on synth factories if facing strategic bombers
 	if = {
 		limit = {
-			any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
-
-			is_major = yes
-			
 			any_state = {
 				is_controlled_by = ROOT
 				free_building_slots = { building = anti_air_building size > 0 include_locked = no }
