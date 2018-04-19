@@ -1131,18 +1131,14 @@ EAI_clear_lend_lease_targets = {
 #	volunteers
 ######################################################
 
-EAI_volunteer_check = {
-	if = { # CLEAR INVALID TARGETS
-		limit = { any_country = { has_country_flag = EAI_volunteers_from_@ROOT } }
-	
-		every_country = { # CLEAR INVALID TARGETS
-			limit = { has_country_flag = EAI_volunteers_from_@ROOT NOT = { EAI_send_volunteers = yes } }
-			
-			clr_country_flag = EAI_volunteers_from_@ROOT
-		}
+EAI_volunteer_expeditionary_check = {
+	every_country = {
+		limit = { has_country_flag = EAI_volunteers_from_@ROOT }
+		
+		clr_country_flag = EAI_volunteers_from_@ROOT
 	}
 	
-	if = { # CHECK THAT SENDING VOLUNTEERS IS POSSIBLE
+	if = { # VOLUNTEERS
 		limit = {
 			NOT = { has_war = yes num_divisions < 30 }
 			
@@ -1160,6 +1156,38 @@ EAI_volunteer_check = {
 			limit = { EAI_send_volunteers = yes }
 			
 			set_country_flag = EAI_volunteers_from_@ROOT
+		}
+	}
+	
+	if = { # EXPEDITIONARY
+		limit = {
+			has_war = yes
+		
+			is_in_faction = yes
+		}
+		
+		if = { limit = { any_country = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes } }
+			every_country = {
+				limit = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+			}
+		}
+		
+		else_if = { limit = { any_country = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } } }
+			every_country = {
+				limit = { any_country = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } } }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+			}
+		}
+		
+		else_if = { limit = { any_country = { EAI_send_expeditionary = yes } }
+			every_country = {
+				limit = { EAI_send_expeditionary = yes }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+			}
 		}
 	}
 }

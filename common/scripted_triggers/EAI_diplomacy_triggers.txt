@@ -138,6 +138,14 @@ EAI_lend_lease = {
 						CHI = { is_subject = yes }
 					}
 				}
+				
+				#make things easier for AI GER vs POL
+				if = { limit = { OR = { original_tag = POL } GER = { is_ai = yes } }
+					OR = {
+						NOT = { is_in_faction_with = ENG }
+						date > 1941.1.1
+					}
+				}
 
 				########################################
 
@@ -410,6 +418,55 @@ EAI_send_volunteers = {
 					}
 				}
 			}
+		}
+	}
+}
+
+EAI_send_expeditionary = {
+	ROOT = {
+		NOT = { 
+			any_home_area_neighbor_country = { has_war_with = ROOT } 
+		}
+		
+		is_major = no
+	}
+	
+	THIS = {
+		is_in_faction_with = ROOT
+		has_war = yes
+		has_capitulated = no
+		
+		OR = {
+			is_faction_leader = yes
+			is_major = yes
+		}
+	}
+	
+	NOT = { EAI_expeditionary_block = yes }
+}
+
+EAI_expeditionary_priorities = {
+	OR = {
+		AND = { 
+			ROOT = { is_in_faction_with = ENG OR = { original_tag = CAN original_tag = SAF } } 
+			THIS = { original_tag = ENG } 
+		}
+		AND = {
+			ROOT = { is_in_faction_with = GER OR = { original_tag = HUN original_tag = ROM original_tag = BUL } } 
+			THIS = { original_tag = GER } 
+		}
+	}
+}
+
+EAI_expeditionary_block = {
+	OR = {
+		AND = { 
+			ROOT = { is_in_faction_with = ENG OR = { original_tag = AST original_tag = NZL original_tag = RAJ original_tag = NOR } } 
+			THIS = { original_tag = ENG } 
+		}
+		AND = {
+			ROOT = { is_in_faction_with = GER OR = { original_tag = FRA original_tag = FIN } } 
+			THIS = { original_tag = GER } 
 		}
 	}
 }
