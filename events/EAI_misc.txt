@@ -278,6 +278,71 @@ country_event = { #init AI config
 	}
 	option = {}
 }
+country_event = { # convert old focuses to new focuses
+	id = EAI_background.13
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+	
+	trigger = {
+		NOT = { has_global_flag = EAI_version_4.15 }
+	}
+	
+	immediate = {
+		set_global_flag = EAI_version_4.15
+
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_A }
+
+			clr_country_flag = EAI_FOCUS/infantry_design_A
+
+			if = { limit = { NOT = { EAI_prefer_artillery_design = yes } }
+				set_country_flag = EAI_FOCUS/infantry_design_B
+
+				else = { set_country_flag = EAI_FOCUS/infantry_design_C }
+			}
+			set_country_flag = EAI_FOCUS/infantry_width_26w
+		}
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_B }
+
+			clr_country_flag = EAI_FOCUS/infantry_design_B
+
+			set_country_flag = EAI_FOCUS/infantry_design_A
+			set_country_flag = EAI_FOCUS/infantry_width_26w
+		}
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_C }
+
+			clr_country_flag = EAI_FOCUS/infantry_design_C
+
+			set_country_flag = EAI_FOCUS/infantry_design_B
+			set_country_flag = EAI_FOCUS/infantry_width_40w
+		}
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_D }
+
+			clr_country_flag = EAI_FOCUS/infantry_design_D
+
+			if = { limit = { NOT = { EAI_prefer_artillery_design = yes } }
+				set_country_flag = EAI_FOCUS/infantry_design_B
+
+				else = { set_country_flag = EAI_FOCUS/infantry_design_C }
+			}
+			set_country_flag = EAI_FOCUS/infantry_width_20w
+		}
+		every_country = {
+			limit = { has_country_flag = EAI_FOCUS/infantry_design_E }
+
+			clr_country_flag = EAI_FOCUS/infantry_design_E
+
+			set_country_flag = EAI_FOCUS/infantry_design_B
+			set_country_flag = EAI_FOCUS/infantry_width_10w
+		}
+	}
+	
+	option = {}
+} 
 
 ####################################################
 # DEBUG
@@ -700,11 +765,17 @@ country_event = { # ll, volunteers
 			country_event = EAI_debug.6
 		}
 	}
+	option = { name = EAI_send_expeditionary
+		every_country = {
+			limit = { EAI_send_expeditionary = yes }
+			country_event = EAI_debug.6
+		}
+	}
 	option = { name = EAI_send_volunteers
 		every_country = {
 			limit = { has_country_flag = EAI_volunteers_from_@ROOT }
-			country_event = EAI_debug.6
 		}
+		EAI_volunteer_expeditionary_check = yes
 	}
 }
 
@@ -803,15 +874,15 @@ country_event = {
 			country_event = EAI_debug.6
 		}
 	}
-	option = { name = infantry_design_D
+	option = { name = infantry_width_D
 		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_D }
+			limit = { has_country_flag = EAI_FOCUS/infantry_width_D }
 			country_event = EAI_debug.6
 		}
 	}
-	option = { name = infantry_design_E
+	option = { name = infantry_width_E
 		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_E }
+			limit = { has_country_flag = EAI_FOCUS/infantry_width_E }
 			country_event = EAI_debug.6
 		}
 	}
@@ -1078,33 +1149,10 @@ country_event = {
 	is_triggered_only = yes
 
 	option = { name = EAI_queue_INF
-		EAI_queue_INF = yes
-	}
-	option = { name = EAI_queue_INF_2
-		EAI_queue_INF_2 = yes
-	}
-	option = { name = EAI_queue_INF_resource
-		EAI_queue_INF_resource = yes
-	}
-	option = { name = EAI_queue_INF_supply
-		EAI_queue_INF_supply = yes
-	}
-}
-
-country_event = {
-	id = EAI_debug.33
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-
-	option = { name = 1
 		every_country = {
-			limit = { is_ai = yes }
-			
-			set_country_flag = EAI_FOCUS/infantry_design_E_override
+			limit = { EAI_send_volunteers = yes }
+
+			country_event = EAI_D
 		}
-	}
-	option = { name = 2
-		
 	}
 }
