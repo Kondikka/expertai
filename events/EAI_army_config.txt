@@ -222,14 +222,18 @@ country_event = { #infantry design
 	desc = ""
 	is_triggered_only = yes
 
-	option = { name = EAI_infantry_design_A
+	option = { name = EAI_infantry_design_A # pure infantry
 
 		trigger = {
 			OR = {
 				EAI_infantry_design_A = yes
-				NOT = { EAI_infantry_design_A = yes EAI_infantry_design_B = yes EAI_infantry_design_C = yes EAI_infantry_design_D = yes EAI_infantry_design_E = yes }
+
+				NOT = {
+					EAI_infantry_design_A = yes
+					EAI_infantry_design_B = yes
+					EAI_infantry_design_C = yes
+				}
 			}
-			NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } #incompatible
 		}
 
 		ai_chance = {
@@ -238,35 +242,70 @@ country_event = { #infantry design
 
 		set_country_flag = EAI_FOCUS/infantry_design_A
 		
-		country_event = { id = EAI_CFG.2 hours = 1 }
+		country_event = { id = EAI_CFG.102 hours = 1 }
 	}
 
-	option = { name = EAI_infantry_design_B
+	option = { name = EAI_infantry_design_B # 7/2 infantry
 
 		trigger = {
-			EAI_infantry_design_B = yes
-			NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } #incompatible
+			OR = {
+				EAI_infantry_design_B = yes
+
+				NOT = {
+					EAI_infantry_design_A = yes
+					EAI_infantry_design_B = yes
+					EAI_infantry_design_C = yes
+				}
+			}
 		}
 
 		ai_chance = {
 			factor = 1
+
+			modifier = { factor = 1.25 is_major = yes }
 		}
 
 		set_country_flag = EAI_FOCUS/infantry_design_B
 		
-		country_event = { id = EAI_CFG.2 hours = 1 }
+		country_event = { id = EAI_CFG.102 hours = 1 }
 	}
 
-	option = { name = EAI_infantry_design_C
+	option = { name = EAI_infantry_design_C # 4/4 infantry
 
 		trigger = {
-			if = { limit = { has_country_flag = EAI_FOCUS/MA_doctrine }
-				OR = {
-					EAI_infantry_design_C = yes
-					NOT = { EAI_infantry_design_A = yes EAI_infantry_design_B = yes EAI_infantry_design_C = yes EAI_infantry_design_D = yes EAI_infantry_design_E = yes }
+			EAI_infantry_design_C = yes
+		}
+
+		ai_chance = {
+			factor = 1
+
+			modifier = { factor = 4 EAI_prefer_artillery_design = yes } # country has a lvl 2-3 arty advisor
+		}
+
+		set_country_flag = EAI_FOCUS/infantry_design_C
+		
+		country_event = { id = EAI_CFG.102 hours = 1 }
+	}
+}
+
+country_event = { #infantry width
+	id = EAI_CFG.102
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+
+	option = { name = EAI_infantry_width_20w
+
+		trigger = {
+			OR = {
+				EAI_infantry_width_20w = yes
+
+				NOT = {
+					EAI_infantry_width_20w = yes
+					EAI_infantry_width_26w = yes
+					EAI_infantry_width_40w = yes
+					EAI_infantry_width_10w = yes
 				}
-				
-				else = { EAI_infantry_design_C = yes }
 			}
 		}
 
@@ -274,37 +313,63 @@ country_event = { #infantry design
 			factor = 1
 		}
 
-		set_country_flag = EAI_FOCUS/infantry_design_C
+		set_country_flag = EAI_FOCUS/infantry_width_20w
 		
 		country_event = { id = EAI_CFG.2 hours = 1 }
 	}
-	
-	option = { name = EAI_infantry_design_D
+
+	option = { name = EAI_infantry_width_26w
 
 		trigger = {
-			EAI_infantry_design_D = yes
+			OR = {
+				EAI_infantry_width_26w = yes
+
+				NOT = {
+					EAI_infantry_width_20w = yes
+					EAI_infantry_width_26w = yes
+					EAI_infantry_width_40w = yes
+					EAI_infantry_width_10w = yes
+				}
+			}
+
+			NOT = { has_country_flag = EAI_FOCUS/MA_doctrine } #incompatible
 		}
 
 		ai_chance = {
 			factor = 1
 		}
 
-		set_country_flag = EAI_FOCUS/infantry_design_D
+		set_country_flag = EAI_FOCUS/infantry_width_26w
 		
 		country_event = { id = EAI_CFG.2 hours = 1 }
 	}
-	
-	option = { name = EAI_infantry_design_E
+
+	option = { name = EAI_infantry_width_40w
 
 		trigger = {
-			EAI_infantry_design_E = yes
+			EAI_infantry_width_40w = yes
 		}
 
 		ai_chance = {
 			factor = 1
 		}
 
-		set_country_flag = EAI_FOCUS/infantry_design_E
+		set_country_flag = EAI_FOCUS/infantry_width_40w
+		
+		country_event = { id = EAI_CFG.2 hours = 1 }
+	}
+
+	option = { name = EAI_infantry_width_10w
+
+		trigger = {
+			EAI_infantry_width_10w = yes
+		}
+
+		ai_chance = {
+			factor = 1
+		}
+
+		set_country_flag = EAI_FOCUS/infantry_width_10w
 		
 		country_event = { id = EAI_CFG.2 hours = 1 }
 	}
@@ -1374,6 +1439,28 @@ country_event = { #ca
 		ai_chance = {
 			factor = 1
 			modifier = { factor = 2 has_tech = basic_heavy_cruiser }
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 1
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 2
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
 		}
 
 		set_country_flag = EAI_FOCUS/ca_navy_focus_1
@@ -1418,6 +1505,28 @@ country_event = { #bc
 			factor = 1
 			modifier = { factor = 2 has_tech = basic_battlecruiser }
 			modifier = { factor = 0.5 has_country_flag = EAI_FOCUS/ca_navy_focus_1 }
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 1
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 2
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
 		}
 
 		set_country_flag = EAI_FOCUS/bc_navy_focus_1
@@ -1505,6 +1614,28 @@ country_event = { #bb
 			factor = 1
 			modifier = { factor = 2 has_tech = basic_battleship }
 			modifier = { factor = 0.5 OR = { has_country_flag = EAI_FOCUS/ca_navy_focus_1 has_country_flag = EAI_FOCUS/bc_navy_focus_1 } }
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 1
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
+			modifier = {
+				factor = 0.5
+
+				count_triggers = {
+					amount = 2
+					has_country_flag = EAI_FOCUS/cv_navy_focus_1
+					has_country_flag = EAI_FOCUS/ca_navy_focus_1
+					has_country_flag = EAI_FOCUS/bc_navy_focus_1
+					has_country_flag = EAI_FOCUS/bb_navy_focus_1
+				}
+			}
 		}
 
 		set_country_flag = EAI_FOCUS/bb_navy_focus_1
@@ -1639,20 +1770,18 @@ country_event = { # switch to 40w infantry on challenging mode + a lot inf equip
 		has_manpower > 500000
 		
 		OR = {
-			has_country_flag = EAI_FOCUS/infantry_design_A
-			has_country_flag = EAI_FOCUS/infantry_design_B
-			has_country_flag = EAI_FOCUS/infantry_design_D
+			has_country_flag = EAI_FOCUS/infantry_width_20w
+			has_country_flag = EAI_FOCUS/infantry_width_26w
 		}
 	}
 
 	immediate = {
 		set_country_flag = EAI_focus_switch_40w_inf
 	
-		clr_country_flag = EAI_FOCUS/infantry_design_A
-		clr_country_flag = EAI_FOCUS/infantry_design_B
-		clr_country_flag = EAI_FOCUS/infantry_design_D
+		clr_country_flag = EAI_FOCUS/infantry_width_20w
+		clr_country_flag = EAI_FOCUS/infantry_width_26w
 		
-		set_country_flag = EAI_FOCUS/infantry_design_C
+		set_country_flag = EAI_FOCUS/infantry_width_40w
 	}
 
 	option = {}
