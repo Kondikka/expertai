@@ -1,0 +1,202 @@
+############################################################################################################
+#	Expert AI mod - law effects
+############################################################################################################
+
+EAI_store_PP = {
+    if = {
+		limit = {
+			has_political_power > 50
+
+			### find the highest law cost
+
+			set_temp_variable = { EAI_max_law_cost = 150 }
+
+			set_temp_variable = { EAI_eco_law_cost = modifier@economy_cost_factor }
+			add_to_temp_variable = { EAI_eco_law_cost = 1 }
+			multiply_temp_variable = { EAI_eco_law_cost = 150 }
+
+			set_temp_variable = { EAI_man_law_cost = modifier@mobilization_laws_cost_factor }
+			add_to_temp_variable = { EAI_man_law_cost = 1 }
+			multiply_temp_variable = { EAI_man_law_cost = 150 }
+
+			set_temp_variable = { EAI_tra_law_cost = modifier@trade_laws_cost_factor }
+			add_to_temp_variable = { EAI_tra_law_cost = 1 }
+			multiply_temp_variable = { EAI_tra_law_cost = 150 }
+
+			if = { limit = { check_variable = { EAI_eco_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_eco_law_cost } }
+			if = { limit = { check_variable = { EAI_man_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_man_law_cost } }
+			if = { limit = { check_variable = { EAI_tra_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_tra_law_cost } }
+
+			check_variable = { EAI_stored_PP < EAI_max_law_cost }
+
+			### simulate fra badness
+			
+			if = { limit = { tag = FRA has_war = no has_government = democratic GER = { is_ai = yes } ITA = { is_ai = yes } }
+
+				date > 1941.1.1
+			}
+		}
+
+		add_political_power = -50
+
+		add_to_variable = { EAI_stored_PP = 50 }
+	}
+}
+
+EAI_upgrade_economy_law = {
+    if = { 
+		limit = { 
+			EAI_can_upgrade_economy_law = yes 
+
+			OR = {
+				AND = {
+					has_war = yes
+
+					NOT = { EAI_can_upgrade_manpower_law = yes }
+				}
+				AND = {
+					has_war = no
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_eco_law_cost = modifier@economy_cost_factor }
+		add_to_temp_variable = { EAI_eco_law_cost = 1 }
+		multiply_temp_variable = { EAI_eco_law_cost = 150 }
+
+		if = {
+			limit = { NOT = { check_variable = { EAI_stored_PP < EAI_eco_law_cost } } }
+
+            subtract_from_variable = { EAI_stored_PP = EAI_eco_law_cost }
+
+			if = { limit = { EAI_can_take_low_economic_mobilisation = yes } 
+            
+                add_ideas = low_economic_mobilisation
+            }
+
+			else_if = { limit = { EAI_can_take_partial_economic_mobilisation = yes } 
+                
+                add_ideas = partial_economic_mobilisation
+            }
+
+			else_if = { limit = { EAI_can_take_war_economy = yes } 
+           
+                add_ideas = war_economy
+            }
+
+			else_if = { limit = { EAI_can_take_tot_economic_mobilisation = yes } 
+            
+                add_ideas = tot_economic_mobilisation
+            }
+		}
+	}
+}
+
+EAI_upgrade_conscription_law = {
+    if = { 
+		limit = { 
+			EAI_can_upgrade_manpower_law = yes 
+
+			OR = {
+                AND = {
+			    	has_war = yes
+			    }
+			    AND = {
+			    	has_war = no
+
+			    	NOT = {
+			    		EAI_can_upgrade_economy_law = yes
+
+			    		EAI_can_upgrade_trade_law = yes
+			    	}
+			    }
+            }
+		}
+
+		set_temp_variable = { EAI_man_law_cost = modifier@mobilization_laws_cost_factor }
+		add_to_temp_variable = { EAI_man_law_cost = 1 }
+		multiply_temp_variable = { EAI_man_law_cost = 150 }
+
+		if = {
+			limit = { NOT = { check_variable = { EAI_stored_PP < EAI_man_law_cost } } }
+
+            subtract_from_variable = { EAI_stored_PP = EAI_man_law_cost }
+
+			if = { limit = { EAI_can_take_volunteer_only = yes } 
+            
+                add_ideas = volunteer_only
+            }
+
+			else_if = { limit = { EAI_can_take_limited_conscription = yes } 
+                
+                add_ideas = limited_conscription
+            }
+
+			else_if = { limit = { EAI_can_take_extensive_conscription = yes } 
+           
+                add_ideas = extensive_conscription
+            }
+
+			else_if = { limit = { EAI_can_take_service_by_requirement = yes } 
+            
+                add_ideas = service_by_requirement
+            }
+
+            else_if = { limit = { EAI_can_take_all_adults_serve = yes } 
+            
+                add_ideas = all_adults_serve
+            }
+
+            else_if = { limit = { EAI_can_take_scraping_the_barrel = yes } 
+            
+                add_ideas = scraping_the_barrel
+            }
+
+			set_country_flag = { flag = EAI_mobilizing_manpower value = 1 days = 250 } # wait for mobilization before upgrading again
+		}
+	}
+}
+
+EAI_upgrade_trade_law = {
+    if = { 
+		limit = { 
+			EAI_can_upgrade_trade_law = yes 
+
+			OR = {
+				AND = {
+					has_war = yes
+	
+					NOT = { EAI_can_upgrade_manpower_law = yes }
+				}
+				AND = {
+					has_war = no
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_tra_law_cost = modifier@trade_laws_cost_factor }
+		add_to_temp_variable = { EAI_tra_law_cost = 1 }
+		multiply_temp_variable = { EAI_tra_law_cost = 150 }
+
+		if = {
+			limit = { NOT = { check_variable = { EAI_stored_PP < EAI_tra_law_cost } } }
+
+            subtract_from_variable = { EAI_stored_PP = EAI_tra_law_cost }
+
+			if = { limit = { EAI_can_take_free_trade = yes } 
+            
+                add_ideas = free_trade
+            }
+
+			else_if = { limit = { EAI_can_take_export_focus = yes } 
+                
+                add_ideas = export_focus
+            }
+
+			else_if = { limit = { EAI_can_take_limited_exports = yes } 
+           
+                add_ideas = limited_exports
+            }
+		}
+	}
+}

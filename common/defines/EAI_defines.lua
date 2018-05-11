@@ -110,7 +110,7 @@ NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	       
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 --7
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.1 --0.1
-NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
+NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 50 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
 --NDefines.NAI.LOW_PRIO_TEMPLATE_PENALTY_FOR_FRONTS = 100000		-- penalty to make ai less likely to assign low prio units to fronts
@@ -151,7 +151,7 @@ NDefines.NAI.STOP_TRAINING_EQUIPMENT_LEVEL = 0.7 --0.8                          
 -- EQUIPMENT PRODUCTION
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1.0
+NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1.5
 
 NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 1
 NDefines.NAI.NEEDED_NAVAL_FACTORIES_EXPENSIVE_SHIP_BONUS = 1000
@@ -359,9 +359,9 @@ NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
 --NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 4                              -- [4]    -- Amount of days between air ai updates priorities for air wings ( from 1 to N )
 
 --NDefines.NAI.NAVAL_AIR_SUPERIORITY_IMPORTANCE = 0.10                             -- [0.10] -- Strategic importance of air superiority ( amount of enemy planes in area )
---NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 2.0                                     -- [2.0]  -- Naval ship air importance
+NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 0.1                                     -- [2.0]  -- Naval ship air importance
 --NDefines.NAI.NAVAL_SHIP_IN_PORT_AIR_IMPORTANCE = 6.0                             -- [6.0]  -- Naval ship in the port air importance
---NDefines.NAI.NAVAL_COMBAT_AIR_IMPORTANCE = 12.0                                  -- [12.0] -- Naval combat air importance
+NDefines.NAI.NAVAL_COMBAT_AIR_IMPORTANCE = 0.1                                  -- [12.0] -- Naval combat air importance
 --NDefines.NAI.NAVAL_TRANSFER_AIR_IMPORTANCE = 0.0                                 -- [0.0]  -- Naval transfer air importance
 --NDefines.NAI.NAVAL_COMBAT_TRANSFER_AIR_IMPORTANCE = 50.0                         -- [50.0] -- Naval combat involving enemy land units
 --NDefines.NAI.NAVAL_IMPORTANCE_SCALE = 1.0                                        -- [1.0]  -- Naval total importance scale (every naval score get's multiplied by it)
@@ -388,15 +388,15 @@ NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 0.1                                     
 NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 1.0                           -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
 NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.0                             -- [1.0]  -- Amount of air interceptor planes requested per enemy plane (non bomber)
 
---NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 0.20                       -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
---NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100                         -- [12]   -- Strategic importance of our armies
---NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 100                        -- [55]   -- Strategic importance of our armies in the combats
+--NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1.0                          -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
+--NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100                           -- [12]   -- Strategic importance of our armies
+--NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 100                          -- [55]   -- Strategic importance of our armies in the combats
 --NDefines.NAI.LAND_COMBAT_FRIEND_ARMIES_AIR_IMPORTANCE = 12                       -- [12]   -- Strategic importance of friendly armies
 --NDefines.NAI.LAND_COMBAT_FRIEND_COMBATS_AIR_IMPORTANCE = 6                       -- [6]    -- Strategic importance of friendly armies in the combat
 --NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 8                         -- [8]    -- Strategic importance of our armies
 --NDefines.NAI.LAND_COMBAT_ENEMY_LAND_FORTS_AIR_IMPORTANCE = 5                     -- [5]    -- Strategic importance of enemy land forts in the region
 --NDefines.NAI.LAND_COMBAT_ENEMY_COASTAL_FORTS_AIR_IMPORTANCE = 3                  -- [3]    -- Strategic importance of enemy coastal fronts in the region
-NDefines.NAI.LAND_COMBAT_IMPORTANCE_SCALE = 10                                     -- [1.5]  -- Lend combat total importance scale (every land combat score get's multiplied by it)
+--NDefines.NAI.LAND_COMBAT_IMPORTANCE_SCALE = 10                                     -- [1.5]  -- Lend combat total importance scale (every land combat score get's multiplied by it)
 
 NDefines.NAI.LAND_COMBAT_FIGHTERS_PER_PLANE = 2                                    -- [1.1]  -- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.LAND_COMBAT_CAS_WINGS_PER_ENEMY_ARMY_LIMIT = 4                      -- [4]    -- Limit of CAS wings requested by enemy armies

@@ -12,14 +12,12 @@ EAI_can_upgrade_economy_law = {
 	}
 }
 EAI_can_upgrade_manpower_law = {
-	OR = {
-		EAI_can_take_volunteer_only = yes
-		EAI_can_take_limited_conscription = yes
-		EAI_can_take_extensive_conscription = yes
-		EAI_can_take_service_by_requirement = yes
-		EAI_can_take_all_adults_serve = yes
-		EAI_can_take_scraping_the_barrel = yes
-	}
+	if = { limit = { has_idea = disarmed_nation } EAI_can_take_volunteer_only = yes }
+	if = { limit = { has_idea = volunteer_only } EAI_can_take_limited_conscription = yes }
+	if = { limit = { has_idea = limited_conscription } EAI_can_take_extensive_conscription = yes }
+	if = { limit = { has_idea = extensive_conscription } EAI_can_take_service_by_requirement = yes }
+	if = { limit = { has_idea = service_by_requirement } EAI_can_take_all_adults_serve = yes }
+	if = { limit = { has_idea = scraping_the_barrel } EAI_can_take_scraping_the_barrel = yes }
 }
 EAI_can_upgrade_trade_law = {
 	OR = {
@@ -29,19 +27,6 @@ EAI_can_upgrade_trade_law = {
 		EAI_can_take_closed_economy = yes
 	}
 }
-
-EAI_prioritise_conscription_law = { #reserve stored PP for manpower
-	has_manpower < 500000
-	
-	has_war = no
-
-	OR = {
-		has_country_flag = EAI_mobilize_army
-		
-		original_tag = FRA
-	}
-}
-
 
 ############ eco laws
 
@@ -89,6 +74,8 @@ EAI_can_take_low_economic_mobilisation = {
 		has_idea = tot_economic_mobilisation
 	}
 
+	has_war_support > 0.25 # to avoid the AI having to demobilize
+
 	########## LAW REQUIREMENTS
 
 	NOT = { has_idea = low_economic_mobilisation }
@@ -125,6 +112,8 @@ EAI_can_take_partial_economic_mobilisation = {
 	if = { limit = { original_tag = JAP }
 		has_completed_focus = JAP_national_mobilization_law
 	}
+
+	has_war_support > 0.35 # to avoid the AI having to demobilize
 
 	########## LAW REQUIREMENTS
 
@@ -171,11 +160,20 @@ EAI_can_take_war_economy = {
 	}
 
 	if = { limit = { original_tag = GER }
-		has_completed_focus = GER_german_war_economy
+		OR = {
+			has_war = yes
+			has_completed_focus = GER_german_war_economy
+			has_completed_focus = GER_integrate_war_economies
+		}
 	}
 	if = { limit = { original_tag = JAP }
-		has_completed_focus = JAP_national_mobilization_law
+		OR = {
+			has_completed_focus = JAP_national_mobilization_law
+			is_historical_focus_on = no
+		}
 	}
+
+	has_war_support > 0.55 # to avoid the AI having to demobilize
 
 	########## LAW REQUIREMENTS
 
@@ -253,11 +251,13 @@ EAI_can_take_tot_economic_mobilisation = {
 EAI_can_take_volunteer_only = {
 	########## AI LOGIC
 
-	has_manpower < 500000
-
 	has_idea = disarmed_nation
 
 	NOT = { original_tag = USA }
+
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	has_manpower < 750000
 
 	########## LAW REQUIREMENTS
 
@@ -281,14 +281,18 @@ EAI_can_take_volunteer_only = {
 EAI_can_take_limited_conscription = {
 	########## AI LOGIC
 
-	OR = {
-		original_tag = SOV
-		has_manpower < 500000
-	}
-
 	has_idea = volunteer_only
 
 	NOT = { original_tag = USA }
+
+	has_war_support > 0.15
+
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	OR = {
+		original_tag = SOV
+		has_manpower < 750000
+	}
 
 	########## LAW REQUIREMENTS
 
@@ -335,12 +339,18 @@ EAI_can_take_limited_conscription = {
 EAI_can_take_extensive_conscription = {
 	########## AI LOGIC
 
-	OR = {
-		original_tag = SOV
-		has_manpower < 500000
+	has_idea = limited_conscription
+
+	if = { limit = { NOT = { has_government = communism has_government = fascism } }
+		has_war_support > 0.25
 	}
 
-	has_idea = limited_conscription
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	OR = {
+		original_tag = SOV
+		has_manpower < 750000
+	}
 
 	########## LAW REQUIREMENTS
 
@@ -400,9 +410,44 @@ EAI_can_take_extensive_conscription = {
 EAI_can_take_service_by_requirement = {
 	########## AI LOGIC
 
-	has_manpower < 500000
-
 	has_idea = extensive_conscription
+
+	if = { limit = { NOT = { has_government = communism has_government = fascism } }
+		has_war_support > 0.65
+	}
+
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	if = { 		limit = { has_army_manpower = { size < 1900000 } } has_manpower < 500000 }
+	else_if = { limit = { has_army_manpower = { size < 2000000 } } has_manpower < 530000 }
+	else_if = { limit = { has_army_manpower = { size < 2100000 } } has_manpower < 530000 }
+	else_if = { limit = { has_army_manpower = { size < 2100000 } } has_manpower < 530000 }
+	else_if = { limit = { has_army_manpower = { size < 2200000 } } has_manpower < 550000 }
+	else_if = { limit = { has_army_manpower = { size < 2300000 } } has_manpower < 580000 }
+	else_if = { limit = { has_army_manpower = { size < 2400000 } } has_manpower < 600000 }
+	else_if = { limit = { has_army_manpower = { size < 2500000 } } has_manpower < 630000 }
+	else_if = { limit = { has_army_manpower = { size < 2600000 } } has_manpower < 650000 }
+	else_if = { limit = { has_army_manpower = { size < 2700000 } } has_manpower < 680000 }
+	else_if = { limit = { has_army_manpower = { size < 2800000 } } has_manpower < 700000 }
+	else_if = { limit = { has_army_manpower = { size < 2900000 } } has_manpower < 730000 }
+
+	else_if = { limit = { has_army_manpower = { size < 3000000 } } has_manpower < 750000 }
+	else_if = { limit = { has_army_manpower = { size < 3200000 } } has_manpower < 800000 }
+	else_if = { limit = { has_army_manpower = { size < 3400000 } } has_manpower < 850000 }
+	else_if = { limit = { has_army_manpower = { size < 3600000 } } has_manpower < 900000 }
+	else_if = { limit = { has_army_manpower = { size < 3800000 } } has_manpower < 950000 }
+
+	else_if = { limit = { has_army_manpower = { size < 4000000 } } has_manpower < 1050000 }
+	else_if = { limit = { has_army_manpower = { size < 4200000 } } has_manpower < 1100000 }
+	else_if = { limit = { has_army_manpower = { size < 4400000 } } has_manpower < 1150000 }
+	else_if = { limit = { has_army_manpower = { size < 4600000 } } has_manpower < 1200000 }
+	else_if = { limit = { has_army_manpower = { size < 4800000 } } has_manpower < 1250000 }
+
+	else_if = { limit = { has_army_manpower = { size < 5000000 } } has_manpower < 1250000 }
+	else_if = { limit = { has_army_manpower = { size < 5200000 } } has_manpower < 1300000 }
+	else_if = { limit = { has_army_manpower = { size < 5400000 } } has_manpower < 1350000 }
+	else_if = { limit = { has_army_manpower = { size < 5600000 } } has_manpower < 1400000 }
+	else_if = { limit = { has_army_manpower = { size < 5800000 } } has_manpower < 1450000 }
 
 	########## LAW REQUIREMENTS
 
@@ -468,8 +513,6 @@ EAI_can_take_service_by_requirement = {
 EAI_can_take_all_adults_serve = {
 	########## AI LOGIC
 
-	has_manpower < 250000
-
 	has_idea = service_by_requirement
 
 	NOT = { has_idea = tot_economic_mobilisation }
@@ -481,6 +524,12 @@ EAI_can_take_all_adults_serve = {
 		}
 		NOT = { has_tech = mobile_warfare }
 	}
+
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	has_manpower < 250000
+
+	amount_manpower_in_deployment_queue < 250000
 
 	########## LAW REQUIREMENTS
 
@@ -544,17 +593,15 @@ EAI_can_take_scraping_the_barrel = {
 
 	NOT = { has_idea = tot_economic_mobilisation }
 
-	OR = {
-		AND = {
-			NOT = { has_country_flag = EAI_FOCUS/MW_doctrine }
-			has_manpower < 250000
-		}
-		AND = {
-			has_country_flag = EAI_FOCUS/MW_doctrine
-			has_tech = nd_conscription
-			has_manpower < 250000
-		}
+	if = { limit = { has_country_flag = EAI_FOCUS/MW_doctrine }
+		has_tech = nd_conscription
 	}
+
+	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+
+	has_manpower < 250000
+
+	amount_manpower_in_deployment_queue < 250000
 
 	########## LAW REQUIREMENTS
 

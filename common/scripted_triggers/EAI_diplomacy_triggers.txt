@@ -6,29 +6,47 @@
 EAI_democratic_nation = {
 	OR = {
 		has_government = democratic
-		AND = { has_government = neutrality democratic > 0.5 }
+
+		AND = {
+			has_government = neutrality
+
+			check_variable = { party_popularity@democratic > party_popularity@neutrality }
+			check_variable = { party_popularity@democratic > party_popularity@fascism }
+			check_variable = { party_popularity@democratic > party_popularity@communism }
+		}
 	}
 }
 EAI_communist_nation = {
 	OR = {
 		has_government = communism
-		AND = { has_government = neutrality communism > 0.5 }
+		
+		AND = {
+			has_government = neutrality
+			
+			check_variable = { party_popularity@communism > party_popularity@neutrality }
+			check_variable = { party_popularity@communism > party_popularity@fascism }
+			check_variable = { party_popularity@communism > party_popularity@democratic }
+		}
 	}
 }
 EAI_fascist_nation = {
 	OR = {
 		has_government = fascism
-		AND = { has_government = neutrality fascism > 0.5 }
+		
+		AND = {
+			has_government = neutrality
+
+			check_variable = { party_popularity@fascism > party_popularity@neutrality }
+			check_variable = { party_popularity@fascism > party_popularity@communism }
+			check_variable = { party_popularity@fascism > party_popularity@democratic }
+		}
 	}
 }
 EAI_nonaligned_nation = {
-	AND = {
-		has_government = neutrality
-		NOT = {
-			democratic > 0.5
-			communism > 0.5
-			fascism > 0.5
-		}
+	NOT = {
+		EAI_democratic_nation = yes
+		EAI_communist_nation = yes
+		EAI_fascist_nation = yes
 	}
 }
 
@@ -59,7 +77,7 @@ EAI_lend_lease = {
 				#SPECIAL RULES
 
 				#GER should focus on stockpiling for itself
-				if = { limit = { original_tag = GER }
+				if = { limit = { original_tag = GER has_war = yes }
 					OR = {
 						SOV = { has_capitulated = yes }
 						SOV = { exists = no }
@@ -67,6 +85,9 @@ EAI_lend_lease = {
 						is_in_faction_with = SOV
 						SOV = { NOT = { has_government = communism } }
 					}
+				}
+				if = { limit = { original_tag = GER has_war = no }
+					has_army_manpower = { size > 550000 }
 				}
 				
 				#SOV should focus on stockpiling for itself
@@ -78,6 +99,10 @@ EAI_lend_lease = {
 						is_in_faction_with = GER
 						GER = { NOT = { has_government = fascism } }
 					}
+				}
+
+				if = { limit = { original_tag = JAP }
+					date > 1938.1.1
 				}
 
 				########################################
@@ -108,6 +133,7 @@ EAI_lend_lease = {
 						is_subject_of = JAP #only LL its own puppets within axis
 						NOT = { is_in_faction_with = GER }
 					}
+					capital_scope = { is_on_continent = asia }
 				}
 
 				#make things easer for AI GER vs SOV

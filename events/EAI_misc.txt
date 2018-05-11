@@ -9,7 +9,9 @@ country_event = { #resistance modifier for new countries
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		is_ai = yes NOT = { has_idea = EAI_resistance_effects_reduced has_idea = EAI_resistance_effects_reduced } date > 1936.2.1
+		is_ai = yes
+		NOT = { has_idea = EAI_resistance_effects_reduced } 
+		date > 1936.2.1
 		NOT = { has_global_flag = EAI_no_resistance_reduction }
 	}
 	immediate = {
@@ -77,6 +79,7 @@ country_event = { #mobile warfare doctrine tech switch to manpower branch
 		has_manpower < 100000
 		has_tech = modern_blitzkrieg
 		NOT = { has_country_flag = EAI_volkssturm_taken }
+		NOT = { has_country_flag = EAI_mobilizing_manpower }
 	}
 	immediate = {
 		set_country_flag = EAI_volkssturm_taken
@@ -127,13 +130,32 @@ country_event = { #for performance reasons, check these monthly
 	id = EAI_background.6
 	title = ""
 	desc = ""
-	mean_time_to_happen = { days = 20 }
+	mean_time_to_happen = { days = 2 }
 	trigger = { is_ai = yes }
 	immediate = {
-		set_variable = { EAI_army_leader_count = 0 }
-		set_variable = { EAI_army_leader_ratio = num_divisions }
-		every_army_leader = { ROOT = { add_to_variable = { EAI_army_leader_count = 1 } } }
-		divide_variable = { EAI_army_leader_ratio = EAI_army_leader_count }
+
+		####################################################################################################################################
+
+		# store PP for law changes
+
+		EAI_store_PP = yes
+
+		# check the need to upgrade laws
+
+		EAI_upgrade_economy_law = yes
+
+		EAI_upgrade_conscription_law = yes
+
+		EAI_upgrade_trade_law = yes
+
+		####################################################################################################################################
+
+		# check the need for more generals
+
+		set_temp_variable = { EAI_army_leader_count = 0 }
+		set_temp_variable = { EAI_army_leader_ratio = num_divisions }
+		every_army_leader = { add_to_temp_variable = { ROOT.EAI_army_leader_count = 1 } }
+		divide_temp_variable = { EAI_army_leader_ratio = EAI_army_leader_count }
 		
 		if = { limit = { check_variable = { EAI_army_leader_ratio > 24 } } set_country_flag = EAI_prioritise_generals else = { clr_country_flag = EAI_prioritise_generals } }
 	
@@ -157,9 +179,9 @@ country_event = { #for performance reasons, check these monthly
 		
 		# check naval production prioritisation
 
-		if = { limit = { EAI_prioritise_capital_ships = yes } 		  set_country_flag = EAI_prioritise_capital_ships 		  else = { clr_country_flag = EAI_prioritise_capital_ships } }
+		if = { limit = { EAI_prioritise_capital_ships = yes } set_country_flag = EAI_prioritise_capital_ships else = { clr_country_flag = EAI_prioritise_capital_ships } }
 		
-		if = { limit = { EAI_prioritise_screen_ships = yes } 		  set_country_flag = EAI_prioritise_screen_ships 		  else = { clr_country_flag = EAI_prioritise_screen_ships } }
+		if = { limit = { EAI_prioritise_screen_ships = yes } set_country_flag = EAI_prioritise_screen_ships else = { clr_country_flag = EAI_prioritise_screen_ships } }
 
 		####################################################################################################################################
 
@@ -278,7 +300,7 @@ country_event = { #init AI config
 	}
 	option = {}
 }
-country_event = { # convert old focuses to new focuses
+country_event = { # convert old focuses to new focuses #todo: remove
 	id = EAI_background.13
 	hidden = yes
 	
