@@ -152,12 +152,9 @@ country_event = { #for performance reasons, check these monthly
 
 		# check the need for more generals
 
-		set_temp_variable = { EAI_army_leader_count = 0 }
-		set_temp_variable = { EAI_army_leader_ratio = num_divisions }
-		every_army_leader = { add_to_temp_variable = { ROOT.EAI_army_leader_count = 1 } }
-		divide_temp_variable = { EAI_army_leader_ratio = EAI_army_leader_count }
-		
-		if = { limit = { check_variable = { EAI_army_leader_ratio > 24 } } set_country_flag = EAI_prioritise_generals else = { clr_country_flag = EAI_prioritise_generals } }
+		EAI_recruit_general = yes
+
+		EAI_recruit_marshal = yes
 	
 		####################################################################################################################################
 	
@@ -365,6 +362,54 @@ country_event = { # convert old focuses to new focuses #todo: remove
 	
 	option = {}
 } 
+country_event = { #AI cant manage too many factories
+	id = EAI_background.14
+	hidden = yes
+	
+	mean_time_to_happen = { days = 2 }
+	
+	trigger  = {
+		is_ai = yes
+
+		num_of_military_factories > 450
+	}
+
+	immediate = {
+		if = { 
+			limit = {  
+				any_state = {
+					is_controlled_by = ROOT
+
+			        NOT = { is_owned_by = ROOT }
+
+					arms_factory > 0
+				}
+			}
+
+			every_state = {
+			    limit = {
+			        is_controlled_by = ROOT
+
+			        NOT = { is_owned_by = ROOT }
+			    }
+
+			    remove_building = { type = arms_factory level = 1 }
+			}
+
+			else = {
+				every_state = {
+				    limit = {
+				        is_controlled_by = ROOT
+				    }
+	
+				    remove_building = { type = arms_factory level = 1 }
+				}
+			}
+		}
+	}
+
+	option = {}
+}
 
 ####################################################
 # DEBUG

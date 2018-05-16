@@ -192,7 +192,7 @@ NDefines.NAI.DOCKYARDS_PER_NAVAL_DESIRE_EFFECT = -100.0
 -- PP
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 0.1 --2.0								 -- Country must have at least this many times extra PP to get new admirals or army leaders
+NDefines.NAI.NEW_LEADER_EXTRA_PP_FACTOR = 1 --2.0								 -- Country must have at least this many times extra PP to get new admirals or army leaders
 
 NDefines.NAI.DIPLOMACY_IMPROVE_RELATION_COST_FACTOR = 7.0                       -- Desire to boost relations subtracts the cost multiplied by this
 

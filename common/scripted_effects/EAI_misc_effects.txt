@@ -833,6 +833,103 @@ EAI_clear_all_override_focuses = {
 	clr_country_flag = EAI_FOCUS/ss_navy_focus_0_override
 }
 
+EAI_recruit_general = {
+
+	### ratio of divisions:generals
+
+	set_temp_variable = { EAI_general_count = 0 }
+	set_temp_variable = { EAI_divisions_to_generals_ratio = num_divisions }
+
+	every_army_leader = {
+		limit = { NOT = { is_field_marshal = yes } }
+
+		add_to_temp_variable = { ROOT.EAI_general_count = 1 } # count the number of generals
+	}
+
+	divide_temp_variable = { EAI_divisions_to_generals_ratio = EAI_general_count }
+
+	### cost of recruiting a new general
+
+	set_temp_variable = { EAI_recruit_cost = 0 }
+	
+	every_army_leader = {
+		add_to_temp_variable = { ROOT.EAI_recruit_cost = 1 }
+	}
+
+	multiply_temp_variable = { EAI_recruit_cost = 5 }
+	
+	### recruit a general
+
+	if = { 
+		limit = { 
+			OR = {
+				check_variable = { EAI_divisions_to_generals_ratio > 24 } 
+				check_variable = { EAI_general_count < 3 } # get at least 3
+			}
+			NOT = { check_variable = { political_power < EAI_recruit_cost } }
+		} 
+
+		multiply_temp_variable = { EAI_recruit_cost = -1 }
+		add_political_power = EAI_recruit_cost
+		
+		create_corps_commander = {
+			skill = 1
+		}
+	}
+}
+
+EAI_recruit_marshal = {
+
+	### ratio of generals:marshals
+
+	set_temp_variable = { EAI_general_count = 0 } 
+	set_temp_variable = { EAI_marshal_count = 0 } 
+
+	every_army_leader = { 
+		limit = { NOT = { is_field_marshal = yes } }
+
+		add_to_temp_variable = { ROOT.EAI_general_count = 1 } 
+	}
+	every_army_leader = { 
+		limit = { is_field_marshal = yes }
+
+		add_to_temp_variable = { ROOT.EAI_marshal_count = 1 } 
+	}
+
+	divide_temp_variable = { EAI_general_count = EAI_marshal_count }
+
+	### cost of recruiting a new general
+
+	set_temp_variable = { EAI_recruit_cost = 0 }
+	
+	every_army_leader = {
+		add_to_temp_variable = { ROOT.EAI_recruit_cost = 1 }
+	}
+
+	multiply_temp_variable = { EAI_recruit_cost = 5 }
+
+	if = { 
+		limit = { 
+			OR = {
+				check_variable = { EAI_general_count > 5 }
+				check_variable = { EAI_general_count < 0 } # was divided by 0
+			}
+			NOT = { check_variable = { political_power < EAI_recruit_cost } }
+			NOT = { command_power < 30 }
+		} 
+
+		multiply_temp_variable = { EAI_recruit_cost = -1 }
+
+		add_political_power = EAI_recruit_cost
+
+		add_command_power = -30
+		
+		create_field_marshal = {
+			skill = 1
+		}
+	}
+}
+
 ######################################################
 #	invasions
 ######################################################
