@@ -4,36 +4,8 @@
 
 add_namespace = EAI_background
 
-country_event = { #resistance modifier for new countries
-	id = EAI_background.0
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		is_ai = yes
-		NOT = { has_idea = EAI_resistance_effects_reduced } 
-		date > 1936.2.1
-		NOT = { has_global_flag = EAI_no_resistance_reduction }
-	}
-	immediate = {
-		add_ideas = EAI_resistance_effects_reduced
-	}
-	option = {}
-}
-country_event = { #free convoys for the AI
-	id = EAI_background.1
-	hidden = yes
-	mean_time_to_happen = { days = 2 }
-	trigger = {
-		has_global_flag = EAI_free_convoys
-		is_ai = yes
-		any_state = { is_controlled_by = ROOT is_coastal = yes }
-		has_equipment = { convoy < 50 }
-	}
-	immediate = {
-		add_equipment_to_stockpile = { type = convoy_1 amount = 50 }
-	}
-	option = {}
-}
+### special cases that require scripting
+
 country_event = { #USA advisor: because the AI won't save up 250 PP
 	id = EAI_background.2
 	hidden = yes
@@ -41,18 +13,28 @@ country_event = { #USA advisor: because the AI won't save up 250 PP
 	trigger = {
 		original_tag = USA
 		is_ai = yes
-		has_political_power > 100
+		has_political_power > 50
 		has_idea = USA_robert_taft
 		NOT = { has_idea = omar_bradley has_idea = george_patton }
+		OR = { has_country_flag = EAI_FOCUS/MW_doctrine has_country_flag = EAI_FOCUS/SF_doctrine }
 	}
 	immediate = {
-		if = { limit = { has_tech = mobile_warfare } add_ideas = george_patton }
-		if = { limit = { has_tech = superior_firepower } add_ideas = omar_bradley }
-		add_political_power = -250
+		if = { limit = { check_variable = { EAI_USA_advisor_pp < 250 } }
+			add_to_variable = { EAI_USA_advisor_pp = 50 }
+			add_political_power = -50
+		}
+		if = { limit = { NOT = { check_variable = { EAI_USA_advisor_pp < 250 } } }
+			clear_variable = EAI_USA_advisor_pp
+
+			if = { limit = { has_country_flag = EAI_FOCUS/MW_doctrine } add_ideas = george_patton }
+			if = { limit = { has_country_flag = EAI_FOCUS/SF_doctrine } add_ideas = omar_bradley }
+		}
+		
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | USA advisor event"
 	}
 	option = {}
 }
-country_event = { #GER advisor: switch
+country_event = { #GER advisor: switch to himmler
 	id = EAI_background.21
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
@@ -66,6 +48,8 @@ country_event = { #GER advisor: switch
 	immediate = {
 		swap_ideas = { remove_idea = martin_bormann add_idea = heinrich_himmler }
 		add_political_power = -150
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | GER advisor event"
 	}
 	option = {}
 }
@@ -89,9 +73,14 @@ country_event = { #mobile warfare doctrine tech switch to manpower branch
 		set_technology = { modern_blitzkrieg = 0 }
 
 		set_technology = { volkssturm = 1 }
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch"
 	}
 	option = {}
 }
+
+###
+
 country_event = { #research reduction for new countries
 	id = EAI_background.4
 	hidden = yes
@@ -109,6 +98,8 @@ country_event = { #research reduction for new countries
 		if = { limit = { original_research_slots > 3 } add_research_slot = -3 set_country_flag = EAI_slots_reduced_3 }
 		if = { limit = { original_research_slots > 2 original_research_slots < 4 } add_research_slot = -2 set_country_flag = EAI_slots_reduced_2 }
 		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = EAI_slots_reduced_1 }
+
+		log = "[GetYear] [GetMonth] | GAME | [Root.GetName] | reducing research slots"
 	}
 	option = {}
 }
@@ -126,6 +117,9 @@ country_event = { #save original capital loc
 	}
 	option = {}
 }
+
+### AI
+
 country_event = { #for performance reasons, check these monthly
 	id = EAI_background.6
 	title = ""
@@ -160,7 +154,15 @@ country_event = { #for performance reasons, check these monthly
 	
 		# check the need to mobilize
 		
-		if = { limit = { EAI_mobilize_army = yes } set_country_flag = EAI_mobilize_army else = { clr_country_flag = EAI_mobilize_army } }
+		if = { limit = { EAI_mobilize_army = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_mobilize_army } } 
+			
+				set_country_flag = EAI_mobilize_army
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | mobilizing army" 
+			}
+		}
+		else = { clr_country_flag = EAI_mobilize_army }
 
 		####################################################################################################################################
 
@@ -176,19 +178,59 @@ country_event = { #for performance reasons, check these monthly
 		
 		# check naval production prioritisation
 
-		if = { limit = { EAI_prioritise_capital_ships = yes } set_country_flag = EAI_prioritise_capital_ships else = { clr_country_flag = EAI_prioritise_capital_ships } }
-		
-		if = { limit = { EAI_prioritise_screen_ships = yes } set_country_flag = EAI_prioritise_screen_ships else = { clr_country_flag = EAI_prioritise_screen_ships } }
+		if = { limit = { EAI_prioritise_capital_ships = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_prioritise_capital_ships } } 
+			
+				set_country_flag = EAI_prioritise_capital_ships
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | NAVY: prioritise capital ships" 
+			}
+		}
+		else = { clr_country_flag = EAI_prioritise_capital_ships }
+
+		if = { limit = { EAI_prioritise_screen_ships = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_prioritise_screen_ships } } 
+			
+				set_country_flag = EAI_prioritise_screen_ships
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | NAVY: prioritise screen ships" 
+			}
+		}
+		else = { clr_country_flag = EAI_prioritise_screen_ships }
 
 		####################################################################################################################################
 
 		# check division limits
 
-		if = { limit = { OR = { EAI_infantry_division_limit = yes EAI_division_limit_MINORS = yes } } set_country_flag = EAI_infantry_division_limit else = { clr_country_flag = EAI_infantry_division_limit } }
-		
-		if = { limit = { EAI_armored_division_limit = yes } set_country_flag = EAI_armored_division_limit else = { clr_country_flag = EAI_armored_division_limit } }
-		
-		if = { limit = { EAI_motorized_division_limit = yes } set_country_flag = EAI_motorized_division_limit else = { clr_country_flag = EAI_motorized_division_limit } }
+		if = { limit = { OR = { EAI_infantry_division_limit = yes EAI_division_limit_MINORS = yes } } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_infantry_division_limit } } 
+			
+				set_country_flag = EAI_infantry_division_limit
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: infantry" 
+			}
+		}
+		else = { clr_country_flag = EAI_infantry_division_limit }
+
+		if = { limit = { EAI_armored_division_limit = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_armored_division_limit } } 
+			
+				set_country_flag = EAI_armored_division_limit
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: armor" 
+			}
+		}
+		else = { clr_country_flag = EAI_motorized_division_limit }
+
+		if = { limit = { EAI_motorized_division_limit = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_motorized_division_limit } } 
+			
+				set_country_flag = EAI_motorized_division_limit
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: motorized" 
+			}
+		}
+		else = { clr_country_flag = EAI_motorized_division_limit }
 
 		####################################################################################################################################
 		
@@ -206,6 +248,8 @@ country_event = { #for performance reasons, check these monthly
 				limit = { EAI_invite_to_faction = yes }
 				
 				set_country_flag = EAI_invite_to_faction_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: inviting [This.GetName]"
 			}
 		}
 	}
@@ -220,63 +264,63 @@ country_event = { #AI weighs naval invasion targets based on distance
 	option = { name = 1
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } }
 		ai_chance = { base = 1024 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 1)" }
 	}
 	option = { name = 6
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } }
 		ai_chance = { base = 512 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 500 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 2)" }
 	}
 	
 	option = { name = 2
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } }
 		ai_chance = { base = 256 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 3)" }
 	}
 	option = { name = 7
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } }
 		ai_chance = { base = 128 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 1000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 4)" }
 	}
 	
 	option = { name = 3
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } }
 		ai_chance = { base = 64 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 5)" }
 	}
 	option = { name = 8
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } }
 		ai_chance = { base = 32 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 2000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 6)" }
 	}
 	
 	option = { name = 4
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } }
 		ai_chance = { base = 16 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 7)" }
 	}
 	option = { name = 9
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } }
 		ai_chance = { base = 8 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 4000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 8)" }
 	}
 	
 	option = { name = 5
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } }
 		ai_chance = { base = 4 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_core_of = PREV is_controlled_by = PREV any_state = { is_core_of = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 9)" }
 	}
 	option = { name = 10
 		trigger = { any_country = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } }
 		ai_chance = { base = 2 }
-		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes any_state = { is_owned_by = PREV is_controlled_by = PREV any_state = { is_owned_by = ROOT is_controlled_by = ROOT distance_to = { target = PREV value < 10000 } } } } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight 10)" }
 	}
 	
 	# ANY
 	option = { name = 11
 		trigger = { any_country = { EAI_naval_invade = yes } }
 		ai_chance = { base = 1 }
-		random_country = { limit = { EAI_naval_invade = yes } EAI_create_naval_invasion_operation = yes }
+		random_country = { limit = { EAI_naval_invade = yes } EAI_create_naval_invasion_operation = yes log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (distance weight any)" }
 	}
 }
 country_event = { #init AI config
@@ -297,71 +341,6 @@ country_event = { #init AI config
 	}
 	option = {}
 }
-country_event = { # convert old focuses to new focuses #todo: remove
-	id = EAI_background.13
-	hidden = yes
-	
-	mean_time_to_happen = { days = 2 }
-	
-	trigger = {
-		NOT = { has_global_flag = EAI_version_4.15 }
-	}
-	
-	immediate = {
-		set_global_flag = EAI_version_4.15
-
-		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_A }
-
-			clr_country_flag = EAI_FOCUS/infantry_design_A
-
-			if = { limit = { NOT = { EAI_prefer_artillery_design = yes } }
-				set_country_flag = EAI_FOCUS/infantry_design_B
-
-				else = { set_country_flag = EAI_FOCUS/infantry_design_C }
-			}
-			set_country_flag = EAI_FOCUS/infantry_width_26w
-		}
-		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_B }
-
-			clr_country_flag = EAI_FOCUS/infantry_design_B
-
-			set_country_flag = EAI_FOCUS/infantry_design_A
-			set_country_flag = EAI_FOCUS/infantry_width_26w
-		}
-		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_C }
-
-			clr_country_flag = EAI_FOCUS/infantry_design_C
-
-			set_country_flag = EAI_FOCUS/infantry_design_B
-			set_country_flag = EAI_FOCUS/infantry_width_40w
-		}
-		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_D }
-
-			clr_country_flag = EAI_FOCUS/infantry_design_D
-
-			if = { limit = { NOT = { EAI_prefer_artillery_design = yes } }
-				set_country_flag = EAI_FOCUS/infantry_design_B
-
-				else = { set_country_flag = EAI_FOCUS/infantry_design_C }
-			}
-			set_country_flag = EAI_FOCUS/infantry_width_20w
-		}
-		every_country = {
-			limit = { has_country_flag = EAI_FOCUS/infantry_design_E }
-
-			clr_country_flag = EAI_FOCUS/infantry_design_E
-
-			set_country_flag = EAI_FOCUS/infantry_design_B
-			set_country_flag = EAI_FOCUS/infantry_width_10w
-		}
-	}
-	
-	option = {}
-} 
 country_event = { #AI cant manage too many factories
 	id = EAI_background.14
 	hidden = yes
@@ -406,6 +385,8 @@ country_event = { #AI cant manage too many factories
 				}
 			}
 		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | deleting factories"
 	}
 
 	option = {}
@@ -591,91 +572,6 @@ country_event = { # div spawning
 		capital_scope = { EAI_dd_spawn_unit = yes }
 		capital_scope = { EAI_dd_spawn_unit = yes }
 		capital_scope = { EAI_dd_spawn_unit = yes }
-	}
-}
-country_event = { # div limits
-	id = EAI_debug.11
-	title = ""
-	desc = ""
-	is_triggered_only = yes
-
-	trigger = {
-		num_of_controlled_states < 2	
-		num_of_controlled_states < 3	
-		num_of_controlled_states < 4	
-		num_of_controlled_states < 5	
-		num_of_controlled_states < 6	
-		num_of_controlled_states < 7	
-		num_of_controlled_states < 8	
-		num_of_controlled_states < 9	
-		num_of_controlled_states < 10	
-		num_of_controlled_states < 12	
-		num_of_controlled_states < 14	
-		num_of_controlled_states < 16	
-		num_of_controlled_states < 18	
-		num_of_controlled_states < 20	
-		num_of_controlled_states < 22	
-		num_of_controlled_states < 24	
-		num_of_controlled_states < 26	
-		num_of_controlled_states < 28 	
-		num_of_controlled_states < 30 	
-		num_of_controlled_states < 32 	
-		num_of_controlled_states < 34 	
-		num_of_controlled_states < 36 	
-		num_of_controlled_states < 38 	
-		num_of_controlled_states < 40	
-		num_of_controlled_states < 42	
-		num_of_controlled_states < 44 	
-		num_of_controlled_states < 46 	
-		num_of_controlled_states < 48 	
-		num_of_controlled_states < 50	
-		num_of_controlled_states < 52	
-		num_of_controlled_states < 54 	
-		num_of_controlled_states < 56 	
-		num_of_controlled_states < 58 	
-		num_of_controlled_states < 60	
-		num_of_controlled_states < 62	
-		num_of_controlled_states < 64 	
-		num_of_controlled_states < 66 	
-		num_of_controlled_states < 68 	
-		num_of_controlled_states < 70	
-		num_of_controlled_states < 72	
-		num_of_controlled_states < 74 	
-		num_of_controlled_states < 76 	
-		num_of_controlled_states < 78 	
-		num_of_controlled_states < 80	
-		num_of_controlled_states < 82	
-		num_of_controlled_states < 84 	
-		num_of_controlled_states < 86 	
-		num_of_controlled_states < 88 	
-		num_of_controlled_states < 90	
-		num_of_controlled_states < 92	
-		num_of_controlled_states < 94 	
-		num_of_controlled_states < 96 	
-		num_of_controlled_states < 98 	
-		num_of_controlled_states < 100 
-		num_of_controlled_states < 102 
-		num_of_controlled_states < 104 
-		num_of_controlled_states < 106 
-		num_of_controlled_states < 108 
-		num_of_controlled_states < 110 
-		num_of_controlled_states < 112 
-		num_of_controlled_states < 114 
-		num_of_controlled_states < 116 
-		num_of_controlled_states < 118 
-		num_of_controlled_states < 120 
-		num_of_controlled_states < 122 
-		num_of_controlled_states < 124 
-		num_of_controlled_states < 126 
-		num_of_controlled_states < 128 
-	}
-
-	option = { name = EAI_infantry_division_limit
-		trigger = { EAI_infantry_division_limit = yes }
-	}
-	
-	option = { name = EAI_division_limit_MINORS
-		trigger = { EAI_division_limit_MINORS = yes }
 	}
 }
 country_event = { # invasion
@@ -1596,5 +1492,46 @@ country_event = {
 			limit = { has_country_flag = EAI_FOCUS/anti_tank_army_focus is_major = no }
 			country_event = EAI_debug.6
 		}
+	}
+}
+
+country_event = {
+	id = EAI_debug.30
+	title = ""
+	desc = ""
+	is_triggered_only = yes
+	
+	trigger  = {
+
+	}
+
+	immediate = {
+		every_country = {
+			set_variable = { global.EAI_divcap_@THIS = 0 }
+
+			every_state = {
+				limit = { is_controlled_by = PREV }
+				add_to_variable = { global.EAI_divcap_@PREV = modifier@local_building_slots }
+			}
+
+			set_variable = { EAI_slots_factor = modifier@global_building_slots_factor }
+			add_to_variable = { EAI_slots_factor = 1 }
+
+			divide_variable = { global.EAI_divcap_@THIS = EAI_slots_factor }
+			multiply_variable = { global.EAI_divcap_@THIS = 2 }
+
+			multiply_variable = { global.EAI_divcap_@THIS = 1.25 }
+		}
+
+		print_variables = {
+			file = divcap
+			text = "divcap"
+			append = yes
+			print_global = yes
+		}
+	}
+
+	option = { name = 1
+
 	}
 }

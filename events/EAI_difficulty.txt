@@ -69,6 +69,8 @@ country_event = {
 			add_ideas = EAI_hard_mode
 		
 			EAI_apply_difficulty_HARD = yes
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | BONUS: applying hard mode"
 		}
 
 		if = { 
@@ -89,6 +91,8 @@ country_event = {
 			add_ideas = EAI_very_hard_mode
 		
 			EAI_apply_difficulty_VERY_HARD = yes
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | BONUS: applying very hard mode"
 		}
 		
 		if = { 
@@ -109,6 +113,8 @@ country_event = {
 			add_ideas = EAI_insane_mode
 		
 			EAI_apply_difficulty_INSANE = yes
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | BONUS: applying insane mode"
 		}
 		
 		#only one equipment production boost can be active at any time
@@ -160,6 +166,8 @@ country_event = { # remove difficulty bonus
 		EAI_clear_difficulty = yes
 		
 		clr_country_flag = EAI_dynamic_country_bonus_active
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | BONUS: removing"
 	}
 	option = {}
 }
@@ -195,6 +203,48 @@ country_event = {
 		if = { limit = { has_global_flag = EAI_attrition_3 }
 			add_ideas = EAI_attrition_reduction3
 		}
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | ATTRITION: adding idea"
+	}
+	option = {}
+}
+
+############# resistance
+
+country_event = { #resistance modifier for new countries
+	id = EAI_H.6
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		is_ai = yes
+		NOT = { has_idea = EAI_resistance_effects_reduced } 
+		date > 1936.2.1
+		NOT = { has_global_flag = EAI_no_resistance_reduction }
+	}
+	immediate = {
+		add_ideas = EAI_resistance_effects_reduced
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | resistance reduction"
+	}
+	option = {}
+}
+
+############# convoys
+
+country_event = { #free convoys for the AI
+	id = EAI_H.4
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		has_global_flag = EAI_free_convoys
+		is_ai = yes
+		any_state = { is_controlled_by = ROOT is_coastal = yes }
+		has_equipment = { convoy < 50 }
+	}
+	immediate = {
+		add_equipment_to_stockpile = { type = convoy_1 amount = 50 }
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys"
 	}
 	option = {}
 }
@@ -227,6 +277,8 @@ country_event = { # normal
 	}
 	immediate = {
 		set_country_flag = EAI_desperate_defense_active
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: applying normal mode"
 		
 		if = {
 			limit = {
@@ -294,6 +346,8 @@ country_event = { # high
 	}
 	immediate = {
 		set_country_flag = EAI_desperate_defense_active
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: applying high mode"
 		
 		if = {
 			limit = {
@@ -352,6 +406,8 @@ country_event = { # low
 	}
 	immediate = {
 		set_country_flag = EAI_desperate_defense_active
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: applying low mode"
 		
 		if = {
 			limit = {
@@ -404,6 +460,8 @@ country_event = { # remove desperate defense
 	}
 	immediate = {
 		EAI_clear_desperate_defense = yes
+
+		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: removing"
 	}
 	option = {}
 }
@@ -682,6 +740,8 @@ country_event = {
 						}
 					}
 
+					log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: spawning units (prio 1)"
+
 					random_list = {
 						1 = {
 							EAI_dd_spawn_unit = yes
@@ -725,6 +785,9 @@ country_event = {
 						}
 					}
 				}
+
+				log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: spawning units (prio 2)"
+				
 				random_state = {
 					limit = {
 						ROOT = { has_full_control_of_state = PREV }
@@ -776,6 +839,9 @@ country_event = {
 						is_in_home_area = yes
 					}
 				}
+
+				log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: spawning units (prio 3)"
+				
 				random_state = {
 					limit = {
 						ROOT = { has_full_control_of_state = PREV }
@@ -825,6 +891,9 @@ country_event = {
 						}
 					}
 				}
+
+				log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: spawning units (prio 4)"
+
 				random_state = {
 					limit = {
 						ROOT = { has_full_control_of_state = PREV }
@@ -867,6 +936,9 @@ country_event = {
 			}
 			else_if = {
 				limit = {}
+
+				log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: spawning units (prio 5)"
+
 				random_state = {
 					limit = {
 						ROOT = { has_full_control_of_state = PREV }

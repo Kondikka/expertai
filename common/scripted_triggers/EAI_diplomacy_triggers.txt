@@ -142,22 +142,31 @@ EAI_lend_lease = {
 				#axis shouldn't lend lease japan
 				if = { 
 					limit = { 
-						ROOT = { is_in_faction_with = GER has_war = yes NOT = { is_subject_of = JAP } } 
+						ROOT = { 
+							is_in_faction_with = GER 
+							has_war = yes 
+							capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } }
+						} 
 					}
 
-					NOT = { tag = JAP is_subject_of = JAP } #dont ll japan or its puppets
+					capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } } #dont ll to asia
 				}
 
 				if = {
 					limit = { 
-						ROOT = { OR = { original_tag = JAP is_subject_of = JAP } has_war = yes } 
+						ROOT = { 
+							OR = { original_tag = JAP is_subject_of = JAP is_in_faction_with = JAP } 
+							has_war = yes 
+							capital_scope = { OR = { is_on_continent = asia is_on_continent = oceania } }
+						} 
 					}
 					
 					OR = {
 						is_subject_of = JAP #only LL its own puppets within axis
 						NOT = { is_in_faction_with = GER }
 					}
-					capital_scope = { is_on_continent = asia }
+
+					capital_scope = { OR = { is_on_continent = asia is_on_continent = oceania } }
 				}
 
 				#make things easer for AI GER vs SOV
@@ -261,9 +270,18 @@ EAI_lend_lease = {
 					}
 				}
 
-				OR = { #when should it lend lease a country depending on ideology
+				OR = { # when should it lend lease a country depending on ideology
 
-					AND = { ROOT = { EAI_democratic_nation = yes }
+					AND = { 
+						if = { limit = { is_in_faction = yes } # behave according to the faction leader's ideology
+							any_country = {
+								is_in_faction_with = ROOT
+								is_faction_leader = yes
+								EAI_democratic_nation = yes
+							}
+
+							else = { ROOT = { EAI_democratic_nation = yes } }
+						}
 
 						OR = {
 							EAI_democratic_nation = yes
@@ -278,7 +296,16 @@ EAI_lend_lease = {
 						}
 					}
 
-					AND = { ROOT = { EAI_communist_nation = yes }
+					AND = { 
+						if = { limit = { is_in_faction = yes } # behave according to the faction leader's ideology
+							any_country = {
+								is_in_faction_with = ROOT
+								is_faction_leader = yes
+								EAI_communist_nation = yes
+							}
+
+							else = { ROOT = { EAI_communist_nation = yes } }
+						}
 
 						OR = {
 							EAI_communist_nation = yes
@@ -299,7 +326,16 @@ EAI_lend_lease = {
 						}
 					}
 
-					AND = { ROOT = { EAI_fascist_nation = yes }
+					AND = {
+						if = { limit = { is_in_faction = yes } # behave according to the faction leader's ideology
+							any_country = {
+								is_in_faction_with = ROOT
+								is_faction_leader = yes
+								EAI_fascist_nation = yes
+							}
+
+							else = { ROOT = { EAI_fascist_nation = yes } }
+						}
 
 						OR = {
 							EAI_fascist_nation = yes
@@ -313,7 +349,16 @@ EAI_lend_lease = {
 						}
 					}
 
-					AND = { ROOT = { EAI_nonaligned_nation = yes }
+					AND = { 
+						if = { limit = { is_in_faction = yes } # behave according to the faction leader's ideology
+							any_country = {
+								is_in_faction_with = ROOT
+								is_faction_leader = yes
+								EAI_nonaligned_nation = yes
+							}
+
+							else = { ROOT = { EAI_nonaligned_nation = yes } }
+						}
 
 						OR = {
 							AND = { EAI_democratic_nation = yes

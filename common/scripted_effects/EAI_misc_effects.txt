@@ -875,28 +875,25 @@ EAI_recruit_general = {
 		create_corps_commander = {
 			skill = 1
 		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RECRUIT: general"
 	}
 }
 
 EAI_recruit_marshal = {
-
 	### ratio of generals:marshals
 
-	set_temp_variable = { EAI_general_count = 0 } 
+	set_temp_variable = { EAI_generals_needed = num_divisions }
+	divide_temp_variable = { EAI_generals_needed = 24 }
 	set_temp_variable = { EAI_marshal_count = 0 } 
 
-	every_army_leader = { 
-		limit = { NOT = { is_field_marshal = yes } }
-
-		add_to_temp_variable = { ROOT.EAI_general_count = 1 } 
-	}
 	every_army_leader = { 
 		limit = { is_field_marshal = yes }
 
 		add_to_temp_variable = { ROOT.EAI_marshal_count = 1 } 
 	}
 
-	divide_temp_variable = { EAI_general_count = EAI_marshal_count }
+	divide_temp_variable = { EAI_generals_needed = EAI_marshal_count }
 
 	### cost of recruiting a new general
 
@@ -911,22 +908,22 @@ EAI_recruit_marshal = {
 	if = { 
 		limit = { 
 			OR = {
-				check_variable = { EAI_general_count > 5 }
-				check_variable = { EAI_general_count < 0 } # was divided by 0
+				check_variable = { EAI_generals_needed > 5 }
+				check_variable = { EAI_generals_needed < 0 } # was divided by 0
 			}
 			NOT = { check_variable = { political_power < EAI_recruit_cost } }
 			NOT = { command_power < 30 }
 		} 
 
 		multiply_temp_variable = { EAI_recruit_cost = -1 }
-
 		add_political_power = EAI_recruit_cost
-
 		add_command_power = -30
 		
 		create_field_marshal = {
 			skill = 1
 		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RECRUIT: marshal"
 	}
 }
 
@@ -955,14 +952,10 @@ EAI_naval_invasion_check = {
 			
 			if = { # IF ANOTHER VALID TARGET EXISTS
 				limit = {
-					any_country = {
-						has_country_flag = EAI_naval_invasion_from_@ROOT
+					any_country = { 
+						NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 						
-						any_other_country = { 
-							NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
-							
-							EAI_naval_invade = yes
-						}
+						EAI_naval_invade = yes
 					}
 				} 
 				
@@ -970,6 +963,8 @@ EAI_naval_invasion_check = {
 					limit = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 					
 					set_country_flag = { flag = EAI_stop_invasions_@ROOT value = 1 days = 90 }
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: blocking invasion [This.GetName]"
 				}
 			}
 			
@@ -1023,6 +1018,8 @@ EAI_naval_invasion_check = {
 					limit = { has_country_flag = EAI_coordinated_naval_invasion_from_@ROOT }
 					
 					EAI_create_naval_invasion_operation = yes
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (player initiated)"
 				}
 			}
 			
@@ -1050,6 +1047,8 @@ EAI_naval_invasion_check = {
 						}
 						
 						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+
+						NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 					}
 				}
 				
@@ -1074,9 +1073,13 @@ EAI_naval_invasion_check = {
 						}
 						
 						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+
+						NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 					}
 					
 					EAI_create_naval_invasion_operation = yes
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (faction leader)"
 				}
 			}
 			
@@ -1109,6 +1112,8 @@ EAI_naval_invasion_check = {
 						}
 						
 						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+
+						NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 					}
 				}
 				
@@ -1133,9 +1138,13 @@ EAI_naval_invasion_check = {
 						}
 						
 						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
+
+						NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
 					}
 					
 					EAI_create_naval_invasion_operation = yes
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (strongest faction member)"
 				}
 			}
 			
@@ -1156,6 +1165,8 @@ EAI_naval_invasion_check = {
 						limit = { EAI_naval_invade = yes EAI_historical_invasion = yes }
 						
 						EAI_create_naval_invasion_operation = yes
+
+						log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (historical)"
 					}
 					
 					else = {  # CHOOSE A TARGET WITH WEIGHING BASED ON DISTANCE
@@ -1229,7 +1240,11 @@ EAI_lend_lease_check = {
 							}
 						}
 					}
-					is_subject_of = ROOT
+					AND = {
+						is_subject_of = ROOT
+
+						EAI_lend_lease = yes
+					}
 				} 
 			}
 		}
@@ -1245,13 +1260,17 @@ EAI_lend_lease_check = {
 				limit = { has_country_flag = EAI_coordinated_lend_lease_from_@ROOT }
 	
 				set_country_flag = EAI_lend_lease_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: [This.GetName] (player initiated)"
 			}
 	
 			else = { # ELSE FLAG ALL VALID TARGETS FOR LEND LEASE
 				every_country = {
-					limit = { EAI_lend_lease = yes }
+					limit = { EAI_lend_lease = yes NOT = { has_country_flag = EAI_lend_lease_from_@ROOT } }
 					
 					set_country_flag = EAI_lend_lease_from_@ROOT
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: [This.GetName] (any)"
 				}
 			}
 		}
@@ -1271,7 +1290,7 @@ EAI_clear_lend_lease_targets = {
 
 EAI_volunteer_expeditionary_check = {
 	every_country = {
-		limit = { has_country_flag = EAI_volunteers_from_@ROOT }
+		limit = { has_country_flag = EAI_volunteers_from_@ROOT NOT = { EAI_send_volunteers = yes EAI_send_expeditionary = yes } }
 		
 		clr_country_flag = EAI_volunteers_from_@ROOT
 	}
@@ -1291,9 +1310,11 @@ EAI_volunteer_expeditionary_check = {
 		}
 		
 		every_country = { # SET TARGETS
-			limit = { EAI_send_volunteers = yes }
+			limit = { EAI_send_volunteers = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
 			
 			set_country_flag = EAI_volunteers_from_@ROOT
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: [This.GetName]"
 		}
 	}
 	
@@ -1306,25 +1327,31 @@ EAI_volunteer_expeditionary_check = {
 		
 		if = { limit = { any_country = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes } }
 			every_country = {
-				limit = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes }
+				limit = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
 				
 				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (priority)"
 			}
 		}
 		
 		else_if = { limit = { any_country = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } } }
 			every_country = {
-				limit = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } }
+				limit = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
 				
 				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (overlord)"
 			}
 		}
 		
 		else_if = { limit = { any_country = { EAI_send_expeditionary = yes } }
 			every_country = {
-				limit = { EAI_send_expeditionary = yes }
+				limit = { EAI_send_expeditionary = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
 				
 				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (any)"
 			}
 		}
 	}

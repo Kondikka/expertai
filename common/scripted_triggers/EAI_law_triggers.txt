@@ -76,6 +76,10 @@ EAI_can_take_low_economic_mobilisation = {
 
 	has_war_support > 0.25 # to avoid the AI having to demobilize
 
+	### this law is not worth taking in the later stages when either partial or war economy are likely to become available
+
+	date < 1938.1.1
+
 	########## LAW REQUIREMENTS
 
 	NOT = { has_idea = low_economic_mobilisation }
@@ -663,17 +667,39 @@ EAI_can_take_scraping_the_barrel = {
 EAI_can_take_free_trade = {
 	########## AI LOGIC
 
-	OR = {
-		AND = {
-			original_tag = USA
-			num_of_military_factories < 120
+	### special case
+
+	if = { 
+		limit = {
+			OR = {
+				original_tag = ENG
+				original_tag = FRA
+			}
 		}
-		AND = {
-			NOT = { EAI_major_country = yes }
-			num_of_military_factories < 50
-		}
+
+		has_war = no
+		date > 1942.1.1
 	}
 
+	### only these countries are allowed to take free trade
+
+	OR = { 
+		has_government = neutrality
+		has_government = democratic
+		NOT = { EAI_major_country = yes }
+	}
+
+	### law allowed when need < 20% 
+
+	check_variable = { var = EAI_average_resource_need value = 0.20 compare = less_than }
+
+	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
+
+	if = { limit = { has_country_flag = EAI_trade_law_recently_changed }
+
+		check_variable = { var = EAI_average_resource_need value = 0.10 compare = less_than }
+	}
+		
 	########## LAW REQUIREMENTS
 
 	NOT = { has_idea = free_trade }
@@ -683,32 +709,54 @@ EAI_can_take_free_trade = {
 EAI_can_take_export_focus = {
 	########## AI LOGIC
 
-	OR = {
-		AND = {
-			original_tag = USA
-			num_of_military_factories < 275
-			NOT = { num_of_military_factories < 120 }
+	### special case
+
+	if = { 
+		limit = {
+			OR = {
+				original_tag = JAP
+				original_tag = ITA
+			}
 		}
-		AND = {
-			original_tag = SOV
-			num_of_military_factories < 125
+
+		has_war = no
+		date > 1942.1.1
+	}
+
+	### normal range: 20-50%
+
+	if = { # if allowed to take free trade
+		limit = {
+			OR = {
+				has_government = neutrality
+				has_government = democratic
+				NOT = { EAI_major_country = yes }
+			}
 		}
-		AND = {
-			original_tag = GER
-			num_of_military_factories < 200
-		}
-		AND = {
-			original_tag = ENG
-			num_of_military_factories < 150
-		}
-		AND = {
-			original_tag = FRA
-			num_of_military_factories < 100
-		}
-		AND = {
-			NOT = { EAI_major_country = yes }
-			num_of_military_factories < 75
-			NOT = { num_of_military_factories < 50 }
+
+		### law allowed when need >= 20% 
+
+		check_variable = { var = EAI_average_resource_need value = 0.20 compare = greater_than_or_equals }
+	}
+
+	check_variable = { var = EAI_average_resource_need value = 0.50 compare = less_than }
+
+	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
+
+	if = { limit = { has_country_flag = EAI_trade_law_recently_changed } # 30-40%
+
+		check_variable = { var = EAI_average_resource_need value = 0.40 compare = less_than }
+
+		if = { # if allowed to take free trade
+			limit = {
+				OR = {
+					has_government = neutrality
+					has_government = democratic
+					NOT = { EAI_major_country = yes }
+				}
+			}
+
+			check_variable = { var = EAI_average_resource_need value = 0.30 compare = greater_than_or_equals }
 		}
 	}
 
@@ -729,33 +777,15 @@ EAI_can_take_export_focus = {
 EAI_can_take_limited_exports = {
 	########## AI LOGIC
 
-	OR =  {
-		original_tag = ITA
-		original_tag = JAP
-		AND = {
-			original_tag = GER
-			NOT = { num_of_military_factories < 200 }
-		}
-		AND = {
-			original_tag = SOV
-			NOT = { num_of_military_factories < 125 }
-		}
-		AND = {
-			original_tag = USA
-			NOT = { num_of_military_factories < 275 }
-		}
-		AND = {
-			original_tag = ENG
-			NOT = { num_of_military_factories < 150 }
-		}
-		AND = {
-			original_tag = FRA
-			NOT = { num_of_military_factories < 100 }
-		}
-		AND = {
-			NOT = { EAI_major_country = yes }
-			NOT = { num_of_military_factories < 75 }
-		}
+	### normal range: >= 50%
+
+	check_variable = { var = EAI_average_resource_need value = 0.50 compare = greater_than_or_equals }
+
+	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
+
+	if = { limit = { has_country_flag = EAI_trade_law_recently_changed } # >= 65%
+
+		check_variable = { var = EAI_average_resource_need value = 0.65 compare = greater_than_or_equals }
 	}
 
 	########## LAW REQUIREMENTS

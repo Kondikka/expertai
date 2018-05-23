@@ -310,7 +310,9 @@ country_event = { # queue up more factories periodically, scale roughly with con
 	}
 
 	immediate = {
-		if = { limit = { OR = { has_idea = isolation has_idea = undisturbed_isolation } }
+		#log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: construction cycle"
+
+		if = { limit = { check_variable = { modifier@production_speed_arms_factory_factor < 0.4 } }
 
 			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 3000 	value = 1 } }
 			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 1500 	value = 1 } }
@@ -330,7 +332,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 111	value = 1 } }
 		}
 		
-		if = { limit = { has_idea = civilian_economy }
+		if = { limit = { NOT = { check_variable = { modifier@production_speed_arms_factory_factor < -0.4 } } check_variable = { modifier@production_speed_arms_factory_factor < 0.1 } }
 
 			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 2000 value = 1 } }
 			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 1000 	value = 1 } }
@@ -350,7 +352,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 74 	value = 1 } }
 		}
 
-		if = { limit = { has_idea = low_economic_mobilisation }
+		if = { limit = { NOT = { check_variable = { modifier@production_speed_arms_factory_factor < -0.1 } } check_variable = { modifier@production_speed_arms_factory_factor < 0.1 } }
 
 			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1800 	value = 1 } }
 			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 900	value = 1 } }
@@ -370,7 +372,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			else_if = {	limit = {}																set_country_flag = { flag = EAI_construction_timer days = 67	value = 1 } }
 		}
 
-		if = { limit = { has_idea = partial_economic_mobilisation }
+		if = { limit = { NOT = { check_variable = { modifier@production_speed_arms_factory_factor < 0.1 } } check_variable = { modifier@production_speed_arms_factory_factor < 0.2 } }
 
 			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1600 	value = 1 } }
 			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 800	value = 1 } }
@@ -390,7 +392,7 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			else_if = {	limit = {} 																set_country_flag = { flag = EAI_construction_timer days = 59	value = 1 } }
 		}
 
-		if = { limit = { OR = { has_idea = war_economy has_idea = tot_economic_mobilisation } }
+		if = { limit = { NOT = { check_variable = { modifier@production_speed_arms_factory_factor < 0.2 } } }
 
 			if = { 		limit = { num_of_civilian_factories_available_for_projects < 2 } 		set_country_flag = { flag = EAI_construction_timer days = 1400 	value = 1 } }
 			else_if = { limit = { num_of_civilian_factories_available_for_projects < 4 } 		set_country_flag = { flag = EAI_construction_timer days = 700	value = 1 } }
@@ -1728,6 +1730,8 @@ country_event = { # use free CIC to build infrastructure
 
 	immediate = {
 		EAI_queue_INF = yes
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queuing INF with free factories"
 	}
 	option = {}
 }
@@ -1768,6 +1772,8 @@ country_event = { # queue up radar in important locations
 			
 			set_state_flag = { flag = EAI_RADAR_construction_@ROOT value = 1 days = 60 }
 		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queueing radar"
 	}
 	option = {}
 }
@@ -1902,6 +1908,8 @@ country_event = { #ITA coastal forts
 	}
 
 	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		
 		every_state = {
 			limit = {
 				CONTROLLER = { original_tag = ITA }
@@ -1937,6 +1945,8 @@ country_event = { #SWI
 	}
 
 	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		
 		every_state = {
 			limit = {
 				CONTROLLER = { original_tag = SWI }
@@ -1985,6 +1995,8 @@ country_event = { #SPR
 	}
 
 	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+
 		every_state = {
 			limit = {
 				CONTROLLER = { original_tag = SPR }
@@ -2019,6 +2031,8 @@ country_event = { #TUR
 	}
 
 	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+
 		every_state = {
 			limit = {
 				CONTROLLER = { original_tag = TUR }
@@ -2039,109 +2053,101 @@ country_event = { #TUR
 	option = {}
 }
 
-#country_event = { #GENERIC
-#	id = EAI_C.1005
-#	hidden = yes
-#	mean_time_to_happen = { days = 2 }
-#	
-#	trigger = {
-#		is_ai = yes
-#
-#		num_of_civilian_factories_available_for_projects > 5
-#
-#		enemies_strength_ratio > 1.0
-#		
-#		has_defensive_war = yes
-#		
-#		any_state = {
-#			OR = {
-#				AND = {
-#					is_controlled_by = ROOT
-#					is_in_home_area = yes
-#					any_neighbor_state = {
-#						CONTROLLER = { has_war_with = ROOT }
-#					}
-#					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
-#				}
-#				
-#				AND = {
-#					is_controlled_by = ROOT
-#					is_in_home_area = yes
-#					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
-#				}
-#				
-#				AND = {
-#					is_capital = yes
-#					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
-#				}
-#			}
-#		}
-#	}
-#
-#	immediate = {
-#		every_state = {
-#			limit = {
-#				is_controlled_by = ROOT
-#				is_in_home_area = yes
-#				any_neighbor_state = {
-#					CONTROLLER = { has_war_with = ROOT }
-#				}
-#				NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
-#			}
-#			
-#			set_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT
-#			
-#			add_building_construction = {
-#				type = bunker
-#				province = {
-#					all_provinces = yes
-#					limit_to_border = yes
-#				}
-#				level = 1
-#				instant_build = no
-#			}
-#		}
-#		
-#		every_state = {
-#			limit = {
-#				is_controlled_by = ROOT
-#				is_in_home_area = yes
-#				NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
-#			}
-#			
-#			set_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT
-#			
-#			add_building_construction = {
-#				type = bunker
-#				province = {
-#					all_provinces = yes
-#					limit_to_victory_point = yes
-#				}
-#				level = 1
-#				instant_build = no
-#			}
-#		}
-#		
-#		capital_scope = {
-#			if = {
-#				limit = { NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT } }
-#			
-#				set_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT
-#		
-#				add_building_construction = {
-#					type = bunker
-#					province = {
-#						all_provinces = yes
-#						limit_to_victory_point = yes
-#					}
-#					level = 2
-#					instant_build = no
-#				}
-#			}
-#		}
-#	}
-#	option = {}
-#}
+country_event = { #GENERIC
+	id = EAI_C.1005
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+	
+	trigger = {
+		is_ai = yes
+
+		num_of_civilian_factories_available_for_projects > 10
+
+		enemies_strength_ratio > 0.75
+		
+		OR = {
+			surrender_progress > 0.05
+			has_defensive_war = yes
+		}
+
+		any_neighbor_country = {
+			has_war_with = ROOT
+		}
+		
+		any_state = {
+			OR = {
+				AND = {
+					is_controlled_by = ROOT
+					is_in_home_area = yes
+					any_neighbor_state = {
+						OR = {
+							CONTROLLER = { has_war_with = ROOT }
+							any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+						}
+					}
+					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
+				}
+				
+				AND = {
+					is_controlled_by = ROOT
+					is_capital = yes
+					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
+				}
+			}
+		}
+	}
+
+	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction (dynamic)"
+
+		every_state = { # build forts on victory points near enemy borders
+			limit = {
+				is_controlled_by = ROOT
+				is_in_home_area = yes
+				any_neighbor_state = {
+					OR = {
+						CONTROLLER = { has_war_with = ROOT }
+						any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+					}
+				}
+				NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
+			}
+			
+			set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 365 }
+			
+			add_building_construction = {
+				type = bunker
+				province = {
+					all_provinces = yes
+					limit_to_victory_point = yes
+					level < 1
+				}
+				level = 2
+				instant_build = no
+			}
+		}
+		
+		capital_scope = { # build forts on capital
+			if = {
+				limit = { NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT } }
+			
+				set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 365 }
+		
+				add_building_construction = {
+					type = bunker
+					province = {
+						all_provinces = yes
+						limit_to_victory_point = yes
+						level < 2
+					}
+					level = 2
+					instant_build = no
+				}
+			}
+		}
+	}
+	option = {}
+}
 
 ########################### misc
 
@@ -2159,6 +2165,8 @@ country_event = { #SOV: fix supply route to the east
 	}
 
 	immediate = {
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: SOV supply route fix"
+
 		if = { limit = { 40 = { controller = { original_tag = SOV } } }
 			40 = { EAI_add_INF = yes EAI_add_INF = yes EAI_add_INF = yes }
 		}
