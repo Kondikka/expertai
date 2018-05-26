@@ -119,7 +119,7 @@ NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 50 --180 --50                        
 -- DIVISION PRODUCTION
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 1 --1 		        			-- How many units a country wants is partially based on how much military industry that is available
+NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --1 		        			-- How many units a country wants is partially based on how much military industry that is available
 
 NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_WARTIME = 0.2 				-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during war time
 NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.1     		-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during peace time
