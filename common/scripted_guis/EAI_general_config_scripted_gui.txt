@@ -14,17 +14,36 @@ scripted_gui = {
 			NOT = { has_country_flag = EAI_config_ARMY }
 			NOT = { has_country_flag = EAI_config_COUNTRY }
 		}
+
+		properties = {
+
+			EAI_config_GENERAL_2_button = {
+				image = "[EAI_GetAntiAggressionSetting]"
+			}
+
+			EAI_config_GENERAL_3_button = {
+				image = "[EAI_GetLendLeaseSetting]"
+			}
+
+			EAI_config_GENERAL_4_button = {
+				image = "[EAI_GetLimitResearchSetting]"
+			}
+
+			EAI_config_GENERAL_5_button = {
+				image = "[EAI_GetLimitSAProductionSetting]"
+			}
+
+			EAI_config_GENERAL_6_button = {
+				image = "[EAI_GetNeutralSpainSetting]"
+			}
+
+			EAI_config_GENERAL_7_button = {
+				image = "[EAI_GetAggressiveGermanySetting]"
+			}
+		}
 		
 		effects = {
-		
-			EAI_config_GENERAL_button1_click = {
-				clr_country_flag = EAI_config_GENERAL
-				set_country_flag = EAI_config_DIFFICULTY
-			}
-			EAI_config_GENERAL_button2_click = {
-				
-			}
-			
+
 			EAI_config_GENERAL_1_dropdown_button_click = {
 				if = { limit = { has_country_flag = EAI_show_ai_focuses_dropdown }
 					clr_country_flag = EAI_show_ai_focuses_dropdown
@@ -33,7 +52,100 @@ scripted_gui = {
 					set_country_flag = EAI_show_ai_focuses_dropdown
 				}
 			}
-			
+
+			EAI_config_GENERAL_2_button_click = {
+				if = { limit = { has_global_flag = EAI_anti_aggression_diplomacy }
+					clr_global_flag = EAI_anti_aggression_diplomacy
+				}
+				else = {
+					set_global_flag = EAI_anti_aggression_diplomacy
+				}
+			}
+
+			EAI_config_GENERAL_3_button_click = {
+				if = { limit = { has_global_flag = EAI_lend_lease }
+					clr_global_flag = EAI_lend_lease
+				}
+				else = {
+					set_global_flag = EAI_lend_lease
+				}
+			}
+
+			EAI_config_GENERAL_4_button_click = {
+				if = { limit = { has_global_flag = EAI_limit_research }
+					clr_global_flag = EAI_limit_research
+
+					every_country = {
+						limit = { has_country_flag = EAI_slots_reduced_3 }
+						add_research_slot = 3
+						clr_country_flag = EAI_slots_reduced_3
+					}
+					every_country = {
+						limit = { has_country_flag = EAI_slots_reduced_2 }
+						add_research_slot = 2
+						clr_country_flag = EAI_slots_reduced_2
+					}
+					every_country = {
+						limit = { has_country_flag = EAI_slots_reduced_1 }
+						add_research_slot = 1
+						clr_country_flag = EAI_slots_reduced_1
+					}
+				}
+				else = {
+					set_global_flag = EAI_limit_research 
+
+					every_country = {
+						limit = { NOT = { EAI_major_country = yes } original_research_slots > 3 }
+						add_research_slot = -3
+						set_country_flag = EAI_slots_reduced_3
+					}
+					every_country = {
+						limit = { NOT = { EAI_major_country = yes } original_research_slots > 2 original_research_slots < 4 }
+						add_research_slot = -2
+						set_country_flag = EAI_slots_reduced_2
+					}
+					every_country = {
+						limit = { NOT = { EAI_major_country = yes } original_research_slots > 1 original_research_slots < 3 }
+						add_research_slot = -1
+						set_country_flag = EAI_slots_reduced_1
+					}
+				}
+			}
+
+			EAI_config_GENERAL_5_button_click = {
+				if = { limit = { has_global_flag = EAI_limit_south_america_production }
+					clr_global_flag = EAI_limit_south_america_production
+				}
+				else = {
+					set_global_flag = EAI_limit_south_america_production
+				}
+			}
+
+			EAI_config_GENERAL_6_button_click = {
+				if = { limit = { has_global_flag = EAI_neutral_spr }
+					clr_global_flag = EAI_neutral_spr
+				}
+				else = {
+					set_global_flag = EAI_neutral_spr
+				}
+			}
+
+			EAI_config_GENERAL_7_button_click = {
+				if = { limit = { has_global_flag = EAI_aggressive_GER }
+					clr_global_flag = EAI_aggressive_GER
+				}
+				else = {
+					set_global_flag = EAI_aggressive_GER
+				}
+			}
+
+			###########################################
+		
+			EAI_config_GENERAL_button1_click = {
+				clr_country_flag = EAI_config_GENERAL
+				set_country_flag = EAI_config_DIFFICULTY
+			}
+
 			# EXIT
 			EAI_config_exit_click = {
 				clr_country_flag = EAI_config_DIFFICULTY
@@ -55,16 +167,6 @@ scripted_gui = {
 				}
 				
 				country_event = EAI.1000 #forces the decision visible triggers to refresh
-			}
-		}
-		
-		triggers = {
-			
-			EAI_config_GENERAL_button1_click_enabled = {
-				
-			}
-			EAI_config_GENERAL_button2_click_enabled = {
-				
 			}
 		}
 	}
@@ -116,151 +218,5 @@ scripted_gui = {
 				set_global_flag = EAI_random_focuses
 			}
 		}
-	}
-	
-	# SETTING: 2
-	EAI_config_GENERAL_2_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_2_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_anti_aggression_diplomacy }
-		effects = { EAI_config_GENERAL_button_2_on_button_click = { clr_global_flag = EAI_anti_aggression_diplomacy } }
-	}
-	EAI_config_GENERAL_2_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_2_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_anti_aggression_diplomacy } }
-		effects = { EAI_config_GENERAL_button_2_off_button_click = { set_global_flag = EAI_anti_aggression_diplomacy } }
-	}
-	
-	# SETTING: 3
-	EAI_config_GENERAL_3_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_3_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_lend_lease }
-		effects = { EAI_config_GENERAL_button_3_on_button_click = { clr_global_flag = EAI_lend_lease } }
-	}
-	EAI_config_GENERAL_3_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_3_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_lend_lease } }
-		effects = { EAI_config_GENERAL_button_3_off_button_click = { set_global_flag = EAI_lend_lease } }
-	}
-	
-	# SETTING: 4
-	EAI_config_GENERAL_4_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_4_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_limit_research }
-		effects = { 
-			EAI_config_GENERAL_button_4_on_button_click = { 
-				clr_global_flag = EAI_limit_research
-
-				every_country = {
-					limit = { has_country_flag = EAI_slots_reduced_3 }
-					add_research_slot = 3
-					clr_country_flag = EAI_slots_reduced_3
-				}
-				every_country = {
-					limit = { has_country_flag = EAI_slots_reduced_2 }
-					add_research_slot = 2
-					clr_country_flag = EAI_slots_reduced_2
-				}
-				every_country = {
-					limit = { has_country_flag = EAI_slots_reduced_1 }
-					add_research_slot = 1
-					clr_country_flag = EAI_slots_reduced_1
-				}
-			} 
-		}
-	}
-	EAI_config_GENERAL_4_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_4_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_limit_research } }
-		effects = { 
-			EAI_config_GENERAL_button_4_off_button_click = { 
-				set_global_flag = EAI_limit_research 
-
-				every_country = {
-					limit = { NOT = { EAI_major_country = yes } original_research_slots > 3 }
-					add_research_slot = -3
-					set_country_flag = EAI_slots_reduced_3
-				}
-				every_country = {
-					limit = { NOT = { EAI_major_country = yes } original_research_slots > 2 original_research_slots < 4 }
-					add_research_slot = -2
-					set_country_flag = EAI_slots_reduced_2
-				}
-				every_country = {
-					limit = { NOT = { EAI_major_country = yes } original_research_slots > 1 original_research_slots < 3 }
-					add_research_slot = -1
-					set_country_flag = EAI_slots_reduced_1
-				}
-			} 
-		}
-	}
-	
-	# SETTING: 5
-	EAI_config_GENERAL_5_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_5_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_limit_south_america_production }
-		effects = { EAI_config_GENERAL_button_5_on_button_click = { clr_global_flag = EAI_limit_south_america_production } }
-	}
-	EAI_config_GENERAL_5_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_5_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_limit_south_america_production } }
-		effects = { EAI_config_GENERAL_button_5_off_button_click = { set_global_flag = EAI_limit_south_america_production } }
-	}
-	
-	# SETTING: 6
-	EAI_config_GENERAL_6_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_6_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_neutral_spr }
-		effects = { 
-			EAI_config_GENERAL_button_6_on_button_click = { 
-				clr_global_flag = EAI_neutral_spr 
-				every_country = { limit = { has_idea = EAI_neutrality_idea_SPR } remove_ideas = EAI_neutrality_idea_SPR }
-			}
-		}
-	}
-	EAI_config_GENERAL_6_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_6_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_neutral_spr } }
-		effects = { 
-			EAI_config_GENERAL_button_6_off_button_click = { 
-				set_global_flag = EAI_neutral_spr 
-				every_country = { limit = { original_tag = SPR has_global_flag = scw_over } add_ideas = EAI_neutrality_idea_SPR }
-			} 
-		}
-	}
-	
-	# SETTING: 7
-	EAI_config_GENERAL_7_enabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_7_on_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL has_global_flag = EAI_aggressive_GER }
-		effects = { EAI_config_GENERAL_button_7_on_button_click = { clr_global_flag = EAI_aggressive_GER } }
-	}
-	EAI_config_GENERAL_7_disabled = { 
-		context_type = player_context
-		window_name = "EAI_config_GENERAL_7_off_window"
-		parent_window_name = "EAI_config_GENERAL_window"
-		visible = { has_country_flag = EAI_config_GENERAL NOT = { has_global_flag = EAI_aggressive_GER } }
-		effects = { EAI_config_GENERAL_button_7_off_button_click = { set_global_flag = EAI_aggressive_GER } }
 	}
 }

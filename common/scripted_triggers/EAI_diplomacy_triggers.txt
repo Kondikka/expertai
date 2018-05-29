@@ -63,20 +63,20 @@ EAI_invite_to_faction = {
 
 # factors when determining who to give lend-lease
 EAI_lend_lease = {
-	ROOT = { #lend leaser
+	has_global_flag = EAI_lend_lease
+
+	ROOT = { # lend leaser
 		OR = {
 			has_country_flag = EAI_supports_@PREV
 
 			AND = {
-				has_global_flag = EAI_lend_lease
-
 				NOT = { surrender_progress > 0.05 }
 
 				########################################
 
-				#SPECIAL RULES
+				# SPECIAL RULES
 
-				#GER should focus on stockpiling for itself
+				# GER should focus on stockpiling for itself
 				if = { 
 					limit = {
 						original_tag = GER 
@@ -101,7 +101,7 @@ EAI_lend_lease = {
 					has_army_manpower = { size > 550000 }
 				}
 				
-				#SOV should focus on stockpiling for itself
+				# SOV should focus on stockpiling for itself
 				if = { 
 					limit = { 
 						original_tag = SOV 
@@ -126,7 +126,7 @@ EAI_lend_lease = {
 		}
 	}
 
-	THIS = { #target
+	THIS = { # target
 		NOT = { tag = ROOT }
 	
 		has_war = yes NOT = { has_war_with = ROOT }
@@ -137,9 +137,9 @@ EAI_lend_lease = {
 			AND = {
 				########################################
 
-				#SPECIAL RULES
+				# SPECIAL RULES
 
-				#axis shouldn't lend lease japan
+				# axis shouldn't lend lease japan
 				if = { 
 					limit = { 
 						ROOT = { 
@@ -149,7 +149,7 @@ EAI_lend_lease = {
 						} 
 					}
 
-					capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } } #dont ll to asia
+					capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } } # dont ll to asia
 				}
 
 				if = {
@@ -162,14 +162,14 @@ EAI_lend_lease = {
 					}
 					
 					OR = {
-						is_subject_of = JAP #only LL its own puppets within axis
+						is_subject_of = JAP # only LL its own puppets within axis
 						NOT = { is_in_faction_with = GER }
 					}
 
 					capital_scope = { OR = { is_on_continent = asia is_on_continent = oceania } }
 				}
 
-				#make things easer for AI GER vs SOV
+				# make things easer for AI GER vs SOV
 				if = { 
 					limit = { 
 						THIS = { original_tag = SOV }
@@ -182,7 +182,7 @@ EAI_lend_lease = {
 					}
 				}
 				
-				#SOV should focus on stockpiling for itself
+				# SOV should focus on stockpiling for itself
 				if = { 
 					limit = { 
 						ROOT = { original_tag = SOV } 
@@ -198,7 +198,7 @@ EAI_lend_lease = {
 					}
 				}
 
-				#make things easier for AI JAP vs CHI
+				# make things easier for AI JAP vs CHI
 				if = { 
 					limit = { 
 						THIS = { OR = { original_tag = CHI original_tag = PRC } }
@@ -213,7 +213,7 @@ EAI_lend_lease = {
 					}
 				}
 				
-				#make things easier for AI GER vs POL
+				# make things easier for AI GER vs POL
 				if = { 
 					limit = { 
 						THIS = { original_tag = POL }
@@ -226,7 +226,7 @@ EAI_lend_lease = {
 					}
 				}
 
-				#SCW
+				# SCW
 				if = { 
 					limit = { 
 						ROOT = { is_in_faction_with = SOV }
@@ -238,7 +238,7 @@ EAI_lend_lease = {
 
 				########################################
 
-				ROOT = { #neutral countries ll to neighbors only
+				ROOT = { # neutral countries ll to neighbors only
 					OR = {
 						NOT = { EAI_neutral_country = yes }
 						AND = {
@@ -248,7 +248,7 @@ EAI_lend_lease = {
 					}
 				}
 
-				ROOT = {
+				ROOT = { # limits just any country from using lend-lease, such as random minors in south america
 					OR = {
 						EAI_major_country = yes
 						is_major = yes
@@ -258,15 +258,22 @@ EAI_lend_lease = {
 							is_neighbor_of = PREV
 							has_opinion = { target = PREV value > 25 }
 						}
+
+						### SPECIAL RULES
+
+						AND = { # in order to make nat spain win more, any fascist country should LL it
+							has_government = fascism
+							PREV = { original_tag = SPR has_government = fascism has_civil_war = yes }
+						}
 					}
 				}
 
-				if = { #rules for subjects
+				if = { # rules for subjects
 					limit = { ROOT = { is_subject = yes } }
 
 					OR = {
-						ROOT = { is_subject_of = PREV } #is subject of the target
-						any_enemy_country = { has_war_with = ROOT } #common enemy
+						ROOT = { is_subject_of = PREV } # is subject of the target
+						any_enemy_country = { has_war_with = ROOT } # common enemy
 					}
 				}
 
@@ -395,20 +402,20 @@ EAI_lend_lease = {
 						}
 					}
 
-					is_in_faction_with = ROOT #faction members
+					is_in_faction_with = ROOT # faction members
 					has_war_together_with = ROOT
 				}
 
-				OR = { #why should it send LL?
-					any_enemy_country = { has_war_with = ROOT } #enemy of my enemy is my friend
+				OR = { # why should it send LL?
+					any_enemy_country = { has_war_with = ROOT } # enemy of my enemy is my friend
 					
-					ROOT = { has_opinion = { target = PREV value > 25 } } #friendly countries
+					ROOT = { has_opinion = { target = PREV value > 25 } } # friendly countries
 					
-					is_in_faction_with = ROOT #faction members
+					is_in_faction_with = ROOT # faction members
 					
 					has_war_together_with = ROOT
 
-					AND = { #support wars against other ideologies
+					AND = { # support wars against other ideologies
 						any_enemy_country = { EAI_fascist_nation = yes }
 						ROOT = { NOT = { EAI_fascist_nation = yes } }
 					}
@@ -421,12 +428,12 @@ EAI_lend_lease = {
 						ROOT = { NOT = { EAI_democratic_nation = yes } }
 					}
 
-					AND = { EAI_communist_nation = yes ROOT = { EAI_communist_nation = yes } } #shared ideology
+					AND = { EAI_communist_nation = yes ROOT = { EAI_communist_nation = yes } } # shared ideology
 					AND = { EAI_fascist_nation = yes ROOT = { EAI_fascist_nation = yes } }
 					AND = { EAI_democratic_nation = yes ROOT = { EAI_democratic_nation = yes } }
 				}
 				
-				NOT = { #why should it NOT send lend lease
+				NOT = { # why should it NOT send lend lease
 					AND = { # the enemy of this country has a NAP with ROOT or faction member
 						NOT = { any_enemy_country = { has_war_with = ROOT } }
 						

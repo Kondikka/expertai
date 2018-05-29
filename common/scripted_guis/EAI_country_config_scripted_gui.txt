@@ -10,12 +10,97 @@ scripted_gui = {
 		window_name = "EAI_config_COUNTRY_window"
 		
 		visible = {
-			any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
+			has_variable = EAI_configuration_target
 			
 			has_country_flag = EAI_config_COUNTRY
 		}
+
+		properties = {
+
+			EAI_config_COUNTRY_3_button = {
+				image = "[EAI_GetCountryReinforcementsSetting]"
+			}
+
+			EAI_config_COUNTRY_6_button = {
+				image = "[EAI_GetCountryPlanningEntrenchmentSetting]"
+			}
+		}
 		
 		effects = {
+
+			EAI_config_COUNTRY_3_button_click = {
+				var:EAI_configuration_target = { 
+					if = { limit = { has_global_flag = EAI_dynamic_division_spawning }
+						
+						if = { limit = { NOT = { has_country_flag = EAI_division_spawning } }
+							
+							if = { limit = { NOT = { has_country_flag = EAI_disable_division_spawning } }
+								set_country_flag = EAI_disable_division_spawning
+
+								else = { clr_country_flag = EAI_disable_division_spawning }
+							}
+						}
+
+						if = { limit = { has_country_flag = EAI_division_spawning }
+							
+							if = { limit = { NOT = { has_country_flag = EAI_disable_division_spawning } }
+								set_country_flag = EAI_disable_division_spawning
+								clr_country_flag = EAI_division_spawning
+
+								else = { clr_country_flag = EAI_disable_division_spawning }
+							}
+						}
+					}
+					else = {
+						clr_country_flag = EAI_disable_division_spawning 
+
+						if = { limit = { has_country_flag = EAI_division_spawning }
+
+							clr_country_flag = EAI_division_spawning
+							
+							else = { set_country_flag = EAI_division_spawning }
+						}
+					}
+				}
+			}
+
+			EAI_config_COUNTRY_6_button_click = {
+				var:EAI_configuration_target = { 
+					if = { limit = { has_global_flag = EAI_dynamic_boost_planning }
+						
+						if = { limit = { NOT = { has_country_flag = EAI_boost_planning } }
+							
+							if = { limit = { NOT = { has_country_flag = EAI_disable_boost_planning } }
+								set_country_flag = EAI_disable_boost_planning
+
+								else = { clr_country_flag = EAI_disable_boost_planning }
+							}
+						}
+
+						if = { limit = { has_country_flag = EAI_boost_planning }
+							
+							if = { limit = { NOT = { has_country_flag = EAI_disable_boost_planning } }
+								set_country_flag = EAI_disable_boost_planning
+								clr_country_flag = EAI_boost_planning
+
+								else = { clr_country_flag = EAI_disable_boost_planning }
+							}
+						}
+					}
+					else = {
+						clr_country_flag = EAI_disable_boost_planning 
+
+						if = { limit = { has_country_flag = EAI_boost_planning }
+
+							clr_country_flag = EAI_boost_planning
+							
+							else = { set_country_flag = EAI_boost_planning }
+						}
+					}
+				}
+			}
+
+			###########################################
 		
 			# ARMY CONFIG
 			EAI_config_COUNTRY_army_config_button_click = {
@@ -30,13 +115,13 @@ scripted_gui = {
 			
 				clr_country_flag = EAI_config_ARMY
 				
-				every_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+				var:EAI_configuration_target = {		
 					clr_country_flag = EAI_player_is_configuring_this_country
-					
+
 					clr_country_flag = EAI_player_is_configuring_this_country_@ROOT
 				}
+
+				clear_variable = EAI_configuration_target
 				
 				country_event = EAI.1000 #forces the decision visible triggers to refresh
 			}
@@ -44,102 +129,58 @@ scripted_gui = {
 	}
 
 	###################################### BONUS
-	
-	EAI_config_COUNTRY_1a_enabled = { # OFF
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1a_enabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			has_country_flag = EAI_config_COUNTRY 
-			
-			OR = {
-				AND = { # show OFF as selected when there is no country bonus and no dynamic bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_country_bonus } }
-					NOT = { has_global_flag = EAI_dynamic_hard_enemies has_global_flag = EAI_dynamic_very_hard_enemies has_global_flag = EAI_dynamic_insane_enemies }
-				}
-			
-				AND = { # show OFF as selected when there is no country bonus, there is a dynamic bonus and it is disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_country_bonus } has_country_flag = EAI_disable_bonus } 
-					OR = { has_global_flag = EAI_dynamic_hard_enemies has_global_flag = EAI_dynamic_very_hard_enemies has_global_flag = EAI_dynamic_insane_enemies }
-				}
-			}
-		}
-		effects = { 
-			EAI_config_COUNTRY_1a_enabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
 
-					clr_country_flag = EAI_disable_bonus
-				}
-			}
-		}
-	}
-	EAI_config_COUNTRY_1a_disabled = {
+	EAI_config_COUNTRY_1a = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1a_disabled_window"
+		window_name = "EAI_config_COUNTRY_1a_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			has_country_flag = EAI_config_COUNTRY 
-			
-			OR = {
-				AND = { # show OFF as not selected when there is a country bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_country_bonus } 
-				}
-				
-				AND = {  # show OFF as not selected when is no country bonus but there is a dynamic bonus and it has not been disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_country_bonus has_country_flag = EAI_disable_bonus } } 
-					OR = { has_global_flag = EAI_dynamic_hard_enemies has_global_flag = EAI_dynamic_very_hard_enemies has_global_flag = EAI_dynamic_insane_enemies }
-				}
+
+		properties = {
+			EAI_config_COUNTRY_1a_button = {
+				image = "[EAI_GetCOUNTRY1aSetting]"
 			}
 		}
-		effects = { 
-			EAI_config_COUNTRY_1a_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
-					clr_country_flag = EAI_country_bonus
+
+		effects = {
+			EAI_config_COUNTRY_1a_button_click = {
+				var:EAI_configuration_target = {
+                    clr_country_flag = EAI_country_bonus
 					clr_country_flag = EAI_country_bonus_HARD
 					clr_country_flag = EAI_country_bonus_VERY_HARD
 					clr_country_flag = EAI_country_bonus_INSANE
-					
+
 					EAI_clear_difficulty = yes
-					
+
 					clr_country_flag = EAI_dynamic_country_bonus_active
-					
+
 					EAI_fix_production_boost = yes
-					
-					if = { 
-						limit = {
-							AND = { 
-								any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_country_bonus has_country_flag = EAI_disable_bonus } } 
-								OR = { has_global_flag = EAI_dynamic_hard_enemies has_global_flag = EAI_dynamic_very_hard_enemies has_global_flag = EAI_dynamic_insane_enemies }
-							}
-						}
+
+					if = { limit = { has_country_flag = EAI_disable_bonus }
+
+						clr_country_flag = EAI_disable_bonus
+					}
+					else_if = { limit = { OR = { has_global_flag = EAI_dynamic_hard_enemies has_global_flag = EAI_dynamic_very_hard_enemies has_global_flag = EAI_dynamic_insane_enemies } }
+
 						set_country_flag = EAI_disable_bonus
 					}
 				}
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_1b_enabled = {
+	EAI_config_COUNTRY_1b = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1b_enabled_window"
+		window_name = "EAI_config_COUNTRY_1b_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_HARD } }
-	}
-	EAI_config_COUNTRY_1b_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1b_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_HARD } } } }
-		effects = { 
-			EAI_config_COUNTRY_1b_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_1b_button = {
+				image = "[EAI_GetCOUNTRY1bSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_1b_button_click = {
+				var:EAI_configuration_target = {					
 					clr_country_flag = EAI_disable_bonus
 					
 					clr_country_flag = EAI_country_bonus_HARD
@@ -162,25 +203,20 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_1c_enabled = {
+	EAI_config_COUNTRY_1c = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1c_enabled_window"
+		window_name = "EAI_config_COUNTRY_1c_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_VERY_HARD } }
-	}
-	EAI_config_COUNTRY_1c_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1c_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_VERY_HARD } } } }
-		effects = { 
-			EAI_config_COUNTRY_1c_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_1c_button = {
+				image = "[EAI_GetCOUNTRY1cSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_1c_button_click = {
+				var:EAI_configuration_target = {					
 					clr_country_flag = EAI_disable_bonus
 					
 					clr_country_flag = EAI_country_bonus_HARD
@@ -203,25 +239,20 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_1d_enabled = {
+	EAI_config_COUNTRY_1d = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1d_enabled_window"
+		window_name = "EAI_config_COUNTRY_1d_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_INSANE } }
-	}
-	EAI_config_COUNTRY_1d_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_1d_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_country_bonus has_country_flag = EAI_country_bonus_INSANE } } } }
-		effects = { 
-			EAI_config_COUNTRY_1d_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_1d_button = {
+				image = "[EAI_GetCOUNTRY1dSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_1d_button_click = {
+				var:EAI_configuration_target = {					
 					clr_country_flag = EAI_disable_bonus
 					
 					clr_country_flag = EAI_country_bonus_HARD
@@ -244,100 +275,58 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################################### DESPERATE DEFENSE
-	
-	EAI_config_COUNTRY_2a_enabled = { # OFF
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2a_enabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			OR = {
-				AND = { # show OFF as selected when there is no country bonus and no dynamic bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_desperate_defense } }
-					NOT = { has_global_flag = EAI_dynamic_desperate_defense_LOW has_global_flag = EAI_dynamic_desperate_defense_NORMAL has_global_flag = EAI_dynamic_desperate_defense_HIGH }
-				}
-			
-				AND = { # show OFF as selected when there is no country bonus, there is a dynamic bonus and it is disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_desperate_defense } has_country_flag = EAI_disable_desperate_defense } 
-					OR = { has_global_flag = EAI_dynamic_desperate_defense_LOW has_global_flag = EAI_dynamic_desperate_defense_NORMAL has_global_flag = EAI_dynamic_desperate_defense_HIGH }
-				}
-			}
-		}
-		effects = { 
-			EAI_config_COUNTRY_2a_enabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
 
-					clr_country_flag = EAI_disable_desperate_defense
-				}
-			}
-		}
-	}
-	EAI_config_COUNTRY_2a_disabled = {
+	###################################### DESPERATE DEFENSE
+
+	EAI_config_COUNTRY_2a = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2a_disabled_window"
+		window_name = "EAI_config_COUNTRY_2a_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			has_country_flag = EAI_config_COUNTRY 
-			
-			OR = {
-				AND = { # show OFF as not selected when there is a country bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_desperate_defense } 
-				}
-				
-				AND = {  # show OFF as not selected when is no country bonus but there is a dynamic bonus and it has not been disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_desperate_defense has_country_flag = EAI_disable_desperate_defense } } 
-					OR = { has_global_flag = EAI_dynamic_desperate_defense_LOW has_global_flag = EAI_dynamic_desperate_defense_NORMAL has_global_flag = EAI_dynamic_desperate_defense_HIGH }
-				}
+
+		properties = {
+			EAI_config_COUNTRY_2a_button = {
+				image = "[EAI_GetCOUNTRY2aSetting]"
 			}
 		}
-		effects = { 
-			EAI_config_COUNTRY_2a_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		effects = {
+			EAI_config_COUNTRY_2a_button_click = {
+				var:EAI_configuration_target = { 
 					clr_country_flag = EAI_desperate_defense
 					clr_country_flag = EAI_desperate_defense_LOW
 					clr_country_flag = EAI_desperate_defense_NORMAL
 					clr_country_flag = EAI_desperate_defense_HIGH
 				
 					EAI_clear_desperate_defense = yes
-					
+
 					EAI_fix_production_boost = yes
-					
-					if = { 
-						limit = {
-							AND = { 
-								any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_desperate_defense has_country_flag = EAI_disable_desperate_defense } } 
-								OR = { has_global_flag = EAI_dynamic_desperate_defense_LOW has_global_flag = EAI_dynamic_desperate_defense_NORMAL has_global_flag = EAI_dynamic_desperate_defense_HIGH }
-							}
-						}
+
+					if = { limit = { has_country_flag = EAI_disable_desperate_defense }
+
+						clr_country_flag = EAI_disable_desperate_defense
+					}
+					else_if = { limit = { OR = { has_global_flag = EAI_dynamic_desperate_defense_LOW has_global_flag = EAI_dynamic_desperate_defense_NORMAL has_global_flag = EAI_dynamic_desperate_defense_HIGH } }
+
 						set_country_flag = EAI_disable_desperate_defense
 					}
 				}
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_2b_enabled = {
+	EAI_config_COUNTRY_2b = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2b_enabled_window"
+		window_name = "EAI_config_COUNTRY_2b_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_LOW } }
-	}
-	EAI_config_COUNTRY_2b_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2b_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_LOW } } } }
-		effects = { 
-			EAI_config_COUNTRY_2b_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_2b_button = {
+				image = "[EAI_GetCOUNTRY2bSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_2b_button_click = {
+				var:EAI_configuration_target = {
 					clr_country_flag = EAI_disable_desperate_defense
 					
 					clr_country_flag = EAI_desperate_defense_LOW
@@ -354,25 +343,20 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_2c_enabled = {
+	EAI_config_COUNTRY_2c = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2c_enabled_window"
+		window_name = "EAI_config_COUNTRY_2c_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_NORMAL } }
-	}
-	EAI_config_COUNTRY_2c_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2c_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_NORMAL } } } }
-		effects = { 
-			EAI_config_COUNTRY_2c_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_2c_button = {
+				image = "[EAI_GetCOUNTRY2cSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_2c_button_click = {
+				var:EAI_configuration_target = {
 					clr_country_flag = EAI_disable_desperate_defense
 					
 					clr_country_flag = EAI_desperate_defense_LOW
@@ -389,25 +373,20 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################
-	
-	EAI_config_COUNTRY_2d_enabled = {
+	EAI_config_COUNTRY_2d = {
 		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2d_enabled_window"
+		window_name = "EAI_config_COUNTRY_2d_window"
 		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_HIGH } }
-	}
-	EAI_config_COUNTRY_2d_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_2d_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { AND = { has_country_flag = EAI_desperate_defense has_country_flag = EAI_desperate_defense_HIGH } } } }
-		effects = { 
-			EAI_config_COUNTRY_2d_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
+
+		properties = {
+			EAI_config_COUNTRY_2d_button = {
+				image = "[EAI_GetCOUNTRY2dSetting]"
+			}
+		}
+
+		effects = {
+			EAI_config_COUNTRY_2d_button_click = {
+				var:EAI_configuration_target = {
 					clr_country_flag = EAI_disable_desperate_defense
 					
 					clr_country_flag = EAI_desperate_defense_LOW
@@ -424,98 +403,3 @@ scripted_gui = {
 			}
 		}
 	}
-	
-	###################################### REINFORCEMENTS
-	
-	EAI_config_COUNTRY_3a_enabled = { # OFF
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_3a_enabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			OR = {
-				AND = { # show OFF as selected when there is no country bonus and no dynamic bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_division_spawning } }
-					NOT = { has_global_flag = EAI_dynamic_division_spawning }
-				}
-			
-				AND = { # show OFF as selected when there is no country bonus, there is a dynamic bonus and it is disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_division_spawning } has_country_flag = EAI_disable_division_spawning } 
-					OR = { has_global_flag = EAI_dynamic_division_spawning }
-				}
-			}
-		}
-		effects = { 
-			EAI_config_COUNTRY_3a_enabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-
-					clr_country_flag = EAI_disable_division_spawning
-				}
-			}
-		}
-	}
-	EAI_config_COUNTRY_3a_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_3a_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { 
-			has_country_flag = EAI_config_COUNTRY 
-			
-			OR = {
-				AND = { # show OFF as not selected when there is a country bonus
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_division_spawning } 
-				}
-				
-				AND = {  # show OFF as not selected when is no country bonus but there is a dynamic bonus and it has not been disabled for this country
-					any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_division_spawning has_country_flag = EAI_disable_division_spawning } } 
-					OR = { has_global_flag = EAI_dynamic_division_spawning }
-				}
-			}
-		}
-		effects = { 
-			EAI_config_COUNTRY_3a_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
-					clr_country_flag = EAI_division_spawning
-					
-					if = { 
-						limit = {
-							AND = { 
-								any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_division_spawning has_country_flag = EAI_disable_division_spawning } } 
-								OR = { has_global_flag = EAI_dynamic_division_spawning }
-							}
-						}
-						set_country_flag = EAI_disable_division_spawning
-					}
-				}
-			}
-		}
-	}
-	
-	###################
-	
-	EAI_config_COUNTRY_3b_enabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_3b_enabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT has_country_flag = EAI_division_spawning } }
-	}
-	EAI_config_COUNTRY_3b_disabled = {
-		context_type = player_context
-		window_name = "EAI_config_COUNTRY_3b_disabled_window"
-		parent_window_name = "EAI_config_COUNTRY_window"
-		visible = { has_country_flag = EAI_config_COUNTRY any_country = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT NOT = { has_country_flag = EAI_division_spawning } } }
-		effects = { 
-			EAI_config_COUNTRY_3b_disabled_button_click = {
-				random_country = {
-					limit = { has_country_flag = EAI_player_is_configuring_this_country_@ROOT }
-					
-					clr_country_flag = EAI_disable_division_spawning
-					
-					set_country_flag = EAI_division_spawning
-				}
-			}
-		}
-	}
-}
