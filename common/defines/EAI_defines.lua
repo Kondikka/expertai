@@ -370,7 +370,7 @@ NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 0.1                                     
 --NDefines.NAI.NAVAL_STRIKE_PLANES_PER_ARMY = 0                                    -- [0]    -- Amount of planes requested per enemy army
 --NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 20                                   -- [20]   -- Amount of bombers requested per enemy ship
 --NDefines.NAI.PORT_STRIKE_PLANES_PER_SHIP = 10                                    -- [10]   -- Amount of bombers request per enemy ship in the port
---NDefines.NAI.NAVAL_MIN_EXCORT_WINGS = 0                                          -- [0]    -- Min amount of airwings requested to excort operations
+NDefines.NAI.NAVAL_MIN_EXCORT_WINGS = 1                                          -- [0]    -- Min amount of airwings requested to excort operations
 
 --NDefines.NAI.LAND_DEFENSE_AIR_SUPERIORITY_IMPORTANCE = 0.10                      -- [0.10] -- Strategic importance of air superiority ( amount of enemy planes in area )
 --NDefines.NAI.LAND_DEFENSE_CIVIL_FACTORY_IMPORTANCE = 50                          -- [50]   -- Strategic importance of civil factories
@@ -384,19 +384,19 @@ NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 0.1                                     
 
 --NDefines.NAI.LAND_DEFENSE_MIN_FACTORIES_FOR_AIR_IMPORTANCE = 6                   -- [6]    -- If amount of factories is less importance of factories won't apply
 
---NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 2.0                                -- [1.0]  -- Amount of air superiority planes requested per enemy plane
-NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 1.0                           -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
+NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 0.1                                -- [1.0]  -- Amount of air superiority planes requested per enemy plane
+NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 0.0                           -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
 NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.0                             -- [1.0]  -- Amount of air interceptor planes requested per enemy plane (non bomber)
 
---NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1.0                          -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
---NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100                           -- [12]   -- Strategic importance of our armies
---NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 100                          -- [55]   -- Strategic importance of our armies in the combats
+NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1.0                          -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
+NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100                           -- [12]   -- Strategic importance of our armies
+NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 100                          -- [55]   -- Strategic importance of our armies in the combats
 --NDefines.NAI.LAND_COMBAT_FRIEND_ARMIES_AIR_IMPORTANCE = 12                       -- [12]   -- Strategic importance of friendly armies
 --NDefines.NAI.LAND_COMBAT_FRIEND_COMBATS_AIR_IMPORTANCE = 6                       -- [6]    -- Strategic importance of friendly armies in the combat
 --NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 8                         -- [8]    -- Strategic importance of our armies
 --NDefines.NAI.LAND_COMBAT_ENEMY_LAND_FORTS_AIR_IMPORTANCE = 5                     -- [5]    -- Strategic importance of enemy land forts in the region
 --NDefines.NAI.LAND_COMBAT_ENEMY_COASTAL_FORTS_AIR_IMPORTANCE = 3                  -- [3]    -- Strategic importance of enemy coastal fronts in the region
---NDefines.NAI.LAND_COMBAT_IMPORTANCE_SCALE = 10                                     -- [1.5]  -- Lend combat total importance scale (every land combat score get's multiplied by it)
+NDefines.NAI.LAND_COMBAT_IMPORTANCE_SCALE = 2                                     -- [1.5]  -- Lend combat total importance scale (every land combat score get's multiplied by it)
 
 NDefines.NAI.LAND_COMBAT_FIGHTERS_PER_PLANE = 2                                    -- [1.1]  -- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.LAND_COMBAT_CAS_WINGS_PER_ENEMY_ARMY_LIMIT = 4                      -- [4]    -- Limit of CAS wings requested by enemy armies
