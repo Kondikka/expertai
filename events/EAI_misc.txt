@@ -60,7 +60,7 @@ country_event = { #mobile warfare doctrine tech switch to manpower branch
 	trigger = {
 		is_ai = yes
 		has_idea = service_by_requirement
-		has_manpower < 100000
+		has_manpower < 500000
 		has_tech = modern_blitzkrieg
 		NOT = { has_country_flag = EAI_volkssturm_taken }
 		NOT = { has_country_flag = EAI_mobilizing_manpower }
@@ -220,7 +220,7 @@ country_event = { #for performance reasons, check these monthly
 				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: armor" 
 			}
 		}
-		else = { clr_country_flag = EAI_motorized_division_limit }
+		else = { clr_country_flag = EAI_armored_division_limit }
 
 		if = { limit = { EAI_motorized_division_limit = yes } 
 
@@ -1497,38 +1497,62 @@ country_event = {
 
 country_event = {
 	id = EAI_debug.30
-	title = ""
-	desc = ""
+	hidden = yes
 	is_triggered_only = yes
-	
-	trigger  = {
-		
-	}
 
 	immediate = {
+		set_global_flag = { flag = EAI_division_statistics value = 1 days = 365 }
+
+		set_variable = { global.1_num_divisions_TOTAL = 0 }
+		set_variable = { global.4_num_divisions_WAR = 0 }
+		set_variable = { global.5_num_divisions_PEACE = 0 }
+		set_variable = { global.2_num_divisions_MAJORS = 0 }
+		set_variable = { global.3_num_divisions_MINORS = 0 }
+
 		every_country = {
-			set_variable = { global.EAI_divcap_@THIS = 0 }
+			clear_variable = global.num_divisions_@THIS
 
-			every_state = {
-				limit = { is_controlled_by = PREV }
-				add_to_variable = { global.EAI_divcap_@PREV = modifier@local_building_slots }
-			}
+			add_to_variable = { global.1_num_divisions_TOTAL = num_divisions }
+		}
 
-			set_variable = { EAI_slots_factor = modifier@global_building_slots_factor }
-			add_to_variable = { EAI_slots_factor = 1 }
+		every_country = {
+			limit = { EAI_major_country = yes }
 
-			divide_variable = { global.EAI_divcap_@THIS = EAI_slots_factor }
-			multiply_variable = { global.EAI_divcap_@THIS = 2 }
+			add_to_variable = { global.2_num_divisions_MAJORS = num_divisions }
+		}
 
-			multiply_variable = { global.EAI_divcap_@THIS = 1.25 }
+		every_country = {
+			limit = { NOT = { EAI_major_country = yes } }
+
+			add_to_variable = { global.3_num_divisions_MINORS = num_divisions }
+		}
+
+		every_country = {
+			limit = { has_war = yes }
+
+			add_to_variable = { global.4_num_divisions_WAR = num_divisions }
+		}
+
+		every_country = {
+			limit = { has_war = no }
+
+			add_to_variable = { global.5_num_divisions_PEACE = num_divisions }
+		}
+
+		every_country = {
+			limit = { has_war = yes }
+
+			set_variable = { global.num_divisions_@THIS = num_divisions }
 		}
 
 		print_variables = {
-			file = divcap
-			text = "divcap"
+			file = divs
+			text = "Division Statistics"
 			append = yes
 			print_global = yes
 		}
+
+		country_event = { id = EAI_debug.31 days = 365 }
 	}
 
 	option = { name = 1
@@ -1536,4 +1560,50 @@ country_event = {
 	}
 }
 
+country_event = {
+	id = EAI_debug.31
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		country_event = EAI_debug.30
+	}
+
+	option = { name = 1
+
+	}
+}
+
+country_event = {
+	id = EAI_debug.32
+	hidden = yes
+
+	fire_only_once = yes
+
+	trigger {
+		is_ai = no
+	}
+
+	immediate = {
+		country_event = EAI_debug.30
+	}
+
+	option = { name = 1
+
+	}
+}
+
+country_event = {
+	id = EAI_debug.33
+	hidden = yes
+
+	is_triggered_only = yes
+	trigger {
+		has_idea = service_by_requirement
+	}
+
+	option = { name = 1
+
+	}
+}
 
