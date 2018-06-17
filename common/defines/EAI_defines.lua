@@ -340,7 +340,7 @@ NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 40
 -- AIR AI
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 100
+NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 400
 
 --NDefines.NAI.AIR_CONTROLLED_TERRITORY_INTERCEPT_SCORE = 6                        -- [6]    -- Interception score per controlled state in mission region
 --NDefines.NAI.AIR_ALLY_TERRITORY_INTERCEPT_SCORE = -400                           -- [-400] -- Interception score per ally controlled state in mission region
