@@ -309,8 +309,8 @@ NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_LOW = 0.7							--vanilla = 0.2
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_MEDIUM = 0.8						--vanilla = 0.4
 NDefines.NNavy.REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.9						--vanilla = 0.8
 
-NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 200.0								-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
-NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
+NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0								-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
+NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 100								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
 
 NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 5										-- A nation may have a large number of theatres but all of them having stationed/assigned navy is redundant
 NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 100								-- Weight of capital when calculating naval theatre assignment
@@ -319,7 +319,7 @@ NDefines.NAI.NAVAL_THEATRE_PRIO_MIN_DISTANCE = 2000								-- Minimum distance (
 
 NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3									-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
-NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 48								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
 
 NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500									-- Base value when AI is evaluating distance score to places
 NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000									-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
@@ -386,7 +386,7 @@ NDefines.NAI.NAVAL_MIN_EXCORT_WINGS = 1                                         
 
 NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 0.1                                -- [1.0]  -- Amount of air superiority planes requested per enemy plane
 NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 0.0                           -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
-NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.0                             -- [1.0]  -- Amount of air interceptor planes requested per enemy plane (non bomber)
+NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.00                             -- [1.0]  -- Amount of air interceptor planes requested per enemy plane (non bomber)
 
 NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1.0                          -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
 NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 100                           -- [12]   -- Strategic importance of our armies
