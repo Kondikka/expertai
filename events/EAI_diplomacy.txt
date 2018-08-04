@@ -327,10 +327,15 @@ country_event = { #usa joins allies 2
 				has_war = yes
 				
 				AND = {
-					ENG = { has_government = democratic }
+					ENG = { 
+						has_government = democratic 
+						surrender_progress > 0.1
+					}
 					any_state = {
-						OR = { region = 1 region = 2 region = 3 }
-						NOT = { is_controlled_by = ENG }
+						OR = { 
+							region = 1 region = 2 region = 3 
+						}
+						CONTROLLER = { is_in_faction_with = GER }
 					}
 				}
 			}
@@ -364,18 +369,26 @@ country_event = { #usa joins allies 2
 
 			date > 1942.1.1
 
-			any_state = {
-				OR = { region = 1 region = 2 region = 3 }
-				NOT = { is_controlled_by = ENG }
+			AND = {
+				ENG = { 
+					has_government = democratic 
+					surrender_progress > 0.1
+				}
+				any_state = {
+					OR = { region = 1 region = 2 region = 3 }
+					CONTROLLER = { is_in_faction_with = GER }
+				}
 			}
 		}
 	}
 	immediate = {
 		remove_ideas = EAI_neutrality_idea_USA
 
+		set_country_flag = { flag = EAI_USA_joins_allies value = 1 days = 60 }
+
 		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: remove neutrality"
 	}
-	option = { name = "OK" }
+	option = {}
 }
 
 ################### clean up some borders
@@ -747,55 +760,57 @@ country_event = { # random ideology for generic nations
 	}
 
 	option = {
-		trigger = { has_available_idea_with_traits = { idea = democratic_reformer limit = 1 } }
+		trigger = { 
+			has_available_idea_with_traits = { idea = democratic_reformer limit = 1 } 
+			has_idea_with_trait = democratic_reformer
+		}
 
 		ai_chance = {
 			base = 1
 
-			modifier = {
-				add = 3
-				check_variable = { party_popularity@democratic > 0.5 }
-			}
-
-			modifier = {
-				add = 3
-				has_government = democratic
-			}
+			modifier = { add = 1 EAI_democratic_nation = yes }
+			modifier = { add = 1 check_variable = { party_popularity@democratic > 0.8 } }
+			modifier = { add = 1 check_variable = { party_popularity@democratic > 0.6 } }
+			modifier = { add = 1 check_variable = { party_popularity@democratic > 0.4 } }
+			modifier = { add = 1 check_variable = { party_popularity@democratic > 0.2 } }
 		}
 
 		set_country_flag = EAI_democratic_focus
 	}
 
 	option = {
-		trigger = { has_available_idea_with_traits = { idea = communist_revolutionary limit = 1 } }
+		trigger = { 
+			has_available_idea_with_traits = { idea = communist_revolutionary limit = 1 } 
+			has_idea_with_trait = communist_revolutionary
+		}
 
 		ai_chance = {
 			base = 1
 
-			modifier = {
-				add = 3
-				check_variable = { party_popularity@communism > 0.5 }
-			}
-
-			modifier = {
-				add = 3
-				has_government = communism
-			}
+			modifier = { add = 1 EAI_communist_nation = yes }
+			modifier = { add = 1 check_variable = { party_popularity@communism > 0.8 } }
+			modifier = { add = 1 check_variable = { party_popularity@communism > 0.6 } }
+			modifier = { add = 1 check_variable = { party_popularity@communism > 0.4 } }
+			modifier = { add = 1 check_variable = { party_popularity@communism > 0.2 } }
 		}
 
 		set_country_flag = EAI_communist_focus
 	}
 
 	option = {
-		trigger = { has_available_idea_with_traits = { idea = fascist_demagogue limit = 1 } }
+		trigger = { 
+			has_available_idea_with_traits = { idea = fascist_demagogue limit = 1 } 
+			has_idea_with_trait = fascist_demagogue
+		}
 
 		ai_chance = {
 			base = 1
 
-			modifier = {
-				add = 3
-				check_variable = { party_popularity@fascism > 0.5 }
-			}
+			modifier = { add = 1 EAI_fascist_nation = yes }
+			modifier = { add = 1 check_variable = { party_popularity@fascism > 0.8 } }
+			modifier = { add = 1 check_variable = { party_popularity@fascism > 0.6 } }
+			modifier = { add = 1 check_variable = { party_popularity@fascism > 0.4 } }
+			modifier = { add = 1 check_variable = { party_popularity@fascism > 0.2 } }
 		}
 
 		set_country_flag = EAI_fascist_focus
@@ -804,13 +819,74 @@ country_event = { # random ideology for generic nations
 	option = {
 		ai_chance = {
 			base = 1
+
+			modifier = { add = 1 EAI_nonaligned_nation = yes }
 		}
 
 		set_country_flag = EAI_neutral_focus
 	}
 }
 
-################### war declaration events
+country_event = {
+	id = EAI_DM.1231
+	hidden = yes
+
+	mean_time_to_happen = { days = 365 }
+
+	trigger = {
+		is_ai = yes
+		has_global_flag = EAI_random_ideology
+		has_focus_tree = generic_focus
+		has_country_flag = EAI_neutral_focus
+
+		OR = {
+			check_variable = { party_popularity@democratic > 0.5 }
+			check_variable = { party_popularity@fascism > 0.5 }
+			check_variable = { party_popularity@communism > 0.5 }
+		}
+	}
+
+	immediate = {
+		clr_country_flag = EAI_neutral_focus
+
+		if = { limit = { check_variable = { party_popularity@democratic > 0.5 } } 
+			set_country_flag = EAI_democratic_focus
+		}
+		if = { limit = { check_variable = { party_popularity@communism > 0.5 } } 
+			set_country_flag = EAI_communist_focus
+		}
+		if = { limit = { check_variable = { party_popularity@fascism > 0.5 } } 
+			set_country_flag = EAI_fascist_focus
+		}
+	}
+
+	option = {}
+}
+
+###
+
+country_event = {
+	id = EAI_DM.160
+	hidden = yes
+	fire_only_once = yes
+	option = {}
+}
+country_event = {
+	id = EAI_DM.170
+	hidden = yes
+	fire_only_once = yes
+	option = {}
+}
+country_event = {
+	id = EAI_DM.180
+	hidden = yes
+	fire_only_once = yes
+	option = {}
+}
+
+######################################
+#	AI war justification
+######################################
 
 add_namespace = EAI_DM_W
 
@@ -1570,8 +1646,6 @@ country_event = {
 	}
 	option = { name = "OK" }
 }
-
-###################
 
 country_event = { # starts war justification after AI has had some time to move troops to this border
 	id = EAI_DM_W.1000

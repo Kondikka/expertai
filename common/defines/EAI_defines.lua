@@ -5,7 +5,7 @@
 NDefines.NCountry.SUPPLY_PATH_MAX_DISTANCE = 8 					-- When supply route reach more than X nodes, the manpower+equipment delivery speed reach 100% penalty.
 NDefines.NCountry.REINFORCEMENT_DELIVERY_SPEED_MIN = 0.5 			-- The distance from the supply region to capital should affect the speed only a little bit. Main factor for penalty is overcrowded areas, and not the route length.
 NDefines.NCountry.REINFORCEMENT_EQUIPMENT_DELIVERY_SPEED = 0.009 	-- Modifier for army equipment reinforcement speed
-NDefines.NCountry.REINFORCEMENT_MANPOWER_DELIVERY_SPEED = 100 	-- Modifier for army manpower reinforcement delivery speed (travel time)
+NDefines.NCountry.REINFORCEMENT_MANPOWER_DELIVERY_SPEED = 80 	-- Modifier for army manpower reinforcement delivery speed (travel time)
 	
 NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.10 -- 0.25
 
@@ -268,11 +268,11 @@ NDefines.NAI.STR_UNIT_STRONG = 0.75												-- Strength (equipment) % for uni
 
 NDefines.NAI.PLAN_FACTION_NORMAL_TO_EXECUTE = 0.65
 NDefines.NAI.ORG_UNIT_NORMAL = 0.6 --6												-- Organization % for unit to be considered normal
-NDefines.NAI.STR_UNIT_NORMAL = 0.6 --6												-- Strength (equipment) % for unit to be considered normal
+NDefines.NAI.STR_UNIT_NORMAL = 0.5 --6												-- Strength (equipment) % for unit to be considered normal
 
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.45												-- Organization % for unit to be considered weak
-NDefines.NAI.STR_UNIT_WEAK = 0.45 --0.45												-- Strength (equipment) % for unit to be considered weak
+NDefines.NAI.STR_UNIT_WEAK = 0.4 --0.45												-- Strength (equipment) % for unit to be considered weak
 
 NDefines.NAI.PLAN_AVG_PREPARATION_TO_EXECUTE = 0.5				            -- % or more average plan preparation before executing
 NDefines.NAI.AI_FRONT_MOVEMENT_FACTOR_FOR_READY = 0.5			                -- If less than this fraction of units on a front is moving  AI sees it as ready for action
