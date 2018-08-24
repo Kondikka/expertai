@@ -14,14 +14,7 @@ EAI_diplomacy_DECISIONS = {
 		visible = {
 			is_ai = no
 			NOT = { has_country_flag = EAI_show_army_priorities_decisions }
-			any_other_country = {
-				is_ai = yes
-				OR = {
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-					ROOT = { is_subject_of = FROM }
-				}
-			}
+			any_allied_country = { is_ai = yes }
 		}
     
 		cost = 0
@@ -112,24 +105,7 @@ EAI_diplomacy_DECISIONS = {
 							is_subject_of = ROOT
 						}
 					}
-					any_other_country = {
-						OR = {
-							is_in_faction_with = ROOT
-							is_subject_of = ROOT
-						}
-					}
-					OR = {
-						has_government = fascism
-						has_government = communism
-						AND = {
-							has_government = neutrality
-							threat > 0.4
-						}
-						AND = {
-							has_government = democratic
-							threat > 0.5
-						}
-					}
+					any_allied_country = { is_ai = yes }
 				}
 				
 				has_country_flag = EAI_coordinate_lend_lease_by_@ROOT
@@ -163,7 +139,7 @@ EAI_diplomacy_DECISIONS = {
 			
 			NOT = { has_global_flag = EAI_ignore_borders_@ROOT }
 			
-			any_country = { has_war_together_with = ROOT }
+			any_allied_country = { is_ai = yes }
 		}
     
 		cost = 0
@@ -180,6 +156,7 @@ EAI_diplomacy_DECISIONS = {
 			factor = 0
 		}
 	}
+
 	EAI_diplomacy_cancel_ignore_borders_DECISION = {
 		allowed = {}
     
@@ -358,6 +335,7 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 			factor = 0
 		}
 	}
+
 	EAI_diplomacy_cancel_stop_all_invasions_DECISION = {
 		allowed = {}
     
@@ -397,15 +375,7 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 		visible = {
 			has_country_flag = EAI_show_naval_invasion_decisions
 			has_war = yes
-			any_other_country = {
-				is_ai = yes
-				
-				OR = {
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-					ROOT = { is_subject_of = PREV }
-				}
-			}
+			any_allied_country = { is_ai = yes }
 			NOT = { FROM = { has_country_flag = EAI_coordinate_invasion_target_by_@ROOT } }
 			
 			FROM = {
@@ -477,6 +447,7 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 			factor = 0
 		}
 	}
+
 	EAI_diplomacy_cancel_naval_invasion_target_DECISION = {
 		allowed = {}
     
@@ -519,6 +490,55 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 
 EAI_diplomacy_lend_lease_DECISIONS = {
 	
+	EAI_diplomacy_lend_lease_self_DECISION = {
+		allowed = {}
+    
+		available = {
+			NOT = { command_power < 50 }
+		}
+    
+		visible = {
+			has_country_flag = EAI_show_lend_lease_decisions
+			
+			NOT = { has_country_flag = EAI_coordinate_lend_lease_by_@ROOT }
+		}
+    
+		cost = 0
+    
+		days_re_enable = 0
+    
+		complete_effect = {
+			add_command_power = -50
+
+			hidden_effect = {
+				set_country_flag = { flag = EAI_coordinate_lend_lease_by_@ROOT value = 1 days = 365 }
+				clr_country_flag = EAI_show_lend_lease_decisions
+			
+				every_country = {
+					limit = {
+						is_ai = yes
+						
+						NOT = { tag = ROOT }
+						
+						OR = {
+							is_in_faction_with = ROOT
+							is_subject_of = ROOT
+							ROOT = { is_subject_of = PREV }
+						}
+					}
+					
+					ROOT = { set_country_flag = { flag = EAI_coordinated_lend_lease_from_@PREV value = 1 days = 365 } }
+					
+					country_event = EAI_background.6 #refresh strategies
+				}
+			}
+		}
+    
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
 	EAI_diplomacy_lend_lease_DECISION = {
 		allowed = {}
     
@@ -535,45 +555,17 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 				OR = {
 					AND = { has_war = yes NOT = { has_war_with = ROOT } }
 					is_subject_of = ROOT
+					tag = ROOT
 				}
-			}
-			
-			any_other_country = {
-				is_ai = yes
-				
-				OR = {
-					is_subject_of = ROOT
-					is_in_faction_with = ROOT
-					ROOT = { is_subject_of = PREV }
-				}
-			}
-			
-			# LEND LEASING IS POSSIBLE
-			any_other_country = { 
-				OR = { 
-					AND = {
-						has_war = yes 
-						ROOT = {
-							OR = {
-								AND = { has_government = neutrality NOT = { threat < 0.4 } }
-								AND = { has_government = fascism }
-								AND = { has_government = communism }
-								AND = { has_government = democratic NOT = { threat < 0.5 } }
-							}
-						}
-					}
-					is_subject_of = ROOT
-				} 
 			}
 		}
     
 		target_trigger = {
-			is_ai = no
-    
 			FROM = {
 				OR = {
 					AND = { has_war = yes NOT = { has_war_with = ROOT } }
 					is_subject_of = ROOT
+					tag = ROOT
 				}
 			}
 		}
@@ -587,6 +579,7 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 
 			hidden_effect = {
 				set_country_flag = { flag = EAI_coordinate_lend_lease_by_@ROOT value = 1 days = 365 }
+				clr_country_flag = EAI_show_lend_lease_decisions
 			
 				every_country = {
 					limit = {
@@ -612,6 +605,7 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 			factor = 0
 		}
 	}
+
 	EAI_diplomacy_cancel_lend_lease_DECISION = {
 		allowed = {}
     
@@ -631,6 +625,8 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 		complete_effect = {
 			hidden_effect = {
 				clr_country_flag = EAI_coordinate_lend_lease_by_@ROOT
+
+				clr_country_flag = EAI_show_lend_lease_decisions
 			
 				every_other_country = {
 					limit = {

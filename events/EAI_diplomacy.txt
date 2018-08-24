@@ -19,7 +19,7 @@ country_event = { #default historical mode settings
 	option = { name = "OK" }
 }
 
-country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension - force it) # old
+country_event = { #SOV: winter war
 	id = EAI_DM.2
 	hidden = yes
 	fire_only_once = yes
@@ -44,7 +44,10 @@ country_event = { #SOV: winter war (AI doesnt generate wargoals on low tension -
 		SOV = { has_war = no }
 	}
 	immediate = {
-		country_event = finland.1
+		SOV = {
+			set_country_flag = { flag = EAI_declare_war_FIN value = 1 days = 180 }
+			set_country_flag = { flag = EAI_prepare_for_war_FIN value = 1 days = 180 }
+		}
 
 		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: winter war"
 	}
@@ -759,10 +762,12 @@ country_event = { # random ideology for generic nations
 		}
 	}
 
-	option = {
+	option = { name = "democratic"
 		trigger = { 
-			has_available_idea_with_traits = { idea = democratic_reformer limit = 1 } 
-			has_idea_with_trait = democratic_reformer
+			OR = {
+				has_available_idea_with_traits = { idea = democratic_reformer limit = 1 } 
+				has_idea_with_trait = democratic_reformer
+			}
 		}
 
 		ai_chance = {
@@ -776,12 +781,16 @@ country_event = { # random ideology for generic nations
 		}
 
 		set_country_flag = EAI_democratic_focus
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | IDEOLOGY FOCUS: democratic"
 	}
 
-	option = {
+	option = { name = "communist"
 		trigger = { 
-			has_available_idea_with_traits = { idea = communist_revolutionary limit = 1 } 
-			has_idea_with_trait = communist_revolutionary
+			OR = {
+				has_available_idea_with_traits = { idea = communist_revolutionary limit = 1 } 
+				has_idea_with_trait = communist_revolutionary
+			}
 		}
 
 		ai_chance = {
@@ -795,12 +804,16 @@ country_event = { # random ideology for generic nations
 		}
 
 		set_country_flag = EAI_communist_focus
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | IDEOLOGY FOCUS: communist"
 	}
 
-	option = {
+	option = { name = "fascist"
 		trigger = { 
-			has_available_idea_with_traits = { idea = fascist_demagogue limit = 1 } 
-			has_idea_with_trait = fascist_demagogue
+			OR = {
+				has_available_idea_with_traits = { idea = fascist_demagogue limit = 1 } 
+				has_idea_with_trait = fascist_demagogue
+			}
 		}
 
 		ai_chance = {
@@ -814,16 +827,20 @@ country_event = { # random ideology for generic nations
 		}
 
 		set_country_flag = EAI_fascist_focus
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | IDEOLOGY FOCUS: fascist"
 	}
 
-	option = {
+	option = { name = "neutral"
 		ai_chance = {
 			base = 1
 
-			modifier = { add = 1 EAI_nonaligned_nation = yes }
+			modifier = { add = 3 EAI_nonaligned_nation = yes }
 		}
 
 		set_country_flag = EAI_neutral_focus
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | IDEOLOGY FOCUS: neutral"
 	}
 }
 
@@ -858,6 +875,8 @@ country_event = {
 		if = { limit = { check_variable = { party_popularity@fascism > 0.5 } } 
 			set_country_flag = EAI_fascist_focus
 		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | IDEOLOGY FOCUS: neutral"
 	}
 
 	option = {}
@@ -895,11 +914,23 @@ country_event = {
 	id = EAI_DM_W.0
 	hidden = yes
 
-	mean_time_to_happen = { days = 365 }
+	mean_time_to_happen = { 
+		days = 365 
+
+		modifier = {
+			factor = 0.5
+			check_variable = { global.EAI_justification_aggressiveness = 2 }
+		}
+		modifier = {
+			factor = 0.25
+			check_variable = { global.EAI_justification_aggressiveness = 3 }
+		}
+	}
 
 	trigger = {
 		is_ai = yes
-		has_global_flag = EAI_random_wardec
+		date > 1936.4.1
+		has_variable = global.EAI_justification_aggressiveness
 		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
 
 		ROOT = { # basic requirements
@@ -923,8 +954,9 @@ country_event = {
 		}
 
 		OR = { # world threat requirement
-			AND = { is_historical_focus_on = no threat > 0.3 }
-			threat > 0.9
+			AND = { threat > 0.9 check_variable = { global.EAI_justification_aggressiveness = 1 } }
+			AND = { threat > 0.5 check_variable = { global.EAI_justification_aggressiveness = 2 } }
+			AND = { check_variable = { global.EAI_justification_aggressiveness = 3 } }
 		}
 
 		NOT = { # do not invade if losing
@@ -934,16 +966,24 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
 		any_country = {
 			EAI_is_threat = yes
-			NOT = { has_war_with = ROOT }
-			NOT = { has_non_aggression_pact_with = ROOT }
+			NOT = { 
+				has_war_with = ROOT 
+				has_non_aggression_pact_with = ROOT
+				ROOT = { has_country_flag = EAI_supports_@PREV }
+			}
 			OR = {
 				is_neighbor_of = ROOT
 				any_other_country = {
@@ -955,9 +995,13 @@ country_event = {
 					}
 				}
 			}
-			is_neighbor_of = ROOT
 			NOT = { ROOT = { has_opinion = { target = PREV value > 75 } } }
 			strength_ratio = { tag = ROOT ratio < 0.5 }
+			NOT = {
+				any_allied_country = {
+					strength_ratio = { tag = ROOT ratio > 1.5 }
+				}
+			}
 			ic_ratio = { tag = ROOT ratio < 1.5 }
 			check_variable = { num_divisions < Root.num_divisions }
 		}
@@ -967,8 +1011,11 @@ country_event = {
 		random_country = {
 			limit = {
 				EAI_is_threat = yes
-				NOT = { has_war_with = ROOT }
-				NOT = { has_non_aggression_pact_with = ROOT }
+				NOT = { 
+					has_war_with = ROOT 
+					has_non_aggression_pact_with = ROOT
+					ROOT = { has_country_flag = EAI_supports_@PREV }
+				}
 				OR = {
 					is_neighbor_of = ROOT
 					any_other_country = {
@@ -982,11 +1029,16 @@ country_event = {
 				}
 				NOT = { ROOT = { has_opinion = { target = PREV value > 75 } } }
 				strength_ratio = { tag = ROOT ratio < 0.5 }
-				ic_ratio = { tag = ROOT ratio < 1.0 }
+				NOT = {
+					any_allied_country = {
+						strength_ratio = { tag = ROOT ratio > 1.5 }
+					}
+				}
+				ic_ratio = { tag = ROOT ratio < 1.5 }
 				check_variable = { num_divisions < Root.num_divisions }
 			}
 
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 
@@ -1035,9 +1087,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1097,7 +1154,7 @@ country_event = {
 					is_neighbor_of = ROOT
 				}
 
-				ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 
 				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 
@@ -1145,7 +1202,7 @@ country_event = {
 					}
 				}
 
-				ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 
 				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 
@@ -1175,7 +1232,7 @@ country_event = {
 					check_variable = { num_divisions < Root.num_divisions }
 				}
 
-				ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 
 				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 
@@ -1219,9 +1276,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1262,7 +1324,7 @@ country_event = {
 	}
 	immediate = {
 		SOV = {
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 			
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 		}
@@ -1304,9 +1366,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1368,7 +1435,7 @@ country_event = {
 				}
 			}
 
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 
@@ -1409,9 +1476,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1442,7 +1514,7 @@ country_event = {
 	}
 	immediate = {
 		NEP = {
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 			
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 		}
@@ -1483,9 +1555,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1516,7 +1593,7 @@ country_event = {
 	}
 	immediate = {
 		BHU = {
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 			
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 		}
@@ -1566,9 +1643,14 @@ country_event = {
 			}
 		}
 
-		NOT = {
+		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { is_justifying_wargoal_against = PREV }
+				ROOT = { 
+					OR = {
+						has_country_flag = EAI_prepare_for_war_@PREV 
+						has_country_flag = EAI_declare_war_@PREV
+					}
+				}
 			}
 		}
 
@@ -1599,7 +1681,7 @@ country_event = {
 	}
 	immediate = {
 		TIB = {
-			ROOT = { add_ai_strategy = { type = conquer id = PREV value = 200 } }
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
 			
 			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
 		}
@@ -1611,43 +1693,19 @@ country_event = {
 
 ##### SOV war scripts
 
-# FIN: make sure USSR starts winter war on time
+#
 country_event = {
 	id = EAI_DM_W.30
 	hidden = yes
 	fire_only_once = yes
 	trigger = {
-		tag = SOV is_ai = yes has_government = communism is_historical_focus_on = yes
-
-		has_wargoal_against = FIN
-		has_war = no
-
-		NOT = {
-			SOV = { has_capitulated = yes }
-			SOV = { exists = no }
-			SOV = { is_subject = yes }
-		}
-
-		NOT = {
-			FIN = { has_capitulated = yes }
-			FIN = { exists = no }
-			FIN = { is_subject = yes }
-			FIN = { has_government = communism }
-			FIN = { is_in_faction = yes }
-			is_in_faction_with = FIN
-			has_war_with = FIN
-		}
+		always = no
 	}
-	immediate = {
-		if = { limit = { NOT = { has_war_with = FIN } } declare_war_on = { target = FIN type = take_state } }
-		set_country_flag = SOV_war_since_purge
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against FIN"
-	}
-	option = { name = "OK" }
+	option = {}
 }
 
-country_event = { # starts war justification after AI has had some time to move troops to this border
+# starts war justification after AI has had some time to move troops to this border
+country_event = { 
 	id = EAI_DM_W.1000
 	hidden = yes
 	
@@ -1660,10 +1718,7 @@ country_event = { # starts war justification after AI has had some time to move 
 
 	immediate = {
 		var:EAI_wardec_script_target_by_@ROOT = {
-			ROOT = {
-				add_ai_strategy = { type = declare_war id = PREV value = 5000 }
-				add_ai_strategy = { type = antagonize id = PREV value = 5000 }
-			}
+			ROOT = { set_country_flag = { flag = EAI_declare_war_@PREV value = 1 days = 365 } }
 		}
 
 		clear_variable = EAI_wardec_script_target_by_@ROOT
@@ -1765,9 +1820,9 @@ country_event = { # add strategies on failure
 		
 		event_target:EAI_illegal_wargoal_target = {
 		
-			ROOT = { set_country_flag = EAI_supports_@PREV } 
+			ROOT = { set_country_flag = { flag = EAI_supports_@PREV value = 1 days = 365 } } 
 			
-			set_country_flag = EAI_receives_support_@THIS
+			set_country_flag = { flag = EAI_receives_support_@THIS value = 1 days = 365 }
 			
 			country_event = { id = EAI_DM.10005 days = 5 random = 5 }
 		}
@@ -2110,9 +2165,9 @@ country_event = { # add ai strategies on wardec
 		
 		event_target:EAI_illegal_wardec_target = {
 		
-			ROOT = { set_country_flag = EAI_supports_@PREV } 
+			ROOT = { set_country_flag = { flag = EAI_supports_@PREV value = 1 days = 365 } } 
 			
-			set_country_flag = EAI_receives_support_@THIS
+			set_country_flag = { flag = EAI_receives_support_@THIS value = 1 days = 365 }
 		}
 		
 		add_ai_strategy = { type = send_volunteers_desire id = event_target:EAI_illegal_wardec_target value = 200 }

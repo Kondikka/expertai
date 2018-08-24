@@ -175,6 +175,8 @@ NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 
 --NDefines.NDiplomacy.JOIN_FACTION_LIMIT_CHANGE_AT_WAR = 0.2
 
+--NDefines.NAI.MAX_EXTRA_WARGOAL_GENERATION = 5
+
 --------------------------------------------------------------------------------------------------------------
 -- ECONOMY
 --------------------------------------------------------------------------------------------------------------
@@ -416,7 +418,7 @@ NDefines.NAI.LAND_COMBAT_INTERCEPT_PER_PLANE = 0                                
 --NDefines.NAI.STR_BOMB_INFRA_IMPORTANCE_FACTOR = 0.25                             -- [0.25] -- Factor of infrastructure influence on strategic importance ( 0.0 - 1.0 )
 --NDefines.NAI.STR_BOMB_IMPORTANCE_SCALE = 1.0                                     -- [1.0]  -- str bombing total importance scale (every str bombing score get's multiplied by it)
 
-NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 1000                            -- [300]  -- If amount of enemy fighters is higher than this mission won't perform
+NDefines.NAI.STR_BOMB_MIN_ENEMY_FIGHTERS_IN_AREA = 400                            -- [300]  -- If amount of enemy fighters is higher than this mission won't perform
 --NDefines.NAI.STR_BOMB_FIGHTERS_PER_PLANE = 1.1                                   -- [1.1]  -- Amount of air superiority planes requested per enemy plane
 --NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 20                                -- [20]   -- Amount of planes requested per enemy civ factory
 --NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 25                                -- [25]   -- Amount of planes requested per enemy military factory

@@ -15,60 +15,20 @@ EAI_i_pol = {
 		tag = SOV
 		is_historical_focus_on = yes
 		date < 1940.2.1
+		NOT = { has_country_flag = EAI_declare_war_@POL }
 	}
 	abort = {
-		NOT = { date < 1940.2.1 }
+		NOT = { 
+			AND = {
+				date < 1940.2.1
+				NOT = { has_country_flag = EAI_declare_war_@POL }
+			}
+		}
 	}
 	ai_strategy = {
 		type = ignore
 		id = "POL"			
 		value = 1000
-	}	
-}
-
-EAI_i_ger = {
-	enable = {
-		tag = SOV
-		is_historical_focus_on = yes
-		has_war_with = JAP
-		JAP = { has_capitulated = no }
-	}
-	abort = {
-		OR = { 
-			JAP = { has_capitulated = yes }
-			JAP = { exists = no }
-			JAP = { is_subject = yes }
-			JAP = { surrender_progress > 0.5 }
-			is_in_faction_with = JAP
-		}
-	}
-	ai_strategy = {
-		type = ignore
-		id = "GER"			
-		value = 500
-	}	
-}
-
-EAI_i_jap = {
-	enable = {
-		tag = SOV
-		is_historical_focus_on = yes
-		has_war_with = GER
-		GER = { has_capitulated = no }
-	}
-	abort = {
-		OR = { 
-			GER = { has_capitulated = yes }
-			GER = { exists = no }
-			GER = { is_subject = yes }
-			GER = { surrender_progress > 0.5 }
-			is_in_faction_with = GER
-		}
-	}
-	ai_strategy = {
-		type = ignore
-		id = "JAP"			
-		value = 500
 	}	
 }
 
@@ -80,35 +40,57 @@ EAI_i_fin2 = {
 		146 = { is_owned_by = SOV }
 		
 		NOT = { 
+			has_country_flag = EAI_declare_war_@FIN
+			has_country_flag = EAI_declare_war_@SWE
+			has_country_flag = EAI_declare_war_@NOR
+
 			GER = { has_capitulated = yes }
 			GER = { exists = no }
 			GER = { is_subject = yes }
 			is_in_faction_with = GER
 		}
+
 		GER = { has_government = fascism }
 	}
 	abort = {
-		OR = { 
-			GER = { has_capitulated = yes }
-			GER = { exists = no }
-			GER = { is_subject = yes }
-			is_in_faction_with = GER
+		NOT = {
+			AND = {
+				146 = { is_owned_by = SOV }
+		
+				NOT = { 
+					has_country_flag = EAI_declare_war_@FIN
+					has_country_flag = EAI_declare_war_@SWE
+					has_country_flag = EAI_declare_war_@NOR
+
+					GER = { has_capitulated = yes }
+					GER = { exists = no }
+					GER = { is_subject = yes }
+					is_in_faction_with = GER
+				}
+
+				GER = { has_government = fascism }
+			}
 		}
 	}
 	ai_strategy = {
 		type = ignore
 		id = "FIN"			
-		value = 300
+		value = 1000
 	}	
+	ai_strategy = {
+		type = ignore_claim
+		id = "FIN"			
+		value = 1000
+	}
 	ai_strategy = {
 		type = ignore
 		id = "SWE"			
-		value = 300
+		value = 1000
 	}
 	ai_strategy = {
 		type = ignore
 		id = "NOR"			
-		value = 300
+		value = 1000
 	}
 }
 
@@ -219,75 +201,49 @@ stop_early_conquest = {
 		tag = SOV
 		NOT = { date > 1939.11.1 }
 		is_historical_focus_on = yes
-	}
-	abort = {
-		date > 1939.11.1
-	}
-	
-	ai_strategy = {
-		type = ignore
-		id = "FIN"			
-		value = 1000
-	}	
-	ai_strategy = {
-		type = ignore
-		id = "EST"			
-		value = 1000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "LAT"			
-		value = 1000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "LIT"			
-		value = 1000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "ROM"			
-		value = 1000
-	}
-}
 
-EAI_c_fin = {
-	enable = {
-		tag = SOV
-		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
-		country_exists = FIN
-		146 = { is_controlled_by = FIN }
-		has_war = no
-		is_historical_focus_on = yes
-		date < 1941.1.1
-		date > 1939.11.1
+		NOT = {
+			has_country_flag = EAI_declare_war_FIN
+			has_country_flag = EAI_declare_war_EST
+			has_country_flag = EAI_declare_war_LIT
+			has_country_flag = EAI_declare_war_LAT
+		}
 	}
 	abort = {
 		OR = {
-			NOT = {
-				country_exists = FIN
-			}
-			NOT = { 146 = { is_controlled_by = FIN } }
-			has_war = yes
-			NOT = { date < 1941.1.1 }
+			date > 1939.11.1
+			has_country_flag = EAI_declare_war_FIN	
+			has_country_flag = EAI_declare_war_EST
+			has_country_flag = EAI_declare_war_LIT
+			has_country_flag = EAI_declare_war_LAT
 		}
 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "FIN"			
-		value = 2000
-	}	
-	ai_strategy = {
-		type = conquer
-		id = "FIN"			
-		value = 2000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "FIN"			
-		value = -1000
-	}	
+ 	ai_strategy = {
+ 		type = ignore
+ 		id = "FIN"			
+ 		value = 1000
+ 	}	
+ 	ai_strategy = {
+ 		type = ignore
+ 		id = "EST"			
+ 		value = 1000
+ 	}
+ 	ai_strategy = {
+ 		type = ignore
+ 		id = "LAT"			
+ 		value = 1000
+ 	}
+ 	ai_strategy = {
+ 		type = ignore
+ 		id = "LIT"			
+ 		value = 1000
+ 	}
+ 	ai_strategy = {
+ 		type = ignore
+ 		id = "ROM"			
+ 		value = 1000
+ 	}
 }
 
 EAI_c_est = {
@@ -295,33 +251,30 @@ EAI_c_est = {
 		tag = SOV
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = EST
-		NOT = { 146 = { is_controlled_by = FIN } }
+		NOT = { 13 = { is_controlled_by = SOV } }
 		has_war = no
 		is_historical_focus_on = yes
 		date < 1941.1.1
+		date > 1940.1.1
 	}
 	abort = {
-		OR = {
-			NOT = { country_exists = EST }
-			has_war = yes
+		NOT = {
+			AND = {
+				OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
+				country_exists = EST
+				NOT = { 13 = { is_controlled_by = SOV } }
+				has_war = no
+				is_historical_focus_on = yes
+				date < 1941.1.1
+				date > 1940.1.1
+			}
 		}
 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "EST"			
-		value = 1000
-	}	
-	ai_strategy = {
-		type = conquer
-		id = "EST"			
-		value = 1000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "EST"			
-		value = -1000
-	}	
+	ai_strategy = { type = antagonize id = "EST" value = 1000 }	
+	ai_strategy = { type = declare_war id = "EST" value = 5000 }
+	ai_strategy = { type = conquer id = "EST" value = 1000 }
+	ai_strategy = { type = ignore id = "EST" value = -1000 }	
 }
 
 EAI_c_lat = {
@@ -329,33 +282,30 @@ EAI_c_lat = {
 		tag = SOV
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = LAT
-		NOT = { 146 = { is_controlled_by = FIN } }
+		NOT = { 12 = { is_controlled_by = SOV } }
 		has_war = no
 		is_historical_focus_on = yes
 		date < 1941.1.1
+		date > 1940.1.1
 	}
 	abort = {
-		OR = {
-			NOT = { country_exists = LAT }
-			has_war = yes
+		NOT = {
+			AND = {
+				OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
+				country_exists = LAT
+				NOT = { 12 = { is_controlled_by = SOV } }
+				has_war = no
+				is_historical_focus_on = yes
+				date < 1941.1.1
+				date > 1940.1.1
+			}
 		}
 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "LAT"			
-		value = 1000
-	}	
-	ai_strategy = {
-		type = conquer
-		id = "LAT"			
-		value = 1000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "LAT"			
-		value = -1000
-	}	
+	ai_strategy = { type = antagonize id = "LAT" value = 1000 }	
+	ai_strategy = { type = declare_war id = "LAT" value = 5000 }
+	ai_strategy = { type = conquer id = "LAT" value = 1000 }
+	ai_strategy = { type = ignore id = "LAT" value = -1000 }		
 }
 
 EAI_c_lit = {
@@ -363,38 +313,71 @@ EAI_c_lit = {
 		tag = SOV
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = LIT
-		NOT = { 146 = { is_controlled_by = FIN } }
+		NOT = { 189 = { is_controlled_by = SOV } }
 		has_war = no
 		is_historical_focus_on = yes
 		date < 1941.1.1
+		date > 1940.1.1
 	}
 	abort = {
-		OR = {
-			NOT = { country_exists = LIT }
-			has_war = yes
+		NOT = {
+			AND = {
+				OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
+				country_exists = LIT
+				NOT = { 189 = { is_controlled_by = SOV } }
+				has_war = no
+				is_historical_focus_on = yes
+				date < 1941.1.1
+				date > 1940.1.1
+			}
 		}
 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "LIT"			
-		value = 1000
-	}	
-	ai_strategy = {
-		type = conquer
-		id = "LIT"			
-		value = 1000
+	ai_strategy = { type = antagonize id = "LIT" value = 1000 }	
+	ai_strategy = { type = declare_war id = "LIT" value = 5000 }
+	ai_strategy = { type = conquer id = "LIT" value = 1000 }
+	ai_strategy = { type = ignore id = "LIT" value = -1000 }	
+}
+
+EAI_c_rom = {
+	enable = {
+		tag = SOV
+		has_global_flag = sov_yes_pact
+		country_exists = ROM
+		NOT = { 78 = { is_controlled_by = SOV } }
+		has_war = no
+		is_historical_focus_on = yes
+		date < 1942.1.1
+		date > 1940.1.1
 	}
-	ai_strategy = {
-		type = ignore
-		id = "LIT"			
-		value = -1000
-	}	
+	abort = {
+		NOT = {
+			AND = {
+				has_global_flag = sov_yes_pact
+				country_exists = ROM
+				NOT = { 78 = { is_controlled_by = SOV } }
+				has_war = no
+				is_historical_focus_on = yes
+				date < 1942.1.1
+				date > 1940.1.1
+			}
+		}
+	}
+	
+	ai_strategy = { type = antagonize id = "ROM" value = 1000 }	
+	ai_strategy = { type = declare_war id = "ROM" value = 5000 }
+	ai_strategy = { type = conquer id = "ROM" value = 1000 }
+	ai_strategy = { type = ignore id = "ROM" value = -1000 }	
 }
 
 EAI_i_baltic = {
 	enable = {
 		tag = SOV
+		NOT = { 
+			has_country_flag = EAI_declare_war_@LIT 
+			has_country_flag = EAI_declare_war_@LAT 
+			has_country_flag = EAI_declare_war_@EST 
+		}
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		146 = { is_controlled_by = FIN }
 		has_war = no
@@ -404,6 +387,9 @@ EAI_i_baltic = {
 	abort = {
 		OR = {
 			has_war = yes
+			has_country_flag = EAI_declare_war_@LIT 
+			has_country_flag = EAI_declare_war_@LAT 
+			has_country_flag = EAI_declare_war_@EST 
 			NOT = { date < 1940.6.1 }
 			NOT = { 146 = { is_controlled_by = FIN } }
 		}
