@@ -436,6 +436,14 @@ country_event = { # queue up more factories periodically, scale roughly with con
 			
 			EAI_queue_AIR = yes
 		}
+
+		if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_state_0 = yes } } } 
+			random_list = {
+				1 = { EAI_queue_CFORT_BASES = yes }
+				1 = { EAI_queue_FORT_CITIES = yes }
+				1 = { EAI_queue_FORT_BORDER = yes }
+			}
+		}
 		
 		#########
 		
@@ -480,6 +488,10 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
+
+			if = { limit = { has_war = yes } 
+				EAI_queue_CFORT_BASES = yes
+			}
 
 			if = {
 				limit = {
@@ -694,6 +706,10 @@ country_event = { # queue up more factories periodically, scale roughly with con
 
 			EAI_queue_INF_supply = yes
 			EAI_queue_INF_supply = yes
+
+			if = { limit = { has_war = yes } 
+				EAI_queue_CFORT_COAST = yes
+			}
 
 			if = { 
 				limit = { 
@@ -1729,7 +1745,23 @@ country_event = { # use free CIC to build infrastructure
 	}
 
 	immediate = {
-		EAI_queue_INF = yes
+		if = { 
+			limit = { 
+				any_state = {
+					is_controlled_by = ROOT
+					free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+				}
+			}
+			EAI_queue_INF = yes
+		}
+		
+		else_if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_state_0 = yes } } } 
+			random_list = {
+				1 = { EAI_queue_CFORT_BASES = yes }
+				1 = { EAI_queue_FORT_CITIES = yes }
+				1 = { EAI_queue_FORT_BORDER = yes }
+			}
+		}
 
 		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queuing INF with free factories"
 	}
@@ -1912,19 +1944,11 @@ country_event = { #ITA coastal forts
 		
 		every_state = {
 			limit = {
-				CONTROLLER = { original_tag = ITA }
+				is_controlled_by = ROOT
 				is_in_home_area = yes
 			}
 			
-			add_building_construction = {
-				type = coastal_bunker
-				province = {
-					all_provinces = yes
-					limit_to_naval_base = yes
-				}
-				level = 1
-				instant_build = no
-			}
+			EAI_add_CFORT_BASE = yes
 		}
 	}
 	option = {}
@@ -1947,33 +1971,12 @@ country_event = { #SWI
 	immediate = {
 		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
 		
-		every_state = {
-			limit = {
-				CONTROLLER = { original_tag = SWI }
-				is_in_home_area = yes
-			}
-			
-			add_building_construction = {
-				type = bunker
-				province = {
-					all_provinces = yes
-					limit_to_border = yes
-				}
-				level = 2
-				instant_build = no
-			}
-		}
+		EAI_queue_FORT_BORDER = yes
+		EAI_queue_FORT_BORDER = yes
 		
 		capital_scope = {
-			add_building_construction = {
-				type = bunker
-				province = {
-					all_provinces = yes
-					limit_to_victory_point = yes
-				}
-				level = 2
-				instant_build = no
-			}
+			EAI_add_FORT_CITY = yes
+			EAI_add_FORT_CITY = yes
 		}
 	}
 	option = {}
@@ -1999,19 +2002,12 @@ country_event = { #SPR
 
 		every_state = {
 			limit = {
-				CONTROLLER = { original_tag = SPR }
+				is_controlled_by = ROOT
 				OR = { state = 165 state = 166 state = 172 }
 			}
 			
-			add_building_construction = {
-				type = bunker
-				province = {
-					all_provinces = yes
-					limit_to_border = yes
-				}
-				level = 2
-				instant_build = no
-			}
+			EAI_add_FORT_BORDER = yes
+			EAI_add_FORT_BORDER = yes
 		}
 	}
 	option = {}
@@ -2035,19 +2031,12 @@ country_event = { #TUR
 
 		every_state = {
 			limit = {
-				CONTROLLER = { original_tag = TUR }
-				OR = { state = 314 }
+				is_controlled_by = ROOT
+				OR = { state = 341 }
 			}
 			
-			add_building_construction = {
-				type = bunker
-				province = {
-					all_provinces = yes
-					limit_to_border = yes
-				}
-				level = 2
-				instant_build = no
-			}
+			EAI_add_FORT_BORDER = yes
+			EAI_add_FORT_BORDER = yes
 		}
 	}
 	option = {}
@@ -2115,16 +2104,7 @@ country_event = { #GENERIC
 			
 			set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 1000 }
 			
-			add_building_construction = {
-				type = bunker
-				province = {
-					all_provinces = yes
-					limit_to_victory_point = yes
-					level < 1
-				}
-				level = 2
-				instant_build = no
-			}
+			EAI_add_FORT_CITY = yes
 		}
 		
 		capital_scope = { # build forts on capital
@@ -2133,16 +2113,8 @@ country_event = { #GENERIC
 			
 				set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 1000 }
 		
-				add_building_construction = {
-					type = bunker
-					province = {
-						all_provinces = yes
-						limit_to_victory_point = yes
-						level < 2
-					}
-					level = 2
-					instant_build = no
-				}
+				EAI_add_FORT_CITY = yes
+				EAI_add_FORT_CITY = yes
 			}
 		}
 	}
@@ -2151,7 +2123,7 @@ country_event = { #GENERIC
 
 ########################### misc
 
-country_event = { #SOV: fix supply route to the east
+country_event = { #SOV: fix supply route to the east + naval base in archangelsk
 	id = EAI_C.10000
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
@@ -2167,14 +2139,30 @@ country_event = { #SOV: fix supply route to the east
 	immediate = {
 		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: SOV supply route fix"
 
-		if = { limit = { 40 = { controller = { original_tag = SOV } } }
+		if = { limit = { 40 = { controller = { tag = ROOT } } }
 			40 = { EAI_add_INF = yes EAI_add_INF = yes EAI_add_INF = yes }
 		}
-		if = { limit = { 563 = { controller = { original_tag = SOV } } }
+		if = { limit = { 563 = { controller = { tag = ROOT } } }
 			563 = { EAI_add_INF = yes EAI_add_INF = yes EAI_add_INF = yes }
 		}
-		if = { limit = { 657 = { controller = { original_tag = SOV } } }
+		if = { limit = { 657 = { controller = { tag = ROOT } } }
 			657 = { EAI_add_INF = yes EAI_add_INF = yes EAI_add_INF = yes }
+		}
+
+		# Naval base
+		if = { limit = { 214 = { controller = { tag = ROOT } } }
+			214 = { 
+				add_building_construction = {
+					type = naval_base
+					province = {
+						all_provinces = yes
+						limit_to_naval_base = yes
+						level < 10
+					}
+					level = 7
+					instant_build = no
+				}
+			}
 		}
 	}
 	option = {}

@@ -35,6 +35,70 @@ EAI_add_AA = {
 	add_building_construction = { type = anti_air_building level = 1 instant_build = no }
 }
 
+EAI_add_FORT_CITY = {
+	add_building_construction = {
+		type = bunker
+		province = {
+			all_provinces = yes
+			limit_to_victory_point = yes
+		}
+		level = 1
+		instant_build = no
+	}
+
+	add_to_variable = { EAI_forts_constructed_on_cities_@ROOT = 1 }
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_add_FORT_CITY"
+}
+
+EAI_add_FORT_BORDER = {
+	add_building_construction = {
+		type = bunker
+		province = {
+			all_provinces = yes
+			limit_to_border = yes
+		}
+		level = 1
+		instant_build = no
+	}
+
+	add_to_variable = { EAI_forts_constructed_on_border_@ROOT = 1 }
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_add_FORT_BORDER"
+}
+
+EAI_add_CFORT_BASE = {
+	add_building_construction = {
+		type = coastal_bunker
+		province = {
+			all_provinces = yes
+			limit_to_naval_base = yes
+		}
+		level = 1
+		instant_build = no
+	}
+
+	add_to_variable = { EAI_forts_constructed_on_bases_@ROOT = 1 }
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_add_CFORT_BASE"
+}
+
+EAI_add_CFORT_COAST = {
+	add_building_construction = {
+		type = coastal_bunker
+		province = {
+			all_provinces = yes
+			limit_to_coastal = yes
+		}
+		level = 1
+		instant_build = no
+	}
+
+	add_to_variable = { EAI_forts_constructed_on_coast_@ROOT = 1 }
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_add_CFORT_COAST"
+}
+
 ######################################################
 
 EAI_queue_AIR = {
@@ -2119,7 +2183,6 @@ EAI_queue_NIC = { # queue NIC if possible, else queue MIC
 			
 				else = { random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
 			}
-			
 		}
 		else_if = {
 			limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes } }
@@ -2133,7 +2196,6 @@ EAI_queue_NIC = { # queue NIC if possible, else queue MIC
 			
 				else = { random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
 			}
-			
 		}
 		else_if = {
 			limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_no_border = yes } }
@@ -2392,4 +2454,57 @@ EAI_queue_REF = { # build only in home area, else queue MIC
 	}
 	
 	else = { EAI_queue_MIC_2 = yes }
+}
+
+EAI_queue_FORT_CITIES = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_in_home_area = yes 
+			EAI_has_city = yes 
+			check_variable = { EAI_forts_constructed_on_cities_@ROOT < 3 }
+		} 
+		
+		EAI_add_FORT_CITY = yes 
+	}
+}
+
+EAI_queue_FORT_BORDER = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			NOT = { EAI_no_border = yes } 
+			is_in_home_area = yes 
+			check_variable = { EAI_forts_constructed_on_border_@ROOT < 3 }
+		} 
+		
+		EAI_add_FORT_BORDER = yes 
+	}
+}
+
+EAI_queue_CFORT_BASES = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_coastal = yes 
+			is_in_home_area = yes 
+			EAI_has_naval_base = yes 
+			check_variable = { EAI_forts_constructed_on_bases_@ROOT < 3 }
+		} 
+			
+		EAI_add_CFORT_BASE = yes 
+	}
+}
+
+EAI_queue_CFORT_COAST = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_coastal = yes 
+			is_in_home_area = yes 
+			check_variable = { EAI_forts_constructed_on_coast_@ROOT < 3 }
+		} 
+			
+		EAI_add_CFORT_COAST = yes 
+	}
 }
