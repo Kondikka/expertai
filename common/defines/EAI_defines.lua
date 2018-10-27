@@ -4,7 +4,7 @@
 	
 NDefines.NCountry.SUPPLY_PATH_MAX_DISTANCE = 8 					-- When supply route reach more than X nodes, the manpower+equipment delivery speed reach 100% penalty.
 NDefines.NCountry.REINFORCEMENT_DELIVERY_SPEED_MIN = 0.5 			-- The distance from the supply region to capital should affect the speed only a little bit. Main factor for penalty is overcrowded areas, and not the route length.
-NDefines.NCountry.REINFORCEMENT_EQUIPMENT_DELIVERY_SPEED = 0.009 	-- Modifier for army equipment reinforcement speed
+NDefines.NCountry.REINFORCEMENT_EQUIPMENT_DELIVERY_SPEED = 0.012 	-- Modifier for army equipment reinforcement speed
 NDefines.NCountry.REINFORCEMENT_MANPOWER_DELIVERY_SPEED = 80 	-- Modifier for army manpower reinforcement delivery speed (travel time)
 	
 NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.10 -- 0.25

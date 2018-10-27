@@ -102,7 +102,7 @@ EAI_special_division_limits = {
 			JAP = { is_ai = yes }
 		}
 
-		set_variable = { EAI_division_cap = 25 }
+		clamp_variable = { EAI_division_cap min = 0 max = 25 }
 	}
 
 	else_if = { 
@@ -114,7 +114,7 @@ EAI_special_division_limits = {
 			is_subject = no
 		}
 
-		set_variable = { EAI_division_cap = 40 }
+		clamp_variable = { EAI_division_cap min = 0 max = 40 }
 	}
 
 	else_if = { 
@@ -141,7 +141,7 @@ EAI_special_division_limits = {
 			date < 1941.1.1
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 10 }
+		set_variable = { EAI_division_cap = 0 }
 	}
 
 	else_if = { 
@@ -1057,7 +1057,7 @@ EAI_recruit_marshal = {
 	### ratio of generals:marshals
 
 	set_temp_variable = { EAI_generals_needed = num_divisions }
-	divide_temp_variable = { EAI_generals_needed = 24 }
+	divide_temp_variable = { EAI_generals_needed = 18 }  # divisions per general
 	set_temp_variable = { EAI_marshal_count = 0 } 
 
 	every_army_leader = { 
@@ -1068,35 +1068,71 @@ EAI_recruit_marshal = {
 
 	divide_temp_variable = { EAI_generals_needed = EAI_marshal_count }
 
-	### cost of recruiting a new general
-
-	set_temp_variable = { EAI_recruit_cost = 0 }
-	
-	every_army_leader = {
-		add_to_temp_variable = { ROOT.EAI_recruit_cost = 1 }
-	}
-
-	multiply_temp_variable = { EAI_recruit_cost = 5 }
+	### Check if a new marshal is needed
 
 	if = { 
 		limit = { 
 			OR = {
-				check_variable = { EAI_generals_needed > 5 }
-				check_variable = { EAI_generals_needed < 0 } # was divided by 0
+				check_variable = { EAI_marshal_count < 2 } # get at least 2 marshals
+				check_variable = { EAI_generals_needed > 3.5 } # there are currently over this many generals ideally per marshal
 			}
-			NOT = { check_variable = { political_power < EAI_recruit_cost } }
-			NOT = { command_power < 30 }
 		} 
 
-		multiply_temp_variable = { EAI_recruit_cost = -1 }
-		add_political_power = EAI_recruit_cost
-		add_command_power = -30
-		
-		create_field_marshal = {
-			skill = 1
+		### Check if it possible to recruit a new field marshal, else check if a general should be promoted
+
+		set_temp_variable = { EAI_recruit_cost = 0 }
+	
+		every_army_leader = {
+			add_to_temp_variable = { ROOT.EAI_recruit_cost = 1 }
 		}
 
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RECRUIT: marshal"
+		multiply_temp_variable = { EAI_recruit_cost = 5 }
+
+		if = { # recruit a new marshal
+			limit = {
+				NOT = { check_variable = { political_power < EAI_recruit_cost } } # recruitment cost
+				NOT = { command_power < 30 } # promotion cost
+			}
+
+			multiply_temp_variable = { EAI_recruit_cost = -1 }
+			add_political_power = EAI_recruit_cost
+			add_command_power = -30
+
+			create_field_marshal = {
+				skill = 1
+			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RECRUIT: marshal"
+
+			else = { # promote a general
+			
+				set_temp_variable = { EAI_general_count = 0 }
+				set_temp_variable = { EAI_divs_per_general = num_divisions }
+				every_army_leader = { limit = { NOT = { is_field_marshal = yes } }
+
+					add_to_temp_variable = { ROOT.EAI_general_count = 1 } # count the number of generals
+				}
+
+				divide_temp_variable = { EAI_divs_per_general = EAI_general_count }
+
+				if = { 
+					limit = { 
+						check_variable = { EAI_general_count > 5 }
+						check_variable = { EAI_divs_per_general < 18 }
+						NOT = { command_power < 30 } # promotion cost
+					}
+
+					random_army_leader = { limit = { NOT = { is_field_marshal = yes } }
+
+						promote_leader = THIS
+					}
+
+					add_command_power = -30
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PROMOTE: marshal"
+				}
+			}
+		}
 	}
 }
 
