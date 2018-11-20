@@ -150,18 +150,67 @@ EAI_can_take_war_economy = {
 	OR = {
 		NOT = { has_idea = tot_economic_mobilisation }
 
-		AND = {
+		AND = { # completely out of manpower
 			has_idea = tot_economic_mobilisation
 
-			NOT = { has_manpower > 1000000 }
+			has_manpower < 10000
+			NOT = { has_country_flag = EAI_mobilizing_manpower }
+		}
+
+		AND = { # downgrade when low on manpower
+			has_idea = tot_economic_mobilisation
+
+			NOT = { has_manpower > 100000 }
 
 			OR = {
 				has_idea = all_adults_serve
 				has_idea = scraping_the_barrel
 				has_idea = service_by_requirement
 			}
+
+			NOT = { has_country_flag = EAI_mobilizing_manpower }
+
+			NOT = { # switch tech first
+				AND = {
+					has_tech = modern_blitzkrieg
+					NOT = { has_tech = volkssturm }
+				}
+			}
+
+			NOT = { # take women in workforce first
+				AND = {
+					NOT = { has_decision = women_in_the_workforce }
+					has_war = yes
+            		OR = {
+            		    AND = {
+            		        has_government = democratic
+            		        has_war_support > 0.79
+            		    }
+            		    AND = {
+            		        has_government = communism
+            		        has_war_support > 0.79
+            		    }
+            		    AND = {
+            		        has_government = fascism
+            		        OR = {
+            		            has_war_support > 0.89
+            		            surrender_progress > 0
+            		        }
+            		    }
+            		    AND = {
+            		        has_government = neutrality
+            		        has_war_support > 0.84
+            		        has_stability > 0.7
+            		    }
+            		}
+				}
+			}
 		}
 	}
+
+	has_war_support > 0.55 # to avoid the AI having to demobilize
+
+	###
 
 	if = { limit = { original_tag = GER }
 		OR = {
@@ -176,8 +225,6 @@ EAI_can_take_war_economy = {
 			is_historical_focus_on = no
 		}
 	}
-
-	has_war_support > 0.55 # to avoid the AI having to demobilize
 
 	########## LAW REQUIREMENTS
 
@@ -214,14 +261,41 @@ EAI_can_take_war_economy = {
 EAI_can_take_tot_economic_mobilisation = {
 	########## AI LOGIC
 
-	original_tag = SOV
+	has_stability > 0.5
 
-	has_manpower > 1000000
+	OR = {
+		AND = {
+			has_manpower > 150000
 
-	NOT = {
-		has_idea = service_by_requirement
-		has_idea = all_adults_serve
-		has_idea = scraping_the_barrel
+			# needs to be able to take women in workforce decision to counteract the manpower reduction
+			NOT = { has_decision = women_in_the_workforce }
+			OR = { # decision requirements
+   			    AND = { 
+   			        has_government = democratic
+   			        has_war_support > 0.79
+   			    }
+   			    AND = {
+   			        has_government = communism
+   			        has_war_support > 0.79
+   			    }
+   			    AND = {
+   			        has_government = fascism
+   			        OR = {
+   			            has_war_support > 0.89
+   			            surrender_progress > 0
+   			        }
+   			    }
+   			    AND = {
+   			        has_government = neutrality
+   			        has_war_support > 0.84
+   			        has_stability > 0.7§§!
+   			    }
+   			}
+		}
+		AND = {
+			NOT = { has_decision = women_in_the_workforce }
+			has_manpower > 1000000
+		}
 	}
 
 	########## LAW REQUIREMENTS
@@ -422,36 +496,7 @@ EAI_can_take_service_by_requirement = {
 
 	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
 
-	if = { 		limit = { has_army_manpower = { size < 1900000 } } has_manpower < 500000 }
-	else_if = { limit = { has_army_manpower = { size < 2000000 } } has_manpower < 530000 }
-	else_if = { limit = { has_army_manpower = { size < 2100000 } } has_manpower < 530000 }
-	else_if = { limit = { has_army_manpower = { size < 2100000 } } has_manpower < 530000 }
-	else_if = { limit = { has_army_manpower = { size < 2200000 } } has_manpower < 550000 }
-	else_if = { limit = { has_army_manpower = { size < 2300000 } } has_manpower < 580000 }
-	else_if = { limit = { has_army_manpower = { size < 2400000 } } has_manpower < 600000 }
-	else_if = { limit = { has_army_manpower = { size < 2500000 } } has_manpower < 630000 }
-	else_if = { limit = { has_army_manpower = { size < 2600000 } } has_manpower < 650000 }
-	else_if = { limit = { has_army_manpower = { size < 2700000 } } has_manpower < 680000 }
-	else_if = { limit = { has_army_manpower = { size < 2800000 } } has_manpower < 700000 }
-	else_if = { limit = { has_army_manpower = { size < 2900000 } } has_manpower < 730000 }
-
-	else_if = { limit = { has_army_manpower = { size < 3000000 } } has_manpower < 750000 }
-	else_if = { limit = { has_army_manpower = { size < 3200000 } } has_manpower < 800000 }
-	else_if = { limit = { has_army_manpower = { size < 3400000 } } has_manpower < 850000 }
-	else_if = { limit = { has_army_manpower = { size < 3600000 } } has_manpower < 900000 }
-	else_if = { limit = { has_army_manpower = { size < 3800000 } } has_manpower < 950000 }
-
-	else_if = { limit = { has_army_manpower = { size < 4000000 } } has_manpower < 1050000 }
-	else_if = { limit = { has_army_manpower = { size < 4200000 } } has_manpower < 1100000 }
-	else_if = { limit = { has_army_manpower = { size < 4400000 } } has_manpower < 1150000 }
-	else_if = { limit = { has_army_manpower = { size < 4600000 } } has_manpower < 1200000 }
-	else_if = { limit = { has_army_manpower = { size < 4800000 } } has_manpower < 1250000 }
-
-	else_if = { limit = { has_army_manpower = { size < 5000000 } } has_manpower < 1250000 }
-	else_if = { limit = { has_army_manpower = { size < 5200000 } } has_manpower < 1300000 }
-	else_if = { limit = { has_army_manpower = { size < 5400000 } } has_manpower < 1350000 }
-	else_if = { limit = { has_army_manpower = { size < 5600000 } } has_manpower < 1400000 }
-	else_if = { limit = { has_army_manpower = { size < 5800000 } } has_manpower < 1450000 }
+	has_manpower < 1000000
 
 	########## LAW REQUIREMENTS
 
@@ -689,16 +734,9 @@ EAI_can_take_free_trade = {
 		NOT = { EAI_major_country = yes }
 	}
 
-	### law allowed when need < 20% 
+	###
 
-	check_variable = { var = EAI_average_resource_need value = 0.20 compare = less_than }
-
-	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
-
-	if = { limit = { has_country_flag = EAI_trade_law_recently_changed }
-
-		check_variable = { var = EAI_average_resource_need value = 0.10 compare = less_than }
-	}
+	check_variable = { var = EAI_average_resource_need value = 0.15 compare = less_than }
 		
 	########## LAW REQUIREMENTS
 
@@ -723,41 +761,17 @@ EAI_can_take_export_focus = {
 		date > 1942.1.1
 	}
 
-	### normal range: 20-60%
+	###
 
-	if = { # if allowed to take free trade
-		limit = {
-			OR = {
-				has_government = neutrality
-				has_government = democratic
-				NOT = { EAI_major_country = yes }
-			}
-		}
+	if = { limit = { has_idea = free_trade } 
 
-		### law allowed when need >= 20% 
-
-		check_variable = { var = EAI_average_resource_need value = 0.20 compare = greater_than_or_equals }
+		check_variable = { var = EAI_average_resource_need value = 0.60 compare = less_than }
+		check_variable = { var = EAI_average_resource_need value = 0.15 compare = greater_than_or_equals }
 	}
+	else = {
 
-	check_variable = { var = EAI_average_resource_need value = 0.60 compare = less_than }
-
-	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
-
-	if = { limit = { has_country_flag = EAI_trade_law_recently_changed } # 30-40%
-
-		check_variable = { var = EAI_average_resource_need value = 0.40 compare = less_than }
-
-		if = { # if allowed to take free trade
-			limit = {
-				OR = {
-					has_government = neutrality
-					has_government = democratic
-					NOT = { EAI_major_country = yes }
-				}
-			}
-
-			check_variable = { var = EAI_average_resource_need value = 0.30 compare = greater_than_or_equals }
-		}
+		check_variable = { var = EAI_average_resource_need value = 0.35 compare = less_than }
+		check_variable = { var = EAI_average_resource_need value = 0.15 compare = greater_than_or_equals }
 	}
 
 	########## LAW REQUIREMENTS
@@ -780,14 +794,7 @@ EAI_can_take_limited_exports = {
 	### normal range: >= 60%
 
 	check_variable = { var = EAI_average_resource_need value = 0.60 compare = greater_than_or_equals }
-
-	### if trade law was recently changed, the difference in need has to be greater to prevent wasted PP due to random fluctuations
-
-	if = { limit = { has_country_flag = EAI_trade_law_recently_changed } # >= 70%
-
-		check_variable = { var = EAI_average_resource_need value = 0.70 compare = greater_than_or_equals }
-	}
-
+	
 	########## LAW REQUIREMENTS
 
 	NOT = { has_idea = limited_exports }

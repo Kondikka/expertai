@@ -81,7 +81,7 @@ political_actions = {
 		cost = 100
 
 		complete_effect = {
-
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: improved_worker_conditions" #EAI
 		}
 
 		ai_will_do = {
@@ -91,9 +91,9 @@ political_actions = {
 				add = 1000
 				
 				OR = {
-					has_stability < 0.65
+					has_stability < 0.7
 				
-					AND = { has_stability < 0.7 NOT = { has_available_idea_with_traits = { idea = popular_figurehead limit = 1 } } }
+					AND = { has_stability < 0.8 NOT = { has_available_idea_with_traits = { idea = popular_figurehead limit = 1 } } }
 				}
 			}
 			
@@ -147,7 +147,7 @@ political_actions = {
 		cost = 50
 
 		complete_effect = {
-
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: promises_of_peace" #EAI
 		}
 
 		ai_will_do = {
@@ -288,6 +288,8 @@ propaganda_efforts = {
 
 		complete_effect = {
 			set_country_flag = war_propaganda_campaign_running
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda" #EAI
 		}
 		remove_effect = {
 			clr_country_flag = war_propaganda_campaign_running
@@ -297,8 +299,56 @@ propaganda_efforts = {
 			base = 0
 			modifier = { #EAI
 				add = 1000
-				has_war_support < 0.6
-				has_war = yes
+
+				OR = {
+					# has low war support
+					AND = {
+						has_war_support < 0.5
+
+						OR = {
+							threat > 0.5
+							has_war = yes
+							has_country_flag = EAI_mobilize_army
+						}
+					}
+
+					# taking tot_economic_mobilisation is possible 
+					AND = {
+						NOT = { has_idea = tot_economic_mobilisation }
+						any_enemy_country = {
+							ic_ratio = {
+								tag = ROOT
+								ratio > 0.5
+							}
+						}
+					}
+
+					# doesnt have women_in_the_workforce but has tot_economic_mobilisation
+					AND = {
+						has_idea = tot_economic_mobilisation
+						NOT = { has_decision = women_in_the_workforce }
+					}
+				}
+
+				# war support needed for total mobilization and women_in_the_workforce
+				NOT = {
+            	    AND = {
+            	        has_government = democratic
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = communism
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = fascism
+            	        has_war_support > 0.89
+            	    }
+            	    AND = {
+            	        has_government = neutrality
+            	        has_war_support > 0.84
+            	    }
+            	}
 			}
 		}
 	}
@@ -361,13 +411,68 @@ propaganda_efforts = {
 
 		complete_effect = {
 			set_country_flag = war_propaganda_campaign_running
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda_against_warmonger" #EAI
 		}
 		remove_effect = {
 			clr_country_flag = war_propaganda_campaign_running
 		}
 
 		ai_will_do = {
-			factor = 0
+			base = 0
+			modifier = { #EAI
+				add = 5000
+
+				OR = {
+					# has low war support
+					AND = {
+						has_war_support < 0.5
+
+						OR = {
+							threat > 0.5
+							has_war = yes
+							has_country_flag = EAI_mobilize_army
+						}
+					}
+
+					# taking tot_economic_mobilisation is possible 
+					AND = {
+						NOT = { has_idea = tot_economic_mobilisation }
+						any_enemy_country = {
+							ic_ratio = {
+								tag = ROOT
+								ratio > 0.5
+							}
+						}
+					}
+
+					# doesnt have women_in_the_workforce but has tot_economic_mobilisation
+					AND = {
+						has_idea = tot_economic_mobilisation
+						NOT = { has_decision = women_in_the_workforce }
+					}
+				}
+
+				# war support needed for total mobilization and women_in_the_workforce
+				NOT = {
+            	    AND = {
+            	        has_government = democratic
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = communism
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = fascism
+            	        has_war_support > 0.89
+            	    }
+            	    AND = {
+            	        has_government = neutrality
+            	        has_war_support > 0.84
+            	    }
+            	}
+			}
 		}
 	}
 
@@ -429,6 +534,8 @@ propaganda_efforts = {
 
 		complete_effect = {
 			set_country_flag = war_propaganda_campaign_running
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda_against_warmonger_neighbor" #EAI
 		}
 		remove_effect = {
 			clr_country_flag = war_propaganda_campaign_running
@@ -436,9 +543,57 @@ propaganda_efforts = {
 		ai_will_do = {
 			base = 0
 			modifier = { #EAI
-				add = 1000
-				has_war_support < 0.6
-				has_war = yes
+				add = 10000
+
+				OR = {
+					# has low war support
+					AND = {
+						has_war_support < 0.5
+
+						OR = {
+							threat > 0.5
+							has_war = yes
+							has_country_flag = EAI_mobilize_army
+						}
+					}
+
+					# taking tot_economic_mobilisation is possible 
+					AND = {
+						NOT = { has_idea = tot_economic_mobilisation }
+						any_enemy_country = {
+							ic_ratio = {
+								tag = ROOT
+								ratio > 0.5
+							}
+						}
+					}
+
+					# doesnt have women_in_the_workforce but has tot_economic_mobilisation
+					AND = {
+						has_idea = tot_economic_mobilisation
+						NOT = { has_decision = women_in_the_workforce }
+					}
+				}
+
+				# war support needed for total mobilization and women_in_the_workforce
+				NOT = {
+            	    AND = {
+            	        has_government = democratic
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = communism
+            	        has_war_support > 0.79
+            	    }
+            	    AND = {
+            	        has_government = fascism
+            	        has_war_support > 0.89
+            	    }
+            	    AND = {
+            	        has_government = neutrality
+            	        has_war_support > 0.84
+            	    }
+            	}
 			}
 		}
 	}
@@ -516,6 +671,8 @@ operations = {
 					}
 				}
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: blow_suez_canal" #EAI
 		}
 	
 		remove_effect = {
@@ -661,6 +818,8 @@ operations = {
 					}
 				}
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:blow_panama_canal" #EAI
 		}
 	
 		remove_effect = {
@@ -737,6 +896,10 @@ special_projects = {
 		modifier = {
 			civilian_factory_use = 50
 		}
+
+		complete_effect = {
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:rebuild_suez_canal" #EAI
+		}
 	
 		remove_effect = {
 			if = {
@@ -808,6 +971,10 @@ special_projects = {
 	
 		modifier = {
 			civilian_factory_use = 80
+		}
+
+		complete_effect = {
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:rebuild_panama_canal" #EAI
 		}
 	
 		remove_effect = {
@@ -916,11 +1083,19 @@ war_measures = {
 		days_re_enable = 360
 
 		cost = 50
-		ai_will_do = {
-			factor = 1
+		ai_will_do = { #EAI
+			factor = 1000
 			modifier = {
-				surrender_progress > 0.6
-				factor = 10
+				has_capitulated = yes
+				factor = 0
+			}
+			modifier = { # ethiopia too op
+				factor = 0
+
+				date < 1940.1.1
+				original_tag = ETH
+				has_war_with = ITA
+				ITA = { is_ai = yes }
 			}
 		}
 
@@ -930,7 +1105,7 @@ war_measures = {
 		}
 
 		complete_effect = {
-
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: desperate_defense" #EAI
 		}
 	}
 
@@ -981,16 +1156,11 @@ war_measures = {
             stability_factor = -0.05
         }
          ai_will_do = {
-			factor = 1
-			
-			modifier = { #EAI
+			factor = 1000
+
+			modifier = {
 				factor = 0
-				has_manpower > 500000
-			}
-			
-			modifier = { #EAI
-				factor = 0
-				has_stability < 0.5
+				has_manpower > 2000000
 			}
 		}
 		complete_effect = {
@@ -1000,6 +1170,8 @@ war_measures = {
 				}
 				country_event = { id = canada_vanilla.1 hours = 6 } # Ronnie the Bren Gun Girl
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: women_in_the_workforce" #EAI
         }
    }
 
@@ -1050,11 +1222,13 @@ war_measures = {
 			consumer_goods_factor = -0.05
 		}
 
-		ai_will_do = {
-			factor = 1
+		ai_will_do = { #EAI
+			base = 0
 			modifier = {
-				has_political_power < 250 #EAI
-				factor = 0 #use as pp dump
+				add = 1000
+
+				num_of_factories > 200
+				has_political_power > 160
 			}
 		}
 
@@ -1063,6 +1237,8 @@ war_measures = {
 		}
 
 		complete_effect = {
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_bonds" #EAI
+
 			if = {
 				limit = {
 					NOT = {
@@ -1232,6 +1408,8 @@ economy_decisions = {
 				add_extra_state_shared_building_slots = 1
 				set_state_flag = infrastructure_building_slot_flag
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: infrastructure_building_slot" #EAI
 		}
 		ai_will_do = { #EAI
 			base = 0 
@@ -1240,12 +1418,6 @@ economy_decisions = {
 				add = 1000
 				
 				NOT = { any_state = { is_controlled_by = ROOT free_building_slots = { building = dummy size > 0 include_locked = no } } }
-			}
-			
-			modifier = {
-				add = 1
-				
-				has_political_power > 200
 			}
 			
 			modifier = {
@@ -1337,6 +1509,8 @@ economy_decisions = {
 				add_extra_state_shared_building_slots = 1
 				set_state_flag = war_building_slot_flag
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_building_slot" #EAI
 		}
 		ai_will_do = { #EAI
 			base = 0 
@@ -1344,13 +1518,8 @@ economy_decisions = {
 			modifier = {
 				add = 1000
 				
+				has_political_power > 170
 				NOT = { any_state = { is_controlled_by = ROOT free_building_slots = { building = dummy size > 0 include_locked = no } } }
-			}
-			
-			modifier = {
-				add = 1
-				
-				has_political_power > 200
 			}
 			
 			modifier = {
@@ -1510,6 +1679,8 @@ foreign_support = {
 				country_event = { id = wtt_burma_road.2 }
 				custom_effect_tooltip = close_burma_road_explanation # Prints the contents of the CHI_burma_road_current_level variable
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_burma_road" #EAI
 		}
 	}
 
@@ -1639,6 +1810,8 @@ foreign_support = {
 					custom_effect_tooltip = reopen_burma_road_explanation # Prints the contents of the CHI_burma_road_closed_level variable
 				}
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_burma_road" #EAI
 		}
 	}
 
@@ -1754,6 +1927,8 @@ foreign_support = {
 				country_event = { id = wtt_ledo_road.2 }
 				custom_effect_tooltip = close_ledo_road_explanation # Prints the contents of the CHI_ledo_road_current_level variable
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_ledo_road" #EAI
 		}
 	}
 
@@ -1883,6 +2058,8 @@ foreign_support = {
 					custom_effect_tooltip = reopen_ledo_road_explanation # Prints the contents of the CHI_ledo_road_closed_level variable
 				}
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_ledo_road" #EAI
 		}
 	}
 
@@ -1996,6 +2173,8 @@ foreign_support = {
  				country_event = { id = wtt_the_hump.2 }
 				custom_effect_tooltip = close_the_hump_explanation # Prints the contents of the CHI_the_hump_current_level variable
  			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_the_hump" #EAI
  		}
  	}
 
@@ -2125,6 +2304,8 @@ foreign_support = {
 					custom_effect_tooltip = reopen_the_hump_explanation # Prints the contents of the CHI_the_hump_closed_level variable
  				}
  			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_the_hump" #EAI
  		}
  	}
 
@@ -2240,6 +2421,8 @@ foreign_support = {
 				country_event = { id = wtt_hanoi_route.2 }
 				custom_effect_tooltip = close_hanoi_route_explanation # Prints the contents of the CHI_hanoi_route_current_level variable
 			}
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_hanoi_route" #EAI
 		}
 	}
 }
