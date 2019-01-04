@@ -507,10 +507,12 @@ scripted_gui = {
 			
 			EAI_config_ARMY_confirm_click = {
 				clr_country_flag = EAI_player_is_configuring_army_focuses
-				
+
 				ROOT = { clear_variable = EAI_config_ARMY_show_category }
-				
-				set_country_flag = EAI_army_focuses_edited
+
+				if = { limit = { NOT = { has_country_flag = EAI_config_ARMY_GLOBAL } }
+					set_country_flag = EAI_army_focuses_edited
+				}
 			}
 			EAI_config_ARMY_cancel_click = {
 				clr_country_flag = EAI_player_is_configuring_army_focuses
@@ -531,6 +533,20 @@ scripted_gui = {
 			
 					EAI_clear_all_override_focuses = yes
 				}
+
+				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
+					every_country = {
+						limit = {
+							is_ai = yes
+						}
+
+						clr_country_flag = EAI_army_config_triggered
+					
+						EAI_clear_all_focuses = yes
+			
+						EAI_clear_all_override_focuses = yes
+					}
+				}
 			}
 		}
 		
@@ -541,11 +557,14 @@ scripted_gui = {
 				}
 			}
 			EAI_config_ARMY_reset_click_enabled = {
-				var:EAI_configuration_target = {
-					OR = {
-						EAI_has_focuses = yes
-						EAI_has_override_focuses = yes
+				OR = {
+					var:EAI_configuration_target = {
+						OR = {
+							EAI_has_focuses = yes
+							EAI_has_override_focuses = yes
+						}
 					}
+					has_country_flag = EAI_config_ARMY_GLOBAL
 				}
 			}
 		}
@@ -631,18 +650,38 @@ scripted_gui = {
 				if = { limit = { has_country_flag = EAI_army_focuses_edited }
 				
 					clr_country_flag = EAI_army_focuses_edited
-				
+
 					var:EAI_configuration_target = {
 						EAI_clear_modified_focuses = yes
-		
+	
 						clr_country_flag = EAI_army_config_triggered
 					}
 				}
-				
+
 				clr_country_flag = EAI_config_ARMY
-				
-				set_country_flag = EAI_config_COUNTRY
-				
+
+				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
+					every_country = {
+						limit = {
+							is_ai = yes
+							NOT = { 
+								has_country_flag = EAI_army_config_triggered 
+								EAI_has_override_focuses = yes
+							}
+						}
+
+						EAI_apply_global_focuses = yes
+					}
+
+					EAI_clear_all_override_focuses = yes 
+
+					clr_country_flag = EAI_config_ARMY_GLOBAL
+					set_country_flag = EAI_config_GENERAL
+				}
+				else = {
+					set_country_flag = EAI_config_COUNTRY
+				}
+
 				country_event = EAI.1000 #forces the decision visible triggers to refresh
 			}
 		}
