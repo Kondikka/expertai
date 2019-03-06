@@ -1,0 +1,74 @@
+############################################################################################################
+#	Expert AI mod - scripted volunteer/expeditionary AI effects
+############################################################################################################
+
+### manages volunteer diplomacy 
+
+EAI_volunteer_expeditionary_check = {
+	every_country = {
+		limit = { has_country_flag = EAI_volunteers_from_@ROOT NOT = { EAI_send_volunteers = yes EAI_send_expeditionary = yes } }
+		
+		clr_country_flag = EAI_volunteers_from_@ROOT
+	}
+	
+	if = { # VOLUNTEERS
+		limit = {
+			NOT = { has_war = yes num_divisions < 30 }
+			
+			OR = {
+				AND = { has_government = neutrality NOT = { threat < 0.4 } }
+				AND = { has_government = fascism }
+				AND = { has_government = communism }
+				AND = { has_government = democratic NOT = { threat < 0.5 } }
+			}
+		
+			any_other_country = { has_war = yes }
+		}
+		
+		every_country = { # SET TARGETS
+			limit = { EAI_send_volunteers = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
+			
+			set_country_flag = EAI_volunteers_from_@ROOT
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: [This.GetName]"
+		}
+	}
+	
+	if = { # EXPEDITIONARY
+		limit = {
+			has_war = yes
+		
+			is_in_faction = yes
+		}
+		
+		if = { limit = { any_country = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes } }
+			every_country = {
+				limit = { EAI_send_expeditionary = yes EAI_expeditionary_priorities = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (priority)"
+			}
+		}
+		
+		else_if = { limit = { any_country = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } } }
+			every_country = {
+				limit = { EAI_send_expeditionary = yes ROOT = { is_subject_of = PREV } NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (overlord)"
+			}
+		}
+		
+		else_if = { limit = { any_country = { EAI_send_expeditionary = yes } }
+			every_country = {
+				limit = { EAI_send_expeditionary = yes NOT = { has_country_flag = EAI_volunteers_from_@ROOT } }
+				
+				set_country_flag = EAI_volunteers_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: [This.GetName] (any)"
+			}
+		}
+	}
+}

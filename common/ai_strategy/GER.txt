@@ -22,15 +22,8 @@ EAI_GER_prep_for_maginot = {
 		
 		NOT = { has_completed_focus = GER_around_maginot }
 	}
-	abort = {
-		NOT = { 
-			AND = {
-				focus_progress = { focus = GER_around_maginot progress > 0 }
-		
-				NOT = { has_completed_focus = GER_around_maginot }
-			}
-		}
-	}
+	
+	abort_when_not_enabled = yes
 	
 	ai_strategy = { type = conquer id = "BEL" value = 2000 }
 	ai_strategy = { type = conquer id = "HOL" value = 2000 }
@@ -50,19 +43,8 @@ EAI_GER_ignore_ITA = {
 		
 		ITA = { has_war_with = FRA }
 	}
-	abort = {
-		NOT = { 
-			AND = {
-				has_war_with = FRA
-		
-				FRA = { has_capitulated = no }
-				
-				is_in_faction_with = ITA
-				
-				ITA = { has_war_with = FRA }
-			}
-		}
-	}
+	
+	abort_when_not_enabled = yes
 	
 	ai_strategy = { type = dont_defend_ally_borders id = "ITA" value = 500 }
 }
@@ -81,6 +63,8 @@ EAI_GER_ignore_FIN = {
 EAI_GER_warprep = {
 	enable = {
 		is_historical_focus_on = yes
+
+		date < 1941.1.1
 		
 		original_tag = GER
 		
@@ -91,27 +75,9 @@ EAI_GER_warprep = {
 		FRA = { is_in_faction_with = ENG }
 		
 		NOT = { has_war_with = FRA }
-		
-		date < 1941.1.1
 	}
 	
-	abort = {
-		NOT = {
-			AND = {
-				original_tag = GER
-		
-				focus_progress = { focus = GER_danzig_or_war progress > 0 }
-				
-				any_neighbor_country = { tag = FRA }
-				
-				FRA = { is_in_faction_with = ENG }
-				
-				NOT = { has_war_with = FRA }
-				
-				date < 1941.1.1
-			}
-		}
-	}
+	abort_when_not_enabled = yes
 
 	ai_strategy = {
 		type = conquer
@@ -154,14 +120,14 @@ EAI_invasion_of_yugoslavia = {
 EAI_portuguese_trade_relation = {
 	enable = {
 		is_historical_focus_on = yes
+
+		date > 1940.1.1
 		
 		original_tag = GER
 		
 		has_political_power > 100
 		
-		has_country_flag = EAI_FOCUS/marm_army_focus
-		
-		date > 1940.1.1
+		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
 		
 		NOT = { has_war_with = POR }
 		
@@ -761,108 +727,108 @@ tfv_protect_fascist_south_africa = {
 	}
 }
 
-axis_stay_away_from_the_royal_navy = { #fixed
-	enable = {
-		has_war_with = ENG
+# axis_stay_away_from_the_royal_navy = { #fixed
+# 	enable = {
+# 		has_war_with = ENG
 		
-		GER = {
-			naval_strength_ratio = {
-				tag = ENG 
-				ratio < 0.5
-			}
-		}
+# 		GER = {
+# 			naval_strength_ratio = {
+# 				tag = ENG 
+# 				ratio < 0.5
+# 			}
+# 		}
 
-		# if we manage to get a foothold in UK we must do what we can to exploit it! (checks coastal states)
-		NOT = {
-			any_state = {
-				OR = { region = 1 region = 2 region = 3 } 
+# 		# if we manage to get a foothold in UK we must do what we can to exploit it! (checks coastal states)
+# 		NOT = {
+# 			any_state = {
+# 				OR = { region = 1 region = 2 region = 3 } 
 				
-				is_coastal = yes
+# 				is_coastal = yes
 				
-				ROOT = { divisions_in_state = { state = PREV size > 0 } }
-			}
-		}
-	}
-	abort = {
-		OR = {
-			NOT = { has_war_with = ENG }
+# 				ROOT = { divisions_in_state = { state = PREV size > 0 } }
+# 			}
+# 		}
+# 	}
+# 	abort = {
+# 		OR = {
+# 			NOT = { has_war_with = ENG }
 
-			NOT = {
-				GER = {
-					naval_strength_ratio = {
-						tag = ENG 
-						ratio < 0.5
-					}
-				}
-			}
+# 			NOT = {
+# 				GER = {
+# 					naval_strength_ratio = {
+# 						tag = ENG 
+# 						ratio < 0.5
+# 					}
+# 				}
+# 			}
 
-			any_state = {
-				OR = { region = 1 region = 2 region = 3 } 
+# 			any_state = {
+# 				OR = { region = 1 region = 2 region = 3 } 
 				
-				is_coastal = yes
+# 				is_coastal = yes
 				
-				ROOT = { divisions_in_state = { state = PREV size > 0 } }
-			}
-		}
-	}
+# 				ROOT = { divisions_in_state = { state = PREV size > 0 } }
+# 			}
+# 		}
+# 	}
 	
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 18 #english channel
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 42
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 47
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 48
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 68
-		value = 2000
-	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 18 #english channel
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 42
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 47
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 48
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 68
+# 		value = 2000
+# 	}
 	
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 61
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 62
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 65
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 103
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 102
-		value = 2000
-	}
-	ai_strategy = {
-		type = naval_avoid_region
-		id = 100
-		value = 2000
-	}
-}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 61
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 62
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 65
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 103
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 102
+# 		value = 2000
+# 	}
+# 	ai_strategy = {
+# 		type = naval_avoid_region
+# 		id = 100
+# 		value = 2000
+# 	}
+# }
 
 make_sure_poland_is_ganked_before_we_move = {
 	enable = {

@@ -1,0 +1,172 @@
+############################################################################################################
+#	Expert AI mod - scripted volunteer/expeditionary AI triggers
+############################################################################################################
+
+# ROOT = SENDER, THIS = TARGET
+# conditions for sending volunteers to a country
+EAI_send_volunteers = {
+	THIS = { # target
+		has_war = yes
+		
+		NOT = { has_war_with = ROOT }
+		
+		NOT = { tag = ROOT }
+
+		###
+
+		OR = {
+			### anti aggression script
+
+			AND = {
+				ROOT = { has_country_flag = EAI_supports_@PREV }
+				has_country_flag = EAI_receives_support_@THIS
+			}
+
+			### historical volunteers
+
+			EAI_historical_volunteers = yes
+ 
+			### ahistorical mode
+
+			AND = {
+				is_historical_focus_on = no
+
+				ROOT = { has_opinion = { target = PREV value > 25 } } # friendly countries
+
+				OR = {
+					AND = { ROOT = { EAI_democratic_nation = yes }
+						EAI_democratic_nation = yes
+					}
+
+					AND = { ROOT = { EAI_communist_nation = yes }
+						EAI_communist_nation = yes
+					}
+
+					AND = { ROOT = { EAI_fascist_nation = yes }
+						EAI_fascist_nation = yes
+					}
+
+					AND = { ROOT = { EAI_nonaligned_nation = yes }
+						EAI_nonaligned_nation = yes
+					}
+				}
+
+				OR = {
+					AND = {
+						any_enemy_country = { EAI_fascist_nation = yes }
+						ROOT = { NOT = { EAI_fascist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { EAI_communist_nation = yes }
+						ROOT = { NOT = { EAI_communist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { EAI_democratic_nation = yes }
+						ROOT = { NOT = { EAI_democratic_nation = yes } }
+					}
+				}
+			}
+		}
+
+		## # why should it NOT send volunteers
+		
+		NOT = { 
+			AND = { # the enemy of this country has a NAP with ROOT or faction member
+				NOT = { any_enemy_country = { has_war_with = ROOT } }
+				
+				any_enemy_country = { 
+					OR = {
+						has_non_aggression_pact_with = ROOT
+						
+						any_country = { OR = { is_subject_of = ROOT ROOT = { is_subject_of = PREV } is_in_faction_with = ROOT } has_non_aggression_pact_with = PREV }
+					}
+				}
+			}
+		}
+	}
+}
+
+EAI_historical_volunteers = {
+	OR = {
+		AND = {
+			ROOT = { original_tag = SOV has_government = communism }
+
+			OR = {
+				AND = { original_tag = CHI has_war_with = JAP date < 1940.1.1 }
+				AND = { original_tag = SPR has_government = communism has_civil_war = yes }
+			}
+		}
+
+		AND = {
+			ROOT = { OR = { original_tag = GER original_tag = ITA } has_government = fascism }
+
+			OR = {
+				AND = { OR = { original_tag = JAP original_tag = MEN } has_government = fascism has_war_with = CHI }
+				AND = { original_tag = SPR has_government = fascism has_civil_war = yes }
+			}
+		}
+
+		AND = {
+			ROOT = { OR = { original_tag = SPR original_tag = HUN } has_government = fascism }
+
+			OR = { original_tag = ITA original_tag = GER } has_government = fascism
+		}
+
+		AND = {
+			ROOT = { original_tag = USA has_government = democratic }
+
+			OR = { original_tag = ENG is_subject_of = ENG } has_government = democratic
+
+			date > 1941.1.1
+		}
+	}
+}
+
+EAI_send_expeditionary = {
+	ROOT = {
+		NOT = { 
+			any_home_area_neighbor_country = { has_war_with = ROOT } 
+		}
+		
+		is_major = no
+	}
+	
+	THIS = {
+		is_in_faction_with = ROOT
+		has_war = yes
+		has_capitulated = no
+		
+		OR = {
+			is_faction_leader = yes
+			is_major = yes
+		}
+	}
+	
+	NOT = { EAI_expeditionary_block = yes }
+}
+
+EAI_expeditionary_priorities = {
+	OR = {
+		AND = { 
+			ROOT = { is_in_faction_with = ENG OR = { original_tag = CAN original_tag = SAF } } 
+			THIS = { original_tag = ENG } 
+		}
+		AND = {
+			ROOT = { is_in_faction_with = GER OR = { original_tag = HUN original_tag = ROM original_tag = BUL } } 
+			THIS = { original_tag = GER } 
+		}
+	}
+}
+
+EAI_expeditionary_block = {
+	OR = {
+		AND = { 
+			ROOT = { is_in_faction_with = ENG OR = { original_tag = AST original_tag = NZL original_tag = RAJ original_tag = NOR } } 
+			THIS = { original_tag = ENG } 
+		}
+		AND = {
+			ROOT = { is_in_faction_with = GER OR = { original_tag = FRA original_tag = FIN } } 
+			THIS = { original_tag = GER } 
+		}
+	}
+}

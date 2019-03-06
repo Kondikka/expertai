@@ -2,377 +2,8 @@
 #	Expert AI mod - misc triggers
 ############################################################################################################
 
-######################################################
-#	NAVAL INVASIONS
-######################################################
-
-EAI_naval_invade = { # ROOT = INVADER # THIS = TARGET
-	NOT = {
-		tag = ROOT
-		is_in_faction_with = ROOT
-		is_subject_of = ROOT
-		ROOT = { is_subject_of = PREV }
-		has_country_flag = EAI_stop_invasions_@ROOT
-	}
-
-	any_state = { # target has a coastal state
-		is_controlled_by = PREV
-		is_coastal = yes
-	}
-
-	ROOT = {
-		OR = {
-			has_navy_size = { size > 50 }
-			
-			alliance_naval_strength_ratio > 1
-			
-			PREV = { EAI_historical_invasion = yes }
-		}
-	}
-
-	if = { limit = { has_war_with = ROOT }
-		
-		OR = {
-			alliance_strength_ratio < 0.8
-			
-			strength_ratio = { tag = ROOT ratio < 1.0 } #??????
-		
-			EAI_historical_invasion = yes
-		}
-	}
-
-	OR = {
-		has_war_with = ROOT
-		
-		is_justifying_wargoal_against = ROOT
-		ROOT = { is_justifying_wargoal_against = PREV }
-		
-		has_wargoal_against = ROOT
-		ROOT = { has_wargoal_against = PREV }
-	}
-	
-	################################################################################
-	
-	NOT = { EAI_invasion_restriction = yes }
-}
-
-EAI_stop_naval_invasion = { # invalid invasions
-	has_country_flag = EAI_naval_invasion_from_@ROOT
-
-	OR = {
-		NOT = { EAI_naval_invade = yes }
-		
-		AND = {
-			NOT = { ROOT = { has_country_flag = EAI_invasion_operation_active } }
-			
-			NOT = {
-				any_state = {
-					has_state_flag = EAI_naval_invasion_target_state_@ROOT
-					
-					any_country = {
-						OR = {
-							tag = ROOT
-							is_in_faction_with = ROOT
-							is_subject_of = ROOT
-							ROOT = { is_subject_of = PREV }
-						}
-						
-						OR = {
-							divisions_in_state = { state = PREV size > 0 }
-							
-							controller = { NOT = { has_war_with = ROOT } }
-						}
-					}
-				}
-			}
-		}
-		
-		NOT = { any_state = { is_controlled_by = PREV is_coastal = yes } }
-	}
-}
-
-EAI_invasion_restriction = { # block invasions
-	OR = {
-		#ALLIES
-		AND = {
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
-			
-			THIS = { OR = { original_tag = GER is_in_faction_with = GER } } 
-			
-			date < 1941.1.1
-			
-			NOT = { GER = { has_war_with = SOV } }
-		}
-		
-		AND = {
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
-			
-			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN original_tag = FRA } is_in_faction_with = GER } 
-		}
-		
-		#JAP
-		AND = {
-			ROOT = { original_tag = JAP }
-			
-			THIS = { OR = { original_tag = MAL AND = { original_tag = GXC ROOT = { has_war_with = CHI } } } }
-		}
-		
-		#GER
-		AND = {
-			ROOT = { 
-				OR = { original_tag = GER is_in_faction_with = GER }
-				
-				has_war_with = SOV
-				SOV = { has_capitulated = no }
-				strength_ratio = { tag = SOV ratio < 4 }
-			}
-			
-			THIS = { original_tag = ENG }
-		}
-	}
-}
-
-EAI_historical_invasion = { # force invasions
-	NOT = {
-		tag = ROOT
-		is_in_faction_with = ROOT
-		is_subject_of = ROOT
-		ROOT = { is_subject_of = PREV }
-		has_country_flag = EAI_stop_invasions_@ROOT
-	}
-	
-	OR = {
-		#GER
-		AND = { ROOT = { original_tag = GER PREV = { original_tag = NOR } } }
-		
-		#ITA
-		AND = { ROOT = { original_tag = ITA PREV = { original_tag = GRE } } }
-		
-		#JAP
-		AND = { 
-			ROOT = { 
-				original_tag = JAP 
-				
-				PREV = { 
-					OR = {
-						original_tag = CHI
-					
-						AND = { original_tag = INS has_capitulated = no }
-					}
-				} 
-			} 
-		}
-		
-		#ALLIES
-		AND = { 
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
-			
-			THIS = { OR = { original_tag = GER is_in_faction_with = GER } } 
-			
-			GER = { has_war_with = SOV }
-		}
-	}
-}
-
-######################################################
-#	MISC
-######################################################
-
-EAI_has_focuses = {
-	OR = {
-		has_country_flag = EAI_FOCUS/MW_doctrine
-		has_country_flag = EAI_FOCUS/SF_doctrine
-		has_country_flag = EAI_FOCUS/GB_doctrine
-		has_country_flag = EAI_FOCUS/MA_doctrine
-		
-		has_country_flag = EAI_FOCUS/land_doctrine_right_path
-		has_country_flag = EAI_FOCUS/land_doctrine_left_path
-		
-		has_country_flag = EAI_FOCUS/SD_doctrine
-		has_country_flag = EAI_FOCUS/BFS_doctrine
-		has_country_flag = EAI_FOCUS/OI_doctrine
-		
-		has_country_flag = EAI_FOCUS/FIB_doctrine
-		has_country_flag = EAI_FOCUS/TI_doctrine
-		has_country_flag = EAI_FOCUS/BS_doctrine
-	
-		has_country_flag = EAI_FOCUS/infantry_design_A
-		has_country_flag = EAI_FOCUS/infantry_design_B
-		has_country_flag = EAI_FOCUS/infantry_design_C
-
-		has_country_flag = EAI_FOCUS/infantry_width_20w
-		has_country_flag = EAI_FOCUS/infantry_width_26w
-		has_country_flag = EAI_FOCUS/infantry_width_40w
-		has_country_flag = EAI_FOCUS/infantry_width_10w
-	
-		has_country_flag = EAI_FOCUS/marm_army_focus
-		has_country_flag = EAI_FOCUS/harm_army_focus
-		has_country_flag = EAI_FOCUS/anti_tank_army_focus
-	
-		has_country_flag = EAI_FOCUS/armor_design_A
-		has_country_flag = EAI_FOCUS/armor_design_B
-		has_country_flag = EAI_FOCUS/armor_design_C
-	
-		has_country_flag = EAI_FOCUS/40w_armor_design_1
-		has_country_flag = EAI_FOCUS/40w_armor_design_0
-		
-		has_country_flag = EAI_FOCUS/marm_design_A
-		has_country_flag = EAI_FOCUS/harm_design_A
-		has_country_flag = EAI_FOCUS/marm_design_B
-		has_country_flag = EAI_FOCUS/harm_design_B
-		has_country_flag = EAI_FOCUS/marm_design_C
-		has_country_flag = EAI_FOCUS/harm_design_C
-	
-		has_country_flag = EAI_FOCUS/motorized_design_A
-		has_country_flag = EAI_FOCUS/motorized_design_B
-		has_country_flag = EAI_FOCUS/motorized_design_C
-	
-		has_country_flag = EAI_FOCUS/anti_tank_design_AT
-		has_country_flag = EAI_FOCUS/anti_tank_design_MTD
-		has_country_flag = EAI_FOCUS/anti_tank_design_HTD
-	
-		has_country_flag = EAI_FOCUS/larm_attachment
-		has_country_flag = EAI_FOCUS/harm_attachment
-		has_country_flag = EAI_FOCUS/marm_attachment
-		has_country_flag = EAI_FOCUS/motorized_attachment
-	
-		has_country_flag = EAI_FOCUS/no_spec_ops
-		has_country_flag = EAI_FOCUS/mountaineer_spec_ops
-		has_country_flag = EAI_FOCUS/marine_spec_ops
-	
-		has_country_flag = EAI_FOCUS/hftr_air_focus_1
-		has_country_flag = EAI_FOCUS/hftr_air_focus_0
-	
-		has_country_flag = EAI_FOCUS/cas_air_focus
-		has_country_flag = EAI_FOCUS/tac_air_focus
-	
-		has_country_flag = EAI_FOCUS/nav_air_focus_1
-		has_country_flag = EAI_FOCUS/nav_air_focus_0
-	
-		has_country_flag = EAI_FOCUS/str_air_focus_1
-		has_country_flag = EAI_FOCUS/str_air_focus_0
-	
-		has_country_flag = EAI_FOCUS/dd_navy_focus_1
-		has_country_flag = EAI_FOCUS/dd_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/cl_navy_focus_1
-		has_country_flag = EAI_FOCUS/cl_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/ca_navy_focus_1
-		has_country_flag = EAI_FOCUS/ca_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/bc_navy_focus_1
-		has_country_flag = EAI_FOCUS/bc_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/bb_navy_focus_1
-		has_country_flag = EAI_FOCUS/bb_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/cv_navy_focus_1
-		has_country_flag = EAI_FOCUS/cv_navy_focus_0
-		
-		has_country_flag = EAI_FOCUS/ss_navy_focus_1
-		has_country_flag = EAI_FOCUS/ss_navy_focus_0
-	}
-}
-
-EAI_has_override_focuses = {
-	OR = {
-		has_country_flag = EAI_FOCUS/MW_doctrine_override
-		has_country_flag = EAI_FOCUS/SF_doctrine_override
-		has_country_flag = EAI_FOCUS/GB_doctrine_override
-		has_country_flag = EAI_FOCUS/MA_doctrine_override
-		
-		has_country_flag = EAI_FOCUS/land_doctrine_right_path_override
-		has_country_flag = EAI_FOCUS/land_doctrine_left_path_override
-		
-		has_country_flag = EAI_FOCUS/SD_doctrine_override
-		has_country_flag = EAI_FOCUS/BFS_doctrine_override
-		has_country_flag = EAI_FOCUS/OI_doctrine_override
-		
-		has_country_flag = EAI_FOCUS/FIB_doctrine_override
-		has_country_flag = EAI_FOCUS/TI_doctrine_override
-		has_country_flag = EAI_FOCUS/BS_doctrine_override
-	
-		has_country_flag = EAI_FOCUS/infantry_design_A_override
-		has_country_flag = EAI_FOCUS/infantry_design_B_override
-		has_country_flag = EAI_FOCUS/infantry_design_C_override
-		
-		has_country_flag = EAI_FOCUS/infantry_width_20w_override
-		has_country_flag = EAI_FOCUS/infantry_width_26w_override
-		has_country_flag = EAI_FOCUS/infantry_width_40w_override
-		has_country_flag = EAI_FOCUS/infantry_width_10w_override
-	
-		has_country_flag = EAI_FOCUS/marm_army_focus_override
-		has_country_flag = EAI_FOCUS/harm_army_focus_override
-		has_country_flag = EAI_FOCUS/anti_tank_army_focus_override
-		
-		has_country_flag = EAI_FOCUS/armor_design_A_override
-		has_country_flag = EAI_FOCUS/armor_design_B_override
-		has_country_flag = EAI_FOCUS/armor_design_C_override
-	
-		has_country_flag = EAI_FOCUS/40w_armor_design_1_override
-		has_country_flag = EAI_FOCUS/40w_armor_design_0_override
-		
-		has_country_flag = EAI_FOCUS/marm_design_A_override
-		has_country_flag = EAI_FOCUS/harm_design_A_override
-		has_country_flag = EAI_FOCUS/marm_design_B_override
-		has_country_flag = EAI_FOCUS/harm_design_B_override
-		has_country_flag = EAI_FOCUS/marm_design_C_override
-		has_country_flag = EAI_FOCUS/harm_design_C_override
-	
-		has_country_flag = EAI_FOCUS/motorized_design_A_override
-		has_country_flag = EAI_FOCUS/motorized_design_B_override
-		has_country_flag = EAI_FOCUS/motorized_design_C_override
-	
-		has_country_flag = EAI_FOCUS/anti_tank_design_AT_override
-		has_country_flag = EAI_FOCUS/anti_tank_design_MTD_override
-		has_country_flag = EAI_FOCUS/anti_tank_design_HTD_override
-	
-		has_country_flag = EAI_FOCUS/larm_attachment_override
-		has_country_flag = EAI_FOCUS/harm_attachment_override
-		has_country_flag = EAI_FOCUS/marm_attachment_override
-		has_country_flag = EAI_FOCUS/motorized_attachment_override
-	
-		has_country_flag = EAI_FOCUS/no_spec_ops_override
-		has_country_flag = EAI_FOCUS/mountaineer_spec_ops_override
-		has_country_flag = EAI_FOCUS/marine_spec_ops_override
-	
-		has_country_flag = EAI_FOCUS/hftr_air_focus_1_override
-		has_country_flag = EAI_FOCUS/hftr_air_focus_0_override
-	
-		has_country_flag = EAI_FOCUS/cas_air_focus_override
-		has_country_flag = EAI_FOCUS/tac_air_focus_override
-	
-		has_country_flag = EAI_FOCUS/nav_air_focus_1_override
-		has_country_flag = EAI_FOCUS/nav_air_focus_0_override
-	
-		has_country_flag = EAI_FOCUS/str_air_focus_1_override
-		has_country_flag = EAI_FOCUS/str_air_focus_0_override
-	
-		has_country_flag = EAI_FOCUS/dd_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/dd_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/cl_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/cl_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/ca_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/ca_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/bc_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/bc_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/bb_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/bb_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/cv_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/cv_navy_focus_0_override
-		
-		has_country_flag = EAI_FOCUS/ss_navy_focus_1_override
-		has_country_flag = EAI_FOCUS/ss_navy_focus_0_override
-	}
-}
-
-EAI_major_country = { # true majors in the game
+# true majors in the game
+EAI_major_country = { 
 	OR = {
 		original_tag = ENG
 		original_tag = FRA
@@ -386,7 +17,8 @@ EAI_major_country = { # true majors in the game
 	}
 }
 
-EAI_civil_war_country = { # civil war country tags
+# civil war country tags
+EAI_civil_war_country = { 
 	OR = {
 		tag = D01
 		tag = D02
@@ -406,7 +38,54 @@ EAI_civil_war_country = { # civil war country tags
 	}
 }
 
-EAI_neutral_country = { # true neutrals
+### significant minors
+
+EAI_asian_minor = {
+	OR = {
+		original_tag = CHI
+		original_tag = SHX
+		original_tag = PRC
+		original_tag = XSM
+		original_tag = GXC
+		original_tag = YUN
+		original_tag = SIA
+		original_tag = PHI
+	}
+}
+
+EAI_commonwealth = {
+	OR = {
+		original_tag = CAN
+		original_tag = AST
+		original_tag = SAF
+		original_tag = RAJ
+		original_tag = NZL
+	}
+}
+
+EAI_european_minor = {
+	OR = {
+		original_tag = CZE
+		original_tag = POL
+		original_tag = ROM
+		original_tag = HUN
+		original_tag = BUL
+		original_tag = SPR
+		original_tag = FIN
+		original_tag = SWE
+		original_tag = NOR
+		original_tag = GRE
+		original_tag = TUR
+		original_tag = DEN
+		original_tag = POR
+		original_tag = YUG
+	}
+}
+
+###
+
+# true neutrals
+EAI_neutral_country = { 
 	NOT = { has_war = yes }
 	OR = {
 		tag = BEL
@@ -416,93 +95,71 @@ EAI_neutral_country = { # true neutrals
 	}
 }
 
-EAI_has_difficulty_bonus = {
-	OR = {
-		has_idea = EAI_hard_mode
-		has_idea = EAI_very_hard_mode
-		has_idea = EAI_insane_mode
-	}
-}
+# triggers the AI to build more units when threatened
+EAI_mobilize_army = {
+	NOT = { has_war = yes EAI_major_country = yes }
 
-EAI_dynamic_bonus_trigger = {
-	any_enemy_country = { 
-		OR = {
-			is_ai = no 
-			
-			any_allied_country = { is_ai = no }
-		}
-		
-		OR = {
-			is_neighbor_of = ROOT 
-			
-			any_state = { 
-				is_controlled_by = PREV 
-				
-				any_state = {
-					is_controlled_by = ROOT 
-					distance_to = { target = PREV value < 1000 } 
-				} 
-			} 
-			
-			any_state = { 
-				is_owned_by = ROOT 
+	OR = {
+		has_country_flag = EAI_mobilize_army
+
+		any_neighbor_country = {
+			capital_scope = { has_state_flag = EAI_original_capital_@PREV }
+			any_state = {
 				is_controlled_by = PREV
-			} 
+				is_in_home_area = yes
+				any_neighbor_state = {
+					is_controlled_by = ROOT
+					is_in_home_area = yes
+				}
+			}
+			OR = {
+				has_added_tension_amount > 10
+				has_war = yes
+
+				any_other_country = { is_justifying_wargoal_against = PREV }
+				any_other_country = { has_wargoal_against = PREV }
+
+				is_justifying_wargoal_against = ROOT
+				has_wargoal_against = ROOT
+			}
 		}
 	}
 }
 
-EAI_ftr_bonus_trigger = {
-	OR = {
-		has_deployed_air_force_size = { type = fighter size < 500 }
-		AND = { num_of_military_factories > 20 has_deployed_air_force_size = { type = fighter size < 750 } }
-		AND = { num_of_military_factories > 30 has_deployed_air_force_size = { type = fighter size < 1000 } }
-		AND = { num_of_military_factories > 40 has_deployed_air_force_size = { type = fighter size < 1500 } }
-		AND = { num_of_military_factories > 60 has_deployed_air_force_size = { type = fighter size < 2000 } }
-		AND = { num_of_military_factories > 80 has_deployed_air_force_size = { type = fighter size < 2500 } }
-		AND = { num_of_military_factories > 100 has_deployed_air_force_size = { type = fighter size < 3000 } }
-		AND = { num_of_military_factories > 150 has_deployed_air_force_size = { type = fighter size < 4500 } }
-		AND = { num_of_military_factories > 200 has_deployed_air_force_size = { type = fighter size < 6000 } }
-		AND = { num_of_military_factories > 250 has_deployed_air_force_size = { type = fighter size < 7500 } }
-		AND = { num_of_military_factories > 300 has_deployed_air_force_size = { type = fighter size < 9000 } }
+# minors build infantry according to their division cap during peace time
+EAI_build_infantry = {
+	NOT = { EAI_major_country = yes }
+	NOT = { has_country_flag = EAI_infantry_division_limit }
+
+	if = { limit = { has_country_flag = EAI_mobilize_army }
+		OR = {
+			AND = { check_variable = { EAI_division_cap > 119 } has_army_manpower = { size < 1200000 } }
+			AND = { check_variable = { EAI_division_cap > 99 } 	has_army_manpower = { size < 1000000 } }
+			AND = { check_variable = { EAI_division_cap > 79 } 	has_army_manpower = { size < 800000 } }
+			AND = { check_variable = { EAI_division_cap > 59 } 	has_army_manpower = { size < 600000 } }
+			AND = { check_variable = { EAI_division_cap > 39 } 	has_army_manpower = { size < 400000 } }
+			AND = { check_variable = { EAI_division_cap > 29 } 	has_army_manpower = { size < 300000 } }
+			AND = { check_variable = { EAI_division_cap > 19 } 	has_army_manpower = { size < 200000 } }
+			AND = { check_variable = { EAI_division_cap < 20 } 	has_army_manpower = { size < 100000 } }
+		}
+	}
+	else = {
+		OR = {
+			AND = { check_variable = { EAI_division_cap > 119 } has_army_manpower = { size < 600000 } }
+			AND = { check_variable = { EAI_division_cap > 99 } 	has_army_manpower = { size < 500000 } }
+			AND = { check_variable = { EAI_division_cap > 79 } 	has_army_manpower = { size < 400000 } }
+			AND = { check_variable = { EAI_division_cap > 59 } 	has_army_manpower = { size < 300000 } }
+			AND = { check_variable = { EAI_division_cap > 39 } 	has_army_manpower = { size < 200000 } }
+			AND = { check_variable = { EAI_division_cap > 29 } 	has_army_manpower = { size < 150000 } }
+			AND = { check_variable = { EAI_division_cap > 19 } 	has_army_manpower = { size < 100000 } }
+			AND = { check_variable = { EAI_division_cap < 20 } 	has_army_manpower = { size < 50000 } }
+		}
 	}
 }
 
-EAI_cas_bonus_trigger = {
+# excludes tags from certain production limits
+EAI_exclude_major_C = {
 	OR = {
-		has_deployed_air_force_size = { type = cas size < 125 }
-		AND = { num_of_military_factories > 25 has_deployed_air_force_size = { type = cas size < 250 } }
-		AND = { num_of_military_factories > 50 has_deployed_air_force_size = { type = cas size < 500 } }
-		AND = { num_of_military_factories > 100 has_deployed_air_force_size = { type = cas size < 1000 } }
-		AND = { num_of_military_factories > 150 has_deployed_air_force_size = { type = cas size < 1500 } }
-		AND = { num_of_military_factories > 200 has_deployed_air_force_size = { type = cas size < 2000 } }
-		AND = { num_of_military_factories > 250 has_deployed_air_force_size = { type = cas size < 2500 } }
-		AND = { num_of_military_factories > 300 has_deployed_air_force_size = { type = cas size < 3000 } }
-	}
-}
-
-EAI_tac_bonus_trigger = {
-	OR = {
-		has_deployed_air_force_size = { type = tactical_bomber size < 125 }
-		AND = { num_of_military_factories > 25 has_deployed_air_force_size = { type = tactical_bomber size < 250 } }
-		AND = { num_of_military_factories > 50 has_deployed_air_force_size = { type = tactical_bomber size < 500 } }
-		AND = { num_of_military_factories > 100 has_deployed_air_force_size = { type = tactical_bomber size < 1000 } }
-		AND = { num_of_military_factories > 150 has_deployed_air_force_size = { type = tactical_bomber size < 1500 } }
-		AND = { num_of_military_factories > 200 has_deployed_air_force_size = { type = tactical_bomber size < 2000 } }
-		AND = { num_of_military_factories > 250 has_deployed_air_force_size = { type = tactical_bomber size < 2500 } }
-		AND = { num_of_military_factories > 300 has_deployed_air_force_size = { type = tactical_bomber size < 3000 } }
-	}
-}
-
-EAI_str_bonus_trigger = {
-	OR = {
-		has_deployed_air_force_size = { type = strategic_bomber size < 125 }
-		AND = { num_of_military_factories > 25 has_deployed_air_force_size = { type = strategic_bomber size < 250 } }
-		AND = { num_of_military_factories > 50 has_deployed_air_force_size = { type = strategic_bomber size < 500 } }
-		AND = { num_of_military_factories > 100 has_deployed_air_force_size = { type = strategic_bomber size < 1000 } }
-		AND = { num_of_military_factories > 150 has_deployed_air_force_size = { type = strategic_bomber size < 1500 } }
-		AND = { num_of_military_factories > 200 has_deployed_air_force_size = { type = strategic_bomber size < 2000 } }
-		AND = { num_of_military_factories > 250 has_deployed_air_force_size = { type = strategic_bomber size < 2500 } }
-		AND = { num_of_military_factories > 300 has_deployed_air_force_size = { type = strategic_bomber size < 3000 } }
+		original_tag = SOV
 	}
 }

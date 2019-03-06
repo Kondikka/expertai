@@ -4,7 +4,10 @@
 # Expert AI mod - diplomacy events
 ############################################################################################################
 
-country_event = { #default historical mode settings
+### AI events
+
+# default historical mode settings (cant be applied on startup)
+country_event = { 
 	id = EAI_DM.0
 	hidden = yes
 	is_triggered_only = yes
@@ -16,10 +19,11 @@ country_event = { #default historical mode settings
 			set_global_flag = EAI_neutral_spr
 		}
 	}
-	option = { name = "OK" }
+	option = {}
 }
 
-country_event = { #SOV: winter war
+# SOV: make sure USSR starts the winter war on time
+country_event = { 
 	id = EAI_DM.2
 	hidden = yes
 	fire_only_once = yes
@@ -54,7 +58,8 @@ country_event = { #SOV: winter war
 	option = { name = "OK" }
 }
 
-country_event = { #CHI: military access to warlord to stop the AI from garrisoning these borders
+# CHI: military access to warlord to stop the AI from garrisoning these borders
+country_event = { 
 	id = EAI_DM.3
 	hidden = yes
 	fire_only_once = yes
@@ -86,7 +91,8 @@ country_event = { #CHI: military access to warlord to stop the AI from garrisoni
 	option = { name = "OK" }
 }
 
-country_event = { #GER: force wardec on SOV
+# GER: force wardec on SOV
+country_event = { 
 	id = EAI_DM.4
 	hidden = yes
 	fire_only_once = yes
@@ -112,7 +118,7 @@ country_event = { #GER: force wardec on SOV
 			}
 		}
 
-		#sov is a threat
+		# sov is a threat
 		NOT = {
 			SOV = { has_capitulated = yes }
 			SOV = { exists = no }
@@ -122,7 +128,7 @@ country_event = { #GER: force wardec on SOV
 		}
 		SOV = { has_government = communism }
 
-		#not invading yug
+		# not invading yug
 		OR = {
 			NOT = { has_war_with = YUG }
 			AND = {
@@ -131,7 +137,7 @@ country_event = { #GER: force wardec on SOV
 			}
 		}
 
-		#not invading spr
+		# not invading spr
 		OR = {
 			NOT = { has_war_with = SPR }
 			AND = {
@@ -140,7 +146,7 @@ country_event = { #GER: force wardec on SOV
 			}
 		}
 
-		#controls western europe
+		# controls western europe
 		NOT = {
 			any_state = {
 				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 27 state = 161 state = 162 }
@@ -158,7 +164,8 @@ country_event = { #GER: force wardec on SOV
 	option = { name = "OK" }
 }
 
-country_event = { #SOV: force wardec on JAP
+# SOV: force wardec on JAP
+country_event = { 
 	id = EAI_DM.6
 	hidden = yes
 	fire_only_once = yes
@@ -182,7 +189,7 @@ country_event = { #SOV: force wardec on JAP
 			}
 		}
 
-		#sov is a threat
+		# sov is a threat
 		NOT = {
 			JAP = { has_capitulated = yes }
 			JAP = { exists = no }
@@ -202,7 +209,8 @@ country_event = { #SOV: force wardec on JAP
 	option = { name = "OK" }
 }
 
-country_event = { #SPR neutrality
+# SPR: add neutrality idea to both sides
+country_event = { 
 	id = EAI_DM.12
 	hidden = yes
 	fire_only_once = yes
@@ -223,7 +231,8 @@ country_event = { #SPR neutrality
 	option = { name = "OK" }
 }
 
-country_event = { #remove SPR neutrality
+# SPR: remove SPR neutrality 
+country_event = { 
 	id = EAI_DM.13
 	hidden = yes
 	fire_only_once = yes
@@ -266,7 +275,8 @@ country_event = { #remove SPR neutrality
 	option = { name = "OK" }
 }
 
-country_event = { #usa joins allies #old
+# USA: add idea to make USA join allies (unnecessary?)
+country_event = { 
 	id = EAI_DM.15
 	hidden = yes
 	fire_only_once = yes
@@ -318,7 +328,8 @@ country_event = { #usa joins allies #old
 	option = { name = "OK" }
 }
 
-country_event = { #usa joins allies 2
+# USA: remove neutrality idea
+country_event = { 
 	id = EAI_DM.19
 	hidden = yes
 	fire_only_once = yes
@@ -349,7 +360,6 @@ country_event = { #usa joins allies 2
 		tag = USA 
 		is_historical_focus_on = yes
 		has_idea = EAI_neutrality_idea_USA
-		has_government = democratic
 
 		OR = {
 			has_war = yes
@@ -394,11 +404,40 @@ country_event = { #usa joins allies 2
 	option = {}
 }
 
-################### clean up some borders
+# ENG: force wardec on iraq
+country_event = { 
+	id = EAI_DM.20
+	hidden = yes
+	fire_only_once = yes
+	mean_time_to_happen = { days = 2 }
+	trigger = {
+		is_ai = yes 
+		tag = ENG 
+		is_historical_focus_on = yes
+		has_completed_focus = uk_iraq_focus
+		NOT = {
+			has_war_with = IRQ
+			any_state = {
+				region = 28
+				CONTROLLER = { has_war_with = ROOT }
+			}
+		}
+		has_army_manpower = { size > 700000 }
+	}
+	immediate = {
+		declare_war_on = { target = IRQ type = take_state_focus }
+	}
+	option = {}
+}
+
+#######################################################
+# AI border gore fixes
+#######################################################
 
 add_namespace = EAI_DM_borders
 
-country_event = { #give germany northern france
+# make sure GER controls northern france
+country_event = { 
 	id = EAI_DM_borders.1
 	hidden = yes
 	mean_time_to_happen = { days = 20 }
@@ -413,7 +452,7 @@ country_event = { #give germany northern france
 		
 		FRA = { has_capitulated = yes }
 		
-		any_state = { #GER doesnt control historical states
+		any_state = { # GER doesnt control historical states
 			OR = { region = 19 region = 20 region = 5 }
 			NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
 			
@@ -440,7 +479,6 @@ country_event = { #give germany northern france
 					NOT = { PREV = { is_owned_by = PREV } }
 				}
 			}
-			
 			ROOT = { set_state_controller = PREV }
 		}
 
@@ -449,7 +487,8 @@ country_event = { #give germany northern france
 	option = { name = "OK" }
 }
 
-country_event = { #yugoslavia invasion AI fix
+# yugoslavia invasion AI fix (unnecessary?)
+country_event = { 
 	id = EAI_DM_borders.2
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
@@ -497,7 +536,8 @@ country_event = { #yugoslavia invasion AI fix
 	option = { name = "OK" }
 }
 
-country_event = { #greece
+# division of greece
+country_event = { 
 	id = EAI_DM_borders.3
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
@@ -545,7 +585,8 @@ country_event = { #greece
 	option = { name = "OK" }
 }
 
-country_event = { #norway
+# make sure GER controls norway
+country_event = { 
 	id = EAI_DM_borders.4
 	hidden = yes
 	fire_only_once = yes
@@ -571,7 +612,7 @@ country_event = { #norway
 			}
 		}
 
-		NOT = { #all combat has ceased
+		NOT = { # all combat has ceased
 			any_state = {
 				OR = { state = 142 state = 110 state = 143 state = 144 }
 				controller = { has_war_with = GER }
@@ -598,7 +639,8 @@ country_event = { #norway
 	option = { name = "OK" }
 }
 
-country_event = { #give italy vichy france
+# aggressive GER setting: give southern france to ITA
+country_event = { 
 	id = EAI_DM_borders.5
 	hidden = yes
 	fire_only_once = yes
@@ -648,7 +690,8 @@ country_event = { #give italy vichy france
 	option = { name = "OK" }
 }
 
-country_event = { #east front: stop GER minors from taking over the east front states
+# make sure GER takes control of eastern front states
+country_event = { 
 	id = EAI_DM_borders.6
 	hidden = yes
 	mean_time_to_happen = { days = 20 }
@@ -703,9 +746,44 @@ country_event = { #east front: stop GER minors from taking over the east front s
 	option = { name = "OK" }
 }
 
-##################
+# puppet EGY setting: transfer conquered territories to ENG
+country_event = { 
+	id = EAI_DM_borders.7
+	hidden = yes
+	mean_time_to_happen = { days = 20 }
+	trigger = {
+		original_tag = EGY
 
-country_event = { #creation of italian east africa
+		is_ai = yes
+
+		ENG = { is_ai = yes }
+		
+		is_puppet_of = ENG
+		
+		any_state = {
+			is_fully_controlled_by = ROOT
+			NOT = { is_owned_by = ROOT }
+		}
+	}
+	immediate = {
+		every_state = {
+			limit = {
+				is_fully_controlled_by = ROOT
+				NOT = { is_owned_by = ROOT }
+			}
+			
+			ENG = { set_state_controller = PREV }
+		}
+	}
+	option = {}
+}
+
+#######################################################
+# misc
+#######################################################
+
+# ITA: Creation of Italian East Africa puppet to stop AI Italy from sending its army to Ethiopia
+country_event = {
 	id = EAI_DM.58
 	title = EAI_DM.58.t
 	desc = EAI_DM.58.d
@@ -745,9 +823,22 @@ country_event = { #creation of italian east africa
 	}
 }
 
-###################
+# debug
+country_event = {
+	id = EAI_DM.1000
+	title = EAI_DM.1000.t
+	desc = EAI_DM.1000.d
+	picture = GFX_report_event_chinese_soldiers_fighting
+	is_triggered_only = yes
+	option = { name = "OK" }
+}
 
-country_event = { # random ideology for generic nations
+#######################################################
+# random generic nation ideology setting
+#######################################################
+
+# makes the AI choose an ideology to focus on
+country_event = {
 	id = EAI_DM.1230
 	hidden = yes
 
@@ -847,6 +938,7 @@ country_event = { # random ideology for generic nations
 	}
 }
 
+# allows a neutral country to pick up an ideology
 country_event = {
 	id = EAI_DM.1231
 	hidden = yes
@@ -885,1367 +977,82 @@ country_event = {
 	option = {}
 }
 
-###
+#######################################################
+# operations
+#######################################################
+
+### operation countenance
 
 country_event = {
-	id = EAI_DM.160
-	hidden = yes
-	fire_only_once = yes
-	option = {}
-}
-country_event = {
-	id = EAI_DM.170
-	hidden = yes
-	fire_only_once = yes
-	option = {}
-}
-country_event = {
-	id = EAI_DM.180
-	hidden = yes
-	fire_only_once = yes
-	option = {}
-}
-
-######################################
-#	AI war justification
-######################################
-
-add_namespace = EAI_DM_W
-
-# random wardec event
-country_event = { 
-	id = EAI_DM_W.0
-	hidden = yes
-
-	mean_time_to_happen = { 
-		days = 365 
-
-		modifier = {
-			factor = 0.5
-			check_variable = { global.EAI_justification_aggressiveness = 2 }
-		}
-		modifier = {
-			factor = 0.25
-			check_variable = { global.EAI_justification_aggressiveness = 3 }
-		}
-	}
-
-	trigger = {
-		is_ai = yes
-		date > 1936.4.1
-		has_variable = global.EAI_justification_aggressiveness
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		ROOT = { # basic requirements
-			num_divisions > 5
-			has_manpower > 25000
-			num_of_military_factories > 5
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		#OR = {
-		#	is_in_faction = no
-		#	is_faction_leader = yes
-		#	is_major = yes
-		#}
-
-		OR = { # only these ideologies invade randomly
-			has_government = fascism
-			has_government = communism
-		}
-
-		OR = { # world threat requirement
-			AND = { threat > 0.9 check_variable = { global.EAI_justification_aggressiveness = 1 } }
-			AND = { threat > 0.5 check_variable = { global.EAI_justification_aggressiveness = 2 } }
-			AND = { check_variable = { global.EAI_justification_aggressiveness = 3 } }
-		}
-
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		any_country = {
-			EAI_is_threat = yes
-			NOT = { 
-				has_war_with = ROOT 
-				has_non_aggression_pact_with = ROOT
-				ROOT = { has_country_flag = EAI_supports_@PREV }
-			}
-			OR = {
-				is_neighbor_of = ROOT
-				any_other_country = {
-					is_neighbor_of = ROOT
-					is_neighbor_of = PREV
-					OR = {
-						is_subject_of = ROOT
-						is_in_faction_with = ROOT
-					}
-				}
-			}
-			NOT = { ROOT = { has_opinion = { target = PREV value > 75 } } }
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-			NOT = {
-				any_allied_country = {
-					strength_ratio = { tag = ROOT ratio > 1.5 }
-				}
-			}
-			ic_ratio = { tag = ROOT ratio < 1.5 }
-			check_variable = { num_divisions < Root.num_divisions }
-		}
-	}
-
-	immediate = {
-		random_country = {
-			limit = {
-				EAI_is_threat = yes
-				NOT = { 
-					has_war_with = ROOT 
-					has_non_aggression_pact_with = ROOT
-					ROOT = { has_country_flag = EAI_supports_@PREV }
-				}
-				OR = {
-					is_neighbor_of = ROOT
-					any_other_country = {
-						is_neighbor_of = ROOT
-						is_neighbor_of = PREV
-						OR = {
-							is_subject_of = ROOT
-							is_in_faction_with = ROOT
-						}
-					}
-				}
-				NOT = { ROOT = { has_opinion = { target = PREV value > 75 } } }
-				strength_ratio = { tag = ROOT ratio < 0.5 }
-				NOT = {
-					any_allied_country = {
-						strength_ratio = { tag = ROOT ratio > 1.5 }
-					}
-				}
-				ic_ratio = { tag = ROOT ratio < 1.5 }
-				check_variable = { num_divisions < Root.num_divisions }
-			}
-
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-
-			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM WARDEC: against [This.GetName]"
-		}
-	}
-
-	option = {}
-}
-
-##### GER war scripts
-
-# GER keeps declaring wars if it has nothing else to do
-country_event = {
-	id = EAI_DM_W.10
-	hidden = yes
-	
-	mean_time_to_happen = { days = 90 }
-
-	trigger = {
-		tag = GER
-		is_ai = yes 
-		date > 1941.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		has_manpower > 250000
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-		
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-				any_state = {
-					is_controlled_by = PREV
-					is_on_continent = europe
-				}
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		any_country = {
-			EAI_is_threat = yes
-			NOT = { has_war_with = ROOT }
-			NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-			ic_ratio = { tag = ROOT ratio < 1.0 }
-			check_variable = { num_divisions < Root.num_divisions }
-		}
-
-		# take care of these countries first
-
-		SOV = {
-			NOT = { EAI_is_threat = yes }
-		}
-
-		FRA = {
-			NOT = { EAI_is_threat = yes }
-		}
-
-		POL = {
-			NOT = { EAI_is_threat = yes }
-		}
-	}
-	immediate = {
-		if = {
-			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
-					is_neighbor_of = ROOT
-				}
-			}
-
-			random_country = {
-				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
-					is_neighbor_of = ROOT
-				}
-
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]"
-			}
-		}
-
-		else_if = {
-			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
-					any_other_country = {
-						OR = {
-							tag = ROOT
-							is_in_faction_with = ROOT
-							is_subject_of = ROOT
-						}
-						is_neighbor_of = PREV
-					}
-				}
-			}
-
-			random_country = {
-				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
-					any_other_country = {
-						OR = {
-							tag = ROOT
-							is_in_faction_with = ROOT
-							is_subject_of = ROOT
-						}
-						is_neighbor_of = PREV
-					}
-				}
-
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]"
-			}
-		}
-
-		else_if = {
-			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-				}
-			}
-
-			random_country = {
-				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-				}
-
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]"
-			}
-		}
-	}
-	option = {}
-}
-
-##### JAP war scripts
-
-# JAP invades SOV
-country_event = {
-	id = EAI_DM_W.20
-	hidden = yes
-	fire_only_once = yes
-
-	mean_time_to_happen = { days = 2 }
-	
-	trigger = {
-		tag = JAP 
-		is_ai = yes 
-		date > 1940.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-		
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		SOV = {
-			EAI_is_threat = yes
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
-			NOT = { has_war_with = ROOT }
-		}
-
-		# take care of these countries first
-
-		CHI = {
-			NOT = { EAI_is_threat = yes }
-		}
-
-		OR = {
-			RAJ = {
-				NOT = { EAI_is_threat = yes }
-			}
-
-			SOV = {
-				surrender_progress > 0.9
-			}
-		}
-	}
-	immediate = {
-		SOV = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against SOV"
-	}
-	option = {}
-}
-
-# JAP keeps declaring wars if it has nothing else to do
-country_event = {
-	id = EAI_DM_W.21
-	hidden = yes
-	
-	mean_time_to_happen = { days = 90 }
-
-	trigger = {
-		tag = JAP
-		is_ai = yes 
-		date > 1940.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		has_manpower > 250000
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-		
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		any_country = {
-			EAI_is_threat = yes
-			NOT = { has_war_with = ROOT }
-			NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-			ic_ratio = { tag = ROOT ratio < 1.0 }
-			check_variable = { num_divisions < Root.num_divisions }
-
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
-		}
-
-		# take care of these countries first
-
-		CHI = {
-			NOT = { EAI_is_threat = yes }
-		}
-
-		RAJ = {
-			NOT = { EAI_is_threat = yes }
-		}
-
-		SOV = {
-			NOT = { EAI_is_threat = yes }
-		}
-	}
-	immediate = {
-		random_country = {
-			limit = {
-				EAI_is_threat = yes
-				NOT = { has_war_with = ROOT }
-				NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-				strength_ratio = { tag = ROOT ratio < 0.5 }
-				ic_ratio = { tag = ROOT ratio < 1.0 }
-				check_variable = { num_divisions < Root.num_divisions }
-
-				any_other_country = {
-					OR = {
-						tag = ROOT
-						is_in_faction_with = ROOT
-						is_subject_of = ROOT
-					}
-					is_neighbor_of = PREV
-				}
-			}
-
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-
-			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM JAP WARDEC: against [This.GetName]"
-		}
-	}
-	option = {}
-}
-
-# JAP invades NEP
-country_event = {
-	id = EAI_DM_W.22
-	hidden = yes
-	fire_only_once = yes
-
-	mean_time_to_happen = { days = 180 }
-
-	trigger = {
-		tag = JAP 
-		is_ai = yes 
-		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		NEP = {
-			EAI_is_threat = yes
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
-			NOT = { has_war_with = ROOT }
-		}
-
-		# take care of these countries first
-
-		CHI = {
-			NOT = { EAI_is_threat = yes }
-		}
-	}
-	immediate = {
-		NEP = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against NEP"
-	}
-	option = {}
-}
-
-# JAP invades BHU
-country_event = {
-	id = EAI_DM_W.23
-	hidden = yes
-	fire_only_once = yes
-
-	mean_time_to_happen = { days = 180 }
-
-	trigger = {
-		tag = JAP 
-		is_ai = yes 
-		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		BHU = {
-			EAI_is_threat = yes
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
-			NOT = { has_war_with = ROOT }
-		}
-
-		# take care of these countries first
-
-		CHI = {
-			NOT = { EAI_is_threat = yes }
-		}
-	}
-	immediate = {
-		BHU = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against BHU"
-	}
-	option = {}
-}
-
-# JAP invades TIB
-country_event = {
-	id = EAI_DM_W.24
-	hidden = yes
-	fire_only_once = yes
-
-	mean_time_to_happen = { 
-		days = 2000
-		
-		modifier = {
-			factor = 0.25
-			SOV = {
-				NOT = { EAI_is_threat = yes }
-			}
-		}
-	}
-
-	trigger = {
-		tag = JAP 
-		is_ai = yes 
-		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
-
-		OR = {
-			is_in_faction = no
-			is_faction_leader = yes
-		}
-
-		OR = {
-			has_government = fascism
-			has_government = communism
-		} 
-
-		NOT = { # do not invade if losing
-			surrender_progress > 0
-			any_home_area_neighbor_country = {
-				has_war_with = ROOT
-			}
-		}
-
-		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
-			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
-				}
-			}
-		}
-
-		ROOT = {
-			has_capitulated = no
-			exists = yes
-			is_subject = no
-		}
-
-		TIB = {
-			EAI_is_threat = yes
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
-			NOT = { has_war_with = ROOT }
-		}
-
-		# take care of these countries first
-
-		CHI = {
-			NOT = { EAI_is_threat = yes }
-		}
-	}
-	immediate = {
-		TIB = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against TIB"
-	}
-	option = {}
-}
-
-##### SOV war scripts
-
-#
-country_event = {
-	id = EAI_DM_W.30
-	hidden = yes
-	fire_only_once = yes
-	trigger = {
-		always = no
-	}
-	option = {}
-}
-
-# starts war justification after AI has had some time to move troops to this border
-country_event = { 
-	id = EAI_DM_W.1000
-	hidden = yes
-	
-	mean_time_to_happen = { days = 60 }
-
-	trigger = {
-		is_ai = yes
-		has_variable = EAI_wardec_script_target_by_@ROOT
-	}
-
-	immediate = {
-		var:EAI_wardec_script_target_by_@ROOT = {
-			ROOT = { set_country_flag = { flag = EAI_declare_war_@PREV value = 1 days = 365 } }
-		}
-
-		clear_variable = EAI_wardec_script_target_by_@ROOT
-
-		set_country_flag = { flag = EAI_justifying_wargoal value = 1 days = 90 }
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: clearing target"
-	}
-
-	option = {}
-}
-
-###################
-
-country_event = { #notify player countries
-	id = EAI_DM.1000
-	title = EAI_DM.1000.t
-	desc = EAI_DM.1000.d
-	picture = GFX_report_event_chinese_soldiers_fighting
-	is_triggered_only = yes
-	option = { name = "OK" }
-}
-
-######################################
-#	AI guarantee events
-######################################
-
-news_event = { # AI warns a country on illegal justification
-	id = EAI_DM.10000
-	title = EAI_DM.10000.t
-	desc = EAI_DM.10000.d
-	picture = GFX_news_event_generic_rally_3
+	id = EAI_DM.1300
+	title = EAI_DM.1300_t
+	desc = EAI_DM.1300_d
+	picture = GFX_report_event_vienna_award_hungary
 
 	is_triggered_only = yes
 
-	option = { # yes
-		name = EAI_DM.10000.o1
+	option = { name = EAI_DM.1300.o1
 
-		hidden_effect = {
-			country_event = { id = EAI_DM.10003 days = 7 } #check if still justifying after 7 days
-		}
-		
-		custom_effect_tooltip = EAI_DM.10000.d.tt
-		
-		#displays the list of supporters
-		
-		# DEMOCRATIC
-		every_country = {
-			limit = { EAI_democratic_willing_to_guarantee_nation = yes }
+		ai_chance = { factor = 100 }
 
-			country_event = EAI_DM.10001
+		custom_effect_tooltip = EAI_DM.1300.tt
+		activate_decision = EAI_operation_countenance
+		FROM = { 
+			activate_decision = EAI_operation_countenance 
+			hidden_effect = { country_event = EAI_DM.1303 } 
 		}
 
-		# COMMUNIST
-		every_country = {
-			limit = { EAI_communism_willing_to_guarantee_nation = yes }
+		country_event = { id = EAI_DM.1301 days = 36 }
 
-			country_event = EAI_DM.10001
-		}
+		set_global_flag = { flag = EAI_operation_countenance_started value = 1 days 365 }
+	}
 
-		# FASCIST
-		every_country = {
-			limit = { EAI_fascism_willing_to_guarantee_nation = yes }
+	option = { name = EAI_DM.1300.o2
 
-			country_event = EAI_DM.10001
-		}
-
-		# NEUTRALITY
-		every_country = {
-			limit = { EAI_neutrality_willing_to_guarantee_nation = yes }
-
-			country_event = EAI_DM.10001
+		FROM = { 
+			add_opinion_modifier = { target = ROOT modifier = refused_help }
+			hidden_effect = { country_event = EAI_DM.130 } 
 		}
 	}
 }
 
-country_event = { # only for localisation
-	id = EAI_DM.10001
-	title = EAI_DM.10002.t
-	hidden = yes
-	is_triggered_only = yes
-	
-	option = {}
-}
-
-country_event = { # add strategies on failure
-	id = EAI_DM.10002
-	title = EAI_DM.10002.t
-	hidden = yes
+news_event = {
+	id = EAI_DM.1301
+	title = EAI_DM.1301_t
+	desc = EAI_DM.1301_d
+	picture = GFX_news_event_soviet_tanks
 
 	is_triggered_only = yes
-
-	immediate = { # ROOT = DEFENDER FROM = INVADER
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10002"
-		
-		set_country_flag = EAI_mobilize_army
-
-		set_country_flag = { flag = EAI_guarantee_workaround value = 20 } #workaround
-		
-		event_target:EAI_illegal_wargoal_target = {
-		
-			ROOT = { set_country_flag = { flag = EAI_supports_@PREV value = 1 days = 365 } } 
-			
-			set_country_flag = { flag = EAI_receives_support_@THIS value = 1 days = 365 }
-			
-			country_event = { id = EAI_DM.10005 days = 5 random = 5 }
-		}
-		
-		add_ai_strategy = { type = antagonize id = event_target:EAI_illegal_wargoal_invader value = 50 }
-	}
-
-	option = { name = "OK" }
-}
-
-country_event = { # check if still justifying
-	id = EAI_DM.10003
-
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10003"
-		
-		clr_global_flag = EAI_illegal_wargoal_event_active
-
-		if = {
-			limit = { ROOT = { is_justifying_wargoal_against = event_target:EAI_illegal_wargoal_target } }
-
-			country_event = EAI_DM.10004 #failed, add guarantees
-
-			else = {
-				if = {
-					limit = { ROOT = { has_country_flag = { flag = EAI_infamy_count_@ROOT value > 1 } } }
-					
-					ROOT = { modify_country_flag = { flag = EAI_infamy_count_@ROOT value = -1 } }
-					
-					else = { ROOT = { clr_country_flag = EAI_infamy_count_@ROOT } }
-				}
-				
-				event_target:EAI_illegal_wargoal_target = { clr_country_flag = EAI_ignore_illegal_justification_by_@ROOT }
-				
-				event_target:EAI_illegal_wargoal_target = { clr_country_flag = EAI_infamy_added_at_@ROOT }
-				
-				country_event = EAI_DM.10011 #global news event
-			}
-		}
-	}
-
-	option = {}
-}
-
-news_event = { # failed
-	id = EAI_DM.10004
-	title = EAI_DM.10004.t
-	desc = EAI_DM.10004.d
-	picture = GFX_news_event_generic_rally_3
-
-	is_triggered_only = yes
-
-	option = { name = EAI_DM.10004.o1
-		hidden_effect = {
-			every_other_country = {
-				country_event = EAI_DM.10012 #a global news event
-			}
-		}
-
-		# DEMOCRATIC
-		every_country = {
-			limit = { EAI_democratic_willing_to_guarantee_nation = yes }
-
-			country_event = EAI_DM.10002
-		}
-
-		# COMMUNIST
-		every_country = {
-			limit = { EAI_communism_willing_to_guarantee_nation = yes }
-
-			country_event = EAI_DM.10002
-		}
-
-		# FASCIST
-		every_country = {
-			limit = { EAI_fascism_willing_to_guarantee_nation = yes }
-
-			country_event = EAI_DM.10002
-		}
-
-		# NEUTRALITY
-		every_country = {
-			limit = { EAI_neutrality_willing_to_guarantee_nation = yes }
-
-			country_event = EAI_DM.10002
-		}
-	}
-}
-
-country_event = { # guarantee workaround
-	id = EAI_DM.10005
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = { # ROOT = TARGET FROM = DEFENDER
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10005"
-	
-		FROM = { country_event = { id = EAI_DM.10006 days = 20 } }
-	}
-
-	option = {}
-}
-
-country_event = { # guarantee workaround 2
-	id = EAI_DM.10006
-
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = { # ROOT = DEFENDER FROM = TARGET
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10006"
-
-		if = {
-			limit = {
-				#ruleset for allowing guarantees
-				OR = {
-					AND = { NOT = { any_country = { ROOT = { has_guaranteed = PREV } } } has_political_power > 25 }
-					AND = { any_country = { ROOT = { has_guaranteed = PREV } } has_political_power > 50 }
-				}
-				NOT = { ROOT = { has_guaranteed = FROM } }
-				NOT = { FROM = { has_war = yes } }
-				NOT = { FROM = { is_in_faction = yes } }
-				NOT = { ic_ratio = { tag = FROM ratio < 0.5 } }
-				OR = {
-					AND = { ROOT = { has_government = democratic } threat > 0.25 }
-					AND = { ROOT = { has_government = fascism } FROM = { has_government = fascism } }
-					AND = { ROOT = { has_government = communism } FROM = { has_government = communism } }
-					AND = { ROOT = { has_government = neutrality } FROM = { has_government = neutrality } OR = { FROM = { is_major = no } ROOT = { is_major = yes } } threat > 0.4 }
-				}
-			}
-
-			add_political_power = -25
-			if = {
-				limit = { any_country = { ROOT = { has_guaranteed = PREV } } }
-				add_political_power = -25
-			}
-			ROOT = { give_guarantee = FROM }
-
-			clr_country_flag = EAI_guarantee_workaround
-
-			#else = {
-			#	if = { #try again later
-			#		limit = { has_country_flag = { flag = EAI_guarantee_workaround value > 0 } }
-           #    
-			#		modify_country_flag = { flag = EAI_guarantee_workaround value = -1 }
-           #    
-			#		FROM = { country_event = EAI_DM.10005 }
-           #    
-			#		else = { clr_country_flag = EAI_guarantee_workaround }
-			#	}
-			#}
-		}
-	}
-
-	option = {}
-}
-
-news_event = { # news event
-	id = EAI_DM.10010
-	title = EAI_DM.10000.t
-	desc = EAI_DM.10000.d
-	picture = GFX_news_event_generic_rally_3
-	is_triggered_only = yes
-
-	option = { name = EAI_DM.10010.o1 }
-}
-
-news_event = { # news event
-	id = EAI_DM.10011
-	title = EAI_DM.10011.t
-	desc = EAI_DM.10011.d
-	picture = GFX_news_event_generic_rally
 
 	major = yes
 
-	is_triggered_only = yes
+	option = { name = EAI_DM.1301.o1
 
-	option = { name = EAI_DM.10011.o1 }
-}
-
-news_event = { # news event
-	id = EAI_DM.10012
-	title = EAI_DM.10012.t
-	desc = EAI_DM.10012.d
-	picture = GFX_news_event_generic_rally_3
-
-	is_triggered_only = yes
-
-	option = { name = EAI_DM.10012.o1 }
-}
-
-country_event = { # lowers infamy if justification was cancelled
-	id = EAI_DM.10009
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = { # FROM = INVADER
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10009"
-		
-		if = {
-			limit = { 
-				NOT = { FROM = { is_justifying_wargoal_against = ROOT } }
-				has_country_flag = EAI_infamy_added_at_@FROM
-			}
-
-			if = {
-				limit = { FROM = { has_country_flag = { flag = EAI_infamy_count_@THIS value > 1 } } }
-				
-				FROM = { modify_country_flag = { flag = EAI_infamy_count_@THIS value = -1 } }
-				
-				else = { FROM = { clr_country_flag = EAI_infamy_count_@THIS } }
-			}
-			
-			clr_country_flag = EAI_ignore_illegal_justification_by_@FROM
-			clr_country_flag = EAI_infamy_added_at_@FROM
-		}
-	}
-
-	option = {}
-}
-
-######################################
-#	AI faction join events
-######################################
-
-country_event = { # AI warns a country if it will join a faction on wardec
-	id = EAI_DM.10007
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10007"
-
-		FROM = { country_event = EAI_DM.10013 }
-	}
-
-	option = {}
-}
-
-country_event = {
-	id = EAI_DM.10008
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10008"
-
-		if = {
-			limit = {
-				NOT = { FROM = { is_justifying_wargoal_against = ROOT } }
-			}
-
-			clr_country_flag = EAI_illegal_wargoal_justified_by_@FROM
-		}
-	}
-
-	option = {}
-}
-
-news_event = { # news event
-	id = EAI_DM.10013
-	title = EAI_DM.10013.t
-	desc = EAI_DM.10013.d
-	picture = GFX_news_event_generic_rally_3
-
-	major = yes
-
-	is_triggered_only = yes
-
-	option = { # ok
-		name = EAI_DM.10013.o1
 	}
 }
 
 country_event = {
-	id = EAI_DM.10014
-	hidden = yes
+	id = EAI_DM.1302
+	title = EAI_DM.1302_t
+	desc = EAI_DM.1302_d
+	picture = GFX_report_event_vienna_award_hungary
 
 	is_triggered_only = yes
 
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10014"
-		
-		if = {
-			limit = {
-				NOT = { FROM = { is_justifying_wargoal_against = ROOT } }
-			}
+	option = { name = EAI_DM.1302.o1
 
-			every_country = {
-				limit = { has_country_flag = EAI_faction_join_warning_issued_at_@FROM }
-				
-				clr_country_flag = EAI_faction_join_warning_issued_at_@FROM
-			}
-		}
 	}
-
-	option = {}
 }
 
 country_event = {
-	id = EAI_DM.10015
-	hidden = yes
+	id = EAI_DM.1303
+	title = EAI_DM.1303_t
+	desc = EAI_DM.1303_d
+	picture = GFX_report_event_vienna_award_hungary
 
 	is_triggered_only = yes
 
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10015"
-
-		if = {
-			limit = {
-				NOT = { FROM = { is_justifying_wargoal_against = ROOT } }
-			}
-
-			clr_country_flag = EAI_will_join_faction_@FROM
-		}
+	option = { name = EAI_DM.1303.o1
+	
 	}
-
-	option = {}
-}
-
-country_event = { # add ai strategies on wardec
-	id = EAI_DM.10100
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10100"
-
-		set_country_flag = EAI_mobilize_army
-		
-		event_target:EAI_illegal_wardec_target = {
-		
-			ROOT = { set_country_flag = { flag = EAI_supports_@PREV value = 1 days = 365 } } 
-			
-			set_country_flag = { flag = EAI_receives_support_@THIS value = 1 days = 365 }
-		}
-		
-		add_ai_strategy = { type = send_volunteers_desire id = event_target:EAI_illegal_wardec_target value = 200 }
-		
-		add_ai_strategy = { type = antagonize id = FROM value = 100 }
-		
-		if = { limit = { has_country_flag = EAI_seeks_alliance_democratic }
-		
-			every_country = {
-				limit = { has_government = democratic is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-		
-		if = { limit = { has_country_flag = EAI_seeks_alliance_communism }
-		
-			every_country = {
-				limit = { has_government = communism is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-		
-		if = { limit = { has_country_flag = EAI_seeks_alliance_fascism }
-		
-			every_country = {
-				limit = { has_government = fascism is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-	}
-
-	option = { name = "OK" }
-}
-
-country_event = { # add ai strategies on wardec
-	id = EAI_DM.10101
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: EAI_DM.10101"
-
-		set_country_flag = EAI_mobilize_army
-
-		if = { limit = { has_country_flag = EAI_seeks_alliance_democratic }
-		
-			every_country = {
-				limit = { has_government = democratic is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-		
-		if = { limit = { has_country_flag = EAI_seeks_alliance_communism }
-		
-			every_country = {
-				limit = { has_government = communism is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-		
-		if = { limit = { has_country_flag = EAI_seeks_alliance_fascism }
-		
-			every_country = {
-				limit = { has_government = fascism is_faction_leader = yes }
-				
-				ROOT = { add_ai_strategy = { type = alliance id = PREV value = 500 } }
-			}
-		}
-	}
-
-	option = { name = "OK" }
 }

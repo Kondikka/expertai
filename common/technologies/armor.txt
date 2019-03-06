@@ -7,29 +7,32 @@ technologies = {
 		}
 
 		on_research_complete = {
-			limit = {
-				NOT = {	has_template_containing_unit = light_armor }
-				NOT = {	has_template_containing_unit = heavy_armor }
-				NOT = {	has_template_containing_unit = medium_armor }
-			}
-			hidden_effect = {
-				if = {
-					limit = {
-						has_tech = motorised_infantry
-					}
-
-					load_oob = "unlock_tanks_mot"
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: gwtank" }
+			if = {
+				limit = {
+					NOT = {	has_template_containing_unit = light_armor }
+					NOT = {	has_template_containing_unit = heavy_armor }
+					NOT = {	has_template_containing_unit = medium_armor }
 				}
-				if = {
-					limit = {
-						NOT = { has_tech = motorised_infantry }
+				hidden_effect = {
+					if = {
+						limit = {
+							has_tech = motorised_infantry
+						}
+
+						load_oob = "unlock_tanks_mot"
 					}
+					if = {
+						limit = {
+							NOT = { has_tech = motorised_infantry }
+						}
 
-					load_oob = "unlock_tanks"
+						load_oob = "unlock_tanks"
+					}
 				}
-			}
 
-			custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+				custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+			}
 		}
 	
 		path = {
@@ -50,19 +53,22 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { date > 1937.1.1 EAI_armor_tech_focus = yes } }
 			modifier = { factor = 0 NOT = { EAI_LARM_tech_focus = yes EAI_MARM_tech_focus = yes EAI_HARM_tech_focus = yes } }
 			modifier = { factor = 0 NOT = { has_tech = motorised_infantry } OR = { EAI_LARM_tech_focus = yes EAI_MARM_tech_focus = yes } }
 		}
-
+		
 		categories = {
 			armor
 			cat_light_armor
 		}
-	}
+	}	
 
 	basic_light_tank = { #Panzer I
 
@@ -71,29 +77,33 @@ technologies = {
 		}
 
 		on_research_complete = {
-			limit = {
-				NOT = {	has_template_containing_unit = light_armor }
-				NOT = {	has_template_containing_unit = heavy_armor }
-				NOT = {	has_template_containing_unit = medium_armor }
-			}
-			hidden_effect = {
-				if = {
-					limit = {
-						has_tech = motorised_infantry
-					}
-
-					load_oob = "unlock_tanks_mot"
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: basic_light_tank" }
+			if = {
+				limit = {
+					NOT = {	has_template_containing_unit = light_armor }
+					NOT = {	has_template_containing_unit = heavy_armor }
+					NOT = {	has_template_containing_unit = medium_armor }
 				}
-				if = {
-					limit = {
-						NOT = { has_tech = motorised_infantry }
+				
+				hidden_effect = {
+					if = {
+						limit = {
+							has_tech = motorised_infantry
+						}
+
+						load_oob = "unlock_tanks_mot"
 					}
+					if = {
+						limit = {
+							NOT = { has_tech = motorised_infantry }
+						}
 
-					load_oob = "unlock_tanks"
+						load_oob = "unlock_tanks"
+					}
 				}
-			}
 
-			custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+				custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+			}
 		}
 		
 		path = {
@@ -116,12 +126,15 @@ technologies = {
 		
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { date > 1937.1.1 EAI_armor_tech_focus = yes } }
 			modifier = { factor = 0 NOT = { EAI_LARM_tech_focus = yes EAI_MARM_tech_focus = yes } }
-			modifier = { factor = 0 has_country_flag = EAI_FOCUS/harm_army_focus has_country_flag = EAI_FOCUS/marm_attachment }
+			modifier = { factor = 0 check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
 		}
 		
 		categories = {
@@ -187,9 +200,13 @@ technologies = {
 	improved_light_tank = { #Panzer II
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_light_tank" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
 			
-			hidden_effect = { country_event = { id = EAI_V_LARM.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+				hidden_effect = { EAI_variant_upgrade_LARM = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -198,6 +215,11 @@ technologies = {
 		
 		path = {
 			leads_to_tech = advanced_light_tank
+			research_cost_coeff = 1
+		}
+
+		path = {
+			leads_to_tech = amphibious_tank
 			research_cost_coeff = 1
 		}
 		
@@ -221,12 +243,15 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 600
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { date > 1937.1.1 EAI_armor_tech_focus = yes } }
 			modifier = { factor = 0 NOT = { EAI_LARM_tech_focus = yes EAI_MARM_tech_focus = yes } }
-			modifier = { factor = 0 has_country_flag = EAI_FOCUS/harm_army_focus has_country_flag = EAI_FOCUS/marm_attachment }
+			modifier = { factor = 0 check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
 		}
 		
 		categories = {
@@ -256,9 +281,12 @@ technologies = {
 	improved_light_art = {
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_LSPART.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_light_art" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_LSPART = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -269,7 +297,10 @@ technologies = {
 		start_year = 1936
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = improved_light_tank } }
@@ -284,9 +315,12 @@ technologies = {
 	improved_light_spaa = {
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_LSPAA.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_light_spaa" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_LSPAA = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -297,7 +331,10 @@ technologies = {
 		start_year = 1936
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = improved_light_tank } }
@@ -308,13 +345,77 @@ technologies = {
 			armor
 		}
 	}
+
+	amphibious_tank = { #SchwimmPanzer II
+
+		enable_equipments = {
+			amphibious_tank_equipment_1
+		}
+
+		enable_subunits = {
+			amphibious_armor
+		}
+
+		path = {
+			leads_to_tech = amphibious_tank_2
+			research_cost_coeff = 1
+		}
+
+		allow_branch = {
+			has_dlc = "Man the Guns"
+		}
+		
+		research_cost = 2
+		start_year = 1940
+		
+		folder = {
+			name = armour_folder
+			position = { x = -8 y = 7 }
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+		
+		categories = {
+			armor
+			tp_tech
+		}
+	}
+
+	amphibious_tank_2 = { #tauchPanzer III
+
+		enable_equipments = {
+			amphibious_tank_equipment_2
+		}
+		
+		research_cost = 2
+		start_year = 1942
+		
+		folder = {
+			name = armour_folder
+			position = { x = -8 y = 9 }
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+		
+		categories = {
+			armor
+			tp_tech
+		}
+	}
 	
 	advanced_light_tank = { #Leopard
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_LARM.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_light_tank" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_LARM = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -336,16 +437,17 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 1
+			factor = 100
 
 			#DATE
-			modifier = { factor = 0 date < 1941.1.1 NOT = { EAI_armor_tech_bonus = yes } }
+			modifier = { factor = 0 date < 1940.6.1 EAI_armor_tech_focus = yes }
+			modifier = { factor = 0 date < 1940.6.1 NOT = { EAI_armor_tech_focus = yes } }
 			
 			#WEIGHT
-			modifier = { factor = 400 date > 1937.1.1 }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { AND = { EAI_LARM_tech_focus = yes has_country_flag = EAI_FOCUS/anti_tank_army_focus has_country_flag = EAI_FOCUS/larm_attachment } } }
+			modifier = { factor = 0 NOT = { AND = { EAI_LARM_tech_focus = yes check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } } }
 		}
 		
 		categories = {
@@ -375,9 +477,12 @@ technologies = {
 	advanced_light_art = {
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_LSPART.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_light_art" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_LSPART = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -388,7 +493,10 @@ technologies = {
 		start_year = 1941
 	
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_LSPART_tech_focus = yes } }
@@ -403,9 +511,12 @@ technologies = {
 	advanced_light_spaa = {
 	
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_LSPAA.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_light_spaa" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_LSPAA = yes }
+			}
 		}
 
 		enable_equipments = {
@@ -416,7 +527,10 @@ technologies = {
 		start_year = 1941
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_LSPAA_tech_focus = yes } }
@@ -428,7 +542,7 @@ technologies = {
 		}
 	}
 	
-	basic_medium_tank = { #Panzer III
+	basic_medium_tank = { on_research_complete = { if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: basic_medium_tank" } } #Panzer III
 
 		enable_equipments = {
 			medium_tank_equipment_1 
@@ -460,11 +574,12 @@ technologies = {
 			modifier = { factor = 0 date < 1938.1.1 NOT = { EAI_armor_tech_bonus = yes } }
 			
 			#WEIGHT
-			modifier = { factor = 400 date > 1937.1.1 }
+			modifier = { factor = 100 date > 1937.1.1 }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MARM_tech_focus = yes } }
-			modifier = { factor = 0 has_country_flag = EAI_FOCUS/harm_army_focus has_country_flag = EAI_FOCUS/marm_attachment }
+			modifier = { factor = 0 check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
 		}
 		
 		categories = {
@@ -531,9 +646,12 @@ technologies = {
 	improved_medium_tank = { #Panzer IV
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MARM.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_medium_tank" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MARM = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -564,10 +682,16 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 150
 			
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 NOT = { EAI_armor_tech_bonus = yes } }
+			modifier = { factor = 0 date < 1938.1.1 EAI_armor_tech_focus = yes EAI_armor_tech_bonus = yes }
+			modifier = { factor = 0 date < 1940.1.1 EAI_armor_tech_focus = yes NOT = { EAI_armor_tech_bonus = yes } }
+			modifier = { factor = 0 date < 1940.1.1 NOT = { EAI_armor_tech_focus = yes } EAI_armor_tech_bonus = yes }
+			modifier = { factor = 0 date < 1941.1.1 NOT = { EAI_armor_tech_focus = yes } NOT = { EAI_armor_tech_bonus = yes } }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MARM_tech_focus = yes } }
@@ -589,9 +713,12 @@ technologies = {
 	improved_medium_td = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MTD.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_medium_td" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MTD = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -605,10 +732,10 @@ technologies = {
 			factor = 100
 			
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 NOT = { has_country_flag = EAI_FOCUS/anti_tank_army_focus } }
+			modifier = { factor = 0 date < 1940.6.1 }
 			
 			#WEIGHT
-			modifier = { factor = 4 OR = { NOT = { EAI_prioritise_infantry_techs = yes } has_country_flag = EAI_FOCUS/anti_tank_army_focus } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = improved_medium_tank } }
@@ -630,9 +757,12 @@ technologies = {
 	improved_medium_art = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPART.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_medium_art" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPART = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -644,12 +774,12 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			factor = 100
-			
+
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 }
-			
+			modifier = { factor = 0 date < 1940.6.1 }
+
 			#WEIGHT
-			modifier = { factor = 4 NOT = { EAI_prioritise_infantry_techs = yes } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { 
@@ -671,9 +801,12 @@ technologies = {
 	improved_medium_spaa = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPAA.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_medium_spaa" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPAA = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -685,12 +818,12 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			factor = 100
-			
+
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 }
-			
+			modifier = { factor = 0 date < 1940.6.1 }
+
 			#WEIGHT
-			modifier = { factor = 4 NOT = { EAI_prioritise_infantry_techs = yes } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { 
@@ -712,9 +845,12 @@ technologies = {
 	advanced_medium_tank = { #Panther
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MARM.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_medium_tank" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MARM = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -746,10 +882,14 @@ technologies = {
 		
 
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
 			
 			#DATE
-			modifier = { factor = 0 date < 1942.1.1 }
+			modifier = { factor = 0 date < 1942.6.1 EAI_armor_tech_focus = yes }
+			modifier = { factor = 0 date < 1943.1.1 NOT = { EAI_armor_tech_focus = yes } }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MARM_tech_focus = yes } }
@@ -765,9 +905,12 @@ technologies = {
 	advanced_medium_td = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MTD.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_medium_td" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MTD = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -778,10 +921,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+			
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = advanced_medium_tank } }
@@ -797,9 +943,12 @@ technologies = {
 	advanced_medium_art = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPART.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_medium_art" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPART = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -810,10 +959,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+			
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = advanced_medium_tank } }
@@ -829,9 +981,12 @@ technologies = {
 	advanced_medium_spaa = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPAA.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_medium_spaa" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPAA = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -842,10 +997,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { has_tech = advanced_medium_tank } }
@@ -861,9 +1019,12 @@ technologies = {
 	main_battle_tank = { #E-50
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MARM.4 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: main_battle_tank" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MARM = yes }
+			}
 		}
 	
 		enable_equipments = {
@@ -885,10 +1046,13 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
 
 			#DATE
 			modifier = { factor = 0 date < 1945.1.1 }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MARM_tech_focus = yes EAI_HARM_tech_focus = yes } }
@@ -903,9 +1067,12 @@ technologies = {
 	modern_td = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MTD.4 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: modern_td" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MTD = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -916,7 +1083,10 @@ technologies = {
 		start_year = 1945
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MTD_tech_focus = yes EAI_HTD_tech_focus = yes } }
@@ -931,9 +1101,12 @@ technologies = {
 	modern_art = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPART.4 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: modern_art" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPART = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -944,7 +1117,10 @@ technologies = {
 		start_year = 1945
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MSPART_tech_focus = yes EAI_HSPART_tech_focus = yes } }
@@ -959,9 +1135,12 @@ technologies = {
 	modern_spaa = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_MSPAA.4 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: modern_spaa" }
+
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_MSPAA = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -972,7 +1151,10 @@ technologies = {
 		start_year = 1945
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_MSPAA_tech_focus = yes EAI_HSPAA_tech_focus = yes } }
@@ -991,29 +1173,32 @@ technologies = {
 		}
 
 		on_research_complete = {
-			limit = {
-				NOT = {	has_template_containing_unit = light_armor }
-				NOT = {	has_template_containing_unit = heavy_armor }
-				NOT = {	has_template_containing_unit = medium_armor }
-			}
-			hidden_effect = {
-				if = {
-					limit = {
-						has_tech = motorised_infantry
-					}
-
-					load_oob = "unlock_tanks_mot"
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: basic_heavy_tank" }
+			if = {
+				limit = {
+					NOT = {	has_template_containing_unit = light_armor }
+					NOT = {	has_template_containing_unit = heavy_armor }
+					NOT = {	has_template_containing_unit = medium_armor }
 				}
-				if = {
-					limit = {
-						NOT = { has_tech = motorised_infantry }
+				hidden_effect = {
+					if = {
+						limit = {
+							has_tech = motorised_infantry
+						}
+
+						load_oob = "unlock_tanks_mot"
 					}
+					if = {
+						limit = {
+							NOT = { has_tech = motorised_infantry }
+						}
 
-					load_oob = "unlock_tanks"
+						load_oob = "unlock_tanks"
+					}
 				}
-			}
 
-			custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+				custom_effect_tooltip = UNLOCK_DIVISION_TEMPLATE
+			}
 		}
 		
 		path = {
@@ -1036,11 +1221,14 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 600
+			factor = 100
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HARM_tech_focus = yes } }
-			modifier = { factor = 0 has_country_flag = EAI_FOCUS/marm_army_focus has_country_flag = EAI_FOCUS/harm_attachment }
+			modifier = { factor = 0 check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } }
 		}
 		
 		categories = {
@@ -1107,9 +1295,11 @@ technologies = {
 	improved_heavy_tank = { #Tiger
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HARM.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_heavy_tank" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HARM = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1145,11 +1335,16 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 150
 			
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 NOT = { EAI_armor_tech_bonus = yes } }
-			modifier = { factor = 0 date < 1938.1.1 EAI_armor_tech_bonus = yes }
+			modifier = { factor = 0 date < 1940.6.1 EAI_armor_tech_focus = yes NOT = { EAI_armor_tech_bonus = yes } }
+			modifier = { factor = 0 date < 1938.1.1 EAI_armor_tech_focus = yes EAI_armor_tech_bonus = yes }
+			modifier = { factor = 0 date < 1940.1.1 NOT = { EAI_armor_tech_focus = yes } EAI_armor_tech_bonus = yes }
+			modifier = { factor = 0 date < 1941.1.1 NOT = { EAI_armor_tech_focus = yes } NOT = { EAI_armor_tech_bonus = yes } }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HARM_tech_focus = yes } }
@@ -1171,9 +1366,11 @@ technologies = {
 	improved_heavy_td = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HTD.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_heavy_td" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HTD = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1185,12 +1382,12 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			factor = 100
-			
+
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 NOT = { has_country_flag = EAI_FOCUS/anti_tank_army_focus } }
-			
+			modifier = { factor = 0 date < 1940.6.1 }
+
 			#WEIGHT
-			modifier = { factor = 4 OR = { NOT = { EAI_prioritise_infantry_techs = yes } has_country_flag = EAI_FOCUS/anti_tank_army_focus } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HTD_tech_focus = yes } }
@@ -1212,9 +1409,11 @@ technologies = {
 	improved_heavy_art = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HSPART.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_heavy_art" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HSPART = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1226,12 +1425,12 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			factor = 100
-			
+
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 NOT = { has_country_flag = EAI_FOCUS/harm_army_focus } }
+			modifier = { factor = 0 date < 1940.6.1 }
 			
 			#WEIGHT
-			modifier = { factor = 4 OR = { NOT = { EAI_prioritise_infantry_techs = yes } has_country_flag = EAI_FOCUS/harm_army_focus } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HSPART_tech_focus = yes } }
@@ -1254,9 +1453,11 @@ technologies = {
 	improved_heavy_spaa = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HSPAA.2 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: improved_heavy_spaa" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HSPAA = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1268,12 +1469,12 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			factor = 100
-			
+
 			#DATE
-			modifier = { factor = 0 date < 1940.1.1 }
-			
+			modifier = { factor = 0 date < 1940.6.1 }
+
 			#WEIGHT
-			modifier = { factor = 4 NOT = { EAI_prioritise_infantry_techs = yes } }
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HSPAA_tech_focus = yes } }
@@ -1295,9 +1496,11 @@ technologies = {
 	advanced_heavy_tank = { #King Tiger
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HARM.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_heavy_tank" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HARM = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1328,10 +1531,14 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 400
+			factor = 100
 			
 			#DATE
-			modifier = { factor = 0 date < 1942.1.1 }
+			modifier = { factor = 0 date < 1942.6.1 EAI_armor_tech_focus = yes }
+			modifier = { factor = 0 date < 1943.1.1 NOT = { EAI_armor_tech_focus = yes } }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 			
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HARM_tech_focus = yes } }
@@ -1347,9 +1554,11 @@ technologies = {
 	advanced_heavy_td = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HTD.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_heavy_td" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HTD = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1360,10 +1569,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HTD_tech_focus = yes } }
@@ -1379,9 +1591,11 @@ technologies = {
 	advanced_heavy_art = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HSPART.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_heavy_art" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HSPART = yes }
+			}
 		}
 	
 		enable_equipments = {
@@ -1392,10 +1606,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HSPART_tech_focus = yes } }
@@ -1411,9 +1628,11 @@ technologies = {
 	advanced_heavy_spaa = {
 
 		on_research_complete = { #EAI
-			limit = { is_ai = yes has_army_experience > 100 }
-			
-			hidden_effect = { country_event = { id = EAI_V_HSPAA.3 hours = 1 } } #upgrade this instantly so that the AI doesn't waste prod.eff by having to do two production switches
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetDate] | AI TECH | [Root.GetName] | ARMOR: advanced_heavy_spaa" }
+			if = {
+				limit = { is_ai = yes check_variable = { EAI_army_xp > 100 } }
+				hidden_effect = { EAI_variant_upgrade_HSPAA = yes }
+			}
 		}
 		
 		enable_equipments = {
@@ -1424,10 +1643,13 @@ technologies = {
 		start_year = 1943
 		
 		ai_will_do = { #EAI
-			factor = 400
-			
+			factor = 100
+
 			#DATE
-			modifier = { factor = 0 date < 1942.6.1 }
+			modifier = { factor = 0 date < 1943.1.1 }
+
+			#WEIGHT
+			modifier = { factor = 2 EAI_armor_tech_focus = yes }
 
 			#RESTRICTIONS
 			modifier = { factor = 0 NOT = { EAI_HSPAA_tech_focus = yes } }

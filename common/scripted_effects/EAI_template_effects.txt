@@ -1,0 +1,1840 @@
+############################################################################################################
+#	Expert AI mod - scripted template AI effects
+############################################################################################################
+
+### These control the upgrade priorities of the AI's division role templates
+# Certain template types require a base template created for the AI which it can use as a starting point for upgrades
+
+# template upgrades
+EAI_template_upgrades = {
+	army_experience = EAI_army_xp # needs to check stored + game xp for these scripts
+	set_variable = { EAI_army_xp = 0 }
+
+    EAI_marine_template_upgrade = yes
+    EAI_mountaineer_template_upgrade = yes
+    EAI_antitank_template_upgrade = yes
+    EAI_light_armor_template_upgrade = yes
+    EAI_medium_armor_template_upgrade = yes
+    EAI_heavy_armor_template_upgrade = yes
+    EAI_modern_armor_template_upgrade = yes
+    EAI_motorized_template_upgrade = yes
+    EAI_mechanized_template_upgrade = yes
+    EAI_garrison_template_upgrade = yes
+
+	EAI_manage_xp = yes # return game xp back to stored xp
+}
+
+EAI_marine_template_upgrade = {
+    if = {
+        limit = {
+            has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_marine_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 10
+
+		    ############ focus req
+
+		    check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+    
+		    ############ tech req
+
+		    has_tech = marines
+
+		    ############ template priorities
+
+		    has_army_experience > 100
+    
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+		    	OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+		    	OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 400 }
+		    }
+        }
+
+        set_country_flag = EAI_marine_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading marine"
+    }
+}
+
+EAI_mountaineer_template_upgrade = {
+    if = {
+        limit = {
+            has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_mountaineer_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 10
+
+		    ############ focus req
+
+		    check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+    
+		    ############ tech req
+
+		    has_tech = tech_mountaineers
+
+		    ############ template priorities
+
+		    has_army_experience > 100
+    
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+		    	OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+		    	OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 400 }
+		    }
+        }
+
+        set_country_flag = EAI_mountaineer_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading mountaineer"
+    }
+}
+
+EAI_antitank_template_upgrade = {
+    if = {
+        limit = {
+		    has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_anti_tank_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 10
+
+			if = { # MTD divisions are pretty useless
+				limit = { 
+					has_global_flag = EAI_challenging_mode 
+					check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
+					NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+				} 
+				num_of_military_factories > 300
+			}
+
+		    ############ tech req
+    
+		    OR = {
+		    	AND = {
+		    		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE }
+
+		    		OR = {
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+    
+		    				has_tech = interwar_antitank
+    
+		    				OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_medium_spaa has_tech = improved_medium_spaa has_tech = advanced_medium_spaa }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_heavy_spaa has_tech = improved_heavy_spaa has_tech = advanced_heavy_spaa }
+		    			}
+		    		}
+		    	}
+		    	AND = {
+		    		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE }
+
+		    		OR = {
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+    
+		    				has_tech = interwar_antitank
+    
+		    				OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+    
+		    				has_tech = motorised_infantry
+    
+		    				OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+		    			}
+		    		}
+		    	}
+		    	AND = {
+		    		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE }
+
+		    		OR = {
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+    
+		    				has_tech = interwar_antitank
+    
+		    				OR = { has_tech = basic_light_spaa has_tech = improved_light_spaa has_tech = advanced_light_spaa }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+    
+		    				has_tech = motorised_infantry
+    
+		    				OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+		    			}
+		    		}
+		    	}
+		    	AND = {
+		    		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+
+		    		OR = {
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+    
+		    				has_tech = interwar_antitank
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_medium_td has_tech = improved_medium_td has_tech = advanced_medium_td }
+		    			}
+		    			AND = {
+		    				check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
+    
+		    				OR = { has_tech = basic_heavy_td has_tech = improved_heavy_td has_tech = advanced_heavy_td }
+		    			}
+		    		}
+		    	}
+		    }
+
+		    ############ template priorities
+    
+		    has_army_experience > 25
+    
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+		    	OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 400 }
+		    }
+		    else_if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+		    	OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 400 }
+		    }
+        }
+
+		set_country_flag = EAI_anti_tank_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading anti-tank"
+		
+		############################################################################################################################
+
+		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_26W_INF_WIDTH } }
+			
+			army_experience = -20
+			
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							infantry = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							infantry = { x = 2 y = 3 }
+				
+							medium_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							infantry = { x = 2 y = 3 }
+				
+							heavy_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							infantry = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							anti_tank_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							infantry = { x = 2 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+		}
+		
+		############################################################################################################################
+		
+		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH } }
+			
+			army_experience = -20
+			
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							medium_sp_anti_air_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_sp_anti_air_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+							motorized = { x = 1 y = 4 }
+				
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+				
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+				
+							light_sp_anti_air_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+							motorized = { x = 0 y = 4 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+							motorized = { x = 1 y = 3 }
+							motorized = { x = 1 y = 4 }
+				
+							motorized = { x = 2 y = 0 }
+							motorized = { x = 2 y = 1 }
+							motorized = { x = 2 y = 2 }
+							motorized = { x = 2 y = 3 }
+							
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+				
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							artillery_brigade = { x = 3 y = 3 }
+				
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							anti_tank_brigade = { x = 0 y = 3 }
+							artillery_brigade = { x = 0 y = 4 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							anti_tank_brigade = { x = 1 y = 3 }
+							artillery_brigade = { x = 1 y = 4 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							anti_tank_brigade = { x = 2 y = 3 }
+							artillery_brigade = { x = 2 y = 4 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+							artillery_brigade = { x = 3 y = 4 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							artillery_brigade = { x = 3 y = 2 }
+							
+							medium_tank_destroyer_brigade = { x = 4 y = 0 }
+							medium_tank_destroyer_brigade = { x = 4 y = 1 }
+							medium_tank_destroyer_brigade = { x = 4 y = 2 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							artillery_brigade = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							artillery_brigade = { x = 1 y = 3 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+							artillery_brigade = { x = 2 y = 3 }
+							
+							infantry = { x = 3 y = 0 }
+							infantry = { x = 3 y = 1 }
+							infantry = { x = 3 y = 2 }
+							infantry = { x = 3 y = 3 }
+							artillery_brigade = { x = 3 y = 4 }
+							
+							heavy_tank_destroyer_brigade = { x = 4 y = 0 }
+						}
+					}
+				}
+			}
+		}
+		
+		############################################################################################################################
+
+		if = { limit = { OR = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH } check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } } }
+			
+			army_experience = -20
+			
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							medium_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+				
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							heavy_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+							infantry = { x = 0 y = 3 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							infantry = { x = 1 y = 3 }
+				
+							anti_tank_brigade = { x = 2 y = 0 }
+				
+							light_sp_anti_air_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							motorized = { x = 0 y = 0 }
+							motorized = { x = 0 y = 1 }
+							motorized = { x = 0 y = 2 }
+							motorized = { x = 0 y = 3 }
+						
+							motorized = { x = 1 y = 0 }
+							motorized = { x = 1 y = 1 }
+							motorized = { x = 1 y = 2 }
+				
+							medium_tank_destroyer_brigade = { x = 2 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } }
+				
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+							infantry = { x = 2 y = 2 }
+				
+							anti_tank_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+						
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+				
+							medium_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+				else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				
+					division_template = {
+						name = "Anti-Tank Template"
+				
+						priority = 3
+				
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 0 y = 1 }
+							infantry = { x = 0 y = 2 }
+						
+							infantry = { x = 1 y = 0 }
+							infantry = { x = 1 y = 1 }
+							infantry = { x = 1 y = 2 }
+							
+							infantry = { x = 2 y = 0 }
+							infantry = { x = 2 y = 1 }
+				
+							heavy_tank_destroyer_brigade = { x = 3 y = 0 }
+						}
+					}
+				}
+			}
+		}
+    }
+}
+
+EAI_light_armor_template_upgrade = {
+    if = {
+        limit = {
+		    has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_larm_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 20
+
+		    ############ focus req
+
+		    check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
+
+		    ############ tech req
+    
+		    has_tech = motorised_infantry
+
+		    OR = { has_tech = basic_light_tank has_tech = improved_light_tank has_tech = advanced_light_tank }
+
+		    ############ template priorities
+
+		    has_army_experience > 25
+        }
+
+      	set_country_flag = EAI_larm_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading light_armor"
+
+		if = { limit = { NOT = { ai_has_role_template = light_armor } }
+			army_experience = -25
+		}
+
+		division_template = {
+			name = "Light Armor Template"
+
+			priority = 4
+
+			regiments = {
+				motorized = { x = 0 y = 0 }
+				motorized = { x = 0 y = 1 }
+				motorized = { x = 0 y = 2 }
+				
+				light_armor = { x = 1 y = 0 }
+
+				light_armor = { x = 2 y = 0 }
+
+				light_armor = { x = 3 y = 0 }
+
+				light_armor = { x = 4 y = 0 }
+			}
+		} 
+    }
+}
+
+EAI_medium_armor_template_upgrade = {
+    if = {
+        limit = {
+	    	has_country_flag = EAI_army_config_triggered
+
+	    	NOT = { has_country_flag = EAI_marm_template_upgrade }
+
+	    	############ industry req
+    
+	    	num_of_military_factories > 20
+    
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+	    		num_of_military_factories > 75
+	    	}
+
+	    	############ focus req
+
+	    	OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
+
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+	    		OR = {
+	    			date > 1942.6.1
+
+	    			AND = { date > 1941.1.1 OR = { has_country_flag = EAI_difficulty_bonus_very_hard_active has_country_flag = EAI_difficulty_bonus_insane_active } }
+	    		}
+	    	}
+
+	    	############ tech req
+    
+	    	has_tech = motorised_infantry
+
+	    	OR = { has_tech = basic_medium_tank has_tech = improved_medium_tank has_tech = advanced_medium_tank }
+
+	    	############ template priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+				has_army_experience > 40
+			}
+
+	    	OR = {
+	    		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } has_army_experience > 25 }
+    
+	    		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } has_army_experience > 100 } 
+    
+	    		has_army_experience > 450
+	    	}
+        }
+
+		set_country_flag = EAI_marm_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading medium_armor"
+
+		####################################################################
+
+		if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } } }
+			army_experience = -25
+
+			division_template = {
+				name = "Medium Armor Template"
+
+				priority = 6
+
+				regiments = {
+					motorized = { x = 0 y = 0 }
+					motorized = { x = 0 y = 1 }
+					motorized = { x = 0 y = 2 }
+					
+					medium_armor = { x = 1 y = 0 }
+
+					medium_armor = { x = 2 y = 0 }
+
+					medium_armor = { x = 3 y = 0 }
+
+					medium_armor = { x = 4 y = 0 }
+				}
+			}
+		}
+
+		####################################################################
+
+		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } NOT = { check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } } }
+			army_experience = -25
+			
+			division_template = {
+				name = "Medium Armor Template"
+
+				priority = 6
+
+				regiments = {
+					infantry = { x = 0 y = 0 }
+
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
+
+					medium_armor = { x = 3 y = 0 }
+					medium_armor = { x = 3 y = 1 }
+
+					medium_armor = { x = 4 y = 0 }
+					medium_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+			army_experience = -40
+			
+			division_template = {
+				name = "Medium Armor Template"
+
+				priority = 6
+
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+
+					infantry = { x = 1 y = 0 }
+					infantry = { x = 1 y = 1 }
+					
+					infantry = { x = 2 y = 0 }
+					infantry = { x = 2 y = 1 }
+
+					medium_armor = { x = 3 y = 0 }
+					medium_armor = { x = 3 y = 1 }
+
+					medium_armor = { x = 4 y = 0 }
+					medium_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+    }
+}
+
+EAI_heavy_armor_template_upgrade = {
+    if = {
+        limit = {
+		    has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_harm_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 20
+    
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+		    	num_of_military_factories > 75
+		    }
+
+		    ############ focus req
+
+		    OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } }
+
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+		    	OR = {
+		    		date > 1942.6.1
+
+		    		AND = { date > 1941.1.1 OR = { has_country_flag = EAI_difficulty_bonus_very_hard_active has_country_flag = EAI_difficulty_bonus_insane_active } }
+		    	}
+		    }
+
+		    ############ tech req
+
+		    OR = { has_tech = basic_heavy_tank has_tech = improved_heavy_tank has_tech = advanced_heavy_tank }
+
+		    ############ template priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+				has_army_experience > 40
+			}
+
+		    OR = {
+		    	AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } has_army_experience > 25 }
+    
+		    	AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } has_army_experience > 100 }
+    
+		    	has_army_experience > 450
+		    }
+        }
+
+		set_country_flag = EAI_harm_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading heavy_armor"
+
+		####################################################################
+
+		if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } } }
+			army_experience = -25
+
+			division_template = {
+				name = "Heavy Armor Template"
+	
+				priority = 5
+	
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+					infantry = { x = 0 y = 2 }
+				
+					heavy_armor = { x = 1 y = 0 }
+	
+					heavy_armor = { x = 2 y = 0 }
+	
+					heavy_armor = { x = 3 y = 0 }
+	
+					heavy_armor = { x = 4 y = 0 }
+				}
+			}
+		}
+		
+		####################################################################
+		
+		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } NOT = { check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } } }
+			army_experience = -25
+
+			division_template = {
+				name = "Heavy Armor Template"
+	
+				priority = 5
+	
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
+					
+					heavy_armor = { x = 3 y = 0 }
+					heavy_armor = { x = 3 y = 1 }
+	
+					heavy_armor = { x = 4 y = 0 }
+					heavy_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+			army_experience = -40
+
+			division_template = {
+				name = "Heavy Armor Template"
+	
+				priority = 5
+	
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+					
+					infantry = { x = 1 y = 0 }
+					infantry = { x = 1 y = 1 }
+					
+					infantry = { x = 2 y = 0 }
+					infantry = { x = 2 y = 1 }
+					
+					heavy_armor = { x = 3 y = 0 }
+					heavy_armor = { x = 3 y = 1 }
+	
+					heavy_armor = { x = 4 y = 0 }
+					heavy_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+    }
+}
+
+EAI_modern_armor_template_upgrade = {
+    if = {
+        limit = {
+		    has_country_flag = EAI_army_config_triggered
+
+		    NOT = { has_country_flag = EAI_mod_template_upgrade }
+
+		    ############ industry req
+
+		    num_of_military_factories > 35
+
+		    ############ tech req
+    
+		    has_tech = motorised_infantry
+    
+		    has_tech = main_battle_tank
+    
+		    ############ xp req
+    
+		    if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+				has_army_experience > 40
+			}
+			else = {
+				has_army_experience > 25
+			}
+        }
+
+		set_country_flag = EAI_mod_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading modern_armor"
+
+		####################################################################
+
+		if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } } }
+			army_experience = -25
+
+			division_template = {
+				name = "Medium Armor Template"
+
+				priority = 7
+
+				regiments = {
+					motorized = { x = 0 y = 0 }
+					motorized = { x = 0 y = 1 }
+					motorized = { x = 0 y = 2 }
+					
+					medium_armor = { x = 1 y = 0 }
+
+					medium_armor = { x = 2 y = 0 }
+
+					medium_armor = { x = 3 y = 0 }
+
+					medium_armor = { x = 4 y = 0 }
+				}
+			}
+		}
+
+		####################################################################
+
+		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } NOT = { check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } } }
+			army_experience = -25
+			
+			division_template = {
+				name = "Modern Armor Template"
+
+				priority = 7
+
+				regiments = {
+					infantry = { x = 0 y = 0 }
+
+					infantry = { x = 1 y = 0 }
+					
+					infantry = { x = 2 y = 0 }
+
+					modern_armor = { x = 3 y = 0 }
+					modern_armor = { x = 3 y = 1 }
+
+					modern_armor = { x = 4 y = 0 }
+					modern_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } check_variable = { EAI_FOCUS/LAND/armor_width = global.EAI_40W_ARM_WIDTH } }
+			army_experience = -40
+			
+			division_template = {
+				name = "Modern Armor Template"
+
+				priority = 7
+
+				regiments = {
+					infantry = { x = 0 y = 0 }
+					infantry = { x = 0 y = 1 }
+
+					infantry = { x = 1 y = 0 }
+					infantry = { x = 1 y = 1 }
+					
+					infantry = { x = 2 y = 0 }
+					infantry = { x = 2 y = 1 }
+
+					modern_armor = { x = 3 y = 0 }
+					modern_armor = { x = 3 y = 1 }
+
+					modern_armor = { x = 4 y = 0 }
+					modern_armor = { x = 4 y = 1 }
+				}
+			}
+		}
+    }
+}
+
+EAI_motorized_template_upgrade = {
+    if = {
+        limit = {
+	    	has_country_flag = EAI_army_config_triggered
+
+	    	NOT = { has_country_flag = EAI_mot_template_upgrade }
+
+	    	############ industry req
+
+	    	num_of_military_factories > 15
+
+			if = { limit = { has_global_flag = EAI_challenging_mode } 
+				num_of_military_factories > 350
+			}
+
+	    	############ focus req
+
+	    	check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MOT_ATTACHMENT }
+
+	    	############ tech req
+    
+	    	has_tech = motorised_infantry
+
+	    	OR = {
+	    		AND = {
+	    			check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN }
+	    			OR = { has_tech = basic_medium_art has_tech = improved_medium_art has_tech = advanced_medium_art }
+	    		}
+
+	    		AND = {
+	    			check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_B_MOT_DESIGN }
+	    			has_tech = motorized_rocket_unit
+	    		}
+
+	    		AND = {
+	    			check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN }
+	    			OR = { has_tech = basic_light_art has_tech = improved_light_art has_tech = advanced_light_art }
+	    		}
+	    	}
+
+	    	############ template priorities
+
+	    	has_army_experience > 100
+    
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+	    		OR = { has_country_flag = EAI_marm_template_upgrade has_army_experience > 400 }
+	    	}
+    
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+	    		OR = { has_country_flag = EAI_harm_template_upgrade has_army_experience > 400 }
+	    	}
+    
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } }
+	    		OR = { has_country_flag = EAI_larm_template_upgrade has_army_experience > 400 }
+	    	}
+    
+	    	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+	    		OR = { has_country_flag = EAI_anti_tank_template_upgrade has_army_experience > 400 }
+	    	}
+        }
+
+		set_country_flag = EAI_mot_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading motorized"
+
+		if = { limit = { NOT = { has_template_majority_unit = motorized } }
+
+			army_experience = -25
+			
+			division_template = {
+				name = "Motorized Template"
+
+				regiments = {
+					motorized = { x = 0 y = 0 }
+					motorized = { x = 0 y = 1 }
+					motorized = { x = 0 y = 2 }
+
+					motorized = { x = 1 y = 0 }
+					motorized = { x = 1 y = 1 }
+					motorized = { x = 1 y = 2 }
+				}
+			}
+		}
+    }
+}
+
+EAI_mechanized_template_upgrade = {
+    if = {
+        limit = {
+	    	has_country_flag = EAI_army_config_triggered
+
+	    	NOT = { has_country_flag = EAI_mech_template_upgrade }
+
+	    	############ industry req
+
+	    	num_of_military_factories > 15
+
+	    	############ focus req
+
+	    	check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MOT_ATTACHMENT }
+
+	    	############ tech req
+
+	    	has_tech = mechanised_infantry
+
+	    	has_country_flag = EAI_mot_template_upgrade
+        }
+
+		set_country_flag = EAI_mech_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading mechanized"
+    }
+}
+
+EAI_garrison_template_upgrade = {
+    if = {
+        limit = {
+	    	has_country_flag = EAI_army_config_triggered
+
+	    	NOT = { has_country_flag = EAI_garrison_template_upgrade }
+
+	    	date > 1938.1.1
+    
+	    	has_tech = gw_artillery
+    
+	    	has_tech = tech_engineers
+
+	    	OR = {
+	    		AND = {
+	    			has_army_experience > 50
+    
+	    			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+	    				has_country_flag = EAI_anti_tank_template_upgrade
+	    			}
+    
+	    			if = { limit = { EAI_armor_tech_focus = yes OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } } }
+	    				OR = {
+	    					has_country_flag = EAI_marm_template_upgrade
+	    					has_country_flag = EAI_harm_template_upgrade
+	    				}
+	    			}
+	    		}
+    
+	    		has_army_experience > 100
+	    	}
+        }
+
+		set_country_flag = EAI_garrison_template_upgrade
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading garrison"
+		
+		army_experience = -20
+		
+		division_template = {
+			name = "Garrison Template"
+
+			priority = 0
+
+			regiments = {
+				infantry = { x = 0 y = 0 }
+				infantry = { x = 0 y = 1 }
+				infantry = { x = 0 y = 2 }
+				infantry = { x = 0 y = 3 }
+				infantry = { x = 0 y = 4 }
+			}
+
+			support = {
+				engineer = { x = 0 y = 0 }
+				artillery = { x = 0 y = 1 }
+			}
+		}
+
+		if = { limit = { NOT = { has_template_majority_unit = cavalry } }
+			army_experience = -30
+		}
+		
+		division_template = {
+			name = "Suppression Template"
+	
+			priority = 0
+	
+			regiments = {
+				cavalry = { x = 0 y = 0 }
+				cavalry = { x = 0 y = 1 }
+				cavalry = { x = 0 y = 2 }
+				cavalry = { x = 0 y = 3 }
+				cavalry = { x = 0 y = 4 }
+			}
+		}
+    }
+}

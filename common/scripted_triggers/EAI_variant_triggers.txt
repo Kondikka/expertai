@@ -1,124 +1,92 @@
 ######################################################
-#	Expert AI mod - variant triggers
+#	Expert AI mod - scripted variant AI triggers
 ######################################################
 
-EAI_named_variants = { # countries that have properly named variants in variant creation events
-	OR = {
-		original_tag = ENG
-		original_tag = FRA
-		original_tag = USA
-
-		original_tag = GER
-		original_tag = ITA
-		original_tag = JAP
-
-		original_tag = SOV
+EAI_save_xp_for_advanced_techs = {
+	
+	# Early and basic equipment is not important to upgrade
+	if = { limit = { check_variable = { EAI_VARIANT/equipment_tech_level < 2 } }
+		OR = { 
+			is_major = no 
+			meta_trigger = { text = { check_variable = { EAI_[x]_xp > 450 } } x = "[EAI_GetExperienceType]" }
+		} 
 	}
 }
 
-# checks the current variant status for a tech when sorting out upgrade priorities between various techs
+### land
+
+# medium armor
 EAI_marm_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/marm_I_2/4 has_tech = basic_medium_tank NOT = { has_tech = improved_medium_tank is_researching_technology = improved_medium_tank } }
-		AND = { has_country_flag = EAI_VARIANT/marm_II_2/4 has_tech = improved_medium_tank NOT = { has_tech = advanced_medium_tank is_researching_technology = advanced_medium_tank } }
-		AND = { has_country_flag = EAI_VARIANT/marm_III_2/4 has_tech = advanced_medium_tank NOT = { has_tech = main_battle_tank is_researching_technology = main_battle_tank } }
-		AND = { has_country_flag = EAI_VARIANT/marm_IV_2/4 has_tech = main_battle_tank }
-	}
+	if = { 		limit = { has_tech = advanced_medium_tank } 	check_variable = { EAI_VARIANT/medium_tank_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = improved_medium_tank } 	check_variable = { EAI_VARIANT/medium_tank_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = basic_medium_tank } 		check_variable = { EAI_VARIANT/medium_tank_equipment_1 > 1 } }
 }
 EAI_mspart_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/mspart_I_1/4 has_tech = basic_medium_art NOT = { has_tech = improved_medium_art } }
-		AND = { has_country_flag = EAI_VARIANT/mspart_II_1/4 has_tech = improved_medium_art NOT = { has_tech = advanced_medium_art } }
-		AND = { has_country_flag = EAI_VARIANT/mspart_III_1/4 has_tech = advanced_medium_art NOT = { has_tech = modern_art } }
-		AND = { has_country_flag = EAI_VARIANT/mspart_IV_1/4 has_tech = modern_art }
-
-		# MA doctrine doesn't use mspart
-		has_country_flag = EAI_FOCUS/MA_doctrine
-	}
+	if = { 		limit = { has_tech = advanced_medium_art } 		check_variable = { EAI_VARIANT/medium_tank_artillery_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_medium_art } 		check_variable = { EAI_VARIANT/medium_tank_artillery_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_medium_art } 		check_variable = { EAI_VARIANT/medium_tank_artillery_equipment_1 > 0 } }
 }
 EAI_mspaa_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/mspaa_I_1/4 has_tech = basic_medium_spaa NOT = { has_tech = improved_medium_spaa } }
-		AND = { has_country_flag = EAI_VARIANT/mspaa_II_1/4 has_tech = improved_medium_spaa NOT = { has_tech = advanced_medium_spaa } }
-		AND = { has_country_flag = EAI_VARIANT/mspaa_III_1/4 has_tech = advanced_medium_spaa }
-	}
+	if = { 		limit = { has_tech = advanced_medium_spaa } 	check_variable = { EAI_VARIANT/medium_tank_aa_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_medium_spaa } 	check_variable = { EAI_VARIANT/medium_tank_aa_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_medium_spaa } 		check_variable = { EAI_VARIANT/medium_tank_aa_equipment_1 > 0 } }
 }
 EAI_mtd_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/mtd_I_1/4 has_tech = basic_medium_td NOT = { has_tech = improved_medium_td } }
-		AND = { has_country_flag = EAI_VARIANT/mtd_II_1/4 has_tech = improved_medium_td NOT = { has_tech = advanced_medium_td } }
-		AND = { has_country_flag = EAI_VARIANT/mtd_III_1/4 has_tech = advanced_medium_td NOT = { has_tech = modern_td } }
-		AND = { has_country_flag = EAI_VARIANT/mtd_IV_1/4 has_tech = modern_td }
-	}
+	if = { 		limit = { has_tech = advanced_medium_td } 	check_variable = { EAI_VARIANT/medium_tank_destroyer_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_medium_td } 	check_variable = { EAI_VARIANT/medium_tank_destroyer_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_medium_td } 		check_variable = { EAI_VARIANT/medium_tank_destroyer_equipment_1 > 0 } }
 }
 
+# heavy armor
 EAI_harm_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/harm_I_2/4 has_tech = basic_heavy_tank NOT = { has_tech = improved_heavy_tank is_researching_technology = improved_heavy_tank } }
-		AND = { has_country_flag = EAI_VARIANT/harm_II_2/4 has_tech = improved_heavy_tank NOT = { has_tech = advanced_heavy_tank is_researching_technology = advanced_heavy_tank } }
-		AND = { has_country_flag = EAI_VARIANT/harm_III_2/4 has_tech = advanced_heavy_tank NOT = { has_tech = main_battle_tank is_researching_technology = main_battle_tank } }
-	}
+	if = { 		limit = { has_tech = advanced_heavy_tank } 	check_variable = { EAI_VARIANT/heavy_tank_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = improved_heavy_tank } 	check_variable = { EAI_VARIANT/heavy_tank_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = basic_heavy_tank } 	check_variable = { EAI_VARIANT/heavy_tank_equipment_1 > 1 } }
 }
 EAI_hspart_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/hspart_I_1/4 has_tech = basic_heavy_art NOT = { has_tech = improved_heavy_art } }
-		AND = { has_country_flag = EAI_VARIANT/hspart_II_1/4 has_tech = improved_heavy_art NOT = { has_tech = advanced_heavy_art } }
-		AND = { has_country_flag = EAI_VARIANT/hspart_III_1/4 has_tech = advanced_heavy_art }
-
-		# MA doctrine doesn't use mspart
-		has_country_flag = EAI_FOCUS/MA_doctrine
-	}
+	if = { 		limit = { has_tech = advanced_heavy_art } 	check_variable = { EAI_VARIANT/heavy_tank_artillery_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_heavy_art } 	check_variable = { EAI_VARIANT/heavy_tank_artillery_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_heavy_art } 		check_variable = { EAI_VARIANT/heavy_tank_artillery_equipment_1 > 0 } }
 }
 EAI_hspaa_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/hspaa_I_1/4 has_tech = basic_heavy_spaa NOT = { has_tech = improved_heavy_spaa } }
-		AND = { has_country_flag = EAI_VARIANT/hspaa_II_1/4 has_tech = improved_heavy_spaa NOT = { has_tech = advanced_heavy_spaa } }
-		AND = { has_country_flag = EAI_VARIANT/hspaa_III_1/4 has_tech = advanced_heavy_spaa }
-	}
+	if = { 		limit = { has_tech = advanced_heavy_spaa } 	check_variable = { EAI_VARIANT/heavy_tank_aa_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_heavy_spaa } 	check_variable = { EAI_VARIANT/heavy_tank_aa_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_heavy_spaa } 	check_variable = { EAI_VARIANT/heavy_tank_aa_equipment_1 > 0 } }
 }
 EAI_htd_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/htd_I_1/4 has_tech = basic_heavy_td NOT = { has_tech = improved_heavy_td } }
-		AND = { has_country_flag = EAI_VARIANT/htd_II_1/4 has_tech = improved_heavy_td NOT = { has_tech = advanced_heavy_td } }
-		AND = { has_country_flag = EAI_VARIANT/htd_III_1/4 has_tech = advanced_heavy_td }
-	}
+	if = { 		limit = { has_tech = advanced_heavy_td } 	check_variable = { EAI_VARIANT/heavy_tank_destroyer_equipment_3 > 0 } }
+	else_if = { limit = { has_tech = improved_heavy_td } 	check_variable = { EAI_VARIANT/heavy_tank_destroyer_equipment_2 > 0 } }
+	else_if = { limit = { has_tech = basic_heavy_td } 		check_variable = { EAI_VARIANT/heavy_tank_destroyer_equipment_1 > 0 } }
 }
+
+### air
 
 EAI_fighter_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/ftr_I_2/4 has_tech = fighter1 NOT = { has_tech = fighter2 is_researching_technology = fighter2 } }
-		AND = { has_country_flag = EAI_VARIANT/ftr_II_2/4 has_tech = fighter2 NOT = { has_tech = fighter3 is_researching_technology = fighter3 } }
-		AND = { has_country_flag = EAI_VARIANT/ftr_III_2/4 has_tech = fighter3 NOT = { has_tech = jet_fighter1 is_researching_technology = jet_fighter1 } }
-		AND = { has_country_flag = EAI_VARIANT/ftr_IV_2/4 has_tech = jet_fighter1 NOT = { has_tech = jet_fighter2 is_researching_technology = jet_fighter2 } }
-		AND = { has_country_flag = EAI_VARIANT/ftr_V_2/4 has_tech = jet_fighter2 }
-	}
+	if = { 		limit = { has_tech = jet_fighter2 } 	check_variable = { EAI_VARIANT/jet_fighter_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = jet_fighter1 } 	check_variable = { EAI_VARIANT/jet_fighter_equipment_1 > 1 } }
+
+	else_if = { limit = { has_tech = fighter3 } 		check_variable = { EAI_VARIANT/fighter_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = fighter2 } 		check_variable = { EAI_VARIANT/fighter_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = fighter1 } 		check_variable = { EAI_VARIANT/fighter_equipment_1 > 1 } }
 }
+
 EAI_bomber_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/tac_I_2/4 has_tech = tactical_bomber1 NOT = { has_tech = tactical_bomber2 } }
-		AND = { has_country_flag = EAI_VARIANT/tac_II_2/4 has_tech = tactical_bomber2 NOT = { has_tech = tactical_bomber3 } }
-		AND = { has_country_flag = EAI_VARIANT/tac_III_2/4 has_tech = tactical_bomber3 NOT = { has_tech = jet_tactical_bomber1 } }
-		AND = { has_country_flag = EAI_VARIANT/tac_IV_2/4 has_tech = jet_tactical_bomber1 NOT = { has_tech = jet_tactical_bomber2 } }
-		AND = { has_country_flag = EAI_VARIANT/tac_V_2/4 has_tech = jet_tactical_bomber2 }
+	if = { 		limit = { has_tech = jet_tactical_bomber2 } 	check_variable = { EAI_VARIANT/jet_tac_bomber_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = jet_tactical_bomber1 } 	check_variable = { EAI_VARIANT/jet_tac_bomber_equipment_1 > 1 } }
 
-		AND = { has_country_flag = EAI_VARIANT/cas_I_2/4 has_tech = CAS1 NOT = { has_tech = CAS2 } }
-		AND = { has_country_flag = EAI_VARIANT/cas_II_2/4 has_tech = CAS2 NOT = { has_tech = CAS3 } }
-		AND = { has_country_flag = EAI_VARIANT/cas_III_2/4 has_tech = CAS3 }
-	}
+	else_if = { limit = { has_tech = tactical_bomber3 } 		check_variable = { EAI_VARIANT/tac_bomber_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = tactical_bomber2 } 		check_variable = { EAI_VARIANT/tac_bomber_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = tactical_bomber1 } 		check_variable = { EAI_VARIANT/tac_bomber_equipment_1 > 1 } }
+
+	else_if = { limit = { has_tech = CAS3 } 		check_variable = { EAI_VARIANT/CAS_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = CAS2 } 		check_variable = { EAI_VARIANT/CAS_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = CAS1 } 		check_variable = { EAI_VARIANT/CAS_equipment_1 > 1 } }
 }
+
 EAI_strat_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/str_I_2/4 has_tech = strategic_bomber1 NOT = { has_tech = strategic_bomber2 } }
-		AND = { has_country_flag = EAI_VARIANT/str_II_2/4 has_tech = strategic_bomber2 NOT = { has_tech = strategic_bomber3 } }
-		AND = { has_country_flag = EAI_VARIANT/str_III_2/4 has_tech = strategic_bomber3 NOT = { has_tech = jet_strategic_bomber1 } }
-		AND = { has_country_flag = EAI_VARIANT/str_IV_2/4 has_tech = jet_strategic_bomber1 }
-	}
-}
-
-EAI_carrier_developed = {
-	OR = {
-		AND = { has_country_flag = EAI_VARIANT/cv_II_1/4 has_tech = basic_carrier NOT = { has_tech = improved_carrier } }
-		AND = { has_country_flag = EAI_VARIANT/cv_III_1/4 has_tech = improved_carrier NOT = { has_tech = advanced_carrier } }
-		AND = { has_country_flag = EAI_VARIANT/cv_IV_1/4 has_tech = advanced_carrier }
-	}
+	if = { 		limit = { has_tech = jet_strategic_bomber1 } 	check_variable = { EAI_VARIANT/jet_strat_bomber_equipment_1 > 1 } }
+	
+	else_if = { limit = { has_tech = strategic_bomber3 } 		check_variable = { EAI_VARIANT/strat_bomber_equipment_3 > 1 } }
+	else_if = { limit = { has_tech = strategic_bomber2 } 		check_variable = { EAI_VARIANT/strat_bomber_equipment_2 > 1 } }
+	else_if = { limit = { has_tech = strategic_bomber1 } 		check_variable = { EAI_VARIANT/strat_bomber_equipment_1 > 1 } }
 }

@@ -1,13 +1,14 @@
 ############################################################################################################
-#	Expert AI mod - law effects
+#	Expert AI mod - scripted law AI effects
 ############################################################################################################
 
+# pp stored separately for important things
 EAI_store_PP = {
     if = {
 		limit = {
 			has_political_power > 50
 
-			### find the highest law cost
+			### find the highest law cost and store enough pp for it
 
 			set_temp_variable = { EAI_max_law_cost = 150 }
 
@@ -37,6 +38,8 @@ EAI_store_PP = {
 		#log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: stored pp = [?EAI_stored_PP]"
 	}
 }
+
+### law upgrade scripted AI
 
 EAI_upgrade_economy_law = {
     if = { 
@@ -68,12 +71,38 @@ EAI_upgrade_economy_law = {
             
                 add_ideas = low_economic_mobilisation
 
+				### on_add
+
+				if = {
+					limit = {
+						tag = USA
+						has_completed_focus = USA_limited_intervention
+						has_defensive_war = no
+					}
+					USA_congress_large_opposition = yes
+				}
+
+				###
+
 				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ECONOMY LAW: low_economic_mobilisation (script)"
             }
 
 			else_if = { limit = { EAI_can_take_partial_economic_mobilisation = yes } 
                 
                 add_ideas = partial_economic_mobilisation
+
+				### on_add
+
+				if = {
+					limit = {
+						tag = USA
+						has_completed_focus = USA_limited_intervention
+						has_defensive_war = no
+					}
+					USA_congress_large_opposition = yes
+				}
+
+				###
 
 				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ECONOMY LAW: partial_economic_mobilisation (script)"
             }
@@ -86,12 +115,38 @@ EAI_upgrade_economy_law = {
            
                 add_ideas = war_economy
 
+				### on_add
+
+				if = {
+					limit = {
+						tag = USA
+						has_completed_focus = USA_limited_intervention
+						has_defensive_war = no
+					}
+					USA_congress_large_opposition = yes
+				}
+
+				###
+
 				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ECONOMY LAW: war_economy (script)"
             }
 
 			else_if = { limit = { EAI_can_take_tot_economic_mobilisation = yes } 
             
                 add_ideas = tot_economic_mobilisation
+
+				### on_add
+
+				if = {
+					limit = {
+						tag = USA
+						has_completed_focus = USA_limited_intervention
+						has_defensive_war = no
+					}
+					USA_congress_large_opposition = yes
+				}
+
+				###
 
 				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ECONOMY LAW: tot_economic_mobilisation (script)"
             }
@@ -230,18 +285,21 @@ EAI_upgrade_trade_law = {
 	}
 }
 
+###
+
+# calculates the fraction of consumed resources : owned resources (only those with significant quantities) for trade law selection
 EAI_calculate_resource_need = {
 	set_variable = { EAI_average_resource_need = 0 }
 
 	###
 
-	if = { limit = { check_variable = { resource_produced@oil > 75 } }
-		set_temp_variable = { EAI_oil_needed = resource_consumed@oil }
-		divide_temp_variable = { EAI_oil_needed = resource_produced@oil } # fraction of extracted resources needed
-		clamp_temp_variable = { var = EAI_oil_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_oil_needed }
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
+	# if = { limit = { check_variable = { resource_produced@oil > 75 } }
+	# 	set_temp_variable = { EAI_oil_needed = resource_consumed@oil }
+	# 	divide_temp_variable = { EAI_oil_needed = resource_produced@oil } # fraction of extracted resources needed
+	# 	clamp_temp_variable = { var = EAI_oil_needed min = 0 max = 1 }
+	# 	add_to_variable = { EAI_average_resource_need = EAI_oil_needed }
+	# 	add_to_temp_variable = { EAI_resource_count = 1 }
+	# }
 
 	###
 

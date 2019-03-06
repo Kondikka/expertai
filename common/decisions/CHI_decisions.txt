@@ -50,7 +50,12 @@ CHI_army_reform = {
 		icon = generic_prepare_civil_war
 
 		available = {
-			has_army_experience > 99
+			if = { limit = { is_ai = no } #EAI
+				has_army_experience > 99
+			}
+			else = {
+				check_variable = { EAI_army_xp > 99 }
+			}
 			has_completed_focus = CHI_army_reform
 		}
 
@@ -88,16 +93,25 @@ CHI_army_reform = {
 			}
 		}
 		complete_effect = {
-			army_experience = -100
-			custom_effect_tooltip = 90_days_tt
-						
+			if = { limit = { is_ai = yes } #EAI
+				subtract_from_variable = { EAI_army_xp = 100 }
+			}
+			else = {
+				army_experience = -100
+			}				
 		}		
 	}
 
 	CHI_lessons_of_war = {
 		icon = generic_army_support
 		available = {
-			has_army_experience > 199
+			if = { limit = { is_ai = no } #EAI
+				has_army_experience > 199
+			}
+			else = {
+				check_variable = { EAI_army_xp > 199 }
+			}
+
 			has_idea = CHI_incompetent_officers
 			if = {
 				limit = { has_idea = CHI_army_corruption_1 }
@@ -136,7 +150,12 @@ CHI_army_reform = {
 		}
 
 		complete_effect = {
-			army_experience = -200
+			if = { limit = { is_ai = yes } #EAI
+				subtract_from_variable = { EAI_army_xp = 200 }
+			}
+			else = {
+				army_experience = -200
+			}
 			remove_ideas = CHI_incompetent_officers
 			set_country_flag = CHI_lessons_of_war_completed
 		}		
@@ -6324,6 +6343,12 @@ political_actions = {
 			NOT = {
 				has_completed_focus = CHI_opposition
 			}
+			OR = {
+				is_subject = no
+				OVERLORD = {
+					is_in_faction_with = event_target:WTT_current_china_leader
+				}
+			}
 		}
 		visible = {
 			is_literally_china = yes
@@ -6488,9 +6513,6 @@ CHI_xian_incident = {
 					is_in_faction_with = PRC
 				}
 				NOT = {
-					has_war_with = JAP
-				}
-				NOT = {
 					has_war_with = PRC
 				}
 				NOT = {
@@ -6501,9 +6523,6 @@ CHI_xian_incident = {
 				}
 			}
 			PRC = {
-				NOT = {
-					has_war_with = JAP
-				}
 				NOT = {
 					has_war_with = CHI
 				}
@@ -6525,13 +6544,10 @@ CHI_xian_incident = {
 				NOT = {
 					is_in_faction_with = PRC
 				}
-				NOT = {
-					has_war_with = JAP
-				}
 			}
 			PRC = {
 				NOT = {
-					has_war_with = JAP
+					has_war_with = PRC
 				}
 			}
 			is_literally_china = yes
@@ -6554,7 +6570,7 @@ CHI_xian_incident = {
 			modifier = {
 				NOT = { 	
 					JAP = {
-						has_added_tension_amount > 0
+						has_completed_focus = JAP_greater_east_asian_co_prosperity_sphere
 					}
 				}
 				factor = 0
@@ -6621,7 +6637,7 @@ prestigious_projects = {
 		}
 		icon = generic_naval
 		available = {
-			has_navy_size = { archetype = carrier size > 0 }
+			has_navy_size = { unit = carrier size > 0 }
 		}
 
 		days_mission_timeout = 720

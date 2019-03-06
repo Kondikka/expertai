@@ -1,14 +1,14 @@
 ############################################################################
 #	Expert AI mod - tech prio triggers
-############################################################################################################
+############################################################################
 
 EAI_prioritise_main_industry = {
 	OR = {
-		AND = { date > 1942.4.1 OR = { can_research = concentrated_industry5 can_research = dispersed_industry5 } 	NOT = { has_tech = concentrated_industry5 is_researching_technology = concentrated_industry5 has_tech = dispersed_industry5 is_researching_technology = dispersed_industry5 } }
+		AND = { date > 1942.10.1 OR = { can_research = concentrated_industry5 can_research = dispersed_industry5 } 	NOT = { has_tech = concentrated_industry5 is_researching_technology = concentrated_industry5 has_tech = dispersed_industry5 is_researching_technology = dispersed_industry5 } }
 
-		AND = { date > 1940.4.1 OR = { can_research = concentrated_industry4 can_research = dispersed_industry4 }	NOT = { has_tech = concentrated_industry4 is_researching_technology = concentrated_industry4 has_tech = dispersed_industry4 is_researching_technology = dispersed_industry4 } }
+		AND = { date > 1940.10.1 OR = { can_research = concentrated_industry4 can_research = dispersed_industry4 }	NOT = { has_tech = concentrated_industry4 is_researching_technology = concentrated_industry4 has_tech = dispersed_industry4 is_researching_technology = dispersed_industry4 } }
 
-		AND = { date > 1938.4.1 OR = { can_research = concentrated_industry3 can_research = dispersed_industry3 }	NOT = { has_tech = concentrated_industry3 is_researching_technology = concentrated_industry3 has_tech = dispersed_industry3 is_researching_technology = dispersed_industry3 } }
+		AND = { date > 1938.10.1 OR = { can_research = concentrated_industry3 can_research = dispersed_industry3 }	NOT = { has_tech = concentrated_industry3 is_researching_technology = concentrated_industry3 has_tech = dispersed_industry3 is_researching_technology = dispersed_industry3 } }
 
 		AND = { date > 1936.1.1 OR = { can_research = concentrated_industry2 can_research = dispersed_industry2 }	NOT = { has_tech = concentrated_industry2 is_researching_technology = concentrated_industry2 has_tech = dispersed_industry2 is_researching_technology = dispersed_industry2 } }
 
@@ -17,16 +17,12 @@ EAI_prioritise_main_industry = {
 }
 
 EAI_prioritise_land_doctrine = {
-	if = { limit = { has_global_flag = EAI_limit_research } #with limited research, dont rush land doctrine
+	if = { limit = { has_global_flag = EAI_limit_research } # with limited research, dont rush land doctrine
 		OR = {
 			EAI_major_country = yes
 			EAI_land_doctrine_tech_focus = yes
 			date > 1939.1.1
 		}
-	}
-
-	if = { limit = { OR = { original_tag = HOL original_tag = BEL original_tag = LUX } }
-		date > 1941.1.1
 	}
 
 	OR = {
@@ -42,9 +38,9 @@ EAI_prioritise_land_doctrine = {
 		}
 	}
 
-	NOT = { has_idea = FRA_victors_of_wwi } #FRA has a land doctrine debuff
+	NOT = { has_idea = FRA_victors_of_wwi } # FRA has a land doctrine debuff
 
-	if = { limit = { original_tag = USA } #lower prio for USA
+	if = { limit = { original_tag = USA } # lower prio for USA
 		OR = {
 			date > 1938.6.1
 			has_war = yes
@@ -61,7 +57,7 @@ EAI_prioritise_infantry_techs = {
 				is_researching_technology = interwar_artillery
 				has_tech = artillery1 is_researching_technology = artillery1
 			}
-			NOT = { has_country_flag = EAI_FOCUS/infantry_design_A has_country_flag = EAI_FOCUS/infantry_width_10w } 
+			NOT = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN } check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } } 
 		}
 
 		AND = { 
@@ -84,7 +80,7 @@ EAI_prioritise_infantry_techs = {
 EAI_prioritise_air_doctrine = {
 	OR = {
 		AND = {
-			has_country_flag = EAI_FOCUS/SD_doctrine
+			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_SD_DOCTRINE }
 
 			NOT = {
 				is_researching_technology = air_superiority
@@ -99,7 +95,7 @@ EAI_prioritise_air_doctrine = {
 		}
 
 		AND = {
-			has_country_flag = EAI_FOCUS/BFS_doctrine
+			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_BFS_DOCTRINE }
 
 			NOT = {
 				is_researching_technology = formation_flying
@@ -116,7 +112,7 @@ EAI_prioritise_air_doctrine = {
 		}
 
 		AND = {
-			has_country_flag = EAI_FOCUS/OI_doctrine
+			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_OI_DOCTRINE }
 
 			NOT = {
 				is_researching_technology = force_rotation
@@ -135,7 +131,7 @@ EAI_prioritise_air_doctrine = {
 EAI_prioritise_naval_doctrine = {
 	OR = {
 		#AND = {
-		#	has_country_flag = EAI_FOCUS/FIB_doctrine
+		#	check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE }
 		#
 		#	NOT = {
 		#		is_researching_technology = fleet_in_being
@@ -149,7 +145,7 @@ EAI_prioritise_naval_doctrine = {
 		#}
 
 		AND = {
-			has_country_flag = EAI_FOCUS/BS_doctrine
+			check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE }
 
 			NOT = {
 				is_researching_technology = base_strike
@@ -161,5 +157,145 @@ EAI_prioritise_naval_doctrine = {
 				AND = { has_tech = massed_strikes }
 			}
 		}
+	}
+}
+
+EAI_prioritise_ship_hulls = {
+	OR = {
+		if = { limit = { EAI_capital_tech_focus = yes }
+
+			OR = {
+				if = { limit = { EAI_CV_tech_focus = yes }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_carrier is_researching_technology = early_ship_hull_carrier } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_carrier is_researching_technology = basic_ship_hull_carrier } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_ship_hull_carrier is_researching_technology = improved_ship_hull_carrier } }
+						AND = { date > 1944.1.1 NOT = { has_tech = advanced_ship_hull_carrier is_researching_technology = advanced_ship_hull_carrier } }
+					}
+					else = { always = no }
+				}
+				if = { limit = { EAI_SHBB_tech_focus = yes }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_heavy is_researching_technology = early_ship_hull_heavy } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_heavy is_researching_technology = basic_ship_hull_heavy } }
+						AND = { date > 1936.1.1 NOT = { has_tech = ship_hull_super_heavy is_researching_technology = ship_hull_super_heavy } }
+					}
+					else = { always = no }
+				}
+				if = { limit = { OR = { EAI_BB_tech_focus = yes EAI_BC_tech_focus = yes } }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_heavy is_researching_technology = early_ship_hull_heavy } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_heavy is_researching_technology = basic_ship_hull_heavy } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_ship_hull_heavy is_researching_technology = improved_ship_hull_heavy } }
+						AND = { date > 1944.1.1 NOT = { has_tech = advanced_ship_hull_heavy is_researching_technology = advanced_ship_hull_heavy } }
+					}
+					else = { always = no }
+				}
+			}
+		}
+		else = { always = no }
+
+		if = { limit = { EAI_screen_tech_focus = yes }
+
+			OR = {
+				if = { limit = { OR = { EAI_CA_tech_focus = yes EAI_CL_tech_focus = yes } }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_cruiser is_researching_technology = early_ship_hull_cruiser } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_cruiser is_researching_technology = basic_ship_hull_cruiser } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_ship_hull_cruiser is_researching_technology = improved_ship_hull_cruiser } }
+						AND = { date > 1944.1.1 NOT = { has_tech = advanced_ship_hull_cruiser is_researching_technology = advanced_ship_hull_cruiser } }
+					}
+					else = { always = no }
+				}
+				if = { limit = { EAI_DD_tech_focus = yes }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_light is_researching_technology = early_ship_hull_light } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_light is_researching_technology = basic_ship_hull_light } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_ship_hull_light is_researching_technology = improved_ship_hull_light } }
+						AND = { date > 1944.1.1 NOT = { has_tech = advanced_ship_hull_light is_researching_technology = advanced_ship_hull_light } }
+					}
+					else = { always = no }
+				}
+			}
+		}
+		else = { always = no }
+
+		if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } EAI_SS_tech_focus = yes }
+			OR= {
+				AND = { date > 1936.1.1 NOT = { has_tech = early_ship_hull_submarine is_researching_technology = early_ship_hull_submarine } }
+				AND = { date > 1936.1.1 NOT = { has_tech = basic_ship_hull_submarine is_researching_technology = basic_ship_hull_submarine } }
+				AND = { date > 1940.1.1 NOT = { has_tech = improved_ship_hull_submarine is_researching_technology = improved_ship_hull_submarine } }
+				AND = { date > 1944.1.1 NOT = { has_tech = advanced_ship_hull_submarine is_researching_technology = advanced_ship_hull_submarine } }
+			}
+		}
+		else = { always = no }
+	}
+}
+
+### special tech bonus checks
+
+EAI_armor_tech_bonus = {
+	OR = {
+		AND = {
+			original_tag = GER
+			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = GER_army_innovation_2 }
+		}
+		AND = {
+			original_tag = SOV
+			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = SOV_lessons_of_war }
+		}
+		AND = {
+			original_tag = FRA
+			OR = {
+				AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } has_completed_focus = FRA_heavy_armor_focus }
+				AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } has_completed_focus = FRA_light_medium_armor }
+			}
+		}
+		AND = {
+			original_tag = ENG
+			has_completed_focus = ENG_tank_focus
+		}
+		AND = {
+			original_tag = ITA
+			has_completed_focus = ITA_armored_effort
+		}
+	}
+}
+
+EAI_armor_tech_bonus_2 = {
+	OR = {
+		AND = {
+			original_tag = GER
+			has_completed_focus = GER_army_innovation_2
+		}
+	}
+}
+
+EAI_GER_SOV_armor_tech_bonus = {
+	OR = {
+		AND = {
+			original_tag = GER
+			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = GER_army_innovation_2 }
+		}
+		AND = {
+			original_tag = SOV
+			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = SOV_lessons_of_war }
+		}
+	}
+}
+
+EAI_fighter_tech_bonus = {
+	NOT = { has_global_flag = EAI_historical_mode }
+	OR = {
+		AND = { original_tag = ENG has_completed_focus = fighter_command_focus }
+		#AND = { original_tag = ITA has_completed_focus = ITA_air_innovation_2 }
+		#AND = { original_tag = JAP has_completed_focus = JAP_fighter_modernization }
+	}
+}
+
+EAI_carrier_tech_bonus = {
+	OR = {
+		AND = { original_tag = ENG has_completed_focus = uk_carrier_focus }
+		AND = { original_tag = USA has_completed_focus = USA_carrier_primacy }
 	}
 }

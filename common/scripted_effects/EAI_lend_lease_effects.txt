@@ -1,0 +1,77 @@
+############################################################################################################
+#	Expert AI mod - scripted lendlease AI effects
+############################################################################################################
+
+### manages lend lease diplomacy
+
+EAI_lend_lease_check = {
+	if = { # CLEAR INVALID TARGETS
+		limit = { any_country = { has_country_flag = EAI_lend_lease_from_@ROOT } }
+	
+		every_country = {
+			limit = { has_country_flag = EAI_lend_lease_from_@ROOT NOT = { EAI_lend_lease = yes } }
+			
+			clr_country_flag = EAI_lend_lease_from_@ROOT
+		}
+	}
+	
+	if = { # CHECK THAT LEND LEASING IS POSSIBLE
+		limit = {
+			any_other_country = { 
+				OR = { 
+					AND = {
+						has_war = yes 
+						ROOT = {
+							OR = {
+								AND = { has_government = neutrality NOT = { threat < 0.4 } }
+								AND = { has_government = fascism }
+								AND = { has_government = communism }
+								AND = { has_government = democratic NOT = { threat < 0.5 } }
+								AND = { has_government = democratic original_tag = USA has_completed_focus = USA_lend_lease_act }
+							}
+						}
+					}
+					AND = {
+						is_subject_of = ROOT
+
+						EAI_lend_lease = yes
+					}
+				} 
+			}
+		}
+		
+		if = { # PLAYER HAS INITIATED COORDINATED LEND LEASE, TAKE THIS TARGET
+			limit = { 
+				any_country = { has_country_flag = EAI_coordinated_lend_lease_from_@ROOT }
+			}
+			
+			EAI_clear_lend_lease_targets = yes
+	
+			random_country = {
+				limit = { has_country_flag = EAI_coordinated_lend_lease_from_@ROOT }
+	
+				set_country_flag = EAI_lend_lease_from_@ROOT
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: [This.GetName] (player initiated)"
+			}
+	
+			else = { # ELSE FLAG ALL VALID TARGETS FOR LEND LEASE
+				every_country = {
+					limit = { EAI_lend_lease = yes NOT = { has_country_flag = EAI_lend_lease_from_@ROOT } }
+					
+					set_country_flag = EAI_lend_lease_from_@ROOT
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: [This.GetName] (any)"
+				}
+			}
+		}
+	}
+}
+
+# clears invalid targets
+EAI_clear_lend_lease_targets = {
+	every_country = { 
+		limit = { has_country_flag = EAI_lend_lease_from_@ROOT }
+		clr_country_flag = EAI_lend_lease_from_@ROOT
+	}
+}
