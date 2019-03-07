@@ -342,8 +342,8 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 
 NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.5 				-- ai will use at most this ratio of affordable fuel for naval training
 
-NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
-NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
+-- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
+-- NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
 
 NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 0.9 					-- ai will not train a taskforce if fully trained ships are above this ratio
 
