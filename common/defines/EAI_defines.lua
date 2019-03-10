@@ -24,6 +24,8 @@ NDefines.NAI.RESEARCH_BONUS_FACTOR = 3 				                       		-- To which 
 NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- To which extent AI should care about ahead of time penalties to research
 NDefines.NAI.RESEARCH_BASE_DAYS = 0					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 NDefines.NAI.RESEARCH_MULTI_DOCTRINE_SCORE = 0
+NDefines.NAI.XP_RATIO_REQUIRED_TO_RESEARCH_WITH_XP = 3.0		-- AI will at least need this amount of xp compared to cost of a tech to reserch it with XP			
+-- NDefines.NAI.RESEARCH_WITH_XP_AI_WEIGHT_MULT = 1.2 				-- AI will bump score of a research with this mult if it can use XP
 
 --------------------------------------------------------------------------------------------------------------
 -- DESIGNS
@@ -74,6 +76,7 @@ NDefines.NAI.DIVISION_DESIGN_WEIGHTS = {							                -- Base values us
 	0.0, -- mine sweep
 	0.0, -- raiding coordination
 	0.0, -- patrol coordination
+	0.0, -- search and destroy coordination
 	-- Air Values
 	0.0, -- air_range
 	0.1, -- air_defence
@@ -363,9 +366,9 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.5 				-- ai will use at most this ratio of affordable fuel for naval training
 
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
-NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
+-- NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
 
-NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 0.9 					-- ai will not train a taskforce if fully trained ships are above this ratio
+NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 1.0 					-- ai will not train a taskforce if fully trained ships are above this ratio
 
 NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0								-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
 NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 100								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
