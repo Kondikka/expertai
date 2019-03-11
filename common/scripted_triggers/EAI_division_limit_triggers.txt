@@ -28,12 +28,7 @@ EAI_infantry_division_limit = {
 }
 
 EAI_armored_division_limit = {
-	set_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_armor }
-	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_anti_air_brigade }
-	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_artillery_brigade }
-	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_tank_destroyer_brigade }
-
-	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_armor }
+	set_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_armor }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_sp_anti_air_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_sp_artillery_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_tank_destroyer_brigade }
@@ -47,6 +42,14 @@ EAI_armored_division_limit = {
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_sp_anti_air_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_sp_artillery_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_tank_destroyer_brigade }
+
+	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } # dont count the garbage it starts with
+
+		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_armor }
+		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_anti_air_brigade }
+		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_artillery_brigade }
+		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_tank_destroyer_brigade }
+	}
 
 	check_variable = { EAI_arm_bat_count > EAI_armor_division_cap }
 }
@@ -93,17 +96,17 @@ EAI_modern_armor_division_limit = {
 
 EAI_motorized_division_limit = {
 	OR = {
-		AND = { num_of_military_factories < 20		OR = { has_army_manpower = { type = motorized size > 40000 } 	has_army_manpower = { type = mechanized size > 40000 } } }
-		AND = { num_of_military_factories < 30		OR = { has_army_manpower = { type = motorized size > 60000 } 	has_army_manpower = { type = mechanized size > 60000 } } }
-		AND = { num_of_military_factories < 40		OR = { has_army_manpower = { type = motorized size > 80000 } 	has_army_manpower = { type = mechanized size > 80000 } } }
-		AND = { num_of_military_factories < 60		OR = { has_army_manpower = { type = motorized size > 150000 } 	has_army_manpower = { type = mechanized size > 150000 } } }
-		AND = { num_of_military_factories < 80		OR = { has_army_manpower = { type = motorized size > 200000 } 	has_army_manpower = { type = mechanized size > 200000 } } }
-		AND = { num_of_military_factories < 100		OR = { has_army_manpower = { type = motorized size > 250000 } 	has_army_manpower = { type = mechanized size > 250000 } } }
-		AND = { num_of_military_factories < 150		OR = { has_army_manpower = { type = motorized size > 300000 } 	has_army_manpower = { type = mechanized size > 300000 } } }
-		AND = { num_of_military_factories < 200		OR = { has_army_manpower = { type = motorized size > 350000 } 	has_army_manpower = { type = mechanized size > 350000 } } }
-		AND = { num_of_military_factories < 250		OR = { has_army_manpower = { type = motorized size > 400000 } 	has_army_manpower = { type = mechanized size > 400000 } } }
-		AND = {                              		OR = { has_army_manpower = { type = motorized size > 450000 } 	has_army_manpower = { type = mechanized size > 450000 } } }
-
+		AND = {
+			set_temp_variable = { t1 = num_of_military_factories }
+			multiply_temp_variable = { t1 = 2 }
+			clamp_temp_variable = { var = t1 min = 0 max = 500 }
+			meta_trigger = {
+				text = { has_army_manpower = { type = motorized size > [x][y] } }
+				x = "[?t1|.0]"
+				y = "0000"
+			}
+		}
+		
 		### fielded divisions need equipment
 
 		AND = {
@@ -133,31 +136,31 @@ EAI_anti_tank_division_limit = {
 
 	if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } }
 
-		set_temp_variable = { EAI_anti_tank_division_cap_AT = EAI_division_cap }
-		multiply_temp_variable = { EAI_anti_tank_division_cap_AT = 0.3 }
-		check_variable = { num_battalions_with_type@anti_air_brigade > EAI_anti_tank_division_cap_AT }
+		set_temp_variable = { t1 = EAI_division_cap }
+		multiply_temp_variable = { t1 = 0.3 }
+		check_variable = { num_battalions_with_type@anti_tank_brigade > t1 }
 	}
 
 	else_if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
 
 		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
 
-			set_temp_variable = { EAI_anti_tank_division_cap_MSPAA = EAI_division_cap }
-			multiply_temp_variable = { EAI_anti_tank_division_cap_MSPAA = 0.4 }
-			check_variable = { num_battalions_with_type@medium_sp_anti_air_brigade > EAI_anti_tank_division_cap_MSPAA }
+			set_temp_variable = { t1 = EAI_division_cap }
+			multiply_temp_variable = { t1 = 0.4 }
 
-			set_temp_variable = { EAI_anti_tank_division_cap_MODSPAA = EAI_division_cap }
-			multiply_temp_variable = { EAI_anti_tank_division_cap_HSPAA = 0.3 }
-			check_variable = { num_battalions_with_type@modern_sp_anti_air_brigade > EAI_anti_tank_division_cap_MODSPAA }
+			set_temp_variable = { t2 = num_battalions_with_type@medium_sp_anti_air_brigade }
+			add_to_temp_variable = { t2 = num_battalions_with_type@modern_sp_anti_air_brigade }
+
+			check_variable = { t2 > t1 }
 
 			else = {	
-				set_temp_variable = { EAI_anti_tank_division_cap_MTD = EAI_division_cap }
-				multiply_temp_variable = { EAI_anti_tank_division_cap_MTD = 0.20 }
-				check_variable = { num_battalions_with_type@medium_tank_destroyer_brigade > EAI_anti_tank_division_cap_MTD }
+				set_temp_variable = { t1 = EAI_division_cap }
+				multiply_temp_variable = { t1 = 0.2 }
 
-				set_temp_variable = { EAI_anti_tank_division_cap_MODTD = EAI_division_cap }
-				multiply_temp_variable = { EAI_anti_tank_division_cap_MODTD = 0.15 }
-				check_variable = { num_battalions_with_type@modern_tank_destroyer_brigade > EAI_anti_tank_division_cap_MODTD }
+				set_temp_variable = { t2 = num_battalions_with_type@medium_tank_destroyer_brigade }
+				add_to_temp_variable = { t2 = num_battalions_with_type@modern_tank_destroyer_brigade }
+
+				check_variable = { t2 > t1 }
 			}
 		}
 	}
@@ -166,22 +169,22 @@ EAI_anti_tank_division_limit = {
 
 		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
 
-			set_temp_variable = { EAI_anti_tank_division_cap_HSPAA = EAI_division_cap }
-			multiply_temp_variable = { EAI_anti_tank_division_cap_HSPAA = 0.3 }
-			check_variable = { num_battalions_with_type@heavy_sp_anti_air_brigade > EAI_anti_tank_division_cap_HSPAA }
+			set_temp_variable = { t1 = EAI_division_cap }
+			multiply_temp_variable = { t1 = 0.3 }
 
-			set_temp_variable = { EAI_anti_tank_division_cap_MODSPAA = EAI_division_cap }
-			multiply_temp_variable = { EAI_anti_tank_division_cap_HSPAA = 0.3 }
-			check_variable = { num_battalions_with_type@modern_sp_anti_air_brigade > EAI_anti_tank_division_cap_MODSPAA }
+			set_temp_variable = { t2 = num_battalions_with_type@heavy_sp_anti_air_brigade }
+			add_to_temp_variable = { t2 = num_battalions_with_type@modern_sp_anti_air_brigade }
+
+			check_variable = { t2 > t1 }
 
 			else = {	
-				set_temp_variable = { EAI_anti_tank_division_cap_HTD = EAI_division_cap }
-				multiply_temp_variable = { EAI_anti_tank_division_cap_HTD = 0.15 }
-				check_variable = { num_battalions_with_type@heavy_tank_destroyer_brigade > EAI_anti_tank_division_cap_HTD }
+				set_temp_variable = { t1 = EAI_division_cap }
+				multiply_temp_variable = { t1 = 0.15 }
 
-				set_temp_variable = { EAI_anti_tank_division_cap_MODTD = EAI_division_cap }
-				multiply_temp_variable = { EAI_anti_tank_division_cap_MODTD = 0.15 }
-				check_variable = { num_battalions_with_type@modern_tank_destroyer_brigade > EAI_anti_tank_division_cap_MODTD }
+				set_temp_variable = { t2 = num_battalions_with_type@heavy_tank_destroyer_brigade }
+				add_to_temp_variable = { t2 = num_battalions_with_type@modern_tank_destroyer_brigade }
+
+				check_variable = { t2 > t1 }
 			}
 		}
 	}
