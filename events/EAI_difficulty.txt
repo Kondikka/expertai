@@ -106,7 +106,7 @@ country_event = { # remove
 		NOT = {
 			AND = {
 				is_ai = yes
-		
+
 				OR = { 
 					has_country_flag = EAI_country_bonus_HARD 
 					has_country_flag = EAI_country_bonus_VERY_HARD 
@@ -204,15 +204,36 @@ country_event = {
 	hidden = yes
 	mean_time_to_happen = { days = 2 }
 	trigger = {
-		has_global_flag = EAI_free_convoys
 		is_ai = yes
-		any_state = { is_controlled_by = ROOT is_coastal = yes }
+
+		OR = {
+			check_variable = { EAI_custom_bonus_26 > 0 }
+
+			AND = { check_variable = { global.EAI_custom_bonus_26 > 0 } EAI_dynamic_bonus_trigger = yes }
+
+			has_global_flag = EAI_free_convoys
+		}
+
 		has_equipment = { convoy < 50 }
 	}
 	immediate = {
-		add_equipment_to_stockpile = { type = convoy_1 amount = 50 }
+		if = { limit = { check_variable = { EAI_custom_bonus_26 > 0 } }
 
-		log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys"
+			add_equipment_to_stockpile = { type = convoy_1 amount = EAI_custom_bonus_26 }
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys (country) ([?EAI_custom_bonus_26])"
+		}
+		else_if = { limit = { check_variable = { global.EAI_custom_bonus_26 > 0 } EAI_dynamic_bonus_trigger = yes }
+
+			add_equipment_to_stockpile = { type = convoy_1 amount = global.EAI_custom_bonus_26 }
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys (dynamic) ([?global.EAI_custom_bonus_26])"
+		}
+		else = {
+			add_equipment_to_stockpile = { type = convoy_1 amount = 50 }
+
+			log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys (global)"
+		}
 	}
 	option = {}
 }
