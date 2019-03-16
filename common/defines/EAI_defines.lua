@@ -31,6 +31,9 @@ NDefines.NAI.XP_RATIO_REQUIRED_TO_RESEARCH_WITH_XP = 3.0		-- AI will at least ne
 -- DESIGNS
 --------------------------------------------------------------------------------------------------------------
 
+NDefines.NAI.REFIT_SHIP_RELUCTANCE = 500							-- How often to consider refitting to new equipment variants for ships in the field
+NDefines.NAI.REFIT_SHIP_PERCENTAGE_OF_FORCES = 0.0				-- How big part of the navy that should be considered for refitting
+
 NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
 
 NDefines.NAI.DIVISION_UPGRADE_MIN_XP = 5							                -- Minimum XP before attempting to upgrade a division template.

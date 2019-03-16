@@ -21,25 +21,10 @@ EAI_lend_lease = {
 
 	THIS = { # target
 		NOT = { tag = ROOT }
-
-		if = {
-			limit = { # try to see if a land route is available
-				NOT = { 
-					any_home_area_neighbor_country = { 
-						NOT = { has_war_with = ROOT has_war_with = PREV }
-						
-						OR = {
-							tag = ROOT
-							any_home_area_neighbor_country = { tag = ROOT } 
-						}
-					} 
-				}
-			}
-
-			has_equipment = { convoy > 100 }
-		}
 	
 		has_war = yes NOT = { has_war_with = ROOT }
+
+		set_temp_variable = { ROOT.t1 = THIS.id }
 
 		OR = {
 			has_country_flag = EAI_receives_support_@THIS
@@ -331,6 +316,30 @@ EAI_lend_lease = {
 				}
 			}
 		}
+
+		if = {
+			limit = { # try to see if a land route is available
+				NOT = { 
+					any_home_area_neighbor_country = { 
+						NOT = { has_war_with = ROOT has_war_with = var:ROOT.t1 tag = var:ROOT.t1 }
+						
+						OR = {
+							tag = ROOT
+							any_home_area_neighbor_country = { 
+								NOT = { has_war_with = ROOT has_war_with = var:ROOT.t1 tag = var:ROOT.t1 }
+
+								OR = {
+									tag = ROOT
+									any_home_area_neighbor_country = { tag = ROOT } 
+								}
+							} 
+						}
+					} 
+				}
+			}
+
+			has_equipment = { convoy > 50 }
+		}
 	}
 }
 
@@ -378,6 +387,10 @@ EAI_special_lend_lease_rules_SENDER = {
 
 	else_if = { limit = { original_tag = JAP }
 		date > 1938.1.1
+	}
+
+	else_if = { limit = { original_tag = CHI }
+		has_equipment = { infantry_equipment > 50000 }
 	}
 }
 
@@ -431,6 +444,7 @@ EAI_special_lend_lease_rules_TARGET = {
 		limit = { 
 			ROOT = { original_tag = SOV } 
 			THIS = { NOT = { original_tag = SPR original_tag = CHI } }
+			NOT = { THIS = { has_war_together_with = ROOT } }
 		}
 		
 		OR = {
@@ -445,15 +459,16 @@ EAI_special_lend_lease_rules_TARGET = {
 	# make things easier for AI JAP vs CHI
 	else_if = { 
 		limit = { 
-			THIS = { OR = { original_tag = CHI original_tag = PRC } }
-			JAP = { is_ai = yes } 
+			THIS = { has_war_with = JAP OR = { original_tag = CHI original_tag = PRC original_tag = XSM original_tag = GXC original_tag = YUN original_tag = SHX } }
+			JAP = { is_ai = yes }
+			NOT = { THIS = { has_war_together_with = ROOT } }
 		}
 
 		date < 1940.1.1
-		
+
 		OR = {
 			AND = { ROOT = { tag = USA } CHI = { surrender_progress > 0.5 } }
-			AND = { ROOT = { tag = SOV } CHI = { surrender_progress > 0.0 } }
+			AND = { ROOT = { is_in_faction_with = SOV } CHI = { surrender_progress > 0.0 } }
 			CHI = { surrender_progress > 0.75 }
 			CHI = { is_subject = yes }
 		}
@@ -471,14 +486,4 @@ EAI_special_lend_lease_rules_TARGET = {
 			date > 1941.1.1
 		}
 	}
-
-	# SCW
-	# else_if = { 
-	# 	limit = { 
-	# 		ROOT = { is_in_faction_with = SOV }
-	# 		THIS = { original_tag = SPR }
-	# 	}
-
-	# 	date > 1940.1.1
-	# }
 }
