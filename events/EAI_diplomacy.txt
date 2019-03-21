@@ -164,6 +164,73 @@ country_event = {
 	option = { name = "OK" }
 }
 
+# SOV: force wardec on GER
+country_event = { 
+	id = EAI_DM.5
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		tag = SOV is_ai = yes is_historical_focus_on = yes
+		has_wargoal_against = GER
+		NOT = { has_non_aggression_pact_with = GER }
+
+		NOT = {
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_subject = yes }
+		}
+
+		has_army_manpower = { size > 2500000 }
+		date > 1942.1.1
+
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT
+			}
+		}
+
+		# ger is a threat
+		NOT = {
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			is_in_faction_with = GER
+			has_war_with = GER
+		}
+		GER = { has_government = fascism }
+	}
+	immediate = {
+		if = { limit = { SOV = { NOT = { has_war_with = GER } } }
+			country_event = { id = EAI_DM.7 days = 30 }
+		}
+
+		set_country_flag = { flag = EAI_prepare_for_war_@GER value = 1 days = 35 }
+
+		every_country = {
+			limit = { OR = { is_in_faction_with = GER has_guaranteed = GER } is_neighbor_of = ROOT }
+
+			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 35 } }
+		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: wardec GER"
+	}
+	option = { name = "OK" }
+}
+country_event = { 
+	id = EAI_DM.7
+	hidden = yes
+	fire_only_once = yes
+	is_triggered_only = yes
+	immediate = {
+		if = { limit = { SOV = { NOT = { has_war_with = GER } } }
+			SOV = { declare_war_on = { target = GER type = puppet_wargoal_focus } }
+		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: wardec GER"
+	}
+	option = { name = "OK" }
+}
+
 # SOV: force wardec on JAP
 country_event = { 
 	id = EAI_DM.6
@@ -430,38 +497,181 @@ country_event = {
 	option = {}
 }
 
-# South america: join allies
+# neutral countries: join allies
 country_event = { 
 	id = EAI_DM.21
+	hidden = yes
+	mean_time_to_happen = { 
+		days = 180 
+		modifier = {
+			factor = 0.25
+
+			ENG = { 
+				has_government = democratic
+				NOT = { EAI_is_not_independent = yes }
+				any_enemy_country = { 
+					original_tag = GER 
+					has_government = fascism 
+					is_faction_leader = yes
+					OR = {
+						surrender_progress > 0.5
+						ENG = { alliance_strength_ratio > 2.0 }
+					}
+				}
+			}
+		}
+	}
+	trigger = {
+		is_ai = yes
+
+		NOT = { has_country_flag = EAI_neutral_joins_allies_triggered }
+
+		is_historical_focus_on = yes
+
+		threat > 0.99
+
+		### this country
+
+		OR = { has_government = neutrality has_government = democratic }
+
+		NOT = { 
+			is_in_faction = yes 
+			EAI_neutral_country = yes
+			EAI_is_not_independent = yes
+		}
+
+		NOT = {
+			any_neighbor_country = {
+				has_war_with = ENG
+				strength_ratio = { tag = ROOT ratio > 2.0 }
+			}
+		}
+
+		### allies
+
+		ENG = { 
+			has_government = democratic
+			any_enemy_country = { is_major = yes }
+			alliance_naval_strength_ratio > 2.0
+		}
+
+		USA = {
+			has_government = democratic
+			is_major = yes
+			surrender_progress < 0.2
+			is_in_faction_with = ENG
+			NOT = { EAI_is_not_independent = yes }
+		}
+
+		### other conditions
+
+		OR = {
+			AND = { # south america
+				capital_scope = { is_on_continent = south_america }
+				OR = {
+					AND = { date > 1944.1.1 }
+					AND = { date > 1942.2.1 original_tag = BRA }
+				}
+			}
+			AND = { # rest of the world
+				any_country = { 
+					OR = { original_tag = ENG original_tag = USA }
+					has_government = democratic
+					is_major = yes
+					is_faction_leader = yes
+
+					any_enemy_country = { 
+						original_tag = GER 
+						has_government = fascism 
+						is_faction_leader = yes
+						surrender_progress > 0.5
+					}
+				}
+			}
+		}
+	}
+	immediate = {
+		set_country_flag = { flag = EAI_neutral_joins_allies value = 1 days = 180 }
+		set_country_flag = EAI_neutral_joins_allies_triggered
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: join allies"
+	}
+	option = {}
+}
+
+# neutral countries: join axis
+country_event = { 
+	id = EAI_DM.22
 	hidden = yes
 	mean_time_to_happen = { days = 100 }
 	trigger = {
 		is_ai = yes
 
-		NOT = { has_country_flag = EAI_sa_joins_allies }
+		NOT = { has_country_flag = EAI_neutral_joins_axis_triggered }
 
 		is_historical_focus_on = yes
-	
-		capital_scope = { is_on_continent = south_america }
 
-		OR = { has_government = neutrality has_government = democratic }
+		threat > 0.99
 
-		NOT = {
-			is_in_faction = yes
-			has_war = yes
+		### this country
+
+		OR = { has_government = fascism }
+
+		NOT = { 
+			is_in_faction = yes 
+			EAI_neutral_country = yes
+			EAI_is_not_independent = yes
 		}
 
-		USA = { has_war_with = GER is_in_faction_with = ENG }
-
 		NOT = {
-			USA = { has_capitulated = yes }
-			GER = { has_capitulated = yes }
+			any_neighbor_country = {
+				has_war_with = GER
+				strength_ratio = { tag = ROOT ratio > 2.0 }
+			}
 		}
 
-		date > 1945.1.1
+		### axis
+
+		GER = { 
+			any_enemy_country = { is_major = yes }
+			is_major = yes
+			has_government = fascism
+			is_faction_leader = yes
+			NOT = { 
+				EAI_is_not_independent = yes 
+				surrender_progress > 0.05
+			}
+		}
+
+		### other conditions
+
+		OR = {
+			AND = { # south america
+				capital_scope = { is_on_continent = south_america }
+				date > 1943.1.1
+
+				OR = {
+					ENG = { OR = { EAI_is_not_independent = yes has_government = fascism } }
+					USA = { OR = { EAI_is_not_independent = yes has_government = fascism } }
+				}
+			}
+			AND = { # rest of the world
+				OR = {
+					AND = {
+						ENG = { OR = { EAI_is_not_independent = yes has_government = fascism } }
+						USA = { OR = { EAI_is_not_independent = yes has_government = fascism } }
+					}
+				
+					SOV = { OR = { EAI_is_not_independent = yes has_government = fascism } }
+				}
+			}
+		}
 	}
 	immediate = {
-		set_country_flag = { flag = EAI_sa_joins_allies value = 1 days = 30 }
+		set_country_flag = { flag = EAI_neutral_joins_axis value = 1 days = 180 }
+		set_country_flag = EAI_neutral_joins_axis_triggered
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: join axis"
 	}
 	option = {}
 }

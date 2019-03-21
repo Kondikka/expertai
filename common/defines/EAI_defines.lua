@@ -121,8 +121,8 @@ NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	       
 --NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0 --500
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 --7
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.1 --0.1
-NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 50 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
+NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.25 --0.1
+NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 365 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
 --NDefines.NAI.LOW_PRIO_TEMPLATE_PENALTY_FOR_FRONTS = 100000		-- penalty to make ai less likely to assign low prio units to fronts
