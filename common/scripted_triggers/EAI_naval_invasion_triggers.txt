@@ -59,33 +59,36 @@ EAI_stop_naval_invasion = {
 	has_country_flag = EAI_naval_invasion_from_@ROOT
 
 	OR = {
+		# invalid invasion
 		NOT = { EAI_naval_invade = yes }
 		
 		AND = {
+			# min duration for invasion has expired
 			NOT = { ROOT = { has_country_flag = EAI_invasion_operation_active } }
 			
-			NOT = {
+			NOT = { # no progress has been made
 				any_state = {
 					has_state_flag = EAI_naval_invasion_target_state_@ROOT
 					
-					any_country = {
-						OR = {
-							tag = ROOT
-							is_in_faction_with = ROOT
-							is_subject_of = ROOT
-							ROOT = { is_subject_of = PREV }
-						}
-						
-						OR = {
+					OR = {
+						any_country = {
+							OR = {
+								tag = ROOT
+								is_in_faction_with = ROOT
+								is_subject_of = ROOT
+								ROOT = { is_subject_of = PREV }
+							}
+
 							divisions_in_state = { state = PREV size > 0 }
 							
-							controller = { NOT = { has_war_with = ROOT } }
 						}
+						CONTROLLER = { NOT = { has_war_with = ROOT } }
 					}
 				}
 			}
 		}
 		
+		# target uninvadeable
 		NOT = { any_state = { is_controlled_by = PREV is_coastal = yes } }
 	}
 }
@@ -109,6 +112,19 @@ EAI_invasion_restriction = {
 			
 			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN original_tag = FRA } is_in_faction_with = GER } 
 		}
+
+		# USA
+		AND = {
+			ROOT = { original_tag = USA } 
+			
+			THIS = { is_in_faction_with = GER } 
+
+			ROOT = {
+				has_war_with = JAP
+
+				date < 1944.1.1
+			}
+		}
 		
 		# JAP
 		AND = {
@@ -122,9 +138,16 @@ EAI_invasion_restriction = {
 			ROOT = { 
 				OR = { original_tag = GER is_in_faction_with = GER }
 				
-				has_war_with = SOV
-				SOV = { has_capitulated = no }
-				strength_ratio = { tag = SOV ratio < 4 }
+				OR = {
+					AND = {
+						has_war_with = SOV
+						SOV = { has_capitulated = no }
+						strength_ratio = { tag = SOV ratio < 4 }
+					}
+					AND = {
+						alliance_naval_strength_ratio < 1.0
+					}
+				}
 			}
 			
 			THIS = { original_tag = ENG }

@@ -1,14 +1,37 @@
 --------------------------------------------------------------------------------------------------------------
--- 
+-- GAMEPLAY
 --------------------------------------------------------------------------------------------------------------
 	
 NDefines.NCountry.SUPPLY_PATH_MAX_DISTANCE = 8 						-- When supply route reach more than X nodes, the manpower+equipment delivery speed reach 100% penalty.
 NDefines.NCountry.REINFORCEMENT_DELIVERY_SPEED_MIN = 0.5 			-- The distance from the supply region to capital should affect the speed only a little bit. Main factor for penalty is overcrowded areas, and not the route length.
 NDefines.NCountry.REINFORCEMENT_EQUIPMENT_DELIVERY_SPEED = 0.012 	-- Modifier for army equipment reinforcement speed
 NDefines.NCountry.REINFORCEMENT_MANPOWER_DELIVERY_SPEED = 80 		-- Modifier for army manpower reinforcement delivery speed (travel time)
+
+
 	
 NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.10 -- 0.25
 NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
+
+
+
+-- NDefines.NNavy.BASE_CONVOY_SPOTTING_SPEED = 0.0								-- daily base spotting speed against convoys
+-- NDefines.NNavy.BASE_UNIT_TRANSFER_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit trans
+-- NDefines.NNavy.BASE_NAVAL_INVASION_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit transfers
+
+-- NDefines.NNavy.CONVOY_SPOTTING_SPEED_MULT = 1.0								-- spotting speed mult against convoys
+NDefines.NNavy.UNIT_TRANSFER_SPOTTING_SPEED_MULT = 1.0 -- 5.0						-- spotting speed mult against unit transfers
+-- NDefines.NNavy.NAVAL_INVASION_SPOTTING_SPEED_MULT = 10.0						-- spotting speed mult against naval invasion armies
+
+-- NDefines.NNavy.CONVOY_DETECTION_CHANCE_BASE = 4.17							-- regular convoy base chance detection percentage (if this fails no detection is done on that tick)
+-- NDefines.NNavy.BASE_SPOTTING_EFFECT_FOR_INITIAL_CONVOY_SPOTTING = 0.35		-- effect of base convoy spotting for initial spotting of regular convoys. this along with next value is added together and rolled a random  once for every convoy to check for spotting
+-- NDefines.NNavy.SPOTTING_SPEED_EFFECT_FOR_INITIAL_CONVOY_SPOTTING = 1.20		-- effect of convoy spotting speed for initial spotting of regular convoys. this along with prev value is added together and rolled a random once for every convoy to check for spotting
+-- NDefines.NNavy.SPOTTING_MOD_FOR_CONVOY_COUNT = 0.2							-- a modifier for scaling the count of convoys on a parabolic curve (counvoy_count ^ SPOTTING_MOD_FOR_CONVOY_COUNT)
+
+NDefines.NNavy.UNIT_TRANSFER_DETECTION_CHANCE_BASE = 4.17 --25.02						-- unit transfer and naval invasion base chance detection percentage (if this fails no detection is done on that tick)
+NDefines.NNavy.BASE_SPOTTING_EFFECT_FOR_INITIAL_UNIT_TRANSFER_SPOTTING = 0.35 --10.0	-- same as BASE_SPOTTING_EFFECT_FOR_INITIAL_CONVOY_SPOTTING but for naval transfer convoys
+NDefines.NNavy.SPOTTING_SPEED_EFFECT_FOR_INITIAL_UNIT_TRANSFER_SPOTTING = 1.20 --20.0 -- same as SPOTTING_SPEED_EFFECT_FOR_INITIAL_CONVOY_SPOTTING but for naval transfer convoys
+-- NDefines.NNavy.BASE_SPOTTING_EFFECT_FOR_INITIAL_NAVAL_INVASION_SPOTTING = 2.4    -- same as BASE_SPOTTING_EFFECT_FOR_INITIAL_CONVOY_SPOTTING but for naval invasion convoys
+-- NDefines.NNavy.SPOTTING_SPEED_EFFECT_FOR_INITIAL_NAVAL_INVASION_SPOTTING = 0.12  -- same as SPOTTING_SPEED_EFFECT_FOR_INITIAL_CONVOY_SPOTTING but for naval invasion convoys
 
 --------------------------------------------------------------------------------------------------------------
 -- RESEARCH
@@ -181,17 +204,8 @@ NDefines.NAI.PRODUCTION_LINE_SWITCH_SURPLUS_NEEDED_MODIFIER = 0 -- 0.2 --delays 
 -- FUEL
 --------------------------------------------------------------------------------------------------------------
 
---NDefines.NAI.FUEL_REQUEST_FOR_ARMY_WITH_SURPLUS = 2
---
---NDefines.NAI.MAX_FACTORY_TO_SPARE_FOR_MISSION_FUEL_TRADE = 1, 					-- amount of factories to spend on oil trade in case of fuel need for missions
---NDefines.NAI.MAX_FACTORY_TO_SPARE_FOR_CRITICAL_MISSION_FUEL_TRADE = 1, 			-- amount of factories to spend on oil trade in case of fuel need for prio missions
---	
---NDefines.NAI.MAX_FACTORY_TO_SPARE_FOR_MISSION_FUEL_TRADE_IN_PEACE = 0.25, 			-- amount of factories to spend on oil trade in case of fuel need for missions in peace time
---NDefines.NAI.MAX_FACTORY_TO_SPARE_FOR_CRITICAL_MISSION_FUEL_TRADE_IN_PEACE = 0.6, 	-- amount of factories to spend on oil trade in case of fuel need for prio missions in peace time
---
---NDefines.NAI.MAX_FACTORY_TO_SPARE_TO_FOR_FUEL_TRADE = 1,							-- countries will use up to this ratio of civilian factories while trading for fuel
---NDefines.NAI.MONTHS_TO_FILL_FUEL_BUFFER_WITH_OIL_REQUESTS = 1.0, 					-- in war time, coutries will try to fill their buffer in this duration and trade for oil if necesarry
---NDefines.NAI.MONTHS_TO_FILL_FUEL_BUFFER_WITH_OIL_REQUESTS_IN_PEACE_TIME = 1.0,      -- in peace time, coutries will try to fill their buffer in this duration and trade for oil if necesarry
+-- NDefines.NAI.MONTHS_TO_FILL_FUEL_BUFFER_WITH_OIL_REQUESTS = 6.0 					-- in war time, coutries will try to fill their buffer in this duration and trade for oil if necesarry
+-- NDefines.NAI.MONTHS_TO_FILL_FUEL_BUFFER_WITH_OIL_REQUESTS_IN_PEACE_TIME = 10.0      -- in peace time, coutries will try to fill their buffer in this duration and trade for oil if necesarry
 
 NDefines.NAI.WANTED_MAX_FUEL_BUFFER_IN_DAYS_FOR_ARMY_MAX_CONSUMPTION = 365  -- AI will try to buffer at least this amount of days on max consumption, will trade if necesarry and will go into fuel saving mode/aggresive mode using this buffer 
 NDefines.NAI.WANTED_MAX_FUEL_BUFFER_IN_DAYS_FOR_AIR_MAX_CONSUMPTION  = 365  -- AI will try to buffer at least this amount of days on max consumption, will trade if necesarry and will go into fuel saving mode/aggresive mode using this buffer
@@ -348,33 +362,30 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 
 -- all-screen taskforces will be shared between convoy defense, mine missions and patrols (in this prio) 
 -- and these ratios limits the maximum ratio of these taskforces to allocate on type
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN = 0.20 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN = 0.40 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX = 0.70 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN_CONVOY_THREAT = 100 -- AI will increase screen assignment for escort missions as threate increases
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = 1500-- AI will increase screen assignment for escort missions as threate increases
 
-
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING = 0.15 -- maximum ratio of screens forces to be used in mine sweeping
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING = 0.05 -- maximum ratio of screens forces to be used in mine sweeping
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO = 0.8 -- if you have mines near your owned states, you will start priotize mine missions and will assign this ratio of screens
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO_MIN_MINES = 10 -- lowest mine for prioing mine missions
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO_MAX_MINES = 1000 -- highest mines for highest prio for mine missions
 
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_LAYING = 0.15 -- maximum ratio of screens forces to be used in mine laying
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_LAYING = 0.05 -- maximum ratio of screens forces to be used in mine laying
 -- NDefines.NAI.MAX_SCREEN_FORCES_FOR_INVASION_SUPPORT = 0.0 -- max ratio of screens forces to be used in naval invasion missions
 -- NDefines.NAI.MAX_CAPITAL_FORCES_FOR_INVASION_SUPPORT = 0.4 -- max ratio of capital forces to be used in naval invasion missions
 -- NDefines.NAI.MAX_PATROL_TO_STRIKE_FORCE_RATIO = 3.0	-- maximum patrol/strike force ratio
 
--- NDefines.NAI.MAX_INVASION_SIZE = 24									-- max invasion group size
-
-NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.5 				-- ai will use at most this ratio of affordable fuel for naval training
+NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.1 				-- ai will use at most this ratio of affordable fuel for naval training
 
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
--- NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
+-- NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 1
 
 NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 1.0 					-- ai will not train a taskforce if fully trained ships are above this ratio
 
 NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0								-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
-NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 100								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
+NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
 
 -- NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 5										-- A nation may have a large number of theatres but all of them having stationed/assigned navy is redundant
 -- NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 100							-- Weight of capital when calculating naval theatre assignment
@@ -383,7 +394,8 @@ NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 100								-- If the enemy has a 
 
 -- NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3								-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 -- NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
-NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 48								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+NDefines.NAI.MAX_INVASION_SIZE = 12
 
 -- NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500									-- Base value when AI is evaluating distance score to places
 -- NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000									-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
@@ -408,7 +420,7 @@ NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = 10 				-- optimum sub count for sub 
 
 -- NDefines.NAI.MIN_CAPITALS_FOR_CARRIER_TASKFORCE = 10			-- carrier fleets will at least have this amount of capitals
 -- NDefines.NAI.CAPITALS_TO_CARRIER_RATIO = 1.5				-- capital to carrier count in carrier taskfoces
--- NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 4.0					-- screens to capital/carrier count in carrier & capital taskforces
+NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 3.5					-- screens to capital/carrier count in carrier & capital taskforces
 
 -- NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
 -- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
@@ -464,7 +476,10 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 -- AIR AI
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 0.5
+NDefines.NAI.PRODUCTION_CARRIER_PLANE_BUFFER_RATIO = 3				-- in additiona to total deck size of carriers, we want at list this ratio to buffer it
+-- NDefines.NAI.PRODUCTION_CARRIER_PLANE_PRODUCTION_BOOST_TO_BUFFER = 4.0  -- production of carrier planes will go up by this ratio if we lack buffers
+
+NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 1
 
 NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 400
 

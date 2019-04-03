@@ -12,6 +12,33 @@ on_actions = {
 				if = { limit = { NOT = { has_country_flag = EAI_construction_timer } }
 					country_event = EAI_C.10
 				}
+
+				### fix to AI not training its navy
+
+				if = { limit = { original_tag = USA }
+
+					if = { 
+						limit = { 
+							has_war = no
+							has_fuel > 50000
+						}
+
+						while_loop_effect = { limit = { has_fuel > 50000 }
+							add_fuel = -50000
+							add_to_variable = { EAI_stored_fuel = 50000 }
+						}
+
+						clamp_variable = { var = EAI_stored_fuel min = 0 max = 2000000 }
+					}
+					if = { 
+						limit = { 
+							has_war = yes 
+							has_variable = EAI_stored_fuel 
+						}
+						add_fuel = EAI_USA_stored_fuel
+						clear_variable = EAI_stored_fuel
+					}
+				}
 			}
 		}
 	}

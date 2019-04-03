@@ -2,7 +2,7 @@
 #	Expert AI mod - naval strategies
 ############################################################################################################
 
-# strike forces
+### strike forces
 
 EAI_USA_strike_force_pacific = {
 	enable = {
@@ -46,17 +46,17 @@ EAI_USA_strike_force_europe = {
 	ai_strategy = { type = strike_force_home_base id = 18 }
 }
 
-# avoidance
+### avoidance
 
-EAI_GER_avoid_ENG = {
+EAI_axis_avoid_ENG = {
 	enable = {
-		original_tag = GER
-		
 		has_war_with = ENG
 
 		NOT = { ENG = { has_capitulated = yes } }
 
 		alliance_naval_strength_ratio < 1.0
+
+		NOT = { ENG = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 	}
 	
 	abort_when_not_enabled = yes
@@ -67,48 +67,74 @@ EAI_GER_avoid_ENG = {
 }
 
 EAI_ITA_avoid_ETH = {
-	enable = { original_tag = ITA enemies_naval_strength_ratio > 1.0 }
+	enable = { 
+		original_tag = ITA 
+		enemies_naval_strength_ratio > 1.0 
+		NOT = { ETH = { has_country_flag = EAI_naval_invasion_from_ITA } }
+	}
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = naval_avoid_region id = 47 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 48 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 61 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 62 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 65 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 103 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 102 value = 2000 }
-	ai_strategy = { type = naval_avoid_region id = 104 value = 2000 }
+	ai_strategy = { type = naval_avoid_region id = 47 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 48 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 61 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 62 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 65 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 103 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 102 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 104 value = 500 }
 }
 
-EAI_allies_atlantic_trade_route = {
-	enable = { is_in_faction_with = ENG alliance_naval_strength_ratio < 8 }
+EAI_allies_avoid_GER = {
+	enable = {
+		has_war_with = GER
+
+		NOT = { GER = { has_capitulated = yes } }
+
+		 alliance_naval_strength_ratio < 8
+	}
+
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = naval_avoid_region id = 43 value = -3000 }
-	ai_strategy = { type = naval_avoid_region id = 44 value = -3000 }
-	ai_strategy = { type = naval_avoid_region id = 50 value = -3000 }
-	ai_strategy = { type = naval_avoid_region id = 55 value = -3000 }
-	ai_strategy = { type = naval_avoid_region id = 54 value = -3000 }
+	ai_strategy = { type = naval_avoid_region id = 18 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 16 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 42 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 47 value = 500 }
+}
 
-	ai_strategy = { type = naval_avoid_region id = 18 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 16 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 42 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 47 value = 50 }
+EAI_allies_avoid_JAP = {
+	enable = {
+		has_war_with = JAP
+
+		NOT = { JAP = { has_capitulated = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 90 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 79 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 76 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 75 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 75 value = 50 }
 }
 
 EAI_allies_avoid_mediterranean = {
 	enable = { 
 		is_in_faction_with = ENG 
+		
 		NOT = { original_tag = USA } 
+
 		alliance_naval_strength_ratio < 8 
+
 		OR = { has_war_with = ITA has_war_with = GER } 
+
+		NOT = { ITA = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 	}
 	abort_when_not_enabled = yes
 
 	ai_strategy = { type = naval_avoid_region id = 68 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 168 value = 500 }
 	ai_strategy = { type = naval_avoid_region id = 169 value = 500 }
-	ai_strategy = { type = naval_avoid_region id = 29 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 29 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 69 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 100 value = 50 }
 }
@@ -156,7 +182,118 @@ EAI_axis_avoid_mediterranean_2 = {
 	ai_strategy = { type = naval_avoid_region id = 69 value = 500 }
 }
 
-# misc
+###
+
+EAI_avoid_borneo = {
+	enable = { 
+		any_state = {
+			OR = { region = 159 region = 187 region = 167 }
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 93 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 72 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 91 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 80 value = 50 }
+}
+
+EAI_avoid_philippines = {
+	enable = { 
+		any_state = {
+			OR = { region = 160 }
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 78 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 75 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 80 value = 50 }
+}
+
+EAI_avoid_midway = {
+	enable = { 
+		631 = {
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 95 value = 50 }
+}
+
+EAI_avoid_hawaii = {
+	enable = { 
+		629 = {
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 105 value = 50 }
+}
+
+EAI_avoid_line = {
+	enable = { 
+		727 = {
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 172 value = 50 }
+}
+
+EAI_avoid_tahiti = {
+	enable = { 
+		641 = {
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 179 value = 50 }
+}
+
+EAI_avoid_fiji = {
+	enable = { 
+		any_state = {
+			OR = { state = 726 state = 636 }
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 178 value = 50 }
+}
+
+EAI_avoid_zealand = {
+	enable = { 
+		any_state = {
+			OR = { region = 157 }
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 86 value = 50 }
+}
+
+EAI_avoid_iwo_jima = {
+	enable = { 
+		any_state = {
+			OR = { state = 645 state = 648 state = 646 }
+			CONTROLLER = { has_war_with = ROOT }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 94 value = 50 }
+}
+
+### misc
 
 EAI_peace_time_naval_missions = {
 	enable = { has_war = no }
@@ -165,6 +302,13 @@ EAI_peace_time_naval_missions = {
 	ai_strategy = { type = naval_mission_threshold id = "MISSION_PATROL" value = 50000 }
 	ai_strategy = { type = naval_mission_threshold id = "MISSION_STRIKE_FORCE" value = 50000 }
 	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = 50000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_RAIDING" value = 50000 }
+}
+
+EAI_halt_sub_missions = {
+	enable = { has_country_flag = EAI_halt_sub_missions }
+	abort_when_not_enabled = yes
+
 	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_RAIDING" value = 50000 }
 }
 
@@ -178,8 +322,8 @@ EAI_conserve_fuel = {
 }
 
 EAI_conserve_fuel_JAP = {
-	enable = { original_tag = JAP OR = { fuel_ratio < 0.95 } has_war = no }
-	abort_when_not_enabled = yes
+	enable = { original_tag = JAP fuel_ratio < 0.50 has_war = no }
+	abort = { NOT = { AND = { fuel_ratio < 0.75 has_war = no } } }
 
 	ai_strategy = { type = naval_mission_threshold id = "MISSION_TRAINING" value = 200000 }
 }
@@ -200,6 +344,8 @@ EAI_invasion_blitz_JAP = {
 ############################################################################
 
 ### special cases
+
+# JAP
 
 EAI_pacific_war_JAP = {
 	enable = {
@@ -253,18 +399,54 @@ EAI_pacific_war_JAP_4 = {
 	ai_strategy = { type = invade id = "USA" value = 4000 }
 }
 
+EAI_pacific_war_JAP_5 = {
+	enable = {
+		original_tag = JAP
+
+		has_war_with = USA
+
+		if = { limit = { has_war_with = PHI } PHI = { has_capitulated = yes } }
+
+		any_state = {
+			OR = { state = 638 state = 650 state = 632 }
+			CONTROLLER = { original_tag = USA }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = invade id = "USA" value = 4000 }
+}
+
+# USA
+
 EAI_pacific_war_USA = {
 	enable = {
 		original_tag = USA
 		
 		has_war_with = JAP
-		
-		NOT = { JAP = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 	}
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = invade id = "JAP" value = 4000 }
+	ai_strategy = { type = invade id = "JAP" value = 7000 }
+}
+
+EAI_pacific_war_USA_2 = {
+	enable = {
+		is_in_faction_with = GER
+		has_war_with = USA
+		USA = { has_war_with = JAP }
+		JAP = { NOT = { has_capitulated = yes } }
+		NOT = { has_country_flag = EAI_coordinated_naval_invasion_from_USA }
+		date < 1944.1.1
+	}
+	
+	abort_when_not_enabled = yes
+
+	reversed = yes
+	
+	ai_strategy = { type = invade id = "USA" value = -7000 }
 }
 
 ###
@@ -672,108 +854,3 @@ EAI_naval_invasion_from_D12 = { reversed = yes enable = { has_country_flag = EAI
 EAI_naval_invasion_from_D13 = { reversed = yes enable = { has_country_flag = EAI_naval_invasion_from_D13 } abort_when_not_enabled = yes ai_strategy = { type = invade id = "D13" value = 7000 } }
 EAI_naval_invasion_from_D14 = { reversed = yes enable = { has_country_flag = EAI_naval_invasion_from_D14 } abort_when_not_enabled = yes ai_strategy = { type = invade id = "D14" value = 7000 } }
 EAI_naval_invasion_from_D15 = { reversed = yes enable = { has_country_flag = EAI_naval_invasion_from_D15 } abort_when_not_enabled = yes ai_strategy = { type = invade id = "D15" value = 7000 } }
-
-###
-
-# # mediterranean
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 68 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 68 value = 2000 } }
-# EAI_avoid_transport_region_169 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 169 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 169 value = 2000 } }
-# EAI_avoid_transport_region_27 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 27 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 27 value = 2000 } }
-# EAI_avoid_transport_region_168 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 168 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 168 value = 2000 } }
-# EAI_avoid_transport_region_69 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 69 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 69 value = 2000 } }
-# EAI_avoid_transport_region_30 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 30 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 30 value = 2000 } }
-# EAI_avoid_transport_region_100 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 100 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 100 value = 2000 } }
-
-# # north atlantic
-# EAI_avoid_transport_region_18 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 18 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 18 value = 2000 } }
-# EAI_avoid_transport_region_16 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 16 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 16 value = 2000 } }
-# EAI_avoid_transport_region_43 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 43 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 43 value = 2000 } }
-# EAI_avoid_transport_region_173 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 173 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 173 value = 2000 } }
-# EAI_avoid_transport_region_174 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 174 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 174 value = 2000 } }
-# EAI_avoid_transport_region_46 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 46 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 46 value = 2000 } }
-# EAI_avoid_transport_region_45 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 45 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 45 value = 2000 } }
-# EAI_avoid_transport_region_44 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 44 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 44 value = 2000 } }
-# EAI_avoid_transport_region_49 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 49 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 49 value = 2000 } }
-# EAI_avoid_transport_region_47 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 47 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 47 value = 2000 } }
-# EAI_avoid_transport_region_42 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 42 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 42 value = 2000 } }
-# EAI_avoid_transport_region_50 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 50 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 50 value = 2000 } }
-# EAI_avoid_transport_region_51 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 51 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 51 value = 2000 } }
-# EAI_avoid_transport_region_55 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 55 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 55 value = 2000 } }
-# EAI_avoid_transport_region_56 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 56 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 56 value = 2000 } }
-# EAI_avoid_transport_region_57 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 57 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 57 value = 2000 } }
-# EAI_avoid_transport_region_54 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 54 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 54 value = 2000 } }
-# EAI_avoid_transport_region_170 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 170 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 170 value = 2000 } }
-# EAI_avoid_transport_region_52 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 52 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 52 value = 2000 } }
-# EAI_avoid_transport_region_53 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 53 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 53 value = 2000 } }
-# EAI_avoid_transport_region_59 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 59 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 59 value = 2000 } }
-# EAI_avoid_transport_region_58 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 58 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 58 value = 2000 } }
-# EAI_avoid_transport_region_48 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 48 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 48 value = 2000 } }
-# EAI_avoid_transport_region_166 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 166 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 166 value = 2000 } }
-
-# # south atlantic
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 61 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 61 value = 2000 } }
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 66 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 66 value = 2000 } }
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 62 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 62 value = 2000 } }
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 64 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 64 value = 2000 } }
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 67 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 67 value = 2000 } }
-# EAI_avoid_transport_region_68 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 65 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 65 value = 2000 } }
-
-# # indian ocean
-# EAI_avoid_transport_region_103 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 103 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 103 value = 2000 } }
-# EAI_avoid_transport_region_102 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 102 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 102 value = 2000 } }
-# EAI_avoid_transport_region_104 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 104 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 104 value = 2000 } }
-# EAI_avoid_transport_region_60 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 60 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 60 value = 2000 } }
-# EAI_avoid_transport_region_85 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 85 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 85 value = 2000 } }
-# EAI_avoid_transport_region_74 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 74 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 74 value = 2000 } }
-# EAI_avoid_transport_region_71 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 71 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 71 value = 2000 } }
-# EAI_avoid_transport_region_101 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 101 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 101 value = 2000 } }
-# EAI_avoid_transport_region_99 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 99 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 99 value = 2000 } }
-
-# # west pacific
-# EAI_avoid_transport_region_73 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 73 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 73 value = 2000 } }
-# EAI_avoid_transport_region_72 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 72 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 72 value = 2000 } }
-# EAI_avoid_transport_region_75 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 75 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 75 value = 2000 } }
-# EAI_avoid_transport_region_93 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 93 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 93 value = 2000 } }
-# EAI_avoid_transport_region_80 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 80 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 80 value = 2000 } }
-# EAI_avoid_transport_region_92 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 92 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 92 value = 2000 } }
-# EAI_avoid_transport_region_91 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 91 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 91 value = 2000 } }
-# EAI_avoid_transport_region_82 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 82 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 82 value = 2000 } }
-# EAI_avoid_transport_region_81 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 81 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 81 value = 2000 } }
-# EAI_avoid_transport_region_86 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 86 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 86 value = 2000 } }
-# EAI_avoid_transport_region_83 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 83 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 83 value = 2000 } }
-# EAI_avoid_transport_region_84 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 84 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 84 value = 2000 } }
-# EAI_avoid_transport_region_78 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 78 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 78 value = 2000 } }
-# EAI_avoid_transport_region_76 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 76 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 76 value = 2000 } }
-# EAI_avoid_transport_region_77 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 77 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 77 value = 2000 } }
-# EAI_avoid_transport_region_79 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 79 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 79 value = 2000 } }
-# EAI_avoid_transport_region_90 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 90 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 90 value = 2000 } }
-# EAI_avoid_transport_region_94 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 94 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 94 value = 2000 } }
-# EAI_avoid_transport_region_177 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 177 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 177 value = 2000 } }
-# EAI_avoid_transport_region_87 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 87 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 87 value = 2000 } }
-# EAI_avoid_transport_region_97 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 97 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 97 value = 2000 } }
-# EAI_avoid_transport_region_180 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 180 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 180 value = 2000 } }
-# EAI_avoid_transport_region_95 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 95 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 95 value = 2000 } }
-# EAI_avoid_transport_region_96 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 96 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 96 value = 2000 } }
-# EAI_avoid_transport_region_88 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 88 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 88 value = 2000 } }
-
-# # east pacific
-# EAI_avoid_transport_region_112 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 112 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 112 value = 2000 } }
-# EAI_avoid_transport_region_178 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 178 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 178 value = 2000 } }
-# EAI_avoid_transport_region_179 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 179 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 179 value = 2000 } }
-# EAI_avoid_transport_region_113 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 113 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 113 value = 2000 } }
-# EAI_avoid_transport_region_32 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 32 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 32 value = 2000 } }
-# EAI_avoid_transport_region_63 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 63 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 63 value = 2000 } }
-# EAI_avoid_transport_region_108 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 108 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 108 value = 2000 } }
-# EAI_avoid_transport_region_109 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 109 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 109 value = 2000 } }
-# EAI_avoid_transport_region_107 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 107 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 107 value = 2000 } }
-# EAI_avoid_transport_region_110 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 110 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 110 value = 2000 } }
-# EAI_avoid_transport_region_175 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 175 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 175 value = 2000 } }
-# EAI_avoid_transport_region_172 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 172 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 172 value = 2000 } }
-# EAI_avoid_transport_region_105 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 105 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 105 value = 2000 } }
-# EAI_avoid_transport_region_111 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 111 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 111 value = 2000 } }
-# EAI_avoid_transport_region_106 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 106 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 106 value = 2000 } }
-# EAI_avoid_transport_region_89 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 89 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 89 value = 2000 } }
-# EAI_avoid_transport_region_171 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 171 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 171 value = 2000 } }
-# EAI_avoid_transport_region_114 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 114 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 114 value = 2000 } }
-# EAI_avoid_transport_region_176 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 176 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 176 value = 2000 } }
-# EAI_avoid_transport_region_105 = { enable = { NOT = { has_global_flag = EAI_performance_mode } any_enemy_country = { ships_in_area = { area = 105 size > 9 } } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 105 value = 2000 } }
