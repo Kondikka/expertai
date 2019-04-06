@@ -39,6 +39,7 @@ EAI_num_surface_ships = {
 	add_to_variable = { EAI_num_surface_ships = num_ships_with_type@battleship }
 }
 
+# stockpile display
 EAI_calculate_fielded_equipment_ratios = {
 	set_variable = { EAI_stockpile_infantry_equipment = Prev.num_equipment@infantry_equipment }
 	set_variable = { EAI_str_ratio_infantry_equipment = Prev.num_equipment_in_armies@infantry_equipment }
@@ -177,6 +178,7 @@ EAI_calculate_fielded_equipment_ratios = {
 	multiply_variable = { EAI_str_ratio_fuel = 100 }
 }
 
+# submarines lost during 20 days
 EAI_track_submarine_losses = {
 	set_temp_variable = { EAI_lost_subs = num_ships_with_type@submarine }
 	subtract_from_temp_variable = { EAI_lost_subs = EAI_previous_subs }
@@ -187,4 +189,107 @@ EAI_track_submarine_losses = {
 	}
 
 	set_variable = { EAI_previous_subs = num_ships_with_type@submarine }
+}
+
+# track the max armor value seen from other countries and the max piercing value of this country
+EAI_armor_intel_check = {
+
+	if = {
+		limit = {
+			OR = { # only check if it has a template that can upgrade its piercing
+				has_country_flag = EAI_anti_tank_template_upgrade
+				has_country_flag = EAI_marm_template_upgrade
+				has_country_flag = EAI_harm_template_upgrade
+			}
+		}
+
+		### armor intel from other countries
+
+		# enemies + neighbors
+
+		set_temp_variable = { armor_intel_value = EAI_max_armor_seen }
+
+		while_loop_effect = { limit = { check_variable = { armor_intel_value < 200 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = {
+							NOT = {
+								any_neighbor_country = { 
+									EAI_is_threat = yes
+									ROOT = { estimated_intel_max_armor = { tag = PREV value > [x] } } 
+								}
+								any_enemy_country = { ROOT = { estimated_intel_max_armor = { tag = PREV value > [x] } } }
+							}
+						}
+						x = "[?armor_intel_value|.0]"
+					}
+				}
+
+				if = { limit = { NOT = { check_variable = { EAI_max_armor_seen = armor_intel_value } } }
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest armor intel value = [?armor_intel_value]"
+				}
+
+				set_variable = { EAI_max_armor_seen = armor_intel_value }
+				set_temp_variable = { break = 1 }
+			}
+
+			add_to_temp_variable = { armor_intel_value = 5 }
+		}
+
+		# enemies only
+
+		set_temp_variable = { armor_intel_value = EAI_max_armor_seen_enemies }
+
+		while_loop_effect = { limit = { check_variable = { armor_intel_value < 200 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = {
+							NOT = {
+								any_enemy_country = { ROOT = { estimated_intel_max_armor = { tag = PREV value > [x] } } }
+							}
+						}
+						x = "[?armor_intel_value|.0]"
+					}
+				}
+
+				if = { limit = { NOT = { check_variable = { EAI_max_armor_seen_enemies = armor_intel_value } } }
+
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new enemies highest armor intel value = [?armor_intel_value]"
+				}
+
+				set_variable = { EAI_max_armor_seen_enemies = armor_intel_value }
+				set_temp_variable = { break = 1 }
+			}
+
+			add_to_temp_variable = { armor_intel_value = 5 }
+		}
+
+		### armor piercing of this country
+
+		set_temp_variable = { piercing_value = EAI_max_piercing }
+
+		while_loop_effect = { limit = { check_variable = { piercing_value < 200 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = {
+							NOT = { ROOT = { estimated_intel_max_piercing = { tag = ROOT value > [x] } } }
+						}
+						x = "[?piercing_value|.0]"
+					}
+				}
+
+				set_variable = { EAI_max_piercing = piercing_value }
+				set_temp_variable = { break = 1 }
+			}
+
+			add_to_temp_variable = { piercing_value = 2 }
+		}
+	}
 }

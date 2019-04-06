@@ -14,6 +14,10 @@ NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
 
 
 
+NDefines.NMilitary.FIELD_MARSHAL_ARMIES_CAP = 15
+
+
+
 -- NDefines.NNavy.BASE_CONVOY_SPOTTING_SPEED = 0.0								-- daily base spotting speed against convoys
 -- NDefines.NNavy.BASE_UNIT_TRANSFER_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit trans
 -- NDefines.NNavy.BASE_NAVAL_INVASION_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit transfers
@@ -48,7 +52,7 @@ NDefines.NAI.RESEARCH_AHEAD_OF_TIME_FACTOR = 0		                            -- T
 NDefines.NAI.RESEARCH_BASE_DAYS = 0					                            -- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 NDefines.NAI.RESEARCH_MULTI_DOCTRINE_SCORE = 0
 NDefines.NAI.XP_RATIO_REQUIRED_TO_RESEARCH_WITH_XP = 3.0		-- AI will at least need this amount of xp compared to cost of a tech to reserch it with XP			
--- NDefines.NAI.RESEARCH_WITH_XP_AI_WEIGHT_MULT = 1.2 				-- AI will bump score of a research with this mult if it can use XP
+NDefines.NAI.RESEARCH_WITH_XP_AI_WEIGHT_MULT = 1.5 				-- AI will bump score of a research with this mult if it can use XP
 
 --------------------------------------------------------------------------------------------------------------
 -- DESIGNS
@@ -190,7 +194,7 @@ NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.5 -- 0.25	-- Base value for
 
 NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 1
 NDefines.NAI.NEEDED_NAVAL_FACTORIES_EXPENSIVE_SHIP_BONUS = 1000
-NDefines.NAI.PRODUCTION_MAX_PROGRESS_TTO_SWITCH_NAVAL = 0.01
+NDefines.NAI.PRODUCTION_MAX_PROGRESS_TO_SWITCH_NAVAL = 0.01
 
 NDefines.NAI.NAVAL_DOCKYARDS_SHIP_FACTOR = 1000			-- The extent to which number of dockyards play into amount of sips a nation wants
 NDefines.NAI.NAVAL_BASES_SHIP_FACTOR = 1000				-- The extent to which number of naval bases play into amount of sips a nation wants
@@ -312,8 +316,6 @@ NDefines.NAI.HOUR_BAD_COMBAT_REEVALUATE = 24                                 	--
 --NDefines.NAI.PLAN_ACTIVATION_SUPERIORITY_AGGRO = 1	                        -- How aggressive a country is in activating a plan based on how superiour their force is.
 
 
-
-NDefines.NAI.PLAN_MOVE_MIN_ORG_TO_ENEMY_PROVINCE = 20.0						-- Minimum organization a unit must have to consider moving into an enemy province (not attack move)
 
 NDefines.NAI.PLAN_ATTACK_MIN_ORG_FACTOR_LOW = 0.85							-- Minimum org % for a unit to actively attack an enemy unit when executing a plan
 NDefines.NAI.PLAN_ATTACK_MIN_STRENGTH_FACTOR_LOW = 0.85						-- Minimum strength for a unit to actively attack an enemy unit when executing a plan
@@ -522,7 +524,7 @@ NDefines.NAI.LAND_DEFENSE_NAVAL_FACTORY_IMPORTANCE = 80                         
 --NDefines.NAI.LAND_DEFENSE_IMPORTANCE_SCALE = 1.5                                 -- [1.5]  -- Lend defence total importance scale (every land defence score get's multiplied by it)
 --NDefines.NAI.LAND_DEFENSE_MIN_FACTORIES_FOR_AIR_IMPORTANCE = 6                   -- [6]    -- If amount of factories is less importance of factories won't apply
 NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 0.1                                -- [1.0]  -- Amount of air superiority planes requested per enemy plane
-NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 2 --TODO check that this doesnt cause issues -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
+NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 2                           -- [2.0]  -- Amount of air interceptor planes requested per enemy bomber
 NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.0                             -- [1.0]  -- Amount of air interceptor planes requested per enemy plane (non bomber)
 
 --NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 1.0                          -- [0.20] -- Strategic importance of air superiority ( amount of enemy planes in area )
