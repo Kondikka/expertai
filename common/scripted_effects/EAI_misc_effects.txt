@@ -293,3 +293,88 @@ EAI_armor_intel_check = {
 		}
 	}
 }
+
+EAI_trade_strategies = {
+	
+	### GER
+
+	if = { 
+		limit = { 
+			GER = { EAI_PREV_on_same_side_with_THIS = yes }
+			capital_scope = { OR = { is_on_continent = europe is_on_continent = middle_east } }
+		}
+
+		if = { limit = { has_war = yes alliance_naval_strength_ratio < 4 }
+
+			every_country = {
+				if = {
+					limit = {
+						NOT = { 
+							capital_scope = { OR = { is_on_continent = europe is_on_continent = middle_east } } 
+							any_neighbor_country = { tag = ROOT }
+						} 
+					}
+
+					EAI_block_trade = yes
+				}
+				else = { EAI_allow_trade = yes }
+			}
+		}
+		else_if = { limit = { has_country_flag = EAI_trades_blocked } every_country = { EAI_allow_trade = yes } }
+	}
+
+	### JAP
+
+	if = { 
+		limit = { 
+			JAP = { EAI_PREV_on_same_side_with_THIS = yes }
+			capital_scope = { OR = { is_on_continent = asia is_on_continent = pacific is_on_continent = oceania } }
+		}
+
+		if = { limit = { has_war = yes alliance_naval_strength_ratio < 4 }
+
+			every_country = { 
+				if = {
+					limit = {
+						NOT = { 
+							capital_scope = { OR = { is_on_continent = asia is_on_continent = pacific is_on_continent = oceania } }
+							any_neighbor_country = { tag = ROOT }
+							original_tag = SOV
+						} 
+					}
+					
+					EAI_block_trade = yes
+				}
+				else = { EAI_allow_trade = yes }
+			}
+		}
+		else_if = { limit = { has_country_flag = EAI_trades_blocked } every_country = { EAI_allow_trade = yes } }
+	}
+}
+
+EAI_block_trade = {
+	if = { limit = { NOT = { has_country_flag = EAI_block_trade_to_@ROOT } }
+
+		set_country_flag = EAI_block_trade_to_@ROOT
+		ROOT = { set_country_flag = EAI_trades_blocked }
+
+		add_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_1 } 
+		add_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_2 } 
+		add_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_3 } 
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE: blocking trade against [This.GetName]"
+	}
+}
+
+EAI_allow_trade = {
+	if = { limit = { has_country_flag = EAI_block_trade_to_@ROOT }
+
+		clr_country_flag = EAI_block_trade_to_@ROOT
+
+		remove_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_1 } 
+		remove_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_2 } 
+		remove_opinion_modifier = { target = ROOT modifier = EAI_trade_opinion_3 } 
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE: allowing trade against [This.GetName]"
+	}
+}
