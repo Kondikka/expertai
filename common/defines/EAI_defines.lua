@@ -242,6 +242,8 @@ NDefines.NAI.WAIT_YEARS_BEFORE_FREER_BUILDING = 0
 
 NDefines.NAI.DOCKYARDS_PER_NAVAL_DESIRE_EFFECT = -100.0
 
+NDefines.NAI.FUEL_RATIO_TO_EXIST_FUEL_SAVING_MODE = 0.40
+
 --------------------------------------------------------------------------------------------------------------
 -- PP
 --------------------------------------------------------------------------------------------------------------
@@ -333,8 +335,8 @@ NDefines.NAI.ORG_UNIT_STRONG = 0.75												-- Organization % for unit to be 
 NDefines.NAI.STR_UNIT_STRONG = 0.75												-- Strength (equipment) % for unit to be considered strong
 
 NDefines.NAI.PLAN_FACTION_NORMAL_TO_EXECUTE = 0.65
-NDefines.NAI.ORG_UNIT_NORMAL = 0.75 --6												-- Organization % for unit to be considered normal
-NDefines.NAI.STR_UNIT_NORMAL = 0.75 --6												-- Strength (equipment) % for unit to be considered normal
+NDefines.NAI.ORG_UNIT_NORMAL = 0.6 --6												-- Organization % for unit to be considered normal
+NDefines.NAI.STR_UNIT_NORMAL = 0.6 --6												-- Strength (equipment) % for unit to be considered normal
 
 NDefines.NAI.PLAN_FACTION_WEAK_TO_ABORT = 0.5 --0.50		0.65		        -- % or more of units in an order to consider ececuting the plan
 NDefines.NAI.ORG_UNIT_WEAK = 0.45 --0.45												-- Organization % for unit to be considered weak
@@ -388,6 +390,8 @@ NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 1.0 					-- ai will not
 
 NDefines.NAI.MAX_DISTANCE_NALAV_INVASION = 300.0								-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
 NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000								-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
+-- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
+-- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
 
 -- NDefines.NAI.NAVAL_MAX_PRIO_THEATRES = 5										-- A nation may have a large number of theatres but all of them having stationed/assigned navy is redundant
 -- NDefines.NAI.NAVAL_THEATRE_PRIO_CAPITAL_SCORE = 100							-- Weight of capital when calculating naval theatre assignment
@@ -397,7 +401,7 @@ NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000								-- If the enemy has a
 -- NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3								-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
 -- NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
 NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
-NDefines.NAI.MAX_INVASION_SIZE = 12
+NDefines.NAI.MAX_INVASION_SIZE = 18
 
 -- NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500									-- Base value when AI is evaluating distance score to places
 -- NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000									-- Base score for region with naval invasion (modified dynamically by prioritizing orders)

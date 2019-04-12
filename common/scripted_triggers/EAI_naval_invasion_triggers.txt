@@ -96,19 +96,39 @@ EAI_stop_naval_invasion = {
 # block invasions
 EAI_invasion_restriction = { 
 	OR = {
+		AND = {
+			has_global_flag = EAI_GER_dont_invade_NOR
+			ROOT = { GER = { EAI_PREV_on_same_side_with_THIS = yes } }
+			THIS = { original_tag = NOR }
+		}
+
 		# ALLIES
 		AND = {
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
+			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
-			THIS = { OR = { original_tag = GER is_in_faction_with = GER } } 
+			THIS = { GER = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
 			date < 1941.1.1
+
+			is_historical_focus_on = yes
 			
 			NOT = { GER = { has_war_with = SOV } }
 		}
+
+		AND = {
+			ROOT = { 
+				OR = { original_tag = ENG original_tag = USA }
+				has_army_manpower = { size < 1000000 }
+			} 
+			
+			THIS = { 
+				GER = { EAI_PREV_on_same_side_with_THIS = yes } 
+				has_army_manpower = { size > 1000000 }
+			}
+		}
 		
 		AND = {
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
+			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
 			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN original_tag = FRA } is_in_faction_with = GER } 
 		}
@@ -167,31 +187,43 @@ EAI_historical_invasion = {
 	
 	OR = {
 		# GER
-		AND = { ROOT = { original_tag = GER PREV = { original_tag = NOR } } }
+		AND = { 
+			NOT = { has_global_flag = EAI_GER_dont_invade_NOR }
+			ROOT = { GER = { EAI_PREV_on_same_side_with_THIS = yes } }
+			THIS = { original_tag = NOR } 
+		}
 		
 		# ITA
-		AND = { ROOT = { original_tag = ITA PREV = { original_tag = GRE } } }
+		AND = { 
+			ROOT = { original_tag = ITA } 
+
+			THIS = { original_tag = GRE } 
+		}
 		
 		# JAP
 		AND = { 
-			ROOT = { 
-				original_tag = JAP 
+			ROOT = { original_tag = JAP } 
+
+			THIS = { 
+				OR = {
+					original_tag = CHI
 				
-				PREV = { 
-					OR = {
-						original_tag = CHI
-					
-						AND = { original_tag = INS has_capitulated = no }
-					}
-				} 
+					AND = { original_tag = INS has_capitulated = no }
+				}
 			} 
 		}
 		
 		# ALLIES
 		AND = { 
-			ROOT = { OR = { original_tag = ENG is_in_faction_with = ENG } } 
+			ROOT = { 
+				OR = { original_tag = USA original_tag = ENG } 
+				has_army_manpower = { size > 1000000 }
+			} 
 			
-			THIS = { OR = { original_tag = GER is_in_faction_with = GER } } 
+			THIS = { 
+				GER = { EAI_PREV_on_same_side_with_THIS = yes } 
+				has_army_manpower = { size < 1000000 }
+			} 
 			
 			GER = { has_war_with = SOV }
 		}

@@ -22,10 +22,6 @@ country_event = {
 			set_country_flag = { flag = EAI_delay value = 1 days = 20 } 
 		}
 
-		### controls which countries the AI can trade with
-
-		EAI_trade_strategies = yes
-
 		### use stored xp for doctrine boosts
 
 		EAI_doctrine_xp_boost = yes
@@ -112,6 +108,8 @@ country_event = {
 
 		### misc
 
+		EAI_check_for_bugged_occupation = yes
+
 		# keep a count of its surface ships
 		EAI_num_surface_ships = yes
 
@@ -195,6 +193,10 @@ country_event = {
 		###
 
 		EAI_track_submarine_losses = yes
+
+		### controls which countries the AI can trade with
+
+		EAI_trade_strategies = yes
 	}
 
 	option = {}
@@ -295,6 +297,25 @@ country_event = {
 	immediate = {
 		set_country_flag = EAI_capital_saved
 		capital_scope = { set_state_flag = EAI_original_capital_@ROOT }
+	}
+	option = {}
+}
+
+country_event = { # temp fix 
+	id = EAI_background.6
+	hidden = yes
+	fire_only_once = yes
+	trigger = { check_variable = { global.EAI_version < 4.33 } }
+	immediate = {
+		every_country = {
+			every_other_country = {
+				clr_country_flag = EAI_block_trade_to_@PREV
+
+				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_1 } 
+				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_2 } 
+				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_3 } 
+			}
+		}
 	}
 	option = {}
 }
