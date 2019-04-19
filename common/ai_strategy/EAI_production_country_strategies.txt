@@ -49,9 +49,6 @@ EAI_GER_increase_armor_production = {
 
 	ai_strategy = { type = equipment_variant_production_factor id = medium_tank_equipment value = 50 }
 	ai_strategy = { type = equipment_variant_production_factor id = heavy_tank_equipment value = 50 }
-
-	ai_strategy = { type = equipment_production_factor id = infantry            value = -10 }
-	ai_strategy = { type = equipment_production_factor id = artillery           value = -10 }
 }
 EAI_GER_avoid_light_tank_production = {
 	enable = {
@@ -215,6 +212,19 @@ EAI_JAP_focus_on_screens = {
 	ai_strategy = { type = equipment_production_min_factories id = submarine value = -2 }
 	ai_strategy = { type = equipment_production_min_factories id = convoy value = -2 }
 }
+EAI_JAP_focus_on_carriers = {
+	enable = { 
+		original_tag = JAP 
+		
+		EAI_CV_navy_production = yes
+		EAI_BB_navy_production = yes
+		check_variable = { num_ships_with_type@battleship > 7 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = role_ratio id = naval_capital_bb value = -40 }
+}
 
 #########################################################
 #	SOV
@@ -284,6 +294,24 @@ EAI_SOV_support_eq = {
 	}
 
 	ai_strategy = { type = equipment_variant_production_factor id = support_equipment value = 150 }
+}
+EAI_SOV_artillery_eq = {
+	enable = {
+		original_tag = SOV
+
+		has_war = no
+
+		if = { limit = { check_variable = { num_equipment@artillery_equipment < 100 } check_variable = { num_target_equipment_in_armies_k@artillery_equipment > 2000 } }
+
+			set_temp_variable = { t1 = num_equipment_in_armies_k@artillery_equipment }
+			divide_temp_variable = { t1 = num_target_equipment_in_armies_k@artillery_equipment }
+			check_variable = { t1 < 0.9 }
+		}
+		else = { always = no }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_variant_production_factor id = artillery_equipment value = 100 }
 }
 
 #########################################################
@@ -431,6 +459,7 @@ EAI_build_some_destroyers_with_subs = {
 	abort_when_not_enabled = yes
 
 	ai_strategy = { type = role_ratio id = naval_screen value = -240 }
+	ai_strategy = { type = role_ratio id = naval_escort value = -190 }
 }
 EAI_build_some_destroyers_with_subs_2 = {
 	enable = { 

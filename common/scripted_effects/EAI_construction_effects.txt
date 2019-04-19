@@ -2,6 +2,280 @@
 #	Expert AI mod - scripted construction AI effects
 ############################################################################################################
 
+######################################################
+# 	priority construction AI
+######################################################
+
+@BUILD_COST_INFRASTRUCTURE = 3000
+@BUILD_COST_AIRBASE = 1250
+@BUILD_COST_ANTIAIR = 2500
+@BUILD_COST_RADAR = 3375
+@BUILD_COST_MILITARY_FACTORY = 7200
+@BUILD_COST_CIVILIAN_FACTORY = 10800
+@BUILD_COST_DOCKYARD = 6400
+@BUILD_COST_REFINERY = 14500
+
+EAI_get_building_values = {
+	if = { limit = { check_variable = { EAI_building_type_selected = 1 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_INFRASTRUCTURE }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_infrastructure_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 2 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_AIRBASE }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_air_base_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 3 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_ANTIAIR }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_anti_air_building_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 4 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_RADAR }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_radar_station_factor }
+	}
+
+	if = { limit = { check_variable = { EAI_building_type_selected = 5 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_MILITARY_FACTORY }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_arms_factory_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 6 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_CIVILIAN_FACTORY }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_industrial_complex_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 7 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_DOCKYARD }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_dockyard_factor }
+	}
+	
+	if = { limit = { check_variable = { EAI_building_type_selected = 8 } }
+
+		set_temp_variable = { EAI_building_cost = @BUILD_COST_REFINERY }
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_synthetic_refinery_factor }
+	}
+}
+
+EAI_start_construction = {
+	ROOT = {
+		### get construction speed modifiers and set building cost
+
+		set_temp_variable = { EAI_construction_speed = 1 }
+
+		EAI_get_building_values = yes
+
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_buildings_factor }
+	}
+
+	THIS = {
+		### get infrastructure level, set target state
+
+		set_temp_variable = { ROOT.EAI_target_state_infra_speed = infrastructure_level }
+
+		set_state_flag = EAI_construction_target_state_@ROOT
+	}
+
+	ROOT = {
+		### infrastructure effect (5-8 use infrastructure effect)
+
+		if = { limit = { check_variable = { EAI_building_type_selected > 4 } }
+
+			multiply_temp_variable = { EAI_target_state_infra_speed = 0.1 }
+
+			add_to_temp_variable = { EAI_target_state_infra_speed = 1 }
+
+			multiply_temp_variable = { EAI_construction_speed = EAI_target_state_infra_speed }
+		}
+
+		### assign factories
+
+		if = { limit = { num_of_civilian_factories_available_for_projects > 30 } set_temp_variable = { EAI_assigned_factories = 15 } }
+		else_if = { limit = { num_of_civilian_factories_available_for_projects > 15 } set_temp_variable = { EAI_assigned_factories = 10 } }
+		else = { set_temp_variable = { EAI_assigned_factories = 5 } }
+
+		### total factory output
+
+		multiply_temp_variable = { EAI_construction_speed = 5 }
+
+		multiply_temp_variable = { EAI_construction_speed = EAI_assigned_factories }
+
+		### days to build
+
+		divide_temp_variable = { EAI_building_cost = EAI_construction_speed }
+
+		set_variable = { EAI_construction_duration = EAI_building_cost }
+
+		round_variable = EAI_construction_duration
+
+		### active project building type
+
+		set_variable = { EAI_active_project_building_type = EAI_building_type_selected }
+		
+		### start construction
+
+		set_country_flag = EAI_construction_project_active
+
+		meta_effect = {
+			text = { activate_decision = EAI_construction_CICx[x]_decision }
+			x = "[?EAI_assigned_factories]"
+		}
+	}
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: building type [?Root.EAI_active_project_building_type] at [This.GetName]"
+}
+
+EAI_end_construction = {
+	every_state = {
+		limit = { has_state_flag = EAI_construction_target_state_@ROOT }
+
+		clr_state_flag = EAI_construction_target_state_@ROOT
+	}
+
+	clear_variable = EAI_active_project_building_type
+
+	clr_country_flag = EAI_construction_project_active
+}
+
+EAI_add_finished_building = {
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 1 } } }
+
+		add_building_construction = { type = infrastructure level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 2 } } }
+
+		add_building_construction = { type = air_base level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 3 } } }
+
+		add_building_construction = { type = anti_air_building level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 4 } } }
+
+		add_building_construction = { type = radar_station level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 5 } } }
+
+		add_building_construction = { type = arms_factory level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 6 } } }
+
+		add_building_construction = { type = industrial_complex level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 7 } } }
+
+		add_building_construction = { type = dockyard level = 1 instant_build = yes }
+	}
+
+	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 8 } } }
+
+		add_building_construction = { type = synthetic_refinery level = 1 instant_build = yes }
+	}
+}
+
+###
+
+EAI_priority_constructions = {
+
+	EAI_important_radar_constructions = yes
+	EAI_improve_north_africa_infrastructure = yes
+}
+
+### priority construction strategies
+
+EAI_important_radar_constructions = {
+
+	if = { 
+		limit = { 
+			NOT = { has_country_flag = EAI_construction_project_active } 
+			threat > 0.3
+			num_of_civilian_factories_available_for_projects > 15
+			any_state = { EAI_radar_location_2 = yes EAI_available_RADAR = yes }
+		}
+
+		set_temp_variable = { EAI_building_type_selected = 4 }
+
+		random_state = { limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes }
+
+			EAI_start_construction = yes
+		}
+	}
+}
+
+EAI_improve_north_africa_infrastructure = {
+
+	if = { 
+		limit = { 
+			NOT = { has_country_flag = EAI_construction_project_active } 
+			has_war = yes 
+			num_of_civilian_factories_available_for_projects > 15
+			any_state = { 
+				OR = { region = 126 state = 452 state = 447 state = 446 } 
+				is_controlled_by = ROOT
+				is_coastal = yes 
+				free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+				infrastructure < 8
+			}
+			any_state = { 
+				OR = { region = 126 region = 128 } 
+				CONTROLLER = { has_war_with = ROOT } 
+			}
+		}
+
+		set_temp_variable = { EAI_building_type_selected = 1 }
+
+		set_variable = { EAI_best_target = 0 }
+		set_variable = { EAI_best_target_score = 0 }
+
+		# find the best target
+		every_state = { 
+			limit = { 
+				OR = { region = 126 state = 452 state = 447 state = 446 } 
+				is_controlled_by = ROOT
+				is_coastal = yes 
+				free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+				infrastructure < 8 
+			}
+
+			# get score
+			set_variable = { EAI_score = 10 }
+			subtract_from_variable = { EAI_score = building_level@infrastructure }
+			if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
+
+			# compare with best score
+			if = { limit = { check_variable = { EAI_score > ROOT.EAI_best_target_score } } 
+
+				set_variable = { ROOT.EAI_best_target = THIS.id } 
+				set_variable = { ROOT.EAI_best_target_score = EAI_score } 
+			}
+		}
+
+		# target was found
+		if = { limit = { check_variable = { EAI_best_target_score > 0 } }
+
+			var:EAI_best_target = { EAI_start_construction = yes }
+		}
+	}
+}
+
+######################################################
+# 	construction AI
+######################################################
+
 EAI_add_CIC = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_CIC in [?This.id] [This.GetName]" }
 	add_building_construction = { type = industrial_complex level = 1 instant_build = no }
@@ -108,7 +382,7 @@ EAI_add_CFORT_COAST = {
 	add_to_variable = { EAI_forts_constructed_on_coast_@ROOT = 1 }
 }
 
-### scripted construction AI
+########################
 
 # queue airfields
 EAI_queue_AIR = {
