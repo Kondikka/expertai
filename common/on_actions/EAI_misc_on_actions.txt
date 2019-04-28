@@ -5,6 +5,36 @@
 on_actions = {
 	on_daily = {
 		effect = {
+
+			# clear invalid construction project
+			if = { limit = { has_country_flag = EAI_construction_project_active }
+
+				if = {
+					limit = {
+						NOT = {
+							has_decision = EAI_construction_CICx5_decision
+							has_decision = EAI_construction_CICx10_decision
+							has_decision = EAI_construction_CICx15_decision
+						}
+					}
+
+					EAI_end_construction = yes
+				}
+			}
+
+			# old version compatibility
+			if = { limit = { is_ai = no check_variable = { global.EAI_version < 4.4 } }
+
+				every_state = { EAI_set_resource_variables = yes }
+
+				clamp_variable = { var = global.EAI_version min = 4.4 max = 10 }
+
+				every_country = { limit = { is_ai = yes }
+
+					country_event = EAI_background.0
+				}
+			}
+
 			if = { limit = { is_ai = yes } 
 			
 				EAI_manage_xp = yes
@@ -15,7 +45,7 @@ on_actions = {
 
 				### fix to AI not training its navy
 
-				if = { limit = { original_tag = USA }
+				if = { limit = { tag = USA }
 
 					if = { 
 						limit = { 
@@ -222,34 +252,17 @@ on_actions = {
 	}
 	on_nuke_drop = {
 		effect = {		
-			log = "[Root.GetName] nuked [From.GetName]"
+			if = { limit = { has_country_flag = EAI_logging } log = "[Root.GetName] nuked [From.GetName]" } 
 		}
 	}
-	on_state_control_changed = {
+	on_state_control_changed = { #ROOT is new controller #FROM is old controller #FROM.FROM is state ID
 		effect = {
-			if = {
-				limit = {
-					any_country = {
-						FROM.FROM = { has_state_flag = EAI_construction_target_state_@PREV }
 
-						ROOT = {
-							NOT = {
-								tag = PREV
-							}
-						}
-					}
-				}
+			# clear priority construction project on lost control
+			FROM = {
+				if = { limit = { has_country_flag = EAI_construction_project_active check_variable = { EAI_construction_target_state = FROM.FROM.id } }
 
-				every_country = {
-					limit = {
-						FROM.FROM = { has_state_flag = EAI_construction_target_state_@PREV }
-					}
-
-					FROM.FROM = { clr_state_flag = EAI_construction_target_state_@PREV }
-
-					clear_variable = EAI_active_project_building_type
-
-					clr_country_flag = EAI_construction_project_active
+					EAI_end_construction = yes
 				}
 			}
 		}

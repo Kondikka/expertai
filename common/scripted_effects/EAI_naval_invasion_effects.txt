@@ -39,7 +39,7 @@ EAI_naval_invasion_check = {
 					
 					set_country_flag = { flag = EAI_stop_invasions_@ROOT value = 1 days = 90 }
 
-					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: stopping invasion against [This.GetName]"
+					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: stopping invasion against [This.GetName]" } 
 				}
 			}
 			
@@ -79,6 +79,11 @@ EAI_naval_invasion_check = {
 							}
 						}
 					}
+
+					AND = {
+						alliance_naval_strength_ratio > 2
+						alliance_strength_ratio > 2
+					}
 					
 					# exception for historical invasions
 					any_other_country = { EAI_naval_invade = yes EAI_historical_invasion = yes }
@@ -99,7 +104,7 @@ EAI_naval_invasion_check = {
 					
 					EAI_create_naval_invasion_operation = yes
 
-					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (player initiated)"
+					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (player initiated)" } 
 				}
 			}
 			
@@ -109,8 +114,8 @@ EAI_naval_invasion_check = {
 			
 			else_if = {
 				limit = {
-					has_army_manpower = { size > 250000 }
-				
+					NOT = { is_faction_leader = yes }
+					
 					any_enemy_country = {
 						any_other_country = {
 							is_ai = yes
@@ -161,7 +166,7 @@ EAI_naval_invasion_check = {
 					
 					EAI_create_naval_invasion_operation = yes
 
-					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (faction leader)"
+					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (faction leader)" } 
 				}
 			}
 			
@@ -228,7 +233,7 @@ EAI_naval_invasion_check = {
 					
 					EAI_create_naval_invasion_operation = yes
 
-					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (strongest faction member)"
+					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (strongest faction member)" } 
 				}
 			}
 			
@@ -252,7 +257,7 @@ EAI_naval_invasion_check = {
 						
 						EAI_create_naval_invasion_operation = yes
 
-						log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (historical)"
+						if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (historical)" } 
 					}
 					
 					else = { # else do a range check and invade the closest country by core states
@@ -278,7 +283,7 @@ EAI_naval_invasion_check = {
 
 							var:EAI_invasion_target_country = { 
 								EAI_create_naval_invasion_operation = yes 
-								log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (nearest)"
+								if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (nearest)" } 
 							}
 						}
 
@@ -296,13 +301,13 @@ EAI_create_naval_invasion_operation = {
 	every_state = {
 		limit = { is_controlled_by = PREV is_coastal = yes }
 		
-		set_state_flag = { flag = EAI_naval_invasion_target_state_@ROOT value = 1 days = 120 }
+		set_state_flag = { flag = EAI_naval_invasion_target_state_@ROOT value = 1 days = 365 }
 	}
 	
 	set_country_flag = EAI_naval_invasion_from_@ROOT
 	
 	ROOT = { # MINIMUM INVASION OPERATION DURATION
-		set_country_flag = { flag = EAI_invasion_operation_active value = 1 days = 90 }
+		set_country_flag = { flag = EAI_invasion_operation_active value = 1 days = 120 }
 	}
 }
 

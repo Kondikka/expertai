@@ -14,8 +14,10 @@
 @BUILD_COST_CIVILIAN_FACTORY = 10800
 @BUILD_COST_DOCKYARD = 6400
 @BUILD_COST_REFINERY = 14500
+@BUILD_COST_SILO = 5000
 
 EAI_get_building_values = {
+
 	if = { limit = { check_variable = { EAI_building_type_selected = 1 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_INFRASTRUCTURE }
@@ -65,7 +67,18 @@ EAI_get_building_values = {
 	}
 }
 
-EAI_start_construction = {
+EAI_start_priority_construction = {
+
+	THIS = {
+		### get infrastructure level, set target state
+
+		set_temp_variable = { ROOT.EAI_target_state_infra_speed = infrastructure_level }
+
+		set_state_flag = EAI_construction_target_state_@ROOT
+
+		set_variable = { ROOT.EAI_construction_target_state = THIS.id }
+	}
+
 	ROOT = {
 		### get construction speed modifiers and set building cost
 
@@ -74,17 +87,9 @@ EAI_start_construction = {
 		EAI_get_building_values = yes
 
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_buildings_factor }
-	}
 
-	THIS = {
-		### get infrastructure level, set target state
+		log = "EAI_construction_speed [?EAI_construction_speed]"
 
-		set_temp_variable = { ROOT.EAI_target_state_infra_speed = infrastructure_level }
-
-		set_state_flag = EAI_construction_target_state_@ROOT
-	}
-
-	ROOT = {
 		### infrastructure effect (5-8 use infrastructure effect)
 
 		if = { limit = { check_variable = { EAI_building_type_selected > 4 } }
@@ -94,7 +99,11 @@ EAI_start_construction = {
 			add_to_temp_variable = { EAI_target_state_infra_speed = 1 }
 
 			multiply_temp_variable = { EAI_construction_speed = EAI_target_state_infra_speed }
+
+			log = "EAI_target_state_infra_speed [?EAI_target_state_infra_speed]"
 		}
+
+		log = "EAI_construction_speed [?EAI_construction_speed]"
 
 		### assign factories
 
@@ -108,9 +117,13 @@ EAI_start_construction = {
 
 		multiply_temp_variable = { EAI_construction_speed = EAI_assigned_factories }
 
+		log = "EAI_construction_speed [?EAI_construction_speed]"
+
 		### days to build
 
 		divide_temp_variable = { EAI_building_cost = EAI_construction_speed }
+
+		log = "EAI_building_cost [?EAI_building_cost]"
 
 		set_variable = { EAI_construction_duration = EAI_building_cost }
 
@@ -130,12 +143,14 @@ EAI_start_construction = {
 		}
 	}
 
-	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: building type [?Root.EAI_active_project_building_type] at [This.GetName]"
+	if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: building type [?Root.EAI_active_project_building_type] at [This.GetName]" } 
 }
 
 EAI_end_construction = {
-	every_state = {
-		limit = { has_state_flag = EAI_construction_target_state_@ROOT }
+
+	log = "ending construction"
+	
+	var:EAI_construction_target_state = {
 
 		clr_state_flag = EAI_construction_target_state_@ROOT
 	}
@@ -146,6 +161,7 @@ EAI_end_construction = {
 }
 
 EAI_add_finished_building = {
+
 	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 1 } } }
 
 		add_building_construction = { type = infrastructure level = 1 instant_build = yes }
@@ -192,7 +208,10 @@ EAI_add_finished_building = {
 EAI_priority_constructions = {
 
 	EAI_important_radar_constructions = yes
+
 	EAI_improve_north_africa_infrastructure = yes
+
+	EAI_resource_extraction = yes
 }
 
 ### priority construction strategies
@@ -211,7 +230,7 @@ EAI_important_radar_constructions = {
 
 		random_state = { limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes }
 
-			EAI_start_construction = yes
+			EAI_start_priority_construction = yes
 		}
 	}
 }
@@ -267,13 +286,949 @@ EAI_improve_north_africa_infrastructure = {
 		# target was found
 		if = { limit = { check_variable = { EAI_best_target_score > 0 } }
 
-			var:EAI_best_target = { EAI_start_construction = yes }
+			var:EAI_best_target = { EAI_start_priority_construction = yes }
 		}
+	}
+}
+
+EAI_resource_extraction = {
+	if = {
+		limit = {
+			num_of_civilian_factories_available_for_projects > 45
+
+			OR = {
+				AND = { has_war = yes fuel_ratio < 0.5  																							any_state = { EAI_available_INF = yes has_resources_amount = { resource = oil amount > 40 } } }
+				AND = { OR = { check_variable = { ROOT.resource@aluminium < -4 } 	check_variable = { ROOT.resource_imported@aluminium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = aluminium amount > 40 } } }
+				AND = { OR = { check_variable = { ROOT.resource@rubber < -4 } 		check_variable = { ROOT.resource_imported@rubber > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = rubber amount > 40 } } }
+				AND = { OR = { check_variable = { ROOT.resource@tungsten < -4 } 	check_variable = { ROOT.resource_imported@tungsten > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = tungsten amount > 40 } } }
+				AND = { OR = { check_variable = { ROOT.resource@steel < -4 } 		check_variable = { ROOT.resource_imported@steel > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = steel amount > 40 } } }
+				AND = { OR = { check_variable = { ROOT.resource@chromium < -4 } 	check_variable = { ROOT.resource_imported@chromium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = chromium amount > 40 } } }
+			}
+		}
+
+		EAI_priority_queue_INF_resource = yes
 	}
 }
 
 ######################################################
 # 	construction AI
+######################################################
+
+EAI_clear_construction_scores = {
+
+	clear_array = EAI_shared_slot_scores
+	clr_country_flag = EAI_shared_slot_scores
+
+	clear_array = EAI_infrastructure_slot_scores
+	clr_country_flag = EAI_infrastructure_slot_scores
+
+	clear_array = EAI_resource_slot_scores
+	clr_country_flag = EAI_resource_slot_scores
+
+	clear_array = EAI_radar_slot_scores
+	clr_country_flag = EAI_radar_slot_scores
+
+	clear_array = EAI_airbase_slot_scores
+	clr_country_flag = EAI_airbase_slot_scores
+
+	clear_array = EAI_antiair_slot_scores
+	clr_country_flag = EAI_antiair_slot_scores
+}
+
+# shared slots
+EAI_get_shared_slot_scores = {
+
+	set_country_flag = EAI_shared_slot_scores
+
+	every_state = { limit = { EAI_available_SHARED = yes }
+
+		EAI_get_shared_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_shared_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_shared_slot_score > EAI_shared_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_shared_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_shared_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_shared_slot_scores ======="
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+			log = "[?EAI_shared_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_shared_slot_score = {
+
+	set_variable = { EAI_shared_slot_score = building_level@infrastructure }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_shared_slot_score = 1.1 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_shared_slot_score = 2 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_shared_slot_score = 4 } }
+
+	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_shared_slot_score = 4 } }
+}
+
+# infrastructure score for construction
+EAI_get_infrastructure_slot_scores = {
+
+	set_country_flag = EAI_infrastructure_slot_scores
+
+	every_state = { limit = { EAI_available_INF = yes }
+
+		EAI_get_infrastructure_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_infrastructure_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_infrastructure_slot_score > EAI_infrastructure_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_infrastructure_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_infrastructure_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+	
+		log = "======= PRINTING EAI_infrastructure_slot_scores ======="
+		for_each_scope_loop = { array = EAI_infrastructure_slot_scores
+			log = "[?EAI_infrastructure_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_infrastructure_slot_score = {
+	
+	set_variable = { EAI_infrastructure_slot_score = 11 }
+	set_temp_variable = { t1 = building_level@infrastructure }
+	multiply_temp_variable = { t1 = 1.5 }
+	subtract_from_variable = { EAI_infrastructure_slot_score = t1 }
+	clamp_variable = { var = EAI_infrastructure_slot_score min = 1 max = 10 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_infrastructure_slot_score = 1.1 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_infrastructure_slot_score = 2 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_infrastructure_slot_score = 4 } }
+
+	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_infrastructure_slot_score = 4 } }
+}
+
+# infrastructure score for resource extraction
+EAI_get_resource_slot_scores = {
+
+	set_country_flag = EAI_resource_slot_scores
+
+	every_state = { limit = { EAI_available_INF = yes check_variable = { EAI_total_resources > 20 } }
+
+		EAI_get_resource_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_resource_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_resource_slot_score > EAI_resource_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_resource_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_resource_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_resource_slot_scores ======="
+		for_each_scope_loop = { array = EAI_resource_slot_scores
+			log = "[?EAI_resource_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_resource_slot_score = {
+
+	set_temp_variable = { t3 = 0 }
+
+	set_temp_variable = { t2 = EAI_oil }
+	if = { limit = { ROOT = { has_war = yes fuel_ratio < 0.5 } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+
+	set_temp_variable = { t2 = EAI_aluminium }
+	if = { limit = { OR = { check_variable = { ROOT.resource@aluminium < -4 } check_variable = { ROOT.resource_imported@aluminium > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+
+	set_temp_variable = { t2 = EAI_rubber }
+	if = { limit = { OR = { check_variable = { ROOT.resource@rubber < -4 } check_variable = { ROOT.resource_imported@rubber > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+
+	set_temp_variable = { t2 = EAI_tungsten }
+	if = { limit = { OR = { check_variable = { ROOT.resource@tungsten < -4 } check_variable = { ROOT.resource_imported@tungsten > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+
+	set_temp_variable = { t2 = EAI_steel }
+	if = { limit = { OR = { check_variable = { ROOT.resource@steel < -4 } check_variable = { ROOT.resource_imported@steel > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+
+	set_temp_variable = { t2 = EAI_chromium }
+	if = { limit = { OR = { check_variable = { ROOT.resource@chromium < -4 } check_variable = { ROOT.resource_imported@chromium > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	add_to_temp_variable = { t3 = t2 }
+	
+	set_variable = { EAI_resource_slot_score = t3 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_resource_slot_score = 1.1 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_resource_slot_score = 1.2 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_resource_slot_score = 1.2 } }
+}
+EAI_set_resource_variables = {
+	
+	if = { 		limit = { has_resources_amount = { resource = oil amount < 10 } } set_variable = { EAI_oil = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 20 } } set_variable = { EAI_oil = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 30 } } set_variable = { EAI_oil = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 40 } } set_variable = { EAI_oil = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 50 } } set_variable = { EAI_oil = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 60 } } set_variable = { EAI_oil = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 70 } } set_variable = { EAI_oil = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 80 } } set_variable = { EAI_oil = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 90 } } set_variable = { EAI_oil = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = oil amount < 100 } } set_variable = { EAI_oil = 90 } }
+	else_if = { limit = { } set_variable = { EAI_oil = 100 } }
+
+	if = { 		limit = { has_resources_amount = { resource = aluminium amount < 10 } } set_variable = { EAI_aluminium = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 20 } } set_variable = { EAI_aluminium = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 30 } } set_variable = { EAI_aluminium = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 40 } } set_variable = { EAI_aluminium = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 50 } } set_variable = { EAI_aluminium = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 60 } } set_variable = { EAI_aluminium = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 70 } } set_variable = { EAI_aluminium = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 80 } } set_variable = { EAI_aluminium = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 90 } } set_variable = { EAI_aluminium = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = aluminium amount < 100 } } set_variable = { EAI_aluminium = 90 } }
+	else_if = { limit = { } set_variable = { EAI_aluminium = 100 } }
+
+	if = { 		limit = { has_resources_amount = { resource = rubber amount < 10 } } set_variable = { EAI_rubber = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 20 } } set_variable = { EAI_rubber = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 30 } } set_variable = { EAI_rubber = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 40 } } set_variable = { EAI_rubber = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 50 } } set_variable = { EAI_rubber = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 60 } } set_variable = { EAI_rubber = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 70 } } set_variable = { EAI_rubber = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 80 } } set_variable = { EAI_rubber = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 90 } } set_variable = { EAI_rubber = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = rubber amount < 100 } } set_variable = { EAI_rubber = 90 } }
+	else_if = { limit = { } set_variable = { EAI_rubber = 100 } }
+
+	if = { 		limit = { has_resources_amount = { resource = tungsten amount < 10 } } set_variable = { EAI_tungsten = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 20 } } set_variable = { EAI_tungsten = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 30 } } set_variable = { EAI_tungsten = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 40 } } set_variable = { EAI_tungsten = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 50 } } set_variable = { EAI_tungsten = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 60 } } set_variable = { EAI_tungsten = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 70 } } set_variable = { EAI_tungsten = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 80 } } set_variable = { EAI_tungsten = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 90 } } set_variable = { EAI_tungsten = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = tungsten amount < 100 } } set_variable = { EAI_tungsten = 90 } }
+	else_if = { limit = { } set_variable = { EAI_tungsten = 100 } }
+
+	if = { 		limit = { has_resources_amount = { resource = steel amount < 10 } } set_variable = { EAI_steel = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 20 } } set_variable = { EAI_steel = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 30 } } set_variable = { EAI_steel = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 40 } } set_variable = { EAI_steel = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 50 } } set_variable = { EAI_steel = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 60 } } set_variable = { EAI_steel = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 70 } } set_variable = { EAI_steel = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 80 } } set_variable = { EAI_steel = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 90 } } set_variable = { EAI_steel = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = steel amount < 100 } } set_variable = { EAI_steel = 90 } }
+	else_if = { limit = { } set_variable = { EAI_steel = 100 } }
+
+	if = { 		limit = { has_resources_amount = { resource = chromium amount < 10 } } set_variable = { EAI_chromium = 0 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 20 } } set_variable = { EAI_chromium = 10 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 30 } } set_variable = { EAI_chromium = 20 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 40 } } set_variable = { EAI_chromium = 30 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 50 } } set_variable = { EAI_chromium = 40 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 60 } } set_variable = { EAI_chromium = 50 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 70 } } set_variable = { EAI_chromium = 60 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 80 } } set_variable = { EAI_chromium = 70 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 90 } } set_variable = { EAI_chromium = 80 } }
+	else_if = { limit = { has_resources_amount = { resource = chromium amount < 100 } } set_variable = { EAI_chromium = 90 } }
+	else_if = { limit = { } set_variable = { EAI_chromium = 100 } }
+
+	set_variable = { EAI_total_resources = EAI_oil }
+	add_to_variable = { EAI_total_resources = EAI_aluminium }
+	add_to_variable = { EAI_total_resources = EAI_rubber }
+	add_to_variable = { EAI_total_resources = EAI_tungsten }
+	add_to_variable = { EAI_total_resources = EAI_steel }
+	add_to_variable = { EAI_total_resources = EAI_chromium }
+}
+
+# radar
+EAI_get_radar_slot_scores = {
+
+	set_country_flag = EAI_radar_slot_scores
+
+	every_state = { limit = { EAI_available_RADAR = yes}
+
+		EAI_get_radar_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_radar_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_radar_slot_score > EAI_radar_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_radar_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_radar_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_radar_slot_scores ======="
+		for_each_scope_loop = { array = EAI_radar_slot_scores
+			log = "[?EAI_radar_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_radar_slot_score = {
+	
+	set_variable = { EAI_radar_slot_score = 6 }
+	subtract_from_variable = { EAI_radar_slot_score = building_level@radar }
+
+	if = { limit = { EAI_radar_location_2 = yes } multiply_variable = { EAI_radar_slot_score = 10 } }
+
+	if = { limit = { radar_station > 1 has_state_flag = EAI_radar_site } multiply_variable = { EAI_radar_slot_score = 2 } }
+
+	if = {
+		limit = {
+			NOT = {
+				any_state = {
+					NOT = { state = PREV } 
+					OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
+					CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+					distance_to = { target = PREV value < 800 } 
+				}
+			}
+		}
+
+		multiply_variable = { EAI_radar_slot_score = 2 }
+	}
+}
+
+# airbase
+EAI_get_airbase_slot_scores = {
+
+	set_country_flag = EAI_airbase_slot_scores
+
+	every_state = { limit = { EAI_available_AIR = yes }
+
+		EAI_get_airbase_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_airbase_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_airbase_slot_score > EAI_airbase_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_airbase_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_airbase_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_airbase_slot_scores ======="
+		for_each_scope_loop = { array = EAI_airbase_slot_scores
+			log = "[?EAI_airbase_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_airbase_slot_score = {
+	
+	set_variable = { EAI_airbase_slot_score = 10 }
+	subtract_from_variable = { EAI_airbase_slot_score = building_level@air_base }
+
+	if = { limit = { EAI_airbase_priority = yes } multiply_variable = { EAI_airbase_slot_score = 4 } }
+
+	if = { limit = { any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } } } multiply_variable = { EAI_airbase_slot_score = 1.5 } }
+	
+	if = { limit = { air_base > 0 } multiply_variable = { EAI_airbase_slot_score = 1.25 } }
+
+	if = { limit = { any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } } } multiply_variable = { EAI_airbase_slot_score = 2 } }
+}
+
+# antiair
+EAI_get_antiair_slot_scores = {
+
+	set_country_flag = EAI_antiair_slot_scores
+
+	every_state = { limit = { EAI_available_AA = yes }
+
+		EAI_get_antiair_slot_score = yes
+
+		for_each_loop = { array = ROOT.EAI_antiair_slot_scores
+
+			var:v = {
+				if = { limit = { check_variable = { PREV.EAI_antiair_slot_score > EAI_antiair_slot_score } }
+
+					add_to_array = { array = ROOT.EAI_antiair_slot_scores index = i value = PREV.id }
+					set_temp_variable = { break = 1 }
+					PREV = { set_state_flag = insert_success }
+				}
+			}
+		}
+
+		if = { limit = { NOT = { has_state_flag = insert_success } }
+			
+			add_to_array = { ROOT.EAI_antiair_slot_scores = THIS.id }
+		}
+		else = { clr_state_flag = insert_success }
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_antiair_slot_scores ======="
+		for_each_scope_loop = { array = EAI_antiair_slot_scores
+			log = "[?EAI_antiair_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_antiair_slot_score = {
+	
+	set_variable = { EAI_antiair_slot_score = 5 }
+	subtract_from_variable = { EAI_antiair_slot_score = building_level@anti_air_building }
+
+	# refineries
+	set_temp_variable = { t1 = building_level@synthetic_refinery }
+	divide_temp_variable = { t1 = 1.5 }
+	add_to_temp_variable = { t1 = 1 }
+	multiply_variable = { EAI_antiair_slot_score = t1 }
+
+	# mic
+	set_temp_variable = { t1 = building_level@industrial_complex }
+	divide_temp_variable = { t1 = 10 }
+	add_to_temp_variable = { t1 = 1 }
+	multiply_variable = { EAI_antiair_slot_score = t1 }
+
+	# cic
+	set_temp_variable = { t1 = building_level@arms_factory }
+	divide_temp_variable = { t1 = 10 }
+	add_to_temp_variable = { t1 = 1 }
+	multiply_variable = { EAI_antiair_slot_score = t1 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_antiair_slot_score = 1.1 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_antiair_slot_score = 2 } }
+
+	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_antiair_slot_score = 4 } }
+}
+
+######################################################
+
+### functions for AI construction
+
+# civilian factories
+EAI_queue_CIC = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = {
+				EAI_available_SHARED = yes
+				infrastructure > 3
+			}
+
+			EAI_add_CIC = yes
+			set_temp_variable = { break = 1 }
+			ROOT = { set_country_flag = EAI_queue_success }
+		}
+	}
+
+	if = { limit = { NOT = { has_country_flag = EAI_queue_success } }
+
+		EAI_queue_INF = yes
+	}
+	else = { clr_country_flag = EAI_queue_success }
+}
+EAI_queue_CIC_2 = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = {
+				EAI_available_SHARED = yes
+			}
+
+			EAI_add_CIC = yes
+			set_temp_variable = { break = 1 }
+		}
+	}
+}
+
+# military factories
+EAI_queue_MIC = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = { 
+				EAI_available_SHARED = yes
+				infrastructure > 3
+			}
+
+			EAI_add_MIC = yes
+			set_temp_variable = { break = 1 }
+			ROOT = { set_country_flag = EAI_queue_success }
+		}
+	}
+
+	if = { limit = { NOT = { has_country_flag = EAI_queue_success } }
+
+		EAI_queue_INF = yes
+	}
+	else = { clr_country_flag = EAI_queue_success }
+}
+EAI_queue_MIC_2 = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = { 
+				EAI_available_SHARED = yes
+			}
+
+			EAI_add_MIC = yes
+			set_temp_variable = { break = 1 }
+		}
+	}
+}
+
+# dockayrds
+EAI_queue_NIC = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = { 
+				is_coastal = yes 
+				EAI_available_SHARED = yes
+			}
+
+			EAI_add_NIC = yes
+			set_temp_variable = { break = 1 }
+			ROOT = { set_country_flag = EAI_queue_success }
+		}
+	}
+
+	if = { limit = { NOT = { has_country_flag = EAI_queue_success } }
+
+		EAI_queue_MIC = yes
+	}
+	else = { clr_country_flag = EAI_queue_success }
+}
+
+# refineries
+EAI_queue_REF = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+		EAI_get_shared_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_shared_slot_scores
+
+		if = { 
+			limit = { 
+				is_core_of = ROOT 
+				EAI_available_REF = yes
+				EAI_available_SHARED = yes
+			}
+
+			EAI_add_REF = yes
+			set_temp_variable = { break = 1 }
+			ROOT = { set_country_flag = EAI_queue_success }
+		}
+	}
+
+	if = { # replace MIC if slots are maxed out
+		limit = { 
+			NOT = { has_country_flag = EAI_queue_success } 
+			OR = { has_tech = concentrated_industry5 has_tech = dispersed_industry5 } 
+		}
+
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+
+			if = { 
+				limit = { 
+					is_core_of = ROOT 
+					arms_factory > 0
+					synthetic_refinery < 3
+					NOT = { has_state_flag = EAI_mic_replaced_with_ref }
+					ROOT = { has_full_control_of_state = PREV } 
+				}
+
+				remove_building = { type = arms_factory level = 1 }
+				if = { limit = { EAI_available_REF = yes }
+					set_state_flag = { flag = EAI_mic_replaced_with_ref value = 1 days = 180 }
+					EAI_add_REF = yes
+					set_temp_variable = { break = 1 }
+
+					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [This.GetName]" } 
+				}
+				else = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			}
+		}
+	}
+	else = { clr_country_flag = EAI_queue_success }
+}
+
+# silos
+EAI_queue_SILO = {
+
+	if = { limit = { has_tech = fuel_silos }
+
+		if = { limit = { NOT = { has_country_flag = EAI_shared_slot_scores } }
+	
+			EAI_get_shared_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+
+			if = { 
+				limit = { 
+					is_core_of = ROOT 
+					EAI_available_SILO = yes
+					EAI_available_SHARED = yes
+				}
+
+				EAI_add_SILO = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+}
+
+# infrastructure
+EAI_queue_INF = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_infrastructure_slot_scores } }
+	
+		EAI_get_infrastructure_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_infrastructure_slot_scores
+
+		if = { 
+			limit = {
+				EAI_available_INF = yes
+				NOT = { has_state_flag = EAI_inf_queued }
+			}
+
+			EAI_add_INF = yes
+			set_temp_variable = { break = 1 }
+			set_state_flag = { flag = EAI_inf_queued value = 1 days = 1 }
+		}
+	}
+}
+
+# infrastructure for resources
+EAI_queue_INF_resource = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_resource_slot_scores } }
+	
+		EAI_get_resource_slot_scores = yes
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_project_active }
+	
+		for_each_scope_loop = { array = EAI_resource_slot_scores
+
+			if = { 
+				limit = {
+					EAI_available_INF = yes
+				}
+
+				EAI_add_INF = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+	else = {
+		EAI_priority_queue_INF_resource = yes
+	}
+}
+EAI_priority_queue_INF_resource = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_construction_project_active } }
+
+		if = { limit = { NOT = { has_country_flag = EAI_resource_slot_scores } }
+
+			EAI_get_resource_slot_scores = yes
+		}
+
+		set_temp_variable = { ROOT.EAI_building_type_selected = 1 }
+
+		for_each_scope_loop = { array = EAI_resource_slot_scores
+
+			if = { 
+				limit = {
+					EAI_available_INF = yes
+				}
+
+				EAI_start_priority_construction = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+}
+
+# radar
+EAI_queue_RADAR = {
+
+	if = { limit = { has_tech = radio_detection }
+
+		if = { limit = { NOT = { has_country_flag = EAI_radar_slot_scores } }
+
+			EAI_get_radar_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_radar_slot_scores
+
+			if = { 
+				limit = {
+					EAI_available_RADAR = yes
+					NOT = { has_state_flag = EAI_radar_queued }
+				}
+
+				EAI_add_RADAR = yes
+				set_temp_variable = { break = 1 }
+				set_state_flag = { flag = EAI_radar_queued value = 1 days = 1 }
+			}
+		}
+	}
+}
+
+# airbase
+EAI_queue_AIR = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_airbase_slot_scores } }
+	
+		EAI_get_airbase_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_airbase_slot_scores
+
+		if = { 
+			limit = {
+				EAI_available_AIR = yes
+			}
+
+			EAI_add_AIR = yes
+			set_temp_variable = { break = 1 }
+		}
+	}
+}
+
+# antiair
+EAI_queue_AA = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_antiair_slot_scores } }
+	
+		EAI_get_antiair_slot_scores = yes
+	}
+
+	for_each_scope_loop = { array = EAI_antiair_slot_scores
+
+		if = { 
+			limit = {
+				EAI_available_AA = yes
+				NOT = { has_state_flag = EAI_aa_queued }
+			}
+
+			EAI_add_AA = yes
+			set_temp_variable = { break = 1 }
+			set_state_flag = { flag = EAI_aa_queued value = 1 days = 1 }
+		}
+	}
+}
+
+######################################################
+
+# for building INF to increase supply
+EAI_queue_INF_supply = { 
+	if = {
+		limit = {
+			any_state = {
+				EAI_available_INF = yes
+				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				ROOT = { divisions_in_state = { state = PREV size > 5 } }
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
+			}
+		}
+
+		random_state = {
+			limit = {
+				EAI_available_INF = yes
+				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				ROOT = { divisions_in_state = { state = PREV size > 5 } }
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
+			}
+			EAI_add_INF = yes
+		}
+	}
+	else_if = {
+		limit = {
+			any_state = {
+				EAI_available_INF = yes
+				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				ROOT = { divisions_in_state = { state = PREV size > 5 } }
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+		}
+		random_state = {
+			limit = {
+				EAI_available_INF = yes
+				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				ROOT = { divisions_in_state = { state = PREV size > 5 } }
+				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+			}
+			EAI_add_INF = yes
+		}
+	}
+}
+
+# build forts on victory points in a state
+EAI_queue_FORT_CITIES = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_in_home_area = yes 
+			EAI_has_city = yes 
+			check_variable = { EAI_forts_constructed_on_cities_@ROOT < 3 }
+		} 
+		
+		EAI_add_FORT_CITY = yes 
+	}
+}
+
+# build forts on every border province of a state
+EAI_queue_FORT_BORDER = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			NOT = { EAI_no_border = yes } 
+			is_in_home_area = yes 
+			check_variable = { EAI_forts_constructed_on_border_@ROOT < 3 }
+		} 
+		
+		EAI_add_FORT_BORDER = yes 
+	}
+}
+
+# build coastal forts on naval bases in a state
+EAI_queue_CFORT_BASES = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_coastal = yes 
+			is_in_home_area = yes 
+			EAI_has_naval_base = yes 
+			check_variable = { EAI_forts_constructed_on_bases_@ROOT < 3 }
+		} 
+			
+		EAI_add_CFORT_BASE = yes 
+	}
+}
+
+# build coastal forts on every coastal province in a state
+EAI_queue_CFORT_COAST = {
+	random_state = { 
+		limit = { 
+			is_controlled_by = ROOT 
+			is_coastal = yes 
+			is_in_home_area = yes 
+			check_variable = { EAI_forts_constructed_on_coast_@ROOT < 3 }
+		} 
+			
+		EAI_add_CFORT_COAST = yes 
+	}
+}
+
 ######################################################
 
 EAI_add_CIC = {
@@ -310,6 +1265,8 @@ EAI_add_RADAR = {
 EAI_add_AIR = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_AIR in [?This.id] [This.GetName]" }
 	add_building_construction = { type = air_base level = 1 instant_build = no }
+
+	ROOT = { add_to_variable = { EAI_CIC_build_cost_queued = @BUILD_COST_AIRBASE } }
 }
 
 EAI_add_AA = {
@@ -380,2553 +1337,4 @@ EAI_add_CFORT_COAST = {
 	}
 
 	add_to_variable = { EAI_forts_constructed_on_coast_@ROOT = 1 }
-}
-
-########################
-
-# queue airfields
-EAI_queue_AIR = {
-	if = {
-		limit = {
-			any_state = {
-				EAI_available_AIR = yes
-				
-				EAI_airbase_priority = yes
-			}
-		}
-		
-		random_state = {
-			limit = {
-				EAI_available_AIR = yes
-				
-				EAI_airbase_priority = yes
-			}
-			
-			EAI_add_AIR = yes
-		}
-	}
-
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_AIR = yes
-				
-				air_base > 0
-				
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-		}
-		
-		random_state = {
-			limit = {
-				EAI_available_AIR = yes
-				
-				air_base > 0
-				
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-			
-			EAI_add_AIR = yes
-		}
-	}
-	
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_AIR = yes
-				
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-		}
-	
-		random_state = {
-			limit = {
-				EAI_available_AIR = yes
-				
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-			
-			EAI_add_AIR = yes
-		}
-	}
-	
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_AIR = yes
-				
-				any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } }
-			}
-		}
-	
-		random_state = {
-			limit = {
-				EAI_available_AIR = yes
-				
-				any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } }
-			}
-			
-			EAI_add_AIR = yes
-		}
-	}
-	
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_AIR = yes
-				
-				any_state = { 
-					CONTROLLER = { 
-						OR = {
-							AND = { EAI_communist_nation = yes ROOT = { NOT = { EAI_communist_nation = yes } } }
-							AND = { EAI_fascist_nation = yes ROOT = { NOT = { EAI_fascist_nation = yes } } }
-							AND = { EAI_democratic_nation = yes ROOT = { NOT = { EAI_democratic_nation = yes } } }
-						}
-						
-						has_deployed_air_force_size = { size > 1000 }
-					} 
-					
-					distance_to = { target = PREV value < 500 }
-				}
-			}
-		}
-	
-		random_state = {
-			limit = {
-				EAI_available_AIR = yes
-				
-				any_state = { 
-					CONTROLLER = { 
-						OR = {
-							AND = { EAI_communist_nation = yes ROOT = { NOT = { EAI_communist_nation = yes } } }
-							AND = { EAI_fascist_nation = yes ROOT = { NOT = { EAI_fascist_nation = yes } } }
-							AND = { EAI_democratic_nation = yes ROOT = { NOT = { EAI_democratic_nation = yes } } }
-						}
-						
-						has_deployed_air_force_size = { size > 1000 }
-					} 
-					
-					distance_to = { target = PREV value < 500 }
-				}
-			}
-			
-			EAI_add_AIR = yes
-		}
-	}
-}
-
-# queue INF anywhere possible
-EAI_queue_INF = { 
-	if = {
-		limit = { any_state = { EAI_available_INF = yes } }
-		if = {
-			limit = { any_state = { EAI_available_INF = yes EAI_available_state_0 = yes is_in_home_area = yes } }
-			random_state = { limit = { EAI_available_INF = yes EAI_available_state_0 = yes is_in_home_area = yes } EAI_add_INF = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_INF = yes is_in_home_area = yes } }
-			random_state = { limit = { EAI_available_INF = yes is_in_home_area = yes } EAI_add_INF = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_INF = yes EAI_available_state_0 = yes } }
-			random_state = { limit = { EAI_available_INF = yes EAI_available_state_0 = yes } EAI_add_INF = yes }
-			
-			else = { random_state = { limit = { EAI_available_INF = yes } EAI_add_INF = yes } }
-		}
-	}
-}
-
-# see if there is a good place for infrastructure, else queue factories
-EAI_queue_INF_2 = { 
-	if = {
-		limit = {
-			ROOT = { num_of_civilian_factories > 9 }
-			EAI_available_INF = yes
-			is_in_home_area = yes
-		}
-
-		EAI_add_INF = yes
-	}
-	else_if = {
-		limit = { EAI_available_state_0 = yes ROOT = { num_of_civilian_factories < 10 } }
-
-		EAI_add_CIC = yes
-	}
-	else_if = {
-		limit = { EAI_available_state_0 = yes }
-
-		EAI_add_MIC = yes
-	}
-	else = {
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				is_in_home_area = yes
-			}
-			EAI_add_INF = yes
-		}
-	}
-}
-
-# for building INF to increase resource extraction
-EAI_queue_INF_resource = { 
-	
-	# prioritise these for all
-	
-	if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 80 }
-					has_resources_amount = { resource = rubber amount > 80 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 80 }
-					has_resources_amount = { resource = rubber amount > 80 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 60 }
-					has_resources_amount = { resource = rubber amount > 60 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 60 }
-					has_resources_amount = { resource = rubber amount > 60 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-	
-	# prioritise according to military focuses
-	
-	else_if = {
-		limit = { any_state = { EAI_available_INF = yes EAI_resource_priorities_80 = yes } }
-		random_state = { limit = { EAI_available_INF = yes EAI_resource_priorities_80 = yes } EAI_add_INF = yes }
-	}
-	else_if = {
-		limit = { any_state = { EAI_available_INF = yes EAI_resource_priorities_60 = yes } }
-		random_state = { limit = { EAI_available_INF = yes EAI_resource_priorities_60 = yes } EAI_add_INF = yes }
-	}
-	else_if = {
-		limit = { any_state = { EAI_available_INF = yes EAI_resource_priorities_40 = yes } }
-		random_state = { limit = { EAI_available_INF = yes EAI_resource_priorities_40 = yes } EAI_add_INF = yes }
-	}
-	else_if = {
-		limit = { any_state = { EAI_available_INF = yes EAI_resource_priorities_20 = yes } }
-		random_state = { limit = { EAI_available_INF = yes EAI_resource_priorities_20 = yes } EAI_add_INF = yes }
-	}
-	
-	# build any
-	
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 80 }
-					has_resources_amount = { resource = rubber amount > 80 }
-					has_resources_amount = { resource = steel amount > 80 }
-					has_resources_amount = { resource = tungsten amount > 80 }
-					has_resources_amount = { resource = chromium amount > 80 }
-					has_resources_amount = { resource = aluminium amount > 80 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 80 }
-					has_resources_amount = { resource = rubber amount > 80 }
-					has_resources_amount = { resource = steel amount > 80 }
-					has_resources_amount = { resource = tungsten amount > 80 }
-					has_resources_amount = { resource = chromium amount > 80 }
-					has_resources_amount = { resource = aluminium amount > 80 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 60 }
-					has_resources_amount = { resource = rubber amount > 60 }
-					has_resources_amount = { resource = steel amount > 60 }
-					has_resources_amount = { resource = tungsten amount > 60 }
-					has_resources_amount = { resource = chromium amount > 60 }
-					has_resources_amount = { resource = aluminium amount > 60 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 60 }
-					has_resources_amount = { resource = rubber amount > 60 }
-					has_resources_amount = { resource = steel amount > 60 }
-					has_resources_amount = { resource = tungsten amount > 60 }
-					has_resources_amount = { resource = chromium amount > 60 }
-					has_resources_amount = { resource = aluminium amount > 60 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 40 }
-					has_resources_amount = { resource = rubber amount > 40 }
-					has_resources_amount = { resource = steel amount > 40 }
-					has_resources_amount = { resource = tungsten amount > 40 }
-					has_resources_amount = { resource = chromium amount > 40 }
-					has_resources_amount = { resource = aluminium amount > 40 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 40 }
-					has_resources_amount = { resource = rubber amount > 40 }
-					has_resources_amount = { resource = steel amount > 40 }
-					has_resources_amount = { resource = tungsten amount > 40 }
-					has_resources_amount = { resource = chromium amount > 40 }
-					has_resources_amount = { resource = aluminium amount > 40 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 20 }
-					has_resources_amount = { resource = rubber amount > 20 }
-					has_resources_amount = { resource = steel amount > 20 }
-					has_resources_amount = { resource = tungsten amount > 20 }
-					has_resources_amount = { resource = chromium amount > 20 }
-					has_resources_amount = { resource = aluminium amount > 20 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				OR = {
-					has_resources_amount = { resource = oil amount > 20 }
-					has_resources_amount = { resource = rubber amount > 20 }
-					has_resources_amount = { resource = steel amount > 20 }
-					has_resources_amount = { resource = tungsten amount > 20 }
-					has_resources_amount = { resource = chromium amount > 20 }
-					has_resources_amount = { resource = aluminium amount > 20 }
-				}
-			}
-			EAI_add_INF = yes
-		}
-	}
-}
-
-# for building INF to increase supply
-EAI_queue_INF_supply = { 
-	if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
-				ROOT = { divisions_in_state = { state = PREV size > 5 } }
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
-			}
-		}
-
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
-				ROOT = { divisions_in_state = { state = PREV size > 5 } }
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
-			}
-			EAI_add_INF = yes
-		}
-	}
-	else_if = {
-		limit = {
-			any_state = {
-				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
-				ROOT = { divisions_in_state = { state = PREV size > 5 } }
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
-				ROOT = { divisions_in_state = { state = PREV size > 5 } }
-				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
-			}
-			EAI_add_INF = yes
-		}
-	}
-}
-
-# queue radar with location priorities for majors
-EAI_queue_RADAR = { 
-	if = { # minors build radar on capitals and only when they cant build more factories
-		limit = { 
-			NOT = { any_state = { EAI_available_state_0 = yes } } 
-			NOT = { original_tag = ENG original_tag = FRA original_tag = USA original_tag = GER original_tag = ITA original_tag = JAP original_tag = SOV } 
-		}
-		
-		if = {
-			limit = { capital_scope = { EAI_available_RADAR = yes } }
-			capital_scope = { EAI_add_RADAR = yes }
-
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = ENG }
-		
-		if = { # 1st priority
-			limit = { any_state = { OR = { state = 126 state = 116 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 126 state = 116 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = { # 2nd priority
-			limit = { any_state = { OR = { state = 118 state = 336 state = 446 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 118 state = 336 state = 446 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = { # build radar on any good locations
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_RADAR = yes is_in_home_area = yes NOT = { any_state = { OR = { has_state_flag = EAI_radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } }
-			random_state = { limit = { EAI_available_RADAR = yes is_in_home_area = yes NOT = { any_state = { OR = { has_state_flag = EAI_radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } } } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = FRA }
-		
-		if = {
-			limit = { any_state = { state = 16 EAI_available_RADAR = yes } }
-			random_state = { limit = { state = 16 EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { state = 16 EAI_available_RADAR = yes } }
-			random_state = { limit = { state = 16 EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = USA }
-		
-		if = {
-			limit = { any_state = { OR = { state = 632 state = 629 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 632 state = 629 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { OR = { state = 631 state = 630 state = 386 state = 366 state = 361 state = 378 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 631 state = 630 state = 386 state = 366 state = 361 state = 378 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_RADAR = yes is_island_state = yes } }
-			random_state = { limit = { EAI_available_RADAR = yes is_island_state = yes } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = GER }
-		
-		if = {
-			limit = { any_state = { OR = { state = 60 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 60 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { OR = { state = 16 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 16 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = ITA }
-		
-		if = {
-			limit = { any_state = { OR = { state = 2 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 2 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = JAP NOT = { has_war_with = CHI } }
-		
-		if = {
-			limit = { any_state = { OR = { state = 446 state = 282 state = 646 state = 645 state = 648 state = 684 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 446 state = 282 state = 646 state = 645 state = 648 state = 684 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_RADAR = yes is_island_state = yes } }
-			random_state = { limit = { EAI_available_RADAR = yes is_island_state = yes } EAI_add_RADAR = yes }
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-
-	if = {
-		limit = { original_tag = SOV }
-		
-		if = {
-			limit = { any_state = { OR = { state = 137 state = 219 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = { state = 137 state = 219 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { OR = {state = 217 state = 195 } EAI_available_RADAR = yes } }
-			random_state = { limit = { OR = {state = 217 state = 195 } EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_radar_location = yes EAI_available_RADAR = yes } }
-			random_state = { limit = { EAI_radar_location = yes EAI_available_RADAR = yes } EAI_add_RADAR = yes }
-		}
-		else_if = {
-			limit = {
-				any_state = {
-					EAI_available_RADAR = yes
-					NOT = { any_state = { OR = { has_state_flag = EAI_radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } }
-					NOT = { any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 400 } } }
-					any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 800 } }
-				}
-			}
-			random_state = {
-				limit = {
-					EAI_available_RADAR = yes
-					NOT = { any_state = { OR = { has_state_flag = EAI_radar_site radar_station > 0 } CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } distance_to = { target = PREV value < 800 } } }
-					NOT = { any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 400 } } }
-					any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 800 } }
-				}
-				EAI_add_RADAR = yes
-			}
-			
-			else = { EAI_queue_RADAR_random = yes }
-		}
-	}
-}
-
-# queue radar in a good random location
-EAI_queue_RADAR_random = {
-	if = {
-		limit = {
-			any_state = {
-				EAI_available_RADAR = yes
-				NOT = { # avoid building within 800 units of another radar
-					any_state = {
-						NOT = { state = PREV } 
-						OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
-						CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } }
-						distance_to = { target = PREV value < 800 } 
-					}
-				}
-				NOT = { # avoid building adjacent to a state with radar
-					any_neighbor_state = { 
-						OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
-						CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } 
-					} 
-				}
-				NOT = { # avoid building on border states
-					any_neighbor_state = { 
-						CONTROLLER = { NOT = { tag = ROOT is_in_faction_with = ROOT } } 
-					} 
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				EAI_available_RADAR = yes
-				NOT = { 
-					any_state = {
-						NOT = { state = PREV } 
-						OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
-						CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } }
-						distance_to = { target = PREV value < 800 } 
-					}
-				}
-				NOT = { 
-					any_neighbor_state = { 
-						OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
-						CONTROLLER = { OR = { tag = ROOT is_in_faction_with = ROOT } } 
-					} 
-				}
-				NOT = { 
-					any_neighbor_state = { 
-						CONTROLLER = { NOT = { tag = ROOT is_in_faction_with = ROOT } } 
-					} 
-				}
-			}
-			EAI_add_RADAR = yes
-		}
-	}
-}
-
-# build AA on synth factories if facing strategic bombers
-EAI_queue_AA = { 
-	if = {
-		limit = {
-			any_state = {
-				is_controlled_by = ROOT
-				free_building_slots = { building = anti_air_building size > 0 include_locked = no }
-				OR = { 
-					synthetic_refinery > 0 
-					radar_station > 2 
-					has_resources_amount = { resource = oil amount > 50 }
-					has_resources_amount = { resource = rubber amount > 50 }
-					has_resources_amount = { resource = steel amount > 50 }
-					has_resources_amount = { resource = tungsten amount > 50 }
-					has_resources_amount = { resource = chromium amount > 50 }
-					has_resources_amount = { resource = aluminium amount > 50 }
-				}
-			}
-		}
-		random_state = {
-			limit = {
-				is_controlled_by = ROOT
-				free_building_slots = { building = anti_air_building size > 0 include_locked = no }
-				OR = { 
-					synthetic_refinery > 0 
-					radar_station > 2 
-					has_resources_amount = { resource = oil amount > 50 }
-					has_resources_amount = { resource = rubber amount > 50 }
-					has_resources_amount = { resource = steel amount > 50 }
-					has_resources_amount = { resource = tungsten amount > 50 }
-					has_resources_amount = { resource = chromium amount > 50 }
-					has_resources_amount = { resource = aluminium amount > 50 }
-				}
-			}
-			EAI_add_AA = yes
-		}
-	}
-}
-
-# queue CIC in higher INF states, else queue INF
-EAI_queue_CIC = { 
-	if = { # countries that must build in a certain area (sov)
-		limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_restrict_location = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-	}
-	
-	else_if = { # infra 8-10
-		limit = { any_state = { EAI_available_state_8 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_8 = yes } EAI_add_CIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 6-7
-		limit = { any_state = { EAI_available_state_6 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_6 = yes } EAI_add_CIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 4-5
-		limit = { any_state = { EAI_available_state_4 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_4 = yes } EAI_add_CIC = yes } }
-		}
-	}
-
-	else_if = { # infra 1-3
-		limit = { any_state = { EAI_available_state_1 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_1 = yes } EAI_queue_INF_2 = yes } }
-		}
-	}
-	
-	else = { EAI_queue_INF = yes }
-}
-
-# only queue CIC
-EAI_queue_CIC_2 = { 
-	if = { # countries that must build in a certain area (sov)
-		limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_restrict_location = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-	}
-	
-	else_if = { # infra 8-10
-		limit = { any_state = { EAI_available_state_8 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_8 = yes } EAI_add_CIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 6-7
-		limit = { any_state = { EAI_available_state_6 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_6 = yes } EAI_add_CIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 4-5
-		limit = { any_state = { EAI_available_state_4 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_4 = yes } EAI_add_CIC = yes } }
-		}
-	}
-
-	else_if = { # infra 1-3
-		limit = { any_state = { EAI_available_state_1 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_CIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes } EAI_add_CIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } EAI_add_CIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_1 = yes } EAI_add_CIC = yes } }
-		}
-	}
-}
-
-# queue MIC in higher INF states, else queue INF
-EAI_queue_MIC = { 
-	if = { # countries that must build in a certain area (sov)
-		limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_restrict_location = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-	}
-	
-	else_if = { # infra 8-10
-		limit = { any_state = { EAI_available_state_8 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_8 = yes } EAI_add_MIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 6-7
-		limit = { any_state = { EAI_available_state_6 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_6 = yes } EAI_add_MIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 4-5
-		limit = { any_state = { EAI_available_state_4 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_4 = yes } EAI_add_MIC = yes } }
-		}
-	}
-
-	else_if = { # infra 1-3
-		limit = { any_state = { EAI_available_state_1 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes } EAI_queue_INF_2 = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } EAI_queue_INF_2 = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_1 = yes } EAI_queue_INF_2 = yes } }
-		}
-	}
-	
-	else = { EAI_queue_INF = yes }
-}
-
-# only queue MIC
-EAI_queue_MIC_2 = { 
-	if = { # countries that must build in a certain area (sov)
-		limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_restrict_location = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-	}
-	
-	else_if = { # infra 8-10
-		limit = { any_state = { EAI_available_state_8 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_8 = yes } EAI_add_MIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 6-7
-		limit = { any_state = { EAI_available_state_6 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_6 = yes } EAI_add_MIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 4-5
-		limit = { any_state = { EAI_available_state_4 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_4 = yes } EAI_add_MIC = yes } }
-		}
-	}
-
-	else_if = { # infra 1-3
-		limit = { any_state = { EAI_available_state_1 = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_MIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes } EAI_add_MIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes EAI_no_enemy_border = yes } EAI_add_MIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_1 = yes } EAI_add_MIC = yes } }
-		}
-	}
-}
-
-# queue NIC if possible, else queue MIC
-EAI_queue_NIC = { 
-	# set_temp_variable = { its = 10 }
-	# while_loop_effect = { limit = { check_variable = { its > 0 } }
-
-	# 	if = {
-	# 		limit = {
-	# 			meta_trigger = {
-	# 				text = { any_state = { EAI_available_state_[x] = yes is_coastal = yes EAI_no_border = yes } }
-	# 				x = "[?its|.0]"
-	# 			}
-	# 		}
-	# 		meta_effect = {
-	# 			text = { random_state = { limit = { EAI_available_state_[x] = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes } }
-	# 		}
-	# 	}
-
-	# 	subtract_from_temp_variable = { its = 1 }
-	# }
-
-	if = { # infra 8-10
-		limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_10 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-				else = { random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-				else = { random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_10 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_8 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		
-			else = { random_state = { limit = { EAI_available_state_8 = yes is_coastal = yes } EAI_add_NIC = yes } }
-		}	
-	}
-	
-	else_if = { # infra 6-7
-		limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-				else = { random_state = { limit = { EAI_available_state_7 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_7 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_6 = yes is_coastal = yes } EAI_add_NIC = yes } }
-		}
-	}
-	
-	else_if = { # infra 4-5
-		limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_5 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_5 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_4 = yes is_coastal = yes } EAI_add_NIC = yes } }
-		}
-	}
-
-	else_if = {
-		limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_3 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_2 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes } }
-			if = {
-				limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes EAI_no_border = yes } EAI_add_NIC = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } }
-				random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-				
-				else = { random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes EAI_region_priority = yes } EAI_add_NIC = yes } }
-			}
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes EAI_no_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes EAI_no_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_3 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_3 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_2 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_2 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes is_coastal = yes EAI_no_enemy_border = yes } }
-			random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes EAI_no_enemy_border = yes } EAI_add_NIC = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_1 = yes is_coastal = yes } EAI_add_NIC = yes } }
-		}
-	}
-	
-	else = { EAI_queue_MIC_2 = yes }
-}
-
-# build only in home area, if no slots available, delete a factory
-EAI_queue_REF = { 
-	if = {
-		limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-			
-			else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes } }
-		}
-	}
-	
-	else_if = {
-		limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-		}
-	}
-	
-	else_if = {
-		limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-		
-		if = {
-			limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-		}
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_REF = yes } }
-			random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_REF = yes } EAI_add_REF = yes }
-		}
-	}
-
-	# delete a MIC and queue REF
-	
-	else_if = {
-		limit = { 
-			OR = { has_tech = concentrated_industry5 has_tech = dispersed_industry5 } 
-			any_state = { infrastructure > 7 ROOT = { has_full_control_of_state = PREV } 
-			EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 
-			NOT = { has_state_flag = EAI_mic_replaced_with_ref } }
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [?This.id] [This.GetName]"
-		random_state = { limit = { infrastructure > 7 ROOT = { has_full_control_of_state = PREV } EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 NOT = { has_state_flag = EAI_mic_replaced_with_ref } } remove_building = { type = arms_factory level = 1 } EAI_add_REF = yes set_state_flag = { flag = EAI_mic_replaced_with_ref value = 1 days = 180 } }
-	}
-
-	else_if = {
-		limit = { 
-			OR = { has_tech = concentrated_industry5 has_tech = dispersed_industry5 } 
-			any_state = { infrastructure > 5 ROOT = { has_full_control_of_state = PREV } 
-			EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 
-			NOT = { has_state_flag = EAI_mic_replaced_with_ref } } 
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [?This.id] [This.GetName]"
-		random_state = { limit = { infrastructure > 5 ROOT = { has_full_control_of_state = PREV } EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 NOT = { has_state_flag = EAI_mic_replaced_with_ref } } remove_building = { type = arms_factory level = 1 } EAI_add_REF = yes set_state_flag = { flag = EAI_mic_replaced_with_ref value = 1 days = 180 } }
-	}
-
-	else_if = {
-		limit = { 
-			OR = { has_tech = concentrated_industry5 has_tech = dispersed_industry5 } 
-			any_state = { infrastructure > 3 ROOT = { has_full_control_of_state = PREV } 
-			EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 
-			NOT = { has_state_flag = EAI_mic_replaced_with_ref } } 
-		}
-
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [?This.id] [This.GetName]"
-		random_state = { limit = { infrastructure > 3 ROOT = { has_full_control_of_state = PREV } EAI_region_priority = yes synthetic_refinery < 3 arms_factory > 0 NOT = { has_state_flag = EAI_mic_replaced_with_ref } } remove_building = { type = arms_factory level = 1 } EAI_add_REF = yes set_state_flag = { flag = EAI_mic_replaced_with_ref value = 1 days = 180 } }
-	}
-}
-
-# build silos, only in core territory
-EAI_queue_SILO = {
-	if  = { limit  = { has_tech = fuel_silos }
-
-		if = {
-			limit = { any_state = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-
-			if = {
-				limit = { any_state = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_10 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_9 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-
-				else = { random_state = { limit = { EAI_available_state_8 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes } }
-			}
-		}
-
-		else_if = {
-			limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-
-			if = {
-				limit = { any_state = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_7 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_6 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-		}
-
-		else_if = {
-			limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-
-			if = {
-				limit = { any_state = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_5 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_4 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-		}
-
-		else_if = {
-			limit = { any_state = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-
-			if = {
-				limit = { any_state = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_3 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-			}
-			else_if = {
-				limit = { any_state = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_available_SILO = yes } }
-				random_state = { limit = { EAI_available_state_2 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes }
-
-				else = { random_state = { limit = { EAI_available_state_1 = yes EAI_region_priority = yes EAI_available_SILO = yes } EAI_add_SILO = yes } }
-			}
-		}
-	}
-}
-
-# build forts on victory points in a state
-EAI_queue_FORT_CITIES = {
-	random_state = { 
-		limit = { 
-			is_controlled_by = ROOT 
-			is_in_home_area = yes 
-			EAI_has_city = yes 
-			check_variable = { EAI_forts_constructed_on_cities_@ROOT < 3 }
-		} 
-		
-		EAI_add_FORT_CITY = yes 
-	}
-}
-
-# build forts on every border province of a state
-EAI_queue_FORT_BORDER = {
-	random_state = { 
-		limit = { 
-			is_controlled_by = ROOT 
-			NOT = { EAI_no_border = yes } 
-			is_in_home_area = yes 
-			check_variable = { EAI_forts_constructed_on_border_@ROOT < 3 }
-		} 
-		
-		EAI_add_FORT_BORDER = yes 
-	}
-}
-
-# build coastal forts on naval bases in a state
-EAI_queue_CFORT_BASES = {
-	random_state = { 
-		limit = { 
-			is_controlled_by = ROOT 
-			is_coastal = yes 
-			is_in_home_area = yes 
-			EAI_has_naval_base = yes 
-			check_variable = { EAI_forts_constructed_on_bases_@ROOT < 3 }
-		} 
-			
-		EAI_add_CFORT_BASE = yes 
-	}
-}
-
-# build coastal forts on every coastal province in a state
-EAI_queue_CFORT_COAST = {
-	random_state = { 
-		limit = { 
-			is_controlled_by = ROOT 
-			is_coastal = yes 
-			is_in_home_area = yes 
-			check_variable = { EAI_forts_constructed_on_coast_@ROOT < 3 }
-		} 
-			
-		EAI_add_CFORT_COAST = yes 
-	}
 }

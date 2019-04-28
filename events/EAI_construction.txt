@@ -33,6 +33,7 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		
 		set_temp_variable = { EAI_ratio_CIC = num_of_civilian_factories_available_for_projects }
 
 		divide_temp_variable = { EAI_ratio_CIC = num_of_factories }
@@ -342,7 +343,7 @@ country_event = {
 			x = "[?EAI_construction_time|.0]"
 		}
 
-		if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: event delay: [?EAI_construction_time]" }
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: event delay: [?EAI_construction_time]" } 
 
 		####################################################################################################################################################
 		#	COMMON
@@ -363,7 +364,7 @@ country_event = {
 		}
 
 		# Forts
-		if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_state_0 = yes } } } 
+		if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_SHARED = yes } } } 
 			random_list = {
 				1 = { EAI_queue_CFORT_BASES = yes }
 				1 = { EAI_queue_FORT_CITIES = yes }
@@ -385,6 +386,24 @@ country_event = {
 			}
 
 			EAI_queue_SILO = yes
+		}
+
+		# resources needed
+		if = {
+			limit = {
+				num_of_civilian_factories_available_for_projects > 15
+
+				OR = {
+					AND = { has_war = yes fuel_ratio < 0.5  																							any_state = { EAI_available_INF = yes has_resources_amount = { resource = oil amount > 40 } } }
+					AND = { OR = { check_variable = { ROOT.resource@aluminium < -4 } 	check_variable = { ROOT.resource_imported@aluminium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = aluminium amount > 40 } } }
+					AND = { OR = { check_variable = { ROOT.resource@rubber < -4 } 		check_variable = { ROOT.resource_imported@rubber > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = rubber amount > 40 } } }
+					AND = { OR = { check_variable = { ROOT.resource@tungsten < -4 } 	check_variable = { ROOT.resource_imported@tungsten > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = tungsten amount > 40 } } }
+					AND = { OR = { check_variable = { ROOT.resource@steel < -4 } 		check_variable = { ROOT.resource_imported@steel > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = steel amount > 40 } } }
+					AND = { OR = { check_variable = { ROOT.resource@chromium < -4 } 	check_variable = { ROOT.resource_imported@chromium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = chromium amount > 40 } } }
+				}
+			}
+
+			EAI_priority_queue_INF_resource = yes
 		}
 
 		#########
@@ -1146,7 +1165,7 @@ country_event = {
 			# CONSTRUCTION SCRIPT
 			if = { limit = { num_of_civilian_factories_available_for_projects > 35 }
 				EAI_queue_RADAR = yes
-				EAI_queue_INF_supply = yes
+				EAI_queue_INF_resource = yes
 			}
 			
 			if = { 
@@ -1352,6 +1371,8 @@ country_event = {
 					EAI_queue_MIC = yes
 					EAI_queue_MIC = yes
 					EAI_queue_MIC = yes
+					EAI_queue_MIC = yes
+					
 					EAI_queue_MIC = yes
 				}
 				else_if = { limit = { num_of_military_factories < 500 }
@@ -1746,6 +1767,10 @@ country_event = {
 				EAI_queue_INF_resource = yes
 			}
 		}
+
+		###################
+
+		EAI_clear_construction_scores = yes
 	}
 	option = {}
 }
@@ -1772,7 +1797,7 @@ country_event = {
 			EAI_queue_INF = yes
 		}
 		
-		else_if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_state_0 = yes } } } 
+		else_if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_SHARED = yes } } } 
 			random_list = {
 				1 = { EAI_queue_CFORT_BASES = yes }
 				1 = { EAI_queue_FORT_CITIES = yes }
@@ -1780,7 +1805,7 @@ country_event = {
 			}
 		}
 
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queuing INF with free factories"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queuing INF with free factories" } 
 	}
 	option = {}
 }
@@ -1823,7 +1848,7 @@ country_event = {
 			set_state_flag = { flag = EAI_RADAR_construction_@ROOT value = 1 days = 60 }
 		}
 
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queueing radar"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: queueing radar" } 
 	}
 	option = {}
 }
@@ -1848,7 +1873,7 @@ country_event = { # ITA coastal forts
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 		
 		every_state = {
 			limit = {
@@ -1873,11 +1898,11 @@ country_event = { # SWI
 
 		original_tag = SWI
 
-		NOT = { any_state = { EAI_available_state_0 = yes } }
+		NOT = { any_state = { EAI_available_SHARED = yes } }
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 		
 		EAI_queue_FORT_BORDER = yes
 		EAI_queue_FORT_BORDER = yes
@@ -1906,7 +1931,7 @@ country_event = { # SPR
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 
 		every_state = {
 			limit = {
@@ -1935,7 +1960,7 @@ country_event = { # TUR
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 
 		every_state = {
 			limit = {
@@ -1995,7 +2020,7 @@ country_event = { # GENERIC
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction (dynamic)"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction (dynamic)" } 
 
 		every_state = { # build forts on victory points near enemy borders
 			limit = {
@@ -2048,7 +2073,7 @@ country_event = {
 	}
 
 	immediate = {
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: SOV supply route fix"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: SOV supply route fix" } 
 
 		if = { limit = { 40 = { controller = { tag = ROOT } } }
 			40 = { EAI_add_INF = yes EAI_add_INF = yes EAI_add_INF = yes }
@@ -2113,7 +2138,7 @@ country_event = {
 			}
 		}
 
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | deleting factories"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | deleting factories" } 
 	}
 
 	option = {}

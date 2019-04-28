@@ -61,7 +61,7 @@ country_event = {
 			if = { limit = { NOT = { has_country_flag = EAI_mobilize_army } } 
 			
 				set_country_flag = EAI_mobilize_army
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | mobilizing army" 
+				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | mobilizing army" }  
 			}
 		}
 		else = { clr_country_flag = EAI_mobilize_army }
@@ -87,6 +87,14 @@ country_event = {
 		}
 		else = { clr_country_flag = EAI_build_infantry }
 
+		### production strategies
+
+		EAI_army_production_strategies = yes
+
+		EAI_aircraft_production_strategies = yes
+
+		EAI_navy_production_strategies = yes
+
 		### anti-aggression script
 		
 		if = { limit = { has_global_flag = EAI_anti_aggression_diplomacy }
@@ -102,18 +110,49 @@ country_event = {
 				
 				set_country_flag = EAI_invite_to_faction_@ROOT
 
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: inviting [This.GetName]"
+				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ANTI-AGGRESSION: inviting [This.GetName]" } 
 			}
 		}
 
-		### misc
+		### occupation laws
 
 		EAI_check_for_bugged_occupation = yes
 
-		# keep a count of its surface ships
+		if = { limit = { EAI_use_gentle_occupation = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_use_gentle_occupation } }
+			
+				set_country_flag = EAI_use_gentle_occupation
+			}
+		}
+		else = { clr_country_flag = EAI_use_gentle_occupation }
+
+		if = { limit = { EAI_use_harshest_occupation = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_use_harshest_occupation } } 
+			
+				set_country_flag = EAI_use_harshest_occupation
+			}
+		}
+		else = { clr_country_flag = EAI_use_harshest_occupation }
+
+		### defend core strategy
+
+		if = { limit = { EAI_defend_core = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_defend_core } } 
+			
+				set_country_flag = EAI_defend_core
+			}
+		}
+		else = { clr_country_flag = EAI_defend_core }
+
+		### keep a count of its surface ships
+
 		EAI_num_surface_ships = yes
 
-		# limit naval doctrine research on date
+		### limit naval doctrine research on date
+
 		if = { limit = { EAI_naval_doctrine_progress_limit = yes } 
 
 			if = { limit = { NOT = { has_country_flag = EAI_naval_doctrine_progress_limit } } 
@@ -123,7 +162,8 @@ country_event = {
 		}
 		else = { clr_country_flag = EAI_naval_doctrine_progress_limit }
 
-		# prioritise ship hull techs
+		### prioritise ship hull techs
+
 		if = { limit = { EAI_prioritise_ship_hulls = yes } 
 
 			if = { limit = { NOT = { has_country_flag = EAI_prioritise_ship_hulls } } 
@@ -133,7 +173,8 @@ country_event = {
 		}
 		else = { clr_country_flag = EAI_prioritise_ship_hulls }
 
-		# prioritise aircraft techs
+		### prioritise aircraft techs
+
 		if = { limit = { EAI_prioritise_aircraft = yes } 
 
 			if = { limit = { NOT = { has_country_flag = EAI_prioritise_aircraft } } 
@@ -143,7 +184,8 @@ country_event = {
 		}
 		else = { clr_country_flag = EAI_prioritise_aircraft }
 
-		# mine sweepers needed
+		### mine sweepers needed
+
 		if = {
 			limit = {
 				any_enemy_country = {
@@ -233,7 +275,7 @@ country_event = {
 			if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE } } add_ideas = omar_bradley }
 		}
 		
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | USA advisor event"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | USA advisor event" } 
 	}
 	option = {}
 }
@@ -260,7 +302,7 @@ country_event = {
 
 		set_technology = { volkssturm = 1 }
 
-		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch" } 
 	}
 	option = {}
 }
@@ -284,7 +326,7 @@ country_event = {
 		if = { limit = { original_research_slots > 2 original_research_slots < 4 } add_research_slot = -2 set_country_flag = EAI_slots_reduced_2 }
 		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = EAI_slots_reduced_1 }
 
-		log = "[GetYear] [GetMonth] | GAME | [Root.GetName] | reducing research slots"
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | GAME | [Root.GetName] | reducing research slots" } 
 	}
 	option = {}
 }
@@ -659,7 +701,7 @@ country_event = {
 				}
 			}
 
-			log = "[GetDate] | AI TECH | [Root.GetName] | failed to research 39 industrial techs"
+			if = { limit = { has_country_flag = EAI_logging } log = "[GetDate] | AI TECH | [Root.GetName] | failed to research 39 industrial techs" } 
 		}
 
 		if = { 
@@ -670,7 +712,7 @@ country_event = {
 				}
 			}
 
-			log = "[GetDate] | AI TECH | [Root.GetName] | failed to research 40 fighters"
+			if = { limit = { has_country_flag = EAI_logging } log = "[GetDate] | AI TECH | [Root.GetName] | failed to research 40 fighters" } 
 		}
 	}
 		
