@@ -426,7 +426,7 @@ NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = 10 				-- optimum sub count for sub 
 
 -- NDefines.NAI.MIN_CAPITALS_FOR_CARRIER_TASKFORCE = 10			-- carrier fleets will at least have this amount of capitals
 -- NDefines.NAI.CAPITALS_TO_CARRIER_RATIO = 1.5				-- capital to carrier count in carrier taskfoces
-NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 3.5					-- screens to capital/carrier count in carrier & capital taskforces
+NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 4					-- screens to capital/carrier count in carrier & capital taskforces
 
 -- NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
 -- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
