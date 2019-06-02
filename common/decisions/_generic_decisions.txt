@@ -15,6 +15,12 @@ political_actions = {
 			NOT = { has_idea = race_for_the_bomb }
 		}
 
+		target_root_trigger = {
+            has_tech = atomic_research
+            NOT = { has_global_flag = first_nuke_dropped }
+            NOT = { has_idea = race_for_the_bomb }
+		}
+
 		#If this trigger matches a country.
 		target_trigger = {
 			#Target is FROM
@@ -81,7 +87,7 @@ political_actions = {
 		cost = 100
 
 		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: improved_worker_conditions" } #EAI
+
 		}
 
 		ai_will_do = {
@@ -148,7 +154,7 @@ political_actions = {
 		cost = 50
 
 		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: promises_of_peace" } #EAI
+
 		}
 
 		ai_will_do = {
@@ -208,9 +214,10 @@ economy_decisions = {
 		}
 
 		visible = {
-			any_state = {
-				is_owned_by = FRA
-				is_controlled_by = ROOT
+			FRA = {
+				any_owned_state = {
+					is_controlled_by = ROOT
+				}
 			}
 			NOT = { is_in_faction_with = FRA }
 		}
@@ -289,8 +296,6 @@ propaganda_efforts = {
 
 		complete_effect = {
 			set_country_flag = war_propaganda_campaign_running
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda" } #EAI
 		}
 		remove_effect = {
 			clr_country_flag = war_propaganda_campaign_running
@@ -363,38 +368,20 @@ propaganda_efforts = {
 			NOT = { has_country_flag = war_propaganda_campaign_running }
 			FROM = {
 				OR = {
-					has_offensive_war = yes
 					is_justifying_wargoal_against = ROOT
+					AND = {
+						has_war_with = ROOT
+						is_neighbor_of = ROOT
+					}
+					has_offensive_war = yes
 				}
 			}
 		}
 
 		visible = {
-			FROM = { NOT = { has_government = ROOT } }
 			FROM = {
-				NOT = { is_neighbor_of = ROOT }
-				OR = {
-					AND = {
-						NOT = { has_government = ROOT }
-						has_offensive_war = yes
-						has_added_tension_amount > 30
-					}
-					is_justifying_wargoal_against = ROOT
-					has_offensive_war_with = ROOT
-				}
-			}
-		}
-
-		target_trigger = {
-			FROM = {
-				NOT = { is_neighbor_of = ROOT }
 				NOT = { is_in_faction_with = ROOT }
 				OR = {
-					AND = {
-						NOT = { has_government = ROOT }
-						has_offensive_war = yes
-						has_added_tension_amount > 30
-					}
 					is_justifying_wargoal_against = ROOT
 					has_offensive_war_with = ROOT
 				}
@@ -495,54 +482,95 @@ propaganda_efforts = {
 		}
 
 		visible = {
-			FROM = { NOT = { has_government = ROOT } }
 			FROM = {
-				is_neighbor_of = ROOT
+				NOT = { is_in_faction_with = ROOT }
 				OR = {
-					AND = {
-						NOT = { has_government = ROOT }
-						has_offensive_war = yes
-					}
 					is_justifying_wargoal_against = ROOT
-					has_war_with = ROOT
+					AND = {
+						is_neighbor_of = ROOT
+						OR = {
+							has_war_with = ROOT
+							AND = {
+								NOT = { has_government = ROOT }
+								has_offensive_war = yes
+								has_added_tension_amount > 5
+							}
+						}
+					}
+					AND = {
+						NOT = { is_neighbor_of = ROOT }
+						OR = {
+							has_offensive_war_with = ROOT
+							AND = {
+								NOT = { has_government = ROOT }
+								has_offensive_war = yes
+								has_added_tension_amount > 30
+							}
+						}
+					}
 				}
-				has_added_tension_amount > 5
 			}
 		}
 
 		target_trigger = {
 			FROM = {
-				is_neighbor_of = ROOT
 				NOT = { is_in_faction_with = ROOT }
 				OR = {
-					AND = {
-						NOT = { has_government = ROOT }
-						has_offensive_war = yes
-					}
 					is_justifying_wargoal_against = ROOT
-					has_war_with = ROOT
+					AND = {
+						is_neighbor_of = ROOT
+						OR = {
+							has_war_with = ROOT
+							AND = {
+								NOT = { has_government = ROOT }
+								has_offensive_war = yes
+								has_added_tension_amount > 5
+							}
+						}
+					}
+					AND = {
+						NOT = { is_neighbor_of = ROOT }
+						OR = {
+							has_offensive_war_with = ROOT
+							AND = {
+								NOT = { has_government = ROOT }
+								has_offensive_war = yes
+								has_added_tension_amount > 30
+							}
+						}
+					}
 				}
-				has_added_tension_amount > 5
+			}
+			if = {
+				limit = {
+					FROM = {
+						is_neighbor_of = ROOT
+					}
+					set_temp_variable = { war_propaganda_cost = 50 }
+				}
 			}
 		}
 
 		days_remove = 90
 		days_re_enable = 180
 
-		cost = 50
+		fire_only_once = yes
+
+		cost = var:war_propaganda_cost?75
 
 		modifier = {
 			war_support_weekly = 0.01
 		}
 
 		complete_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision war_propaganda_against_warmonger"
 			set_country_flag = war_propaganda_campaign_running
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda_against_warmonger_neighbor" } #EAI
 		}
 		remove_effect = {
+			log = "[GetDateText]: [Root.GetName]: Decision remove war_propaganda_against_warmonger"
 			clr_country_flag = war_propaganda_campaign_running
 		}
+
 		ai_will_do = {
 			base = 0
 			modifier = { #EAI
@@ -1124,8 +1152,7 @@ operations = {
 					owns_state = 446
 					owns_state = 453
 				}
-				any_country = {
-					has_war_with = ROOT
+				any_enemy_country = {
 					OR = {
 						controls_state = 452
 						controls_state = 447
@@ -1178,8 +1205,6 @@ operations = {
 					}
 				}
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: blow_suez_canal" } #EAI
 		}
 	
 		remove_effect = {
@@ -1246,7 +1271,7 @@ operations = {
 			
 		}
 		available = {
-				has_full_control_of_state = 685
+			has_full_control_of_state = 685
 		}
 	
 		visible = {
@@ -1287,8 +1312,6 @@ operations = {
 					}
 				}
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:blow_panama_canal" } #EAI
 		}
 	
 		remove_effect = {
@@ -1365,10 +1388,6 @@ special_projects = {
 		modifier = {
 			civilian_factory_use = 15
 		}
-
-		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:rebuild_suez_canal" } #EAI
-		}
 	
 		remove_effect = {
 			if = {
@@ -1420,8 +1439,7 @@ special_projects = {
 		available = {
 			has_full_control_of_state = 685
 			NOT = {
-				any_country = {
-					has_war_with = ROOT
+				any_enemy_country = {
 					controls_state = 304
 				}
 			}
@@ -1441,25 +1459,20 @@ special_projects = {
 		modifier = {
 			civilian_factory_use = 25
 		}
-
-		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION:rebuild_panama_canal" } #EAI
-		}
 	
 		remove_effect = {
 			if = {
 				limit = {
 					has_full_control_of_state = 685
 					NOT = {
-						any_country = {
-							has_war_with = ROOT
+						any_enemy_country = {
 							controls_state = 304
 						}
 					}
 				}
 				set_country_flag = rebuilt_panama
 				clr_global_flag = PANAMA_CANAL_BLOCKED
-				country_event = { id = wtt_news.43 hours = 6}
+				country_event = { id = wtt_news.43 hours = 6 }
 			}
 		}
 		ai_will_do = {
@@ -1574,7 +1587,7 @@ war_measures = {
 		}
 
 		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: desperate_defense" } #EAI
+
 		}
 	}
 
@@ -1642,8 +1655,6 @@ war_measures = {
 				}
 				country_event = { id = canada_vanilla.1 hours = 6 } # Ronnie the Bren Gun Girl
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: women_in_the_workforce" } #EAI
         }
    }
 
@@ -1709,8 +1720,6 @@ war_measures = {
 		}
 
 		complete_effect = {
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_bonds" } #EAI
-
 			if = {
 				limit = {
 					check_variable = {
@@ -1768,7 +1777,7 @@ foreign_politics = {
 	object_to_attaches = {
 
 		allowed = {
-            always = yes
+            has_dlc = "Waking the Tiger"
         }
 
         cost = 50
@@ -1791,6 +1800,11 @@ foreign_politics = {
         	any_enemy_country = {
 				has_attache_from = FROM
 			}
+		}
+
+		target_root_trigger = {
+			has_war = yes
+			has_capitulated = no
 		}
 
 		target_trigger = {
@@ -1868,8 +1882,6 @@ economy_decisions = {
 				add_extra_state_shared_building_slots = 1
 				set_state_flag = infrastructure_building_slot_flag
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: infrastructure_building_slot" } #EAI
 		}
 		ai_will_do = { #EAI
 			base = 0 
@@ -2025,8 +2037,6 @@ economy_decisions = {
 					set_state_flag = war_building_slot_flag
 				}
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_building_slot" } #EAI
 		}
 		ai_will_do = { #EAI
 			base = 0 
@@ -2103,28 +2113,72 @@ foreign_support = {
 		}
 
 		available = {
-			any_state = {
-				has_state_flag = CHI_needed_for_burma_road
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
+			OR = {
+				AND = {
+					288 = { #Burma
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
 				}
-			}			
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
 		}
 
 		visible = {
 			is_subject = no
+			OR = {
+				AND = {
+					288 = { #Burma
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_needed_for_burma_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
 			any_country = {
 				check_variable = { CHI_burma_road_current_level > 0 }
 				NOT = { is_in_faction_with = ROOT }
 				NOT = { tag = ROOT }
-			}
-			any_state = {
-				has_state_flag = CHI_needed_for_burma_road
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
-				}
 			}
 		}
 
@@ -2195,8 +2249,6 @@ foreign_support = {
 				country_event = { id = wtt_burma_road.2 }
 				custom_effect_tooltip = close_burma_road_explanation # Prints the contents of the CHI_burma_road_current_level variable
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_burma_road" } #EAI
 		}
 	}
 
@@ -2212,32 +2264,92 @@ foreign_support = {
 		}
 
 		available = {
-			any_state = {
-				has_state_flag = CHI_burma_road_closed_state
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
+			OR = {
+				AND = {
+					288 = { #Burma
+						has_state_flag = CHI_burma_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_burma_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_burma_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
 				}
 			}
 		}
 
 		visible = {
 			is_subject = no
-			any_country = {
-				check_variable = { CHI_burma_road_closed_level > 0 }
-				NOT = { has_war_with = ROOT }
-			}
-			any_state = {
-				has_state_flag = CHI_burma_road_closed_state
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = {
+			OR = {
+				AND = {
+					288 = { #Burma
+						has_state_flag = CHI_burma_road_closed_state
 						OR = {
-							is_subject_of = ROOT
-							check_variable = { CHI_burma_road_closed_level > 0 }
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_burma_road_closed_level > 0 }
+								}
+							}
 						}
 					}
 				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_burma_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_burma_road_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_burma_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_burma_road_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+			}
+			any_country = {
+				check_variable = { CHI_burma_road_closed_level > 0 }
+				NOT = { has_war_with = ROOT }
 			}
 		}
 
@@ -2326,8 +2438,6 @@ foreign_support = {
 					custom_effect_tooltip = reopen_burma_road_explanation # Prints the contents of the CHI_burma_road_closed_level variable
 				}
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_burma_road" } #EAI
 		}
 	}
 
@@ -2351,28 +2461,72 @@ foreign_support = {
 		}
 
 		available = {
-			any_state = {
-				has_state_flag = CHI_needed_for_ledo_road
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
+			OR = {
+				AND = {
+					432 = { #Assam
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
 				}
 			}			
 		}
 
 		visible = {
 			is_subject = no
+			OR = {
+				AND = {
+					432 = { #Assam
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_needed_for_ledo_road
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
 			any_country = {
 				check_variable = { CHI_ledo_road_current_level > 0 }
 				NOT = { is_in_faction_with = ROOT }
 				NOT = { tag = ROOT }
-			}
-			any_state = {
-				has_state_flag = CHI_needed_for_ledo_road
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
-				}
 			}
 		}
 
@@ -2443,8 +2597,6 @@ foreign_support = {
 				country_event = { id = wtt_ledo_road.2 }
 				custom_effect_tooltip = close_ledo_road_explanation # Prints the contents of the CHI_ledo_road_current_level variable
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_ledo_road" } #EAI
 		}
 	}
 
@@ -2460,17 +2612,89 @@ foreign_support = {
 		}
 
 		available = {
-			any_state = {
-				has_state_flag = CHI_ledo_road_closed_state
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
+			OR = {
+				AND = {
+					432 = { #Assam
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								is_subject_of = ROOT
+							}
+						}
+					}
 				}
 			}
 		}
 
 		visible = {
 			is_subject = no
+			OR = {
+				AND = {
+					432 = { #Assam
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_ledo_road_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_ledo_road_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+				AND = {
+					640 = { #Mandalay
+						has_state_flag = CHI_ledo_road_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_ledo_road_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+			}
 			any_country = {
 				check_variable = { CHI_ledo_road_closed_level > 0 }
 				NOT = { has_war_with = ROOT }
@@ -2574,8 +2798,6 @@ foreign_support = {
 					custom_effect_tooltip = reopen_ledo_road_explanation # Prints the contents of the CHI_ledo_road_closed_level variable
 				}
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_ledo_road" } #EAI
 		}
 	}
 
@@ -2597,28 +2819,54 @@ foreign_support = {
  		}
 
  		available = {
- 			any_state = {
- 				has_state_flag = CHI_needed_for_the_hump
- 				OR = {
- 					is_controlled_by = ROOT
- 					CONTROLLER = { is_subject_of = ROOT }
- 				}
- 			}			
+			OR = {
+				AND = {
+					434 = { #Arunachal Pradesh
+						has_state_flag = CHI_needed_for_the_hump
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					601 = { #Xikang
+						has_state_flag = CHI_needed_for_the_hump
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
  		}
 
  		visible = {
  			is_subject = no
+			OR = {
+				AND = {
+					434 = { #Arunachal Pradesh
+						has_state_flag = CHI_needed_for_the_hump
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					601 = { #Xikang
+						has_state_flag = CHI_needed_for_the_hump
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
  			any_country = {
  				check_variable = { CHI_the_hump_current_level > 0 }
  				NOT = { is_in_faction_with = ROOT }
  				NOT = { tag = ROOT }
- 			}
- 			any_state = {
- 				has_state_flag = CHI_needed_for_the_hump
- 				OR = {
- 					is_controlled_by = ROOT
- 					CONTROLLER = { is_subject_of = ROOT }
- 				}
  			}
  		}
 
@@ -2689,8 +2937,6 @@ foreign_support = {
  				country_event = { id = wtt_the_hump.2 }
 				custom_effect_tooltip = close_the_hump_explanation # Prints the contents of the CHI_the_hump_current_level variable
  			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_the_hump" } #EAI
  		}
  	}
 
@@ -2705,33 +2951,64 @@ foreign_support = {
  			#Everyone
  		}
 
- 		available = {
- 			any_state = {
- 				has_state_flag = CHI_the_hump_closed_state
- 				OR = {
- 					is_controlled_by = ROOT
- 					CONTROLLER = { is_subject_of = ROOT }
- 				}
- 			}
+		available = {
+			OR = {
+				AND = {
+					434 = { #Arunachal Pradesh
+						has_state_flag = CHI_the_hump_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					601 = { #Xikang
+						has_state_flag = CHI_the_hump_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
  		}
 
  		visible = {
  			is_subject = no
+			OR = {
+				AND = {
+					434 = { #Arunachal Pradesh
+						has_state_flag = CHI_the_hump_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_the_hump_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+				AND = {
+					601 = { #Xikang
+						has_state_flag = CHI_the_hump_closed_state
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = {
+								OR = {
+									is_subject_of = ROOT
+									check_variable = { CHI_the_hump_closed_level > 0 }
+								}
+							}
+						}
+					}
+				}
+			}
  			any_country = {
  				check_variable = { CHI_the_hump_closed_level > 0 }
  				NOT = { has_war_with = ROOT }
- 			}
- 			any_state = {
- 				has_state_flag = CHI_the_hump_closed_state
- 				OR = {
- 					is_controlled_by = ROOT
- 					CONTROLLER = {
- 						OR = {
- 							is_subject_of = ROOT
- 							check_variable = { CHI_the_hump_closed_level > 0 }
- 						}
- 					}
- 				}
  			}
  		}
 
@@ -2820,8 +3097,6 @@ foreign_support = {
 					custom_effect_tooltip = reopen_the_hump_explanation # Prints the contents of the CHI_the_hump_closed_level variable
  				}
  			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_reopen_the_hump" } #EAI
  		}
  	}
 
@@ -2845,28 +3120,54 @@ foreign_support = {
 		}
 
 		available = {
-			any_state = {
-				has_state_flag = CHI_needed_for_hanoi_route
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
+			OR = {
+				AND = {
+					671 = { #Tonkin
+						has_state_flag = CHI_needed_for_hanoi_route
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
 				}
-			}			
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_hanoi_route
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
 		}
 
 		visible = {
 			is_subject = no
+			OR = {
+				AND = {
+					671 = { #Tonkin
+						has_state_flag = CHI_needed_for_hanoi_route
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+				AND = {
+					325 = { #Yunnan
+						has_state_flag = CHI_needed_for_hanoi_route
+						OR = {
+							is_controlled_by = ROOT
+							CONTROLLER = { is_subject_of = ROOT }
+						}
+					}
+				}
+			}
 			any_country = {
 				check_variable = { CHI_hanoi_route_current_level > 0 }
 				NOT = { is_in_faction_with = ROOT }
 				NOT = { tag = ROOT }
-			}
-			any_state = {
-				has_state_flag = CHI_needed_for_hanoi_route
-				OR = {
-					is_controlled_by = ROOT
-					CONTROLLER = { is_subject_of = ROOT }
-				}
 			}
 		}
 
@@ -2937,8 +3238,6 @@ foreign_support = {
 				country_event = { id = wtt_hanoi_route.2 }
 				custom_effect_tooltip = close_hanoi_route_explanation # Prints the contents of the CHI_hanoi_route_current_level variable
 			}
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: CHI_close_hanoi_route" } #EAI
 		}
 	}
 }

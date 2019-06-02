@@ -693,12 +693,34 @@ EAI_motart_tech_focus = {
 	}
 }
 
+### antiair
+
 EAI_aa_tech_focus = {
 	date > 1936.7.1
 	
-	check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
-	check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS }
-	check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+	OR = {
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+			check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS }
+			check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
+		}
+		EAI_anti_air_design_focus = yes
+	}
+}
+EAI_anti_air_design_focus = {
+	NOT = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } }
+	OR = {
+		AND = {
+			is_major = no
+			num_of_military_factories > 6
+			NOT = { EAI_FTR_tech_focus = yes }
+		}
+	}
+}
+EAI_cancel_anti_air_design_focus = {
+	has_country_flag = EAI_anti_air_design_focus
+	is_major = yes
+	has_deployed_air_force_size = { size > 2000 }
 }
 
 EAI_land_doctrine_tech_focus = {
@@ -712,6 +734,7 @@ EAI_land_doctrine_tech_focus = {
 ############################################
 
 EAI_garrison_production = {
+	NOT = { original_tag = SOV }
 	OR = {
 		has_war = yes
 		original_tag = USA

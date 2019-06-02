@@ -5,9 +5,9 @@
 # Operation Countenance - stop allies from sending troops
 EAI_operation_countenance = {
 	enable = { 
+		has_global_flag = EAI_operation_countenance_started
 		capital_scope = { is_on_continent = europe }
 		is_in_faction_with = PER
-		has_global_flag = EAI_operation_countenance_started
 	}
 	abort_when_not_enabled = yes
 
@@ -21,7 +21,7 @@ EAI_SOV_no_access_to_allies = {
 		is_in_faction_with = ENG
 		has_war_together_with = SOV
 		NOT = { is_in_faction_with = SOV }
-		ENG = { SOV = { NOT = { EAI_same_ideology = yes } } }
+		ENG = { SOV = { NOT = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 	}
 
 	abort_when_not_enabled = yes
@@ -37,7 +37,7 @@ EAI_MON_no_access_to_allies = {
 		has_war_together_with = MON
 		NOT = { is_in_faction_with = MON }
 		MON = { is_in_faction_with = SOV }
-		ENG = { SOV = { NOT = { EAI_same_ideology = yes } } }
+		ENG = { SOV = { NOT = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 	}
 
 	abort_when_not_enabled = yes
@@ -53,7 +53,7 @@ EAI_SIK_no_access_to_allies = {
 		has_war_together_with = SIK
 		NOT = { is_in_faction_with = SIK }
 		SIK = { is_in_faction_with = SOV }
-		ENG = { SOV = { NOT = { EAI_same_ideology = yes } } }
+		ENG = { SOV = { NOT = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 	}
 	
 	abort_when_not_enabled = yes
@@ -472,6 +472,10 @@ EAI_neutral_south_america = {
 	ai_strategy = { type = alliance   	id = "SOV"     value = -500 }
 }
 EAI_neutral_south_america_2 = {
+	enable_reverse = {
+		is_faction_leader = yes
+	}
+
 	enable = {
 		is_historical_focus_on = yes
 	
@@ -529,10 +533,9 @@ EAI_neutral_joins_allies = {
 
 		OR = { has_government = neutrality has_government = democratic }
 
-		any_country = {
-			OR = { original_tag = ENG original_tag = USA }
-			is_faction_leader = yes
-			any_enemy_country = { is_major = yes }
+		OR = {
+			ENG = { is_faction_leader = yes any_enemy_country = { is_major = yes } }
+			USA = { is_faction_leader = yes any_enemy_country = { is_major = yes } }
 		}
 
 		threat > 0.99
@@ -544,6 +547,10 @@ EAI_neutral_joins_allies = {
 	ai_strategy = { type = alliance   	id = "USA"     value = 700 }
 }
 EAI_neutral_joins_allies_2 = {
+	enable_reverse = {
+		is_faction_leader = yes
+	}
+
 	enable = {
 		is_historical_focus_on = yes
 
@@ -553,10 +560,9 @@ EAI_neutral_joins_allies_2 = {
 
 		OR = { has_government = neutrality has_government = democratic }
 
-		any_country = {
-			OR = { original_tag = ENG original_tag = USA }
-			is_faction_leader = yes
-			any_enemy_country = { is_major = yes }
+		OR = {
+			ENG = { is_faction_leader = yes any_enemy_country = { is_major = yes } }
+			USA = { is_faction_leader = yes any_enemy_country = { is_major = yes } }
 		}
 
 		threat > 0.99
@@ -627,7 +633,7 @@ EAI_ICE_joins_allies = {
 
 		NOT = { is_in_faction_with = ENG }
 		
-		ENG = { ICE = { EAI_same_ideology = yes } }
+		ENG = { ICE = { EAI_PREV_has_same_ideology_with_THIS = yes } }
 
 		ENG = { any_enemy_country = { is_major = yes } }
 
@@ -647,7 +653,7 @@ EAI_stay_out_of_axis_FIN = {
 
 		OR = { tag = FIN tag = GER }
 
-		NOT = { GER = { FIN = { EAI_same_ideology = yes } } }
+		NOT = { GER = { FIN = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 
 		NOT = {
 			GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0.5 } }
@@ -700,50 +706,49 @@ EAI_continuation_war = {
 	ai_strategy = { type = alliance   	id = "FIN"     value = 500 }
 }
 
-### romania joins axis
+### ROM HUN BUL join axis
 
 EAI_ROM_joins_axis_0 = {
 	enable = {
 		is_historical_focus_on = yes
-	
+
 		OR = { tag = ROM tag = GER }
-		
-		NOT = { ROM = { has_completed_focus = ROM_join_axis } }
 
-		ROM = { NOT = { EAI_is_not_independent = yes } }
-
-		GER = { NOT = { EAI_is_not_independent = yes } }
+		NOT = { 
+			is_in_faction = yes 
+			ROM = { has_war_together_with = GER }
+		}
 	}
 	
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
-	ai_strategy = { type = alliance 	id = "ROM"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = -500 }
+	ai_strategy = { type = alliance   	id = "ROM"     value = -500 }
 }
 EAI_ROM_joins_axis_1 = {
 	enable = {
 		is_historical_focus_on = yes
-	
+
 		OR = { tag = ROM tag = GER }
+
+		NOT = { is_in_faction_with = GER }
 		
 		if = { limit = { has_dlc = "Death or Dishonor" }
 		
-			ROM = { has_completed_focus = ROM_join_axis }
-			
-			else = {
-				date > 1940.9.1
+			OR = {
+				ROM = { has_completed_focus = ROM_join_axis }
+				GER = { has_completed_focus = GER_align_romania }
 			}
 		}
+		else = {
+			date > 1940.9.1
+		}
 
-		ROM = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
-		}
+		ROM = { GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+
+		ROM = { NOT = { EAI_is_not_independent = yes } }
 				
-		GER = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
-		}
+		GER = { NOT = { EAI_is_not_independent = yes } }
 	}
 	
 	abort_when_not_enabled = yes
@@ -752,50 +757,47 @@ EAI_ROM_joins_axis_1 = {
 	ai_strategy = { type = alliance   	id = "ROM"     value = 1000 }
 }
 
-### hungary joins axis
-
 EAI_HUN_joins_axis_0 = {
 	enable = {
 		is_historical_focus_on = yes
-	
-		OR = { tag = HUN tag = GER }
-		
-		NOT = { HUN = { has_completed_focus = HUN_join_axis } }
-		
-		HUN = { NOT = { EAI_is_not_independent = yes } }
 
-		GER = { NOT = { EAI_is_not_independent = yes } }
+		OR = { tag = HUN tag = GER }
+
+		NOT = { 
+			is_in_faction = yes 
+			HUN = { has_war_together_with = GER }
+		}
 	}
 	
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
-	ai_strategy = { type = alliance 	id = "HUN"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = -500 }
+	ai_strategy = { type = alliance   	id = "HUN"     value = -500 }
 }
 EAI_HUN_joins_axis_1 = {
 	enable = {
 		is_historical_focus_on = yes
 	
 		OR = { tag = HUN tag = GER }
+
+		NOT = { is_in_faction_with = GER }
 		
 		if = { limit = { has_dlc = "Death or Dishonor" }
 		
-			HUN = { has_completed_focus = HUN_join_axis }
-			
-			else = {
-				date > 1940.9.1
+			OR = {
+				HUN = { has_completed_focus = HUN_join_axis }
+				GER = { has_completed_focus = GER_align_hungary }
 			}
 		}
-		
-		HUN = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
+		else = {
+			date > 1940.9.1
 		}
+
+		HUN = { GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+
+		HUN = { NOT = { EAI_is_not_independent = yes } }
 				
-		GER = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
-		}
+		GER = { NOT = { EAI_is_not_independent = yes } }
 	}
 	
 	abort_when_not_enabled = yes
@@ -804,30 +806,30 @@ EAI_HUN_joins_axis_1 = {
 	ai_strategy = { type = alliance   	id = "HUN"     value = 1000 }
 }
 
-### bulgaria joins axis
-
 EAI_BUL_joins_axis_0 = {
 	enable = {
 		is_historical_focus_on = yes
-	
+
 		OR = { tag = BUL tag = GER }
 
-		HUN = { NOT = { EAI_is_not_independent = yes } }
-
-		GER = { NOT = { EAI_is_not_independent = yes } }
+		NOT = { 
+			is_in_faction = yes
+			BUL = { has_war_together_with = GER }
+		}
 	}
 	
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = alliance 	id = "GER"     value = -500 }
-	
-	ai_strategy = { type = alliance 	id = "BUL"     value = -500 }
+	ai_strategy = { type = alliance   	id = "GER"     value = -500 }
+	ai_strategy = { type = alliance   	id = "BUL"     value = -500 }
 }
 EAI_BUL_joins_axis_1 = {
 	enable = {
 		is_historical_focus_on = yes
-	
+
 		OR = { tag = BUL tag = GER }
+
+		NOT = { is_in_faction_with = GER }
 		
 		BUL = {
 			any_neighbor_country = {
@@ -835,24 +837,21 @@ EAI_BUL_joins_axis_1 = {
 				has_war = yes
 			}
 		}
-		
-		BUL = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
-		}
+
+		BUL = { GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+
+		BUL = { NOT = { EAI_is_not_independent = yes } }
 				
-		GER = { 
-			NOT = { EAI_is_not_independent = yes } 
-			has_government = fascism
-		}
+		GER = { NOT = { EAI_is_not_independent = yes } }
 	}
 	
 	abort_when_not_enabled = yes
 
 	ai_strategy = { type = alliance   	id = "GER"     value = 1000 }
-
 	ai_strategy = { type = alliance   	id = "BUL"     value = 1000 }
 }
+
+###
 
 EAI_bulgaria_stop_doing_crazy_things = {
 	enable = { tag = BUL is_historical_focus_on = yes }

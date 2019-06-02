@@ -2948,57 +2948,36 @@ focus_tree = {
 		y = 4
 		relative_position_id = GER_anti_comitern_pact
 		cost = 10
-		historical_ai = { #EAI
-			has_government = fascism
-		
+		historical_ai = { #EAI war focus
+
 			date > 1941.4.1
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+
+			NOT = { EAI_is_not_independent = yes }
+
+			SOV = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
 			}
-		
-			#army requirement
+
+			# army requirements
 			OR = {
 				has_army_manpower = { size > 2250000 }
 				date > 1941.8.1
 			}
-
 			OR = {
 				has_army_size = { type = armor size > 10 }
 				has_army_manpower = { type = armor size > 100000 }
 				date > 1941.8.1
 			}
-			
-			OR = { #borders sov
-				any_neighbor_country = { tag = SOV }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = SOV } }
-			}
-			
-			#sov is a threat
-			SOV = { EAI_is_threat = yes }
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-		
-			OR = { #pol is no threat
-				POL = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #fra is no threat
-				FRA = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #den is no threat
-				DEN = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #yug is no threat
-				YUG = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
+
+			# has dealt with its enemies
+			OR = {
+				EAI_is_prepared_for_war = yes
+
+				AND = {
+					POL = { NOT = { EAI_is_threat = yes } }
+					FRA = { NOT = { EAI_is_threat = yes } }
+				}
 			}
 		}
 		bypass = {
@@ -3401,38 +3380,27 @@ focus_tree = {
 		y = 3
 		relative_position_id = GER_demand_memel
 		cost = 10
-		historical_ai = { #EAI
-			has_government = fascism
-		
+		historical_ai = { #EAI war focus
+
 			date > 1939.4.1
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+
+			EAI_is_prepared_for_war = yes
+
+			POL = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
 			}
-			
-			#army requirement
+
+			# army requirements
 			has_army_manpower = { size > 800000 }
-			
-			OR = { #borders pol
-				any_neighbor_country = { tag = POL }
-				any_allied_country = { any_neighbor_country = { tag = POL } }
-			}
-			
-			#pol is a threat
-			POL = { EAI_is_threat = yes }
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			
-			OR = { #is not at war with or invading sov
+
+			# is not invading sov
+			OR = {
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				#or sov is not a threat
-				SOV = { NOT = { EAI_is_threat = yes } }
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		ai_will_do = {
@@ -3545,62 +3513,56 @@ focus_tree = {
 		y = 2
 		relative_position_id = GER_danzig_or_war
 		cost = 4
-		historical_ai = { #EAI
-			has_government = fascism
-			
+		historical_ai = { #EAI war focus
+
 			date > 1939.8.1
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+
+			NOT = { EAI_is_not_independent = yes }
+
+			DEN = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
 			}
-			
-			#army requirement
+
+			# army requirements
 			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders den
-				any_neighbor_country = { tag = DEN }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = DEN } }
-			}
-			
-			#den is a threat
-			DEN = { EAI_is_threat = yes }
-			
-			#pol is no threat
+
+			# pol is no threat
 			OR = {
-				POL = { NOT = { EAI_is_threat = yes } }
-				AND = {
-					POL = { num_of_controlled_states < 3 }
-					POL = { has_army_manpower = { size < 200000 } }
+				POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+				POL = {
+					num_of_controlled_states < 3
+					has_army_manpower = { size < 200000 }
 				}
 				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
 			}
 			
-			OR = { #is not at war with or invading sov
+			# is not invading sov
+			OR = {
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				#or sov is not a threat
-				SOV = { NOT = { EAI_is_threat = yes } }
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 			
-			OR = { #is not at war with or invading west
+			# west is no threat
+			OR = { 
 				NOT = { 
-					GER = { focus_progress = { focus = GER_around_maginot progress > 0 } }
+					focus_progress = { focus = GER_around_maginot progress > 0 }
 					has_war_with = HOL
 					has_war_with = BEL
 					has_war_with = LUX
 				}
 				
-				AND = { #or west is not a threat
+				AND = {
 					OR = { 
-						GER = { focus_progress = { focus = GER_around_maginot progress > 0 } }
+						focus_progress = { focus = GER_around_maginot progress > 0 }
 						has_war_with = FRA
 					}
 					
-					FRA = { NOT = { EAI_is_threat = yes } }
+					FRA = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 				}
 			}
 		}		
@@ -3688,36 +3650,35 @@ focus_tree = {
 			}
 		}
 
-		historical_ai = { #EAI
-			has_government = fascism
-		
+		historical_ai = { #EAI war focus
+
 			date > 1939.11.1
 			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+			NOT = { EAI_is_not_independent = yes }
+
+			BEL = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
 			}
-			
-			#army requirement
+
+			# army requirements
 			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders bel
-				any_neighbor_country = { tag = BEL }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = BEL } }
-			}
-			
-			OR = { #pol is no threat
-				POL = { NOT = { EAI_is_threat = yes } }
-				AND = {
-					POL = { num_of_controlled_states < 3 }
-					POL = { has_army_manpower = { size < 200000 } }
+
+			# pol is no threat
+			OR = {
+				POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+				POL = {
+					num_of_controlled_states < 3
+					has_army_manpower = { size < 200000 }
 				}
 				AND = { date > 1940.3.1 NOT = { has_war_with = POL } }
 				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
 			}
-			
-			OR = { #den is no threat
-				DEN = { NOT = { EAI_is_threat = yes } }
+
+			# den is no threat
+			OR = { 
+				DEN = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 				AND = {
 					DEN = { num_of_controlled_states < 2 }
 					DEN = { has_army_manpower = { size < 100000 } }
@@ -3727,15 +3688,14 @@ focus_tree = {
 				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
 				date > 1940.4.1
 			}
-			
-			OR = { #is not at war with or invading sov
+
+			# is not invading sov
+			OR = {
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				#or sov is not a threat
-				SOV = { NOT = { EAI_is_threat = yes } }
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		will_lead_to_war_with = BEL
@@ -4515,69 +4475,41 @@ focus_tree = {
 				has_war_with = FRA
 			}
 		}
-		historical_ai = {
-			has_government = fascism
-		
+		historical_ai = { #EAI war focus
+
 			date > 1939.1.1
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+
+			EAI_is_prepared_for_war = yes
+
+			FRA = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
 			}
 
-			#army requirement
+			# army requirements
 			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders yug
-				any_neighbor_country = { tag = FRA }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = FRA } }
-			}
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-		
-			OR = { #pol is no threat
-				POL = { has_capitulated = yes }
-				POL = { exists = no }
-				POL = { is_subject = yes }
-				POL = { has_government = fascism }
-				is_in_faction_with = POL
-				
+
+			# pol is no threat
+			OR = {
+				POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 				AND = { date > 1940.3.1 NOT = { has_war_with = POL } }
 				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
 			}
 			
-			OR = { #den is no threat
-				DEN = { has_capitulated = yes }
-				DEN = { exists = no }
-				DEN = { is_subject = yes }
-				DEN = { has_government = fascism }
-				is_in_faction_with = DEN
-				
+			# den is no threat
+			OR = { 
+				DEN = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 				AND = { date > 1940.3.1 NOT = { has_war_with = DEN } }
 				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
 			}
 			
-			OR = { #is not at war with or invading sov
+			# is not invading sov
+			OR = {
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				AND = { #or sov is not a threat
-					OR = { 
-						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
-						has_war_with = SOV
-					}
-					
-					OR = {
-						SOV = { has_capitulated = yes }
-						SOV = { exists = no }
-						SOV = { is_subject = yes }
-						SOV = { has_government = fascism }
-						is_in_faction_with = SOV
-					}
-				}
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		ai_will_do = {
@@ -4619,55 +4551,39 @@ focus_tree = {
 		y = 1
 		relative_position_id = GER_war_with_france
 		cost = 10
-		historical_ai = {  #EAI
-			has_government = fascism
-		
-			date > 1939.8.1
-			
-			has_global_flag = EAI_aggressive_GER
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
-			}
-		
-			#army requirement
-			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders swi
-				any_neighbor_country = { tag = SWI }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = SWI } }
-			}
-			
-			#swi is a threat
-			SWI = { EAI_is_threat = yes }
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
+		historical_ai = { #EAI war focus
 
-			OR = { #pol is no threat
-				POL = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
+			date > 1939.8.1
+
+			has_global_flag = EAI_aggressive_GER
+
+			NOT = { EAI_is_not_independent = yes }
+
+			SWI = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
+			}
+
+			# has dealt with its enemies
+			OR = {
+				EAI_is_prepared_for_war = yes
+
+				AND = {
+					POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					FRA = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					DEN = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+				}
 			}
 			
-			OR = { #fra is no threat
-				FRA = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #den is no threat
-				DEN = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #is not at war with or invading sov
+			# is not invading sov
+			OR = { 
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				#or sov is not a threat
-				SOV = { NOT = { EAI_is_threat = yes } }
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		ai_will_do = {
@@ -5552,57 +5468,44 @@ focus_tree = {
 		y = 1
 		relative_position_id = GER_anschluss
 		cost = 10
-		historical_ai = {  #EAI
-			has_government = fascism
-		
+		historical_ai = { #EAI war focus
+
 			date > 1939.8.1
 			
 			OR = {
 				date > 1940.10.1
 				has_global_flag = EAI_aggressive_GER
 			}
-			
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+
+			NOT = { EAI_is_not_independent = yes }
+
+			YUG = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
 			}
-			
-			#army requirement
+
+			# army requirements
 			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders yug
-				any_neighbor_country = { tag = YUG }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = YUG } }
+
+			# has dealt with its enemies
+			OR = {
+				EAI_is_prepared_for_war = yes
+
+				AND = {
+					POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					FRA = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					DEN = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+				}
 			}
 			
-			YUG = { EAI_is_threat = yes }
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-		
-			OR = { #pol is no threat
-				POL = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #fra is no threat
-				FRA = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #den is no threat
-				DEN = { NOT = { EAI_is_threat = yes } }
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #is not at war with or invading sov
+			# is not invading sov
+			OR = { 
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				#or sov is not a threat
-				SOV = { NOT = { EAI_is_threat = yes } }
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		ai_will_do = {
@@ -6035,8 +5938,7 @@ focus_tree = {
 		relative_position_id = GER_fate_of_yugoslavia
 		cost = 10
 		historical_ai = {
-			has_government = fascism
-		
+
 			date > 1940.6.1
 			
 			OR = {
@@ -6044,91 +5946,36 @@ focus_tree = {
 				has_global_flag = EAI_aggressive_GER
 			}
 
-			NOT = { #has not lost
-				GER = { has_capitulated = yes }
-				GER = { is_subject = yes }
+			NOT = { EAI_is_not_independent = yes }
+
+			GRE = {
+				EAI_THIS_is_threat_to_PREV = yes
+				EAI_THIS_has_land_border_with_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
 			}
-			
-			#army requirement
+
+			# army requirements
 			has_army_manpower = { size > 1000000 }
-			
-			OR = { #borders gre
-				any_neighbor_country = { tag = GRE }
-				any_allied_country = { is_neighbor_of = ROOT any_neighbor_country = { tag = GRE } }
+
+			# has dealt with its enemies
+			OR = {
+				EAI_is_prepared_for_war = yes
+
+				AND = {
+					POL = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					FRA = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					DEN = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+					YUG = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
+				}
 			}
-			
-			NOT = { #gre is a threat
-				GRE = { has_capitulated = yes }
-				GRE = { exists = no }
-				GRE = { is_subject = yes }
-				GRE = { has_government = fascism }
-				has_war_with = GRE
-				is_in_faction_with = GRE
-			}
-			
-			#no current enemies to deal with
-			NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			
-			OR = { #pol is no threat
-				POL = { has_capitulated = yes }
-				POL = { exists = no }
-				POL = { is_subject = yes }
-				POL = { has_government = fascism }
-				is_in_faction_with = POL
-				
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #fra is no threat
-				FRA = { has_capitulated = yes }
-				FRA = { exists = no }
-				FRA = { is_subject = yes }
-				FRA = { has_government = fascism }
-				is_in_faction_with = FRA
-				
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #den is no threat
-				DEN = { has_capitulated = yes }
-				DEN = { exists = no }
-				DEN = { is_subject = yes }
-				DEN = { has_government = fascism }
-				is_in_faction_with = DEN
-				
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #yug is no threat
-				YUG = { has_capitulated = yes }
-				YUG = { exists = no }
-				YUG = { is_subject = yes }
-				YUG = { has_government = fascism }
-				is_in_faction_with = YUG
-				
-				NOT = { any_home_area_neighbor_country = { has_war_with = ROOT } }
-			}
-			
-			OR = { #is not at war with or invading sov
+
+			# is not invading sov
+			OR = { 
 				NOT = { 
-					GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 }
 					has_war_with = SOV
 				}
-				
-				AND = { #or sov is not a threat
-					OR = { 
-						GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
-						has_war_with = SOV
-					}
-					
-					OR = {
-						SOV = { has_capitulated = yes }
-						SOV = { exists = no }
-						SOV = { is_subject = yes }
-						SOV = { has_government = fascism }
-						is_in_faction_with = SOV
-					}
-				}
+				SOV = { NOT = { EAI_THIS_is_threat_to_PREV = yes } }
 			}
 		}
 		ai_will_do = {

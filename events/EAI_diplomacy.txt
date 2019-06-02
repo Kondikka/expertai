@@ -14,7 +14,7 @@ country_event = {
 	immediate = {
 		if = { limit = { is_historical_focus_on = yes }
 		
-			every_country = { limit = { tag = USA is_ai = yes } add_ideas = EAI_neutrality_idea_USA }
+			USA = { if = { limit = { is_ai = yes } add_ideas = EAI_neutrality_idea_USA } }
 			
 			set_global_flag = EAI_neutral_spr
 		}
@@ -48,9 +48,9 @@ country_event = {
 		SOV = { has_war = no }
 	}
 	immediate = {
-		SOV = {
-			set_country_flag = { flag = EAI_declare_war_FIN value = 1 days = 180 }
-			set_country_flag = { flag = EAI_prepare_for_war_FIN value = 1 days = 180 }
+		FIN = {
+			set_country_flag = { flag = EAI_declare_war_from_SOV value = 1 days = 180 }
+			set_country_flag = { flag = EAI_prepare_for_war_from_SOV value = 1 days = 180 }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: winter war" } 
@@ -158,9 +158,10 @@ country_event = {
 
 		# controls western europe
 		NOT = {
-			any_state = {
-				OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 27 state = 161 state = 162 }
-				controller = { has_war_with = GER }
+			any_enemy_country = {
+				any_of_scopes = { array = controlled_states
+					OR = { region = 19 region = 20 region = 5 region = 6 region = 21 region = 24 region = 27 state = 161 state = 162 }
+				}
 			}
 		}
 	}
@@ -214,12 +215,11 @@ country_event = {
 			country_event = { id = EAI_DM.7 days = 30 }
 		}
 
-		set_country_flag = { flag = EAI_prepare_for_war_GER value = 1 days = 35 }
+		GER = { set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 } }
 
-		every_country = {
-			limit = { OR = { is_in_faction_with = GER has_guaranteed = GER } is_neighbor_of = ROOT }
+		every_country = { limit = { OR = { is_in_faction_with = GER has_guaranteed = GER } is_neighbor_of = ROOT }
 
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 35 } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: wardec GER" } 
@@ -363,7 +363,7 @@ country_event = {
 			factor = 0.1
 			OR = {
 				has_war = yes
-				any_state = {
+				any_of_scopes = { array = ENG.owned_states
 					OR = { region = 1 region = 2 region = 3 }
 					NOT = { is_controlled_by = ENG }
 				}
@@ -391,7 +391,7 @@ country_event = {
 
 			date > 1942.1.1
 
-			any_state = {
+			any_of_scopes = { array = ENG.owned_states
 				OR = { region = 1 region = 2 region = 3 }
 				NOT = { is_controlled_by = ENG }
 			}
@@ -422,11 +422,9 @@ country_event = {
 						has_government = democratic 
 						surrender_progress > 0.1
 					}
-					any_state = {
-						OR = { 
-							region = 1 region = 2 region = 3 
-						}
-						CONTROLLER = { is_in_faction_with = GER }
+					any_of_scopes = { array = ENG.owned_states
+						OR = { region = 1 region = 2 region = 3 }
+						CONTROLLER = { has_war_with = ENG }
 					}
 				}
 			}
@@ -464,9 +462,9 @@ country_event = {
 					has_government = democratic 
 					surrender_progress > 0.1
 				}
-				any_state = {
+				any_of_scopes = { array = ENG.owned_states
 					OR = { region = 1 region = 2 region = 3 }
-					CONTROLLER = { is_in_faction_with = GER }
+					CONTROLLER = { has_war_with = ENG }
 				}
 			}
 		}
@@ -494,9 +492,10 @@ country_event = {
 		has_completed_focus = uk_iraq_focus
 		NOT = {
 			has_war_with = IRQ
-			any_state = {
-				region = 28
-				CONTROLLER = { has_war_with = ROOT }
+			any_enemy_country = {
+				any_of_scopes = { array = controlled_states
+					region = 28
+				}
 			}
 		}
 		has_army_manpower = { size > 700000 }
@@ -699,13 +698,15 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	immediate = {
-		every_country = {
-			limit = { is_in_faction_with = GER is_neighbor_of = SOV is_ai = yes }
+		for_each_scope_loop = { array = GER.allies
+			
+			if = { limit = { is_neighbor_of = SOV is_ai = yes }
 
-			add_to_war = {
-				targeted_alliance = GER
-				enemy = SOV
-				hostility_reason = asked_to_join
+				add_to_war = {
+					targeted_alliance = GER
+					enemy = SOV
+					hostility_reason = asked_to_join
+				}
 			}
 		}
 	}
@@ -734,11 +735,12 @@ country_event = {
 		
 		FRA = { has_capitulated = yes }
 		
-		any_state = { # GER doesnt control historical states
+		any_of_scopes = { array = FRA.owned_states # GER doesnt control historical states
+
 			OR = { region = 19 region = 20 region = 5 }
 			NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
 			
-			controller = { 
+			CONTROLLER = { 
 				NOT = { tag = GER }
 				is_in_faction_with = GER 
 				is_ai = yes 
@@ -748,20 +750,24 @@ country_event = {
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				OR = { region = 19 region = 20 region = 5 }
-				NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-				
-				controller = { 
-					NOT = { tag = GER }
-					is_in_faction_with = GER 
-					is_ai = yes 
-					has_full_control_of_state = PREV 
-					NOT = { PREV = { is_owned_by = PREV } }
+		for_each_scope_loop = { array = FRA.owned_states
+			
+			if = {
+				limit = {
+					OR = { region = 19 region = 20 region = 5 }
+					NOT = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
+					
+					CONTROLLER = { 
+						NOT = { tag = GER }
+						is_in_faction_with = GER 
+						is_ai = yes 
+						has_full_control_of_state = PREV 
+						NOT = { PREV = { is_owned_by = PREV } }
+					}
 				}
+
+				ROOT = { set_state_controller = PREV }
 			}
-			ROOT = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: partition FRA" } 
@@ -783,34 +789,39 @@ country_event = {
 		
 		has_war_with = YUG
 
-		any_state = {
+		any_of_scopes = { array = YUG.owned_states
+
 			OR = { state = 102 state = 731 region = 24 }
 			NOT = { state = 103 state = 163 state = 44 }
 			
-			controller = {
+			CONTROLLER = {
+				is_ai = yes
 				NOT = { tag = GER owns_state = PREV } 
 				is_in_faction_with = GER 
-				is_ai = yes
 				has_full_control_of_state = PREV
 				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
 			}
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				OR = { state = 102 state = 731 region = 24 }
-				NOT = { state = 103 state = 163 state = 44 }
-				
-				controller = {
-					NOT = { tag = GER owns_state = PREV } 
-					is_in_faction_with = GER 
-					is_ai = yes 
-					has_full_control_of_state = PREV
-					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+		for_each_scope_loop = { array = YUG.owned_states
+
+			if = {
+				limit = {
+					OR = { state = 102 state = 731 region = 24 }
+					NOT = { state = 103 state = 163 state = 44 }
+					
+					CONTROLLER = {
+						is_ai = yes
+						NOT = { tag = GER owns_state = PREV } 
+						is_in_faction_with = GER 
+						has_full_control_of_state = PREV
+						PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+					}
 				}
+				
+				ROOT = { set_state_controller = PREV }
 			}
-			ROOT = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: YUG invasion fix" } 
@@ -834,32 +845,33 @@ country_event = {
 		
 		GRE = { has_capitulated = yes }
 		
-		any_state = {
-			is_core_of = GRE
-			
-			controller = { 
+		any_of_scopes = { array = GRE.owned_states
+
+			CONTROLLER = { 
+				is_ai = yes 
 				NOT = { tag = ROOT } 
 				has_full_control_of_state = PREV 
 				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
-				is_ai = yes 
 				is_in_faction_with = ITA
 			}
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = { 
-				is_core_of = GRE
+		for_each_scope_loop = { array = GRE.owned_states
 			
-				controller = { 
-					NOT = { tag = ROOT } 
-					has_full_control_of_state = PREV 
-					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
-					is_ai = yes 
-					is_in_faction_with = ITA
+			if = {
+				limit = { 
+					CONTROLLER = { 
+						is_ai = yes 
+						NOT = { tag = ROOT } 
+						has_full_control_of_state = PREV 
+						PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+						is_in_faction_with = ITA
+					}
 				}
+				
+				ROOT = { set_state_controller = PREV }
 			}
-			ROOT = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: GRE invasion fix" } 
@@ -882,38 +894,42 @@ country_event = {
 		has_war_with = NOR 
 		
 		NOR = { has_capitulated = yes }
-		
-		any_state = {
+
+		any_of_scopes = { array = NOR.owned_states
+
 			OR = { state = 142 state = 110 state = 143 state = 144 }
-			
-			controller = {
-				has_full_control_of_state = PREV 
-				NOT = { tag = ROOT } 
+			CONTROLLER = {
+				is_ai = yes
+				NOT = { tag = GER } 
 				is_in_faction_with = GER 
-				is_ai = yes 
+				has_full_control_of_state = PREV
 			}
 		}
 
-		NOT = { # all combat has ceased
-			any_state = {
+		NOT = {
+			any_of_scopes = { array = NOR.owned_states
+
 				OR = { state = 142 state = 110 state = 143 state = 144 }
-				controller = { has_war_with = GER }
+				CONTROLLER = { has_war_with = GER }
 			}
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				OR = { state = 142 state = 110 state = 143 state = 144 }
-			
-				controller = {
-					has_full_control_of_state = PREV 
-					NOT = { tag = ROOT } 
-					is_in_faction_with = GER 
-					is_ai = yes 
+		for_each_scope_loop = { array = NOR.owned_states
+
+			if = {
+				limit = {
+					OR = { state = 142 state = 110 state = 143 state = 144 }
+					CONTROLLER = {
+						is_ai = yes
+						NOT = { tag = GER } 
+						is_in_faction_with = GER 
+						has_full_control_of_state = PREV
+					}
 				}
+				
+				ROOT = { set_state_controller = PREV }
 			}
-			ROOT = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: NOR invasion fix" } 
@@ -941,30 +957,33 @@ country_event = {
 		
 		FRA = { has_capitulated = yes }
 		
-		any_state = {
+		any_of_scopes = { array = FRA.owned_states
+
 			OR = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
-			
-			controller = { 
-				has_full_control_of_state = PREV 
-				NOT = { tag = ROOT } 
-				is_in_faction_with = GER 
+			CONTROLLER = {
 				is_ai = yes
+				NOT = { tag = GER } 
+				is_in_faction_with = GER 
+				has_full_control_of_state = PREV
 			}
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				OR = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
+		for_each_scope_loop = { array = FRA.owned_states
 			
-				controller = { 
-					has_full_control_of_state = PREV 
-					NOT = { tag = ROOT } 
-					is_in_faction_with = GER 
-					is_ai = yes
+			if = {
+				limit = {
+					OR = { state = 31 state = 22 state = 25 state = 33 state = 26 state = 20 state = 21 state = 735 state = 32 }
+					CONTROLLER = {
+						is_ai = yes
+						NOT = { tag = GER } 
+						is_in_faction_with = GER 
+						has_full_control_of_state = PREV
+					}
 				}
+
+				ROOT = { set_state_controller = PREV }
 			}
-			ROOT = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: partition FRA" } 
@@ -990,12 +1009,11 @@ country_event = {
 		
 		has_war_with = SOV
 		
-		any_state = {
-			is_core_of = SOV
-			
+		any_of_scopes = { array = SOV.owned_states
+
 			any_neighbor_state = { is_controlled_by = GER }
 			
-			controller = { 
+			CONTROLLER = { 
 				NOT = { tag = ROOT } 
 				has_full_control_of_state = PREV 
 				PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
@@ -1005,22 +1023,23 @@ country_event = {
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				is_core_of = SOV
+		for_each_scope_loop = { array = SOV.owned_states
 			
-				any_neighbor_state = { is_controlled_by = GER }
+			if = {
+				limit = {
+					any_neighbor_state = { is_controlled_by = GER }
 				
-				controller = { 
-					NOT = { tag = ROOT } 
-					has_full_control_of_state = PREV 
-					PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
-					is_ai = yes 
-					is_in_faction_with = GER
+					CONTROLLER = { 
+						NOT = { tag = ROOT } 
+						has_full_control_of_state = PREV 
+						PREV = { NOT = { is_core_of = PREV is_claimed_by = PREV } } 
+						is_ai = yes 
+						is_in_faction_with = GER
+					}
 				}
+				
+				GER = { set_state_controller = PREV }
 			}
-			
-			GER = { set_state_controller = PREV }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: east front state priority" } 
@@ -1042,19 +1061,23 @@ country_event = {
 		
 		is_puppet_of = ENG
 		
-		any_state = {
+		any_of_scopes = { array = controlled_states
+
 			is_fully_controlled_by = ROOT
 			NOT = { is_owned_by = ROOT }
 		}
 	}
 	immediate = {
-		every_state = {
-			limit = {
-				is_fully_controlled_by = ROOT
-				NOT = { is_owned_by = ROOT }
+		for_each_scope_loop = { array = controlled_states
+		
+			if = {
+				limit = {
+					is_fully_controlled_by = ROOT
+					NOT = { is_owned_by = ROOT }
+				}
+				
+				ENG = { set_state_controller = PREV }
 			}
-			
-			ENG = { set_state_controller = PREV }
 		}
 	}
 	option = {}

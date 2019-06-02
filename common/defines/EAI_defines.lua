@@ -14,10 +14,6 @@ NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
 
 
 
-NDefines.NMilitary.FIELD_MARSHAL_ARMIES_CAP = 15
-
-
-
 -- NDefines.NNavy.BASE_CONVOY_SPOTTING_SPEED = 0.0								-- daily base spotting speed against convoys
 -- NDefines.NNavy.BASE_UNIT_TRANSFER_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit trans
 -- NDefines.NNavy.BASE_NAVAL_INVASION_SPOTTING_SPEED = 0.0						-- daily base spotting speed against unit transfers

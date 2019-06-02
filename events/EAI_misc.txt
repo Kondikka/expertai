@@ -22,10 +22,6 @@ country_event = {
 			set_country_flag = { flag = EAI_delay value = 1 days = 20 } 
 		}
 
-		### use stored xp for doctrine boosts
-
-		EAI_doctrine_xp_boost = yes
-
 		### check the need to upgrade laws
 
 		EAI_upgrade_economy_law = yes
@@ -68,11 +64,11 @@ country_event = {
 
 		### set targets for these actions
 		
-		EAI_naval_invasion_check = yes 
+		EAI_update_naval_invasion_target = yes 
 		
-		EAI_lend_lease_check = yes
+		EAI_update_lend_lease_targets = yes
 		
-		EAI_volunteer_expeditionary_check = yes
+		EAI_update_volunteer_targets = yes
 
 		### check division limits
 
@@ -162,28 +158,6 @@ country_event = {
 		}
 		else = { clr_country_flag = EAI_naval_doctrine_progress_limit }
 
-		### prioritise ship hull techs
-
-		if = { limit = { EAI_prioritise_ship_hulls = yes } 
-
-			if = { limit = { NOT = { has_country_flag = EAI_prioritise_ship_hulls } } 
-			
-				set_country_flag = EAI_prioritise_ship_hulls
-			}
-		}
-		else = { clr_country_flag = EAI_prioritise_ship_hulls }
-
-		### prioritise aircraft techs
-
-		if = { limit = { EAI_prioritise_aircraft = yes } 
-
-			if = { limit = { NOT = { has_country_flag = EAI_prioritise_aircraft } } 
-			
-				set_country_flag = EAI_prioritise_aircraft
-			}
-		}
-		else = { clr_country_flag = EAI_prioritise_aircraft }
-
 		### mine sweepers needed
 
 		if = {
@@ -243,6 +217,67 @@ country_event = {
 		###
 
 		EAI_priority_constructions = yes
+	}
+
+	option = {}
+}
+
+# Low priority scripts
+country_event = { 
+	id = EAI_background.11
+	hidden = yes
+	mean_time_to_happen = { days = 2 }
+
+	trigger = { 
+		is_ai = yes 
+		NOT = { has_country_flag = EAI_low_priority_delay }
+	}
+
+	immediate = {
+
+		set_country_flag = { flag = EAI_low_priority_delay value = 1 days = 80 }
+
+		### antiair infantry design
+
+		if = { limit = { EAI_anti_air_design_focus = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_anti_air_design_focus } } 
+			
+				set_country_flag = EAI_anti_air_design_focus
+				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | antiair infantry design" } 
+			}
+		}
+		else_if = { limit = { EAI_cancel_anti_air_design_focus = yes }
+		
+			clr_country_flag = EAI_anti_air_design_focus
+			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CANCEL antiair infantry design" } 
+		}
+
+		### use stored xp for doctrine boosts
+
+		EAI_doctrine_xp_boost = yes
+
+		### prioritise ship hull techs
+
+		if = { limit = { EAI_prioritise_ship_hulls = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_prioritise_ship_hulls } } 
+			
+				set_country_flag = EAI_prioritise_ship_hulls
+			}
+		}
+		else = { clr_country_flag = EAI_prioritise_ship_hulls }
+
+		### prioritise aircraft techs
+
+		if = { limit = { EAI_prioritise_aircraft = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_prioritise_aircraft } } 
+			
+				set_country_flag = EAI_prioritise_aircraft
+			}
+		}
+		else = { clr_country_flag = EAI_prioritise_aircraft }
 	}
 
 	option = {}
@@ -343,25 +378,6 @@ country_event = {
 	immediate = {
 		set_country_flag = EAI_capital_saved
 		capital_scope = { set_state_flag = EAI_original_capital_@ROOT }
-	}
-	option = {}
-}
-
-country_event = { # temp fix 
-	id = EAI_background.6
-	hidden = yes
-	fire_only_once = yes
-	trigger = { check_variable = { global.EAI_version < 4.33 } }
-	immediate = {
-		every_country = {
-			every_other_country = {
-				clr_country_flag = EAI_block_trade_to_@PREV
-
-				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_1 } 
-				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_2 } 
-				remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_3 } 
-			}
-		}
 	}
 	option = {}
 }
@@ -585,88 +601,6 @@ country_event = { # prints statistics on divisions counts
 
 	option = { name = 1
 
-	}
-}
-
-country_event = {
-	id = EAI_debug.31
-	hidden = yes
-	is_triggered_only = yes
-
-	immediate = {
-
-		### create an array of countries with weak garrisons against this country
-
-		every_country = { limit = { is_neighbor_of = ROOT NOT = { is_in_faction_with = ROOT is_subject_of = ROOT } }
-
-			ROOT = {
-				set_variable = { EAI_border_states_@PREV = 0 }
-				set_variable = { EAI_border_states_with_strong_garrison_@PREV = 0 }
-				set_variable = { EAI_border_country = Prev.id }
-			}
-
-			every_state = {
-				limit = { 
-					CONTROLLER = { OR = { original_tag = var:Root.EAI_border_country is_subject_of = var:Root.EAI_border_country is_in_faction_with = var:Root.EAI_border_country } }
-					any_neighbor_state = { CONTROLLER = { OR = { original_tag = ROOT is_subject_of = ROOT is_in_faction_with = ROOT } } }
-				}
-
-				var:Root.EAI_border_country = { 
-					add_to_variable = { Root.EAI_border_states_@THIS = 1 } 
-
-					if = { limit = { any_country = { divisions_in_state = { state = PREV size > 2 } } } 
-				
-						add_to_variable = { Root.EAI_border_states_with_strong_garrison_@THIS = 1 }
-					}
-				}
-			}
-
-			var:Root.EAI_border_country = { 
-				divide_variable = { Root.EAI_border_states_with_strong_garrison_@THIS = Root.EAI_border_states_@THIS } 
-
-				if = { limit = { check_variable = { Root.EAI_border_states_with_strong_garrison_@THIS < 0.5 } }
-
-					ROOT = { add_to_temp_array = { EAI_countries_with_weak_border = PREV.id } }
-				}
-			}
-		}
-
-		### choose a random country from array
-
-		for_each_loop = { array = EAI_countries_with_weak_border
-
-			add_to_temp_variable = { len = 1 }
-		}
-
-		set_temp_variable = { rand = random }
-		set_temp_variable = { count = 1 }
-
-		for_each_loop = { array = EAI_countries_with_weak_border
-
-			set_temp_variable = { temp = count }
-			divide_temp_variable = { temp = len }
-
-			if = { limit = { check_variable = { var = temp value = rand compare = greater_than_or_equals } } 
-
-				# effects
-
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { count = 1 }
-		}
-	}
-
-	option = { name = 1
-		ai_chance = {
-			factor = 50
-		}
-	}
-
-	option = { name = 2
-		ai_chance = {
-			factor = 100
-		}
 	}
 }
 

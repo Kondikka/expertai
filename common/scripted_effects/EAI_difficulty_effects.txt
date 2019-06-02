@@ -3,10 +3,170 @@
 ############################################################################################################
 
 ######################################################
-#	division spawning difficulty mode
+#	reinforcements mode
 ######################################################
 
+EAI_dd_get_templates = {
+
+	### inf
+
+	set_temp_variable = { t1 = 1 }
+
+	while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+		if = {
+			limit = {
+				meta_trigger = {
+					text = { has_template = "Infantry template [x]" }
+					x = "[?t1]"
+				}
+			}
+
+			set_temp_variable = { EAI_dd_inf_template = t1 }
+			add_to_temp_variable = { t1 = 1 }
+		}
+		else = { set_temp_variable = { break = 1 } }
+	}
+	
+	### mot
+
+	set_temp_variable = { t1 = 1 }
+
+	while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+		if = {
+			limit = {
+				meta_trigger = {
+					text = { has_template = "Motorized Infantry template [x]" }
+					x = "[?t1]"
+				}
+			}
+
+			set_temp_variable = { EAI_dd_mot_template = t1 }
+			add_to_temp_variable = { t1 = 1 }
+		}
+		else = { set_temp_variable = { break = 1 } }
+	}
+
+	### arm
+
+	if = { 
+		limit = { 
+			ROOT = { 
+				NOT = { has_country_flag = EAI_mod_template_upgrade }
+				OR = { 
+					check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } 
+					AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } } } 
+				}
+			} 
+		}
+
+		set_temp_variable = { t1 = 1 }
+
+		while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = { has_template = "Medium Tank template [x]" }
+						x = "[?t1]"
+					}
+				}
+
+				set_temp_variable = { EAI_dd_arm_template = t1 }
+				add_to_temp_variable = { t1 = 1 }
+			}
+			else = { set_temp_variable = { break = 1 } }
+		}
+	}
+	else_if = { 
+		limit = { 
+			ROOT = { 
+				NOT = { has_country_flag = EAI_mod_template_upgrade }
+				OR = { 
+					check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } 
+					AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } } } 
+				}
+			} 
+		}
+
+		set_temp_variable = { t1 = 1 }
+
+		while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = { has_template = "Heavy Tank template [x]" }
+						x = "[?t1]"
+					}
+				}
+
+				set_temp_variable = { EAI_dd_arm_template = t1 }
+				add_to_temp_variable = { t1 = 1 }
+			}
+			else = { set_temp_variable = { break = 1 } }
+		}
+	}
+	else_if = { 
+		limit = { 
+			ROOT = { 
+				has_country_flag = EAI_mod_template_upgrade
+				OR = { 
+					check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } 
+					check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } 
+				}
+			} 
+		}
+
+		set_temp_variable = { t1 = 1 }
+
+		while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = { has_template = "Modern Tank template [x]" }
+						x = "[?t1]"
+					}
+				}
+
+				set_temp_variable = { EAI_dd_arm_template = t1 }
+				add_to_temp_variable = { t1 = 1 }
+			}
+			else = { set_temp_variable = { break = 1 } }
+		}
+	}
+	else_if = { 
+		limit = { 
+			ROOT = { 
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
+				NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+			} 
+		}
+
+		set_temp_variable = { t1 = 1 }
+
+		while_loop_effect = { limit = { check_variable = { t1 < 50 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = { has_template = "Light Tank template [x]" }
+						x = "[?t1]"
+					}
+				}
+
+				set_temp_variable = { EAI_dd_arm_template = t1 }
+				add_to_temp_variable = { t1 = 1 }
+			}
+			else = { set_temp_variable = { break = 1 } }
+		}
+	}
+}
+
 EAI_dd_spawn_unit = {
+
 	ROOT = { add_to_variable = { var = EAI_dd_unit_count value = 1 } }
 	ROOT = { add_to_variable = { var = global.EAI_global_dd_unit_count value = 1 } }
 	
@@ -18,799 +178,76 @@ EAI_dd_spawn_unit = {
 }
 
 EAI_dd_spawn_inf = {
-	if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: inf" } 
 
-	if = { limit = { has_manpower > 9000 }
+	if = { limit = { check_variable = { EAI_dd_inf_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		add_manpower = -9000
+		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: inf" } 
 
-		if = { limit = { ROOT = { has_template = "Infantry template 20" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 20\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 20\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 20\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 20\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 20\" start_experience_factor = 1.00" owner = ROOT } }
-			}
+		ROOT = { add_manpower = -9000 }
+		
+		meta_effect = {
+			text = { create_unit = { division = "division_template = \"Infantry template [x]\" start_experience_factor = [y]" owner = ROOT } }
+			x = "[?EAI_dd_inf_template]"
+			y = "[?random|.2]"
 		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 19" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 19\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 19\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 19\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 19\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 19\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 18" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 18\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 18\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 18\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 18\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 18\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 17" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 17\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 17\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 17\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 17\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 17\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 16" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 16\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 16\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 16\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 16\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 16\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 15" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 15\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 15\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 15\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 15\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 15\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 14" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 14\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 14\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 14\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 14\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 14\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 13" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 13\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 13\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 13\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 13\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 13\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 12" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 12\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 12\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 12\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 12\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 12\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 11" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 11\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 11\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 11\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 11\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 11\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 10" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 10\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 10\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 10\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 10\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 10\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 9" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 9\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 9\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 9\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 9\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 9\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 8" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 8\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 8\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 8\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 8\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 8\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 7" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 7\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 7\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 7\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 7\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 7\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 6" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 6\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 6\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 6\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 6\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 6\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 5" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 5\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 5\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 5\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 5\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 5\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 4" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 4\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 4\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 4\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 4\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 4\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 3" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 3\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 3\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 3\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 3\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 3\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 2" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 2\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 2\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 2\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 2\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 2\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = { limit = { ROOT = { has_template = "Infantry template 1" } }
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry template 1\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry template 1\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry template 1\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry template 1\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry template 1\" start_experience_factor = 1.00" owner = ROOT } }
-			}
-		}
-		else_if = {
-			if = { limit = { ROOT = { NOT = { has_template = "Infantry reinforement" } } }
-				ROOT = {
-					division_template = {
-						name = "Infantry reinforement"
+	}
+	else_if = { limit = { ROOT = { has_manpower > 9000 } }
+		
+		if = { limit = { ROOT = { NOT = { has_template = "Infantry reinforement" } } }
+		
+			ROOT = {
+				division_template = {
+					name = "Infantry reinforement"
 
-						regiments = {
-							infantry = { x = 0 y = 0 }
-							infantry = { x = 0 y = 1 }
-							infantry = { x = 0 y = 2 }
+					regiments = {
+						infantry = { x = 0 y = 0 }
+						infantry = { x = 0 y = 1 }
+						infantry = { x = 0 y = 2 }
 
-							infantry = { x = 1 y = 0 }
-							infantry = { x = 1 y = 1 }
-							infantry = { x = 1 y = 2 }
+						infantry = { x = 1 y = 0 }
+						infantry = { x = 1 y = 1 }
+						infantry = { x = 1 y = 2 }
 
-							infantry = { x = 2 y = 0 }
-							infantry = { x = 2 y = 1 }
-							infantry = { x = 2 y = 2 }
-						}
+						infantry = { x = 2 y = 0 }
+						infantry = { x = 2 y = 1 }
+						infantry = { x = 2 y = 2 }
 					}
 				}
 			}
-			random_list = { 
-				5 = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = 0.00" owner = ROOT } }
-				4 = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = 0.25" owner = ROOT } }
-				3 = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = 0.50" owner = ROOT } }
-				2 = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = 0.75" owner = ROOT } }
-				1 = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = 1.00" owner = ROOT } }
-			}
+		}
+
+		meta_effect = {
+			text = { create_unit = { division = "division_template = \"Infantry reinforement\" start_experience_factor = [y]" owner = ROOT } }
+			y = "[?random|.2]"
 		}
 	}
 }
 
 EAI_dd_spawn_mot = {
-	if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: mot" } 
 
-	if = { limit = { has_manpower > 9000 }
+	if = { limit = { check_variable = { EAI_dd_mot_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		add_manpower = -9000
-	
-		if = { limit = { ROOT = { NOT = { has_template = "Mechanized Infantry template 1" has_template = "Mechanized Rocket Artillery template 1" } } }
+		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: mot" } 
 
-			if = { limit = { ROOT = { has_template = "Motorized Infantry template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Infantry template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Infantry template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Infantry template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Infantry template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Infantry template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Infantry template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_inf = yes }
-			}
-		}
-
-		if = { limit = { ROOT = { has_template = "Mechanized Infantry template 1" NOT = { has_template = "Motorized Rocket Artillery template 1" } } }
-
-			if = { limit = { ROOT = { has_template = "Mechanized Infantry template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Mechanized Infantry template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Mechanized Infantry template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Mechanized Infantry template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Mechanized Infantry template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Mechanized Infantry template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Mechanized Infantry template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_inf = yes }
-			}
-		}
-
-		if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 1" } }
-
-			if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Motorized Rocket Artillery template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Motorized Rocket Artillery template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_inf = yes }
-			}
+		ROOT = { add_manpower = -9000 }
+		
+		meta_effect = {
+			text = { create_unit = { division = "division_template = \"Motorized Infantry template [x]\" start_experience_factor = [y]" owner = ROOT } }
+			x = "[?EAI_dd_mot_template]"
+			y = "[?random|.2]"
 		}
 	}
+	else = { EAI_dd_spawn_inf = yes }
 }
 
 EAI_dd_spawn_arm = {
-	if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: arm" } 
 
-	if = { limit = { has_manpower > 9000 }
+	if = { limit = { check_variable = { EAI_dd_arm_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		add_manpower = -9000
-	
+		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: arm" } 
+
+		ROOT = { add_manpower = -9000 }
+
 		if = { 
 			limit = { 
 				ROOT = { 
@@ -822,191 +259,13 @@ EAI_dd_spawn_arm = {
 				} 
 			}
 
-			if = { limit = { ROOT = { has_template = "Medium Tank template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Medium Tank template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Medium Tank template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Medium Tank template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Medium Tank template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Medium Tank template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Medium Tank template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_mot = yes }
+			meta_effect = {
+				text = { create_unit = { division = "division_template = \"Medium Tank template [x]\" start_experience_factor = [y]" owner = ROOT } }
+				x = "[?EAI_dd_arm_template]"
+				y = "[?random|.2]"
 			}
 		}
-
-		if = { 
+		else_if = { 
 			limit = { 
 				ROOT = { 
 					NOT = { has_country_flag = EAI_mod_template_upgrade }
@@ -1017,191 +276,13 @@ EAI_dd_spawn_arm = {
 				} 
 			}
 
-			if = { limit = { ROOT = { has_template = "Heavy Tank template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Heavy Tank template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Heavy Tank template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Heavy Tank template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Heavy Tank template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Heavy Tank template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Heavy Tank template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_mot = yes }
+			meta_effect = {
+				text = { create_unit = { division = "division_template = \"Heavy Tank template [x]\" start_experience_factor = [y]" owner = ROOT } }
+				x = "[?EAI_dd_arm_template]"
+				y = "[?random|.2]"
 			}
 		}
-
-		if = { 
+		else_if = { 
 			limit = { 
 				ROOT = { 
 					has_country_flag = EAI_mod_template_upgrade
@@ -1212,191 +293,13 @@ EAI_dd_spawn_arm = {
 				} 
 			}
 
-			if = { limit = { ROOT = { has_template = "Modern Tank template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Modern Tank template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Modern Tank template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Modern Tank template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Modern Tank template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Modern Tank template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Modern Tank template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_mot = yes }
+			meta_effect = {
+				text = { create_unit = { division = "division_template = \"Modern Tank template [x]\" start_experience_factor = [y]" owner = ROOT } }
+				x = "[?EAI_dd_arm_template]"
+				y = "[?random|.2]"
 			}
 		}
-
-		if = { 
+		else_if = { 
 			limit = { 
 				ROOT = { 
 					check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
@@ -1404,194 +307,18 @@ EAI_dd_spawn_arm = {
 				} 
 			}
 
-			if = { limit = { ROOT = { has_template = "Light Tank template 20" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 20\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 20\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 20\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 20\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 20\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 19" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 19\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 19\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 19\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 19\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 19\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 18" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 18\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 18\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 18\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 18\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 18\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 17" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 17\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 17\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 17\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 17\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 17\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 16" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 16\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 16\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 16\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 16\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 16\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 15" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 15\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 15\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 15\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 15\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 15\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 14" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 14\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 14\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 14\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 14\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 14\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 13" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 13\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 13\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 13\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 13\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 13\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 12" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 12\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 12\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 12\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 12\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 12\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 11" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 11\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 11\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 11\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 11\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 11\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 10" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 10\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 10\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 10\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 10\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 10\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 9" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 9\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 9\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 9\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 9\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 9\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 8" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 8\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 8\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 8\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 8\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 8\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 7" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 7\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 7\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 7\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 7\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 7\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 6" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 6\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 6\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 6\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 6\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 6\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 5" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 5\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 5\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 5\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 5\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 5\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 4" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 4\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 4\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 4\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 4\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 4\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 3" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 3\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 3\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 3\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 3\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 3\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 2" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 2\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 2\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 2\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 2\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 2\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-			}
-			else_if = { limit = { ROOT = { has_template = "Light Tank template 1" } }
-				random_list = { 
-					5 = { create_unit = { division = "division_template = \"Light Tank template 1\" start_experience_factor = 0.00" owner = ROOT } }
-					4 = { create_unit = { division = "division_template = \"Light Tank template 1\" start_experience_factor = 0.25" owner = ROOT } }
-					3 = { create_unit = { division = "division_template = \"Light Tank template 1\" start_experience_factor = 0.50" owner = ROOT } }
-					2 = { create_unit = { division = "division_template = \"Light Tank template 1\" start_experience_factor = 0.75" owner = ROOT } }
-					1 = { create_unit = { division = "division_template = \"Light Tank template 1\" start_experience_factor = 1.00" owner = ROOT } }
-				}
-
-				else = { EAI_dd_spawn_mot = yes }
+			meta_effect = {
+				text = { create_unit = { division = "division_template = \"Light Tank template [x]\" start_experience_factor = [y]" owner = ROOT } }
+				x = "[?EAI_dd_arm_template]"
+				y = "[?random|.2]"
 			}
 		}
 	}
+	else = { EAI_dd_spawn_mot = yes }
 }
 
 ######################################################
-#	misc
+#	custom bonus
 ######################################################
 
 EAI_custom_bonus_shift_click = { 
@@ -1685,6 +412,37 @@ EAI_custom_bonus_right_click = {
 	}
 }
 
+### country variable localization issue fix
+
+EAI_get_custom_bonus_settings = {
+	set_temp_variable = { settings = 26 }
+	while_loop_effect = { limit = { check_variable = { settings > 0 } }
+		meta_effect = {
+			text = { var:EAI_configuration_target = { set_variable = { Root.EAI_custom_bonus_[x] = This.EAI_custom_bonus_[x] } } }
+			x = "[?settings]"
+		}
+		subtract_from_temp_variable = { settings = 1 }
+	}
+}
+EAI_set_custom_bonus_settings = {
+	set_temp_variable = { settings = 26 }
+	while_loop_effect = { limit = { check_variable = { settings > 0 } }
+		meta_effect = {
+			text = { 
+				var:EAI_configuration_target = { set_variable = { This.EAI_custom_bonus_[x] = Root.EAI_custom_bonus_[x] } } 
+				ROOT = { clear_variable = EAI_custom_bonus_[x] }
+			}
+			x = "[?settings]"
+		}
+		subtract_from_temp_variable = { settings = 1 }
+	}
+	var:EAI_configuration_target = { force_update_dynamic_modifier = yes }
+}
+
+######################################################
+#	misc
+######################################################
+
 # two equipment cost reduction ideas cant be allowed to be active at the same time so the highest is used
 EAI_fix_production_boost = { 
 	if = { 
@@ -1744,32 +502,9 @@ EAI_fix_production_boost = {
 	}
 }
 
-### country variable localization issue fix
-
-EAI_get_custom_bonus_settings = {
-	set_temp_variable = { settings = 26 }
-	while_loop_effect = { limit = { check_variable = { settings > 0 } }
-		meta_effect = {
-			text = { var:EAI_configuration_target = { set_variable = { Root.EAI_custom_bonus_[x] = This.EAI_custom_bonus_[x] } } }
-			x = "[?settings]"
-		}
-		subtract_from_temp_variable = { settings = 1 }
-	}
-}
-EAI_set_custom_bonus_settings = {
-	set_temp_variable = { settings = 26 }
-	while_loop_effect = { limit = { check_variable = { settings > 0 } }
-		meta_effect = {
-			text = { 
-				var:EAI_configuration_target = { set_variable = { This.EAI_custom_bonus_[x] = Root.EAI_custom_bonus_[x] } } 
-				ROOT = { clear_variable = EAI_custom_bonus_[x] }
-			}
-			x = "[?settings]"
-		}
-		subtract_from_temp_variable = { settings = 1 }
-	}
-	var:EAI_configuration_target = { force_update_dynamic_modifier = yes }
-}
+######################################################
+#	difficulty bonus
+######################################################
 
 ### difficulty bonus presets
 
@@ -2035,9 +770,7 @@ EAI_set_insane_difficulty_modifiers = {
 	force_update_dynamic_modifier = yes
 }
 
-######################################################
-#	difficulty bonus
-######################################################
+###
 
 EAI_clear_difficulty_bonus = {
 	clr_country_flag = EAI_country_bonus_active

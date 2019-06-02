@@ -3,6 +3,7 @@
 ############################################################################################################
 
 EAI_check_division_limits = {
+	
 	EAI_calculate_division_cap = yes
 
 	# infantry
@@ -112,25 +113,27 @@ EAI_calculate_division_cap = {
 	set_temp_variable = { EAI_core_states_slots = 0 }
 	set_temp_variable = { EAI_noncore_states_slots = 0 }
 
-	# building slot score from core states
-	every_state = { limit = { is_owned_by = PREV is_controlled_by = PREV }
+	for_each_scope_loop = { array = controlled_states 
 
-		add_to_temp_variable = { Prev.EAI_core_states_slots = modifier@local_building_slots }
+		if = { limit = { NOT = { is_owned_by = PREV } }
+
+			add_to_temp_variable = { EAI_noncore_states_slots = modifier@local_building_slots }
+		}
+		else = { add_to_temp_variable = { EAI_core_states_slots = modifier@local_building_slots } }
 	}
+
+	# building slot score from core states
 	set_temp_variable = { EAI_slots_factor = modifier@global_building_slots_factor }
 	clamp_temp_variable = { var = EAI_slots_factor min = 0 max = 1 }
 	multiply_temp_variable = { EAI_slots_factor = 0.4 }
 	add_to_temp_variable = { EAI_slots_factor = 1 }
 	multiply_temp_variable = { EAI_core_states_slots = EAI_slots_factor }
 
-	# building slot score from noncores
-	every_state = { limit = { NOT = { is_owned_by = PREV } is_controlled_by = PREV }
+	add_to_variable = { EAI_division_cap = EAI_core_states_slots }
 
-		add_to_temp_variable = { Prev.EAI_noncore_states_slots = modifier@local_building_slots }
-	}
+	# building slot score from noncores
 	multiply_temp_variable = { EAI_noncore_states_slots = 0.2 }
 
-	add_to_variable = { EAI_division_cap = EAI_core_states_slots }
 	add_to_variable = { EAI_division_cap = EAI_noncore_states_slots }
 
 	### armor division cap
@@ -157,6 +160,7 @@ EAI_calculate_division_cap = {
 
 # special modifiers applied to division cap
 EAI_special_infantry_division_limits = {
+
 	if = { # historical badness
 		limit = { 
 			original_tag = FRA

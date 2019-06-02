@@ -2114,15 +2114,13 @@ focus_tree = {
 		prerequisite = { focus = ITA_support_nationalist_spain }
 		mutually_exclusive = { focus = ITA_demand_balearic_islands }
 		available = {
+			is_in_faction = yes
 			any_other_country = {
 				original_tag = SPR
 				has_government = fascism
 				has_civil_war = no
 				NOT = { has_war_with = ROOT }
-				OR = {
-					is_in_faction = no
-					is_in_faction_with = ROOT
-				}
+				is_in_faction = no
 			}
 			FRA = {
 				OR = {
@@ -2154,7 +2152,7 @@ focus_tree = {
 				}
 				add_opinion_modifier = { target = ITA modifier = ita_diplomacy_focus }
 				add_ideas = fascist_influence 
-				country_event = { id = generic.2 }           
+				country_event = { id = generic.5 }           
 			}
 		}
 	}
@@ -2172,6 +2170,7 @@ focus_tree = {
 		}
 
 		available = {
+			is_in_faction = yes
 			country_exists = POR
 			NOT = {
 				has_war_with = POR
@@ -2193,7 +2192,7 @@ focus_tree = {
 					limit = { ROOT = { has_government = communism } }
 					add_timed_idea = { idea = communist_influence days = 1095 }
 				}
-				country_event = { id = generic.2 }
+				country_event = { id = generic.5 }
 			}
 		}
 	}
@@ -2215,38 +2214,15 @@ focus_tree = {
 		relative_position_id = ITA_pact_of_steel
 		cost = 10
 		
-		historical_ai = { #EAI
+		historical_ai = { #EAI war focus
+
 			date > 1940.6.1
-			
-			OR = { 
-				POL = { has_capitulated = yes }
-				POL = { exists = no }
-				POL = { is_puppet = yes }
-				POL = { has_government = fascism }
-				is_in_faction_with = POL
-			}
-			
-			OR = { 
-				FRA = { has_capitulated = yes }
-				FRA = { exists = no }
-				FRA = { is_puppet = yes }
-				FRA = { has_government = fascism }
-				is_in_faction_with = FRA
-			}
-			
-			NOT = { 
-				GRE = { has_capitulated = yes }
-				GRE = { exists = no }
-				GRE = { is_puppet = yes }
-				GRE = { has_government = fascism }
-				is_in_faction_with = GRE
-			}
-			
-			NOT = {
-				any_state = {
-					OR = { region = 21 region = 23 }
-					controller = { has_war_with = ITA }
-				}
+
+			EAI_is_prepared_for_war = yes
+
+			GRE = {
+				EAI_THIS_is_threat_to_PREV = yes
+				ROOT = { EAI_THIS_is_strong_vs_PREV = yes }
 			}
 		}
 		

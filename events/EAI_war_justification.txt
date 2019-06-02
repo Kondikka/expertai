@@ -28,7 +28,7 @@ country_event = {
 		is_ai = yes
 		date > 1936.4.1
 		has_variable = global.EAI_justification_aggressiveness
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		ROOT = { # basic requirements
 			num_divisions > 5
@@ -65,57 +65,22 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
-		}
-
-		any_country = {
-			EAI_is_threat = yes
-			NOT = { 
-				has_war_with = ROOT 
-				has_non_aggression_pact_with = ROOT
-				ROOT = { has_country_flag = EAI_supports_@PREV }
-			}
-			OR = {
-				AND = {
-					has_navy_size = { size > 20 }
-					has_equipment = { convoy > 100 }
-				}
-				is_neighbor_of = ROOT
-				any_other_country = {
-					is_neighbor_of = ROOT
-					is_neighbor_of = PREV
-					OR = {
-						is_subject_of = ROOT
-						is_in_faction_with = ROOT
-					}
-				}
-			}
-			NOT = { ROOT = { has_opinion = { target = PREV value > 75 } } }
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-			NOT = {
-				any_allied_country = {
-					strength_ratio = { tag = ROOT ratio > 1.5 }
-				}
-			}
-			ic_ratio = { tag = ROOT ratio < 1.5 }
-			check_variable = { num_divisions < Root.num_divisions }
 		}
 	}
 
 	immediate = {
 		# invade the closest target
 
-		set_variable = { EAI_invasion_min_distance = 99999 }
-		set_variable = { EAI_invasion_target_country = 0 }
+		set_temp_variable = { EAI_invasion_min_distance = 99999 }
+		set_temp_variable = { EAI_invasion_target_country = 0 }
 
-		every_country = { 
-			limit = { 
+		every_country = {
+			limit = {
 				EAI_is_threat = yes
 				NOT = { 
 					has_war_with = ROOT 
@@ -123,10 +88,13 @@ country_event = {
 					ROOT = { has_country_flag = EAI_supports_@PREV }
 				}
 				OR = {
+					AND = {
+						has_navy_size = { size > 20 }
+						has_equipment = { convoy > 100 }
+					}
 					is_neighbor_of = ROOT
-					any_other_country = {
+					any_neighbor_country = {
 						is_neighbor_of = ROOT
-						is_neighbor_of = PREV
 						OR = {
 							is_subject_of = ROOT
 							is_in_faction_with = ROOT
@@ -144,14 +112,17 @@ country_event = {
 				check_variable = { num_divisions < Root.num_divisions }
 			}
 
-			every_state = { limit = { is_core_of = PREV is_controlled_by = PREV }
+			for_each_scope_loop = { array = core_states
 
-				every_state = { limit = { is_core_of = ROOT is_controlled_by = ROOT }
+				if = { limit = { is_controlled_by = PREV }
 
-					if = { limit = { check_variable = { Root.EAI_invasion_min_distance > distance_to@PREV } }
+					for_each_scope_loop = { array = ROOT.core_states 
+					
+						if = { limit = { is_controlled_by = ROOT check_variable = { EAI_invasion_min_distance > distance_to@PREV } }
 
-						set_variable = { Root.EAI_invasion_min_distance = distance_to@PREV }
-						set_variable = { Root.EAI_invasion_target_country = Prev.Prev.id }
+							set_temp_variable = { EAI_invasion_min_distance = distance_to@PREV }
+							set_temp_variable = { EAI_invasion_target_country = PREV.PREV.id }
+						}
 					}
 				}
 			}
@@ -159,14 +130,11 @@ country_event = {
 
 		if = { limit = { NOT = { check_variable = { EAI_invasion_target_country = 0 } } }
 		
-			set_country_flag = { flag = EAI_prepare_for_war_@EAI_invasion_target_country value = 1 days = 365 }
-			set_variable = { EAI_wardec_script_target_by_@ROOT = EAI_invasion_target_country }
+			var:EAI_invasion_target_country = { set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 } }
+			set_variable = { EAI_wardec_script_target = EAI_invasion_target_country }
+
+			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM WARDEC: against [?EAI_invasion_target_country.GetName]" } 
 		}
-
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM WARDEC: against [?EAI_invasion_target_country.GetName]" } 
-
-		clear_variable = EAI_invasion_min_distance
-		clear_variable = EAI_invasion_target_country
 	}
 
 	option = {}
@@ -185,7 +153,7 @@ country_event = {
 		tag = GER
 		is_ai = yes 
 		date > 1941.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		has_manpower > 250000
 
@@ -203,8 +171,7 @@ country_event = {
 			surrender_progress > 0.1
 			any_home_area_neighbor_country = {
 				has_war_with = ROOT
-				any_state = {
-					is_controlled_by = PREV
+				any_of_scopes = { array = controlled_states
 					is_on_continent = europe
 				}
 			}
@@ -212,11 +179,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -251,50 +216,41 @@ country_event = {
 		}
 	}
 	immediate = {
+		every_country = {
+			limit = {
+				EAI_is_threat = yes
+				NOT = { has_war_with = ROOT }
+				NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
+				strength_ratio = { tag = ROOT ratio < 0.5 }
+				ic_ratio = { tag = ROOT ratio < 1.0 }
+				check_variable = { num_divisions < Root.num_divisions }
+			}
+
+			add_to_temp_array = { array = justification_targets value = THIS.id }
+		}
+
 		if = {
 			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
+				any_of_scopes = { array = justification_targets
 					is_neighbor_of = ROOT
 				}
 			}
 
-			random_country = {
+			random_scope_in_array = { array = justification_targets
 				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
 					is_neighbor_of = ROOT
 				}
 
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+				set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+				ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 
 				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]" } 
 			}
 		}
-
 		else_if = {
 			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
+				any_of_scopes = { array = justification_targets
 					any_other_country = {
 						OR = {
 							tag = ROOT
@@ -306,15 +262,8 @@ country_event = {
 				}
 			}
 
-			random_country = {
+			random_scope_in_array = { array = justification_targets
 				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-
 					any_other_country = {
 						OR = {
 							tag = ROOT
@@ -325,39 +274,19 @@ country_event = {
 					}
 				}
 
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+				set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+				ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 
 				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]" } 
 			}
 		}
+		else = {
+			random_scope_in_array = { array = justification_targets
 
-		else_if = {
-			limit = {
-				any_country = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-				}
-			}
+				set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 
-			random_country = {
-				limit = {
-					EAI_is_threat = yes
-					NOT = { has_war_with = ROOT }
-					NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-					strength_ratio = { tag = ROOT ratio < 0.5 }
-					ic_ratio = { tag = ROOT ratio < 1.0 }
-					check_variable = { num_divisions < Root.num_divisions }
-				}
-
-				ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-				ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+				ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 
 				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM GER WARDEC: against [This.GetName]" } 
 			}
@@ -380,7 +309,7 @@ country_event = {
 		tag = JAP 
 		is_ai = yes 
 		date > 1940.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		OR = {
 			is_in_faction = no
@@ -401,11 +330,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -447,9 +374,9 @@ country_event = {
 	}
 	immediate = {
 		SOV = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+			ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against SOV" } 
@@ -468,7 +395,7 @@ country_event = {
 		tag = JAP
 		is_ai = yes 
 		date > 1940.1.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		has_manpower > 250000
 
@@ -491,11 +418,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -504,24 +429,6 @@ country_event = {
 			has_capitulated = no
 			exists = yes
 			is_subject = no
-		}
-
-		any_country = {
-			EAI_is_threat = yes
-			NOT = { has_war_with = ROOT }
-			NOT = { ROOT = { has_opinion = { target = PREV value > 50 } } }
-			strength_ratio = { tag = ROOT ratio < 0.5 }
-			ic_ratio = { tag = ROOT ratio < 1.0 }
-			check_variable = { num_divisions < Root.num_divisions }
-
-			any_other_country = {
-				OR = {
-					tag = ROOT
-					is_in_faction_with = ROOT
-					is_subject_of = ROOT
-				}
-				is_neighbor_of = PREV
-			}
 		}
 
 		# take care of these countries first
@@ -558,9 +465,9 @@ country_event = {
 				}
 			}
 
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
-
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
+			
+			ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RANDOM JAP WARDEC: against [This.GetName]" } 
 		}
@@ -580,7 +487,7 @@ country_event = {
 		tag = JAP 
 		is_ai = yes 
 		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		OR = {
 			is_in_faction = no
@@ -601,11 +508,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -637,9 +542,9 @@ country_event = {
 	}
 	immediate = {
 		NEP = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+			ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against NEP" } 
@@ -659,7 +564,7 @@ country_event = {
 		tag = JAP 
 		is_ai = yes 
 		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		OR = {
 			is_in_faction = no
@@ -680,11 +585,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -716,9 +619,9 @@ country_event = {
 	}
 	immediate = {
 		BHU = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+			ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against BHU" } 
@@ -747,7 +650,7 @@ country_event = {
 		tag = JAP 
 		is_ai = yes 
 		date > 1942.6.1
-		NOT = { has_variable = EAI_wardec_script_target_by_@ROOT }
+		NOT = { has_variable = EAI_wardec_script_target }
 
 		OR = {
 			is_in_faction = no
@@ -768,11 +671,9 @@ country_event = {
 
 		NOT = { # do not justify against more countries if it hasn't dealt with the previous target
 			any_country = {
-				ROOT = { 
-					OR = {
-						has_country_flag = EAI_prepare_for_war_@PREV 
-						has_country_flag = EAI_declare_war_@PREV
-					}
+				OR = {
+					has_country_flag = EAI_prepare_for_war_from_@PREV 
+					has_country_flag = EAI_declare_war_from_@PREV
 				}
 			}
 		}
@@ -804,9 +705,9 @@ country_event = {
 	}
 	immediate = {
 		TIB = {
-			ROOT = { set_country_flag = { flag = EAI_prepare_for_war_@PREV value = 1 days = 365 } }
+			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 365 }
 			
-			ROOT = { set_variable = { EAI_wardec_script_target_by_@ROOT = Prev.id } }
+			ROOT = { set_variable = { EAI_wardec_script_target = PREV.id } }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO WARDEC: against TIB" } 
@@ -825,15 +726,15 @@ country_event = {
 
 	trigger = {
 		is_ai = yes
-		has_variable = EAI_wardec_script_target_by_@ROOT
+		NOT = { check_variable = { EAI_wardec_script_target = 0 } }
 	}
 
 	immediate = {
-		var:EAI_wardec_script_target_by_@ROOT = {
-			ROOT = { set_country_flag = { flag = EAI_declare_war_@PREV value = 1 days = 365 } }
+		var:EAI_wardec_script_target = {
+			set_country_flag = { flag = EAI_declare_war_from_@PREV value = 1 days = 365 }
 		}
 
-		clear_variable = EAI_wardec_script_target_by_@ROOT
+		clear_variable = EAI_wardec_script_target
 
 		set_country_flag = { flag = EAI_justifying_wargoal value = 1 days = 90 }
 

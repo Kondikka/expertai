@@ -2,7 +2,51 @@
 #	Expert AI mod - diplomacy triggers
 ######################################################
 
+EAI_THIS_is_strong_vs_PREV = {
+
+	NOT = { EAI_is_not_independent = yes }
+	surrender_progress < 0.05
+	strength_ratio = { tag = PREV ratio > 1.0 }
+	if = { limit = { PREV = { is_major = yes } } is_major = yes }
+}
+
+EAI_THIS_has_land_border_with_PREV = {
+
+	set_temp_variable = { prev_id = PREV.id }
+
+	any_country = {
+		EAI_PREV_on_same_side_with_THIS = yes
+
+		any_home_area_neighbor_country = {
+			var:prev_id = {
+				EAI_PREV_on_same_side_with_THIS = yes
+			}
+		}
+	}
+}
+
+EAI_is_prepared_for_war = {
+
+	OR = {
+		NOT = { 
+			any_home_area_neighbor_country = { 
+				has_war_with = PREV 
+			} 
+		}
+
+		AND = {
+			enemies_strength_ratio < 0.5
+			surrender_progress < 0.05
+		}
+	}
+
+	NOT = { EAI_is_not_independent = yes }
+
+	has_manpower > 200000
+}
+
 EAI_is_threat = {
+
 	AND = {
 		has_capitulated = no
 		exists = yes
@@ -23,7 +67,34 @@ EAI_is_threat = {
 	}
 }
 
+EAI_THIS_is_threat_to_PREV = {
+
+	NOT = { EAI_PREV_has_same_ideology_with_THIS = yes }
+
+	set_temp_variable = { prev_id = PREV.id }
+
+	AND = {
+		has_capitulated = no
+		exists = yes
+		NOT = {
+			has_war_together_with = PREV
+			is_subject_of = PREV
+			has_government = PREV
+			is_in_faction_with = PREV
+			AND = {
+				is_in_faction = yes
+				any_allied_country = { is_faction_leader = yes var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+			}
+			AND = {
+				is_subject = yes
+				any_country = { PREV = { is_subject_of = PREV } var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+			}
+		}
+	}
+}
+
 EAI_is_not_independent = {
+
 	OR = {
 		has_capitulated = yes
 		exists = no
@@ -32,9 +103,11 @@ EAI_is_not_independent = {
 }
 
 EAI_player_intervening = {
+	
 	OR = {
 		any_enemy_country = { is_ai = no }
 		any_country = { is_ai = no is_justifying_wargoal_against = ROOT }
+		NOT = { check_variable = { EAI_wardec_script_target = 0 } }
 	}
 }
 
@@ -131,7 +204,7 @@ EAI_nonaligned_focus = {
 	}
 }
 
-EAI_same_ideology = {
+EAI_PREV_has_same_ideology_with_THIS = {
 	if = { limit = { PREV = { has_government = neutrality } } has_government = neutrality }
 	else_if = { limit = { PREV = { has_government = democratic } } has_government = democratic }
 	else_if = { limit = { PREV = { has_government = fascism } } has_government = fascism }

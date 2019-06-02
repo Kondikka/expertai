@@ -366,7 +366,7 @@ country_event = {
 		}
 
 		# Forts
-		if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_SHARED = yes } } } 
+		if = { limit = { threat > 0.5 NOT = { any_of_scopes = { array = controlled_states EAI_available_SHARED = yes } } } 
 			random_list = {
 				1 = { EAI_queue_CFORT_BASES = yes }
 				1 = { EAI_queue_FORT_CITIES = yes }
@@ -395,13 +395,29 @@ country_event = {
 			limit = {
 				num_of_civilian_factories_available_for_projects > 15
 
-				OR = {
-					AND = { has_war = yes fuel_ratio < 0.5  																							any_state = { EAI_available_INF = yes has_resources_amount = { resource = oil amount > 40 } } }
-					AND = { OR = { check_variable = { ROOT.resource@aluminium < -4 } 	check_variable = { ROOT.resource_imported@aluminium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = aluminium amount > 40 } } }
-					AND = { OR = { check_variable = { ROOT.resource@rubber < -4 } 		check_variable = { ROOT.resource_imported@rubber > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = rubber amount > 40 } } }
-					AND = { OR = { check_variable = { ROOT.resource@tungsten < -4 } 	check_variable = { ROOT.resource_imported@tungsten > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = tungsten amount > 40 } } }
-					AND = { OR = { check_variable = { ROOT.resource@steel < -4 } 		check_variable = { ROOT.resource_imported@steel > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = steel amount > 40 } } }
-					AND = { OR = { check_variable = { ROOT.resource@chromium < -4 } 	check_variable = { ROOT.resource_imported@chromium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = chromium amount > 40 } } }
+				any_of_scopes = { array = controlled_states
+
+					EAI_available_INF = yes
+
+					if = { limit = { ROOT = { has_war = yes fuel_ratio < 0.5 } }
+						has_resources_amount = { resource = oil amount > 40 }
+					}
+					else_if = { limit = { OR = { check_variable = { ROOT.resource@aluminium < -4 } check_variable = { ROOT.resource_imported@aluminium > 16 } } }
+						has_resources_amount = { resource = aluminium amount > 40 }
+					}
+					else_if = { limit = { OR = { check_variable = { ROOT.resource@rubber < -4 } check_variable = { ROOT.resource_imported@rubber > 16 } } }
+						has_resources_amount = { resource = rubber amount > 40 }
+					}
+					else_if = { limit = { OR = { check_variable = { ROOT.resource@tungsten < -4 } check_variable = { ROOT.resource_imported@tungsten > 16 } } }
+						has_resources_amount = { resource = tungsten amount > 40 }
+					}
+					else_if = { limit = { OR = { check_variable = { ROOT.resource@steel < -4 } check_variable = { ROOT.resource_imported@steel > 16 } } }
+						has_resources_amount = { resource = steel amount > 40 }
+					}
+					else_if = { limit = { OR = { check_variable = { ROOT.resource@chromium < -4 } check_variable = { ROOT.resource_imported@chromium > 16 } } }
+						has_resources_amount = { resource = chromium amount > 40 }
+					}
+					else = { always = no }
 				}
 			}
 
@@ -1791,15 +1807,14 @@ country_event = {
 	immediate = {
 		if = { 
 			limit = { 
-				any_state = {
-					is_controlled_by = ROOT
+				any_of_scopes = { array = controlled_states
 					free_building_slots = { building = infrastructure size > 0 include_locked = no } 
 				}
 			}
 			EAI_queue_INF = yes
 		}
 		
-		else_if = { limit = { threat > 0.5 NOT = { any_state = { EAI_available_SHARED = yes } } } 
+		else_if = { limit = { threat > 0.5 NOT = { any_of_scopes = { array = controlled_states EAI_available_SHARED = yes } } } 
 			random_list = {
 				1 = { EAI_queue_CFORT_BASES = yes }
 				1 = { EAI_queue_FORT_CITIES = yes }
@@ -1846,13 +1861,9 @@ country_event = { # ITA coastal forts
 	immediate = {
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 		
-		every_state = {
-			limit = {
-				is_controlled_by = ROOT
-				is_in_home_area = yes
-			}
-			
-			EAI_add_CFORT_BASE = yes
+		for_each_scope_loop = { array = controlled_states
+
+			if = { limit = { is_in_home_area = yes } EAI_add_CFORT_BASE = yes }
 		}
 	}
 	option = {}
@@ -1869,7 +1880,7 @@ country_event = { # SWI
 
 		original_tag = SWI
 
-		NOT = { any_state = { EAI_available_SHARED = yes } }
+		NOT = { any_of_scopes = { array = controlled_states EAI_available_SHARED = yes } }
 	}
 
 	immediate = {
@@ -1904,14 +1915,13 @@ country_event = { # SPR
 	immediate = {
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 
-		every_state = {
-			limit = {
-				is_controlled_by = ROOT
-				OR = { state = 165 state = 166 state = 172 }
+		for_each_scope_loop = { array = controlled_states
+
+			if = { limit = { OR = { state = 165 state = 166 state = 172 } }
+				
+				EAI_add_FORT_BORDER = yes
+				EAI_add_FORT_BORDER = yes
 			}
-			
-			EAI_add_FORT_BORDER = yes
-			EAI_add_FORT_BORDER = yes
 		}
 	}
 	option = {}
@@ -1933,14 +1943,13 @@ country_event = { # TUR
 	immediate = {
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction" } 
 
-		every_state = {
-			limit = {
-				is_controlled_by = ROOT
-				OR = { state = 341 }
+		for_each_scope_loop = { array = controlled_states
+
+			if = { limit = { OR = { state = 341 } }
+				
+				EAI_add_FORT_BORDER = yes
+				EAI_add_FORT_BORDER = yes
 			}
-			
-			EAI_add_FORT_BORDER = yes
-			EAI_add_FORT_BORDER = yes
 		}
 	}
 	option = {}
@@ -1967,10 +1976,9 @@ country_event = { # GENERIC
 			has_war_with = ROOT
 		}
 		
-		any_state = {
+		any_of_scopes = { array = controlled_states
 			OR = {
 				AND = {
-					is_controlled_by = ROOT
 					is_in_home_area = yes
 					any_neighbor_state = {
 						OR = {
@@ -1982,7 +1990,6 @@ country_event = { # GENERIC
 				}
 				
 				AND = {
-					is_controlled_by = ROOT
 					is_capital = yes
 					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
 				}
@@ -1993,22 +2000,24 @@ country_event = { # GENERIC
 	immediate = {
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: fort construction (dynamic)" } 
 
-		every_state = { # build forts on victory points near enemy borders
-			limit = {
-				is_controlled_by = ROOT
-				is_in_home_area = yes
-				any_neighbor_state = {
-					OR = {
-						CONTROLLER = { has_war_with = ROOT }
-						any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+		for_each_scope_loop = { array = controlled_states # build forts on victory points near enemy borders
+
+			if = {
+				limit = {
+					is_in_home_area = yes
+					any_neighbor_state = {
+						OR = {
+							CONTROLLER = { has_war_with = ROOT }
+							any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+						}
 					}
+					NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
 				}
-				NOT = { has_state_flag = EAI_generic_fort_construction_state_triggered_@ROOT }
+				
+				set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 1000 }
+				
+				EAI_add_FORT_CITY = yes
 			}
-			
-			set_state_flag = { flag = EAI_generic_fort_construction_state_triggered_@ROOT value = 1 days = 1000 }
-			
-			EAI_add_FORT_CITY = yes
 		}
 		
 		capital_scope = { # build forts on capital
@@ -2068,43 +2077,60 @@ country_event = {
 	
 	trigger  = {
 		is_ai = yes
-
 		num_of_military_factories > 450
 	}
 
 	immediate = {
-		if = { 
-			limit = {  
-				any_state = {
-					is_controlled_by = ROOT
 
-			        NOT = { is_owned_by = ROOT }
+		set_temp_variable = { t1 = num_of_military_factories }
+		subtract_from_temp_variable = { t1 = 450 }
 
+		if = {
+			limit = {
+				any_of_scopes = { array = controlled_states
+					NOT = { is_core_of = ROOT }
 					arms_factory > 0
 				}
 			}
 
-			every_state = {
-			    limit = {
-			        is_controlled_by = ROOT
+			for_each_scope_loop = { array = controlled_states
 
-			        NOT = { is_owned_by = ROOT }
-
-					arms_factory > 0
-			    }
-
-			    remove_building = { type = arms_factory level = 1 }
-			}
-
-			else = {
-				every_state = {
-				    limit = {
-				        is_controlled_by = ROOT
-
+				if = {
+					limit = {
+						NOT = { is_core_of = ROOT }
 						arms_factory > 0
-				    }
-	
-				    remove_building = { type = arms_factory level = 1 }
+					}
+
+					set_temp_variable = { t2 = building_level@arms_factory }
+					clamp_temp_variable = { var = t2 min = 0 max = t1 }
+					remove_building = { type = arms_factory level = t2 }
+					subtract_from_temp_variable = { t1 = t2 }
+				}
+
+				if = { limit = { NOT = { check_variable = { t1 > 0 } } }
+
+					set_temp_variable = { break = 1 }
+				}
+			}
+		}
+		else = {
+
+			for_each_scope_loop = { array = controlled_states
+
+				if = {
+					limit = {
+						arms_factory > 0
+					}
+
+					set_temp_variable = { t2 = building_level@arms_factory }
+					clamp_temp_variable = { var = t2 min = 0 max = t1 }
+					remove_building = { type = arms_factory level = t2 }
+					subtract_from_temp_variable = { t1 = t2 }
+				}
+
+				if = { limit = { NOT = { check_variable = { t1 > 0 } } }
+
+					set_temp_variable = { break = 1 }
 				}
 			}
 		}

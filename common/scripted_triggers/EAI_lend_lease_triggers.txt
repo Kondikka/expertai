@@ -5,9 +5,14 @@
 # ROOT = LEASER, THIS = TARGET
 # conditions for a country to be lend-leased
 EAI_lend_lease = {
+
 	has_global_flag = EAI_lend_lease
 
-	ROOT = { # lend leaser
+	#####################################################################################################
+	#	LEASER
+	#####################################################################################################
+
+	ROOT = {
 		OR = {
 			has_country_flag = EAI_supports_@PREV
 
@@ -17,14 +22,262 @@ EAI_lend_lease = {
 				NOT = { surrender_progress > 0.05 }
 			}
 		}
+
+		### neutral countries ll to neighbors only
+
+		if = { limit = { EAI_neutral_country = yes }
+
+			is_neighbor_of = PREV
+			has_opinion = { target = PREV value > 25 }
+		}
+
+		### limits just any country from using lend-lease, such as random minors in south america
+
+		if = {
+			limit = {
+				NOT = {
+					EAI_major_country = yes
+					is_major = yes
+					is_in_faction = yes
+					has_war = yes
+				}
+			}
+
+			OR = {
+				AND = {
+					is_neighbor_of = PREV
+					has_opinion = { target = PREV value > 50 }
+				}
+
+				### SPECIAL RULES
+
+				AND = {
+					has_government = fascism
+					PREV = { original_tag = SPR has_government = fascism has_civil_war = yes }
+				}
+			}
+		}
+
+		### rules for subjects
+
+		if = { limit = { is_subject = yes }
+
+			OR = {
+				is_subject_of = PREV # is subject of the target
+				PREV = { any_enemy_country = { has_war_with = ROOT } } # common enemy
+			}
+		}
+
+		### when should it lend lease a country depending on ideology
+
+		# democratic countries
+
+		if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+					EAI_democratic_nation = yes
+				}
+				else = { # behave according to the faction leader's ideology
+					OR = {
+						AND = {
+							is_faction_leader = yes
+							EAI_democratic_nation = yes
+						}
+						any_allied_country = {
+							is_faction_leader = yes
+							EAI_democratic_nation = yes
+						}
+					}
+				}
+			}
+
+			PREV = {
+				OR = {
+					EAI_democratic_nation = yes
+
+					AND = { 
+						EAI_communist_nation = yes
+
+						has_offensive_war = no
+					}
+
+					AND = { 
+						EAI_nonaligned_nation = yes
+
+						has_offensive_war = no
+					}
+
+					is_in_faction_with = ROOT
+
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# communist countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+					EAI_communist_nation = yes
+				}
+				else = { # behave according to the faction leader's ideology
+					OR = {
+						AND = {
+							is_faction_leader = yes
+							EAI_communist_nation = yes
+						}
+						any_allied_country = {
+							is_faction_leader = yes
+							EAI_communist_nation = yes
+						}
+					}
+				}
+			}
+
+			PREV = {
+				OR = {
+					EAI_communist_nation = yes
+
+					AND = { 
+						EAI_democratic_nation = yes
+
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					AND = { 
+						EAI_nonaligned_nation = yes
+
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					is_in_faction_with = ROOT
+
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# fascist countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+					EAI_fascist_nation = yes
+				}
+				else = { # behave according to the faction leader's ideology
+					OR = {
+						AND = {
+							is_faction_leader = yes
+							EAI_fascist_nation = yes
+						}
+						any_allied_country = {
+							is_faction_leader = yes
+							EAI_fascist_nation = yes
+						}
+					}
+				}
+			}
+
+			PREV = {
+				OR = {
+					EAI_fascist_nation = yes
+
+					AND = {
+						EAI_nonaligned_nation = yes
+
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					is_in_faction_with = ROOT
+
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# nonaligned countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+					EAI_nonaligned_nation = yes
+				}
+				else = { # behave according to the faction leader's ideology
+					OR = {
+						AND = {
+							is_faction_leader = yes
+							EAI_nonaligned_nation = yes
+						}
+						any_allied_country = {
+							is_faction_leader = yes
+							EAI_nonaligned_nation = yes
+						}
+					}
+				}
+			}
+
+			PREV = {
+				OR = {
+					AND = { EAI_democratic_nation = yes
+						has_offensive_war = no 
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					AND = { EAI_fascist_nation = yes
+						has_offensive_war = no 
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					AND = { EAI_communist_nation = yes
+						has_offensive_war = no
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					AND = { EAI_nonaligned_nation = yes
+						has_offensive_war = no
+						any_country = {
+							OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
+							any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
+						}
+					}
+
+					is_in_faction_with = ROOT
+
+					has_war_together_with = ROOT
+				}
+			}
+		}
 	}
 
-	THIS = { # target
+	#####################################################################################################
+	#	TARGET
+	#####################################################################################################
+
+	THIS = {
 		NOT = { tag = ROOT }
 	
 		has_war = yes NOT = { has_war_with = ROOT }
 
-		set_temp_variable = { ROOT.t1 = THIS.id }
+		set_temp_variable = { t1 = THIS.id }
 
 		OR = {
 			has_country_flag = EAI_receives_support_@THIS
@@ -32,241 +285,7 @@ EAI_lend_lease = {
 			AND = {
 				EAI_special_lend_lease_rules_TARGET = yes
 
- 				### neutral countries ll to neighbors only
-
-				ROOT = {
-					if = { limit = { EAI_neutral_country = yes }
-
-						is_neighbor_of = PREV
-						has_opinion = { target = PREV value > 25 }
-					}
-				}
-
-				### limits just any country from using lend-lease, such as random minors in south america
-
-				ROOT = {
-					if = {
-						limit = {
-							NOT = {
-								EAI_major_country = yes
-								is_major = yes
-								is_in_faction = yes
-								has_war = yes
-							}
-						}
-
-						OR = {
-							AND = {
-								is_neighbor_of = PREV
-								has_opinion = { target = PREV value > 50 }
-							}
-
-							### SPECIAL RULES
-
-							AND = { # in order to make nat spain win more, any fascist country should LL it
-								has_government = fascism
-								PREV = { original_tag = SPR has_government = fascism has_civil_war = yes }
-							}
-						}
-					}
-				}
-
-				### rules for subjects
-
-				ROOT = {
-					if = {
-						limit = { is_subject = yes }
-
-						OR = {
-							is_subject_of = PREV # is subject of the target
-							PREV = { any_enemy_country = { has_war_with = ROOT } } # common enemy
-						}
-					}
-				}
-
-				### when should it lend lease a country depending on ideology
-
-				ROOT = {
-
-					###################################### democratic countries
-
-					if = {
-						limit = { 
-							if = { limit = { is_in_faction = no }
-								EAI_democratic_nation = yes
-							}
-							else = { # behave according to the faction leader's ideology
-								any_country = {
-									is_in_faction_with = ROOT
-									is_faction_leader = yes
-									EAI_democratic_nation = yes
-								}
-							}
-						}
-
-						PREV = {
-							OR = {
-								EAI_democratic_nation = yes
-
-								AND = { 
-									EAI_communist_nation = yes
-
-									has_offensive_war = no
-								}
-
-								AND = { 
-									EAI_nonaligned_nation = yes
-
-									has_offensive_war = no
-								}
-
-								is_in_faction_with = ROOT
-
-								has_war_together_with = ROOT
-							}
-						}
-					}
-
-					###################################### communist countries
-
-					else_if = {
-						limit = { 
-							if = { limit = { is_in_faction = no }
-								EAI_communist_nation = yes
-							}
-							else = { # behave according to the faction leader's ideology
-								any_country = {
-									is_in_faction_with = ROOT
-									is_faction_leader = yes
-									EAI_communist_nation = yes
-								}
-							}
-						}
-
-						PREV = {
-							OR = {
-								EAI_communist_nation = yes
-
-								AND = { 
-									EAI_democratic_nation = yes
-
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								AND = { 
-									EAI_nonaligned_nation = yes
-
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								is_in_faction_with = ROOT
-
-								has_war_together_with = ROOT
-							}
-						}
-					}
-
-					###################################### fascist countries
-
-					else_if = {
-						limit = { 
-							if = { limit = { is_in_faction = no }
-								EAI_fascist_nation = yes
-							}
-							else = { # behave according to the faction leader's ideology
-								any_country = {
-									is_in_faction_with = ROOT
-									is_faction_leader = yes
-									EAI_fascist_nation = yes
-								}
-							}
-						}
-
-						PREV = {
-							OR = {
-								EAI_fascist_nation = yes
-
-								AND = {
-									EAI_nonaligned_nation = yes
-
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								is_in_faction_with = ROOT
-
-								has_war_together_with = ROOT
-							}
-						}
-					}
-
-					###################################### nonaligned countries
-
-					else_if = {
-						limit = { 
-							if = { limit = { is_in_faction = no }
-								EAI_nonaligned_nation = yes
-							}
-							else = { # behave according to the faction leader's ideology
-								any_country = {
-									is_in_faction_with = ROOT
-									is_faction_leader = yes
-									EAI_nonaligned_nation = yes
-								}
-							}
-						}
-
-						PREV = {
-							OR = {
-								AND = { EAI_democratic_nation = yes
-									has_offensive_war = no 
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								AND = { EAI_fascist_nation = yes
-									has_offensive_war = no 
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								AND = { EAI_communist_nation = yes
-									has_offensive_war = no
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								AND = { EAI_nonaligned_nation = yes
-									has_offensive_war = no
-									any_country = {
-										OR = { tag = PREV is_in_faction_with = PREV is_subject_of = PREV has_war_together_with = PREV }
-										any_neighbor_country = { OR = { tag = ROOT is_in_faction_with = ROOT is_subject_of = ROOT has_war_together_with = ROOT } }
-									}
-								}
-
-								is_in_faction_with = ROOT
-
-								has_war_together_with = ROOT
-							}
-						}
-					}
-				}
-
-				### why should it lend lease
+				### why should it receive lend lease
 
 				OR = {
 					any_enemy_country = { has_war_with = ROOT } # enemy of my enemy is my friend
@@ -294,9 +313,10 @@ EAI_lend_lease = {
 
 					### shared ideology
 
-					AND = { EAI_communist_nation = yes ROOT = { EAI_communist_nation = yes } }
-					AND = { EAI_fascist_nation = yes ROOT = { EAI_fascist_nation = yes } }
-					AND = { EAI_democratic_nation = yes ROOT = { EAI_democratic_nation = yes } }
+					ROOT = { 
+						NOT = { has_government = neutrality } 
+						EAI_PREV_has_same_ideology_with_THIS = yes 
+					}
 				}
 
 				### why should it NOT lend lease
@@ -317,8 +337,10 @@ EAI_lend_lease = {
 			}
 		}
 
+		### if a land route isnt available, check that the target has convoys
+
 		if = {
-			limit = { # try to see if a land route is available
+			limit = {
 				NOT = { 
 					any_home_area_neighbor_country = { 
 						NOT = { has_war_with = ROOT has_war_with = var:ROOT.t1 tag = var:ROOT.t1 }
@@ -344,6 +366,7 @@ EAI_lend_lease = {
 }
 
 EAI_special_lend_lease_rules_SENDER = {
+	
 	# GER should focus on stockpiling for itself
 	if = { 
 		limit = {
@@ -395,6 +418,7 @@ EAI_special_lend_lease_rules_SENDER = {
 }
 
 EAI_special_lend_lease_rules_TARGET = {
+	
 	# axis shouldn't lend lease japan
 	if = { 
 		limit = { 

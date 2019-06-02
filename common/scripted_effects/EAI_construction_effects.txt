@@ -75,7 +75,7 @@ EAI_start_priority_construction = {
 
 		### get infrastructure level, set target state
 
-		set_temp_variable = { ROOT.EAI_target_state_infra_speed = infrastructure_level }
+		set_temp_variable = { EAI_target_state_infra_speed = infrastructure_level }
 		set_state_flag = EAI_construction_target_state_@ROOT
 		set_variable = { ROOT.EAI_construction_target_state = THIS.id }
 	}
@@ -208,7 +208,7 @@ EAI_important_radar_constructions = {
 			NOT = { has_country_flag = EAI_construction_project_active } 
 			threat > 0.3
 			num_of_civilian_factories_available_for_projects > 15
-			any_state = { EAI_radar_location_2 = yes EAI_available_RADAR = yes }
+			any_of_scopes = { array = controlled_states EAI_radar_location_2 = yes EAI_available_RADAR = yes }
 		}
 
 		set_temp_variable = { EAI_building_type_selected = 4 }
@@ -227,16 +227,16 @@ EAI_improve_north_africa_infrastructure = {
 			NOT = { has_country_flag = EAI_construction_project_active } 
 			has_war = yes 
 			num_of_civilian_factories_available_for_projects > 15
-			any_state = { 
+			any_enemy_country = {
+				any_of_scopes = { array = controlled_states
+					OR = { region = 126 region = 128 } 
+				}
+			}
+			any_of_scopes = { array = controlled_states
 				OR = { region = 126 state = 452 state = 447 state = 446 } 
-				is_controlled_by = ROOT
 				is_coastal = yes 
 				free_building_slots = { building = infrastructure size > 0 include_locked = no } 
 				infrastructure < 8
-			}
-			any_state = { 
-				OR = { region = 126 region = 128 } 
-				CONTROLLER = { has_war_with = ROOT } 
 			}
 		}
 
@@ -246,25 +246,27 @@ EAI_improve_north_africa_infrastructure = {
 		set_variable = { EAI_best_target_score = 0 }
 
 		# find the best target
-		every_state = { 
-			limit = { 
-				OR = { region = 126 state = 452 state = 447 state = 446 } 
-				is_controlled_by = ROOT
-				is_coastal = yes 
-				free_building_slots = { building = infrastructure size > 0 include_locked = no } 
-				infrastructure < 8 
-			}
+		for_each_scope_loop = { array = controlled_states 
+		
+			if = {
+				limit = { 
+					OR = { region = 126 state = 452 state = 447 state = 446 } 
+					is_coastal = yes 
+					free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+					infrastructure < 8 
+				}
 
-			# get score
-			set_variable = { EAI_score = 10 }
-			subtract_from_variable = { EAI_score = building_level@infrastructure }
-			if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
+				# get score
+				set_variable = { EAI_score = 10 }
+				subtract_from_variable = { EAI_score = building_level@infrastructure }
+				if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
 
-			# compare with best score
-			if = { limit = { check_variable = { EAI_score > ROOT.EAI_best_target_score } } 
+				# compare with best score
+				if = { limit = { check_variable = { EAI_score > ROOT.EAI_best_target_score } } 
 
-				set_variable = { ROOT.EAI_best_target = THIS.id } 
-				set_variable = { ROOT.EAI_best_target_score = EAI_score } 
+					set_variable = { ROOT.EAI_best_target = THIS.id } 
+					set_variable = { ROOT.EAI_best_target_score = EAI_score } 
+				}
 			}
 		}
 
@@ -277,17 +279,34 @@ EAI_improve_north_africa_infrastructure = {
 }
 
 EAI_resource_extraction = {
+	
 	if = {
 		limit = {
 			num_of_civilian_factories_available_for_projects > 45
 
-			OR = {
-				AND = { has_war = yes fuel_ratio < 0.5  																							any_state = { EAI_available_INF = yes has_resources_amount = { resource = oil amount > 40 } } }
-				AND = { OR = { check_variable = { ROOT.resource@aluminium < -4 } 	check_variable = { ROOT.resource_imported@aluminium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = aluminium amount > 40 } } }
-				AND = { OR = { check_variable = { ROOT.resource@rubber < -4 } 		check_variable = { ROOT.resource_imported@rubber > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = rubber amount > 40 } } }
-				AND = { OR = { check_variable = { ROOT.resource@tungsten < -4 } 	check_variable = { ROOT.resource_imported@tungsten > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = tungsten amount > 40 } } }
-				AND = { OR = { check_variable = { ROOT.resource@steel < -4 } 		check_variable = { ROOT.resource_imported@steel > 16 } } 		any_state = { EAI_available_INF = yes has_resources_amount = { resource = steel amount > 40 } } }
-				AND = { OR = { check_variable = { ROOT.resource@chromium < -4 } 	check_variable = { ROOT.resource_imported@chromium > 16 } } 	any_state = { EAI_available_INF = yes has_resources_amount = { resource = chromium amount > 40 } } }
+			any_of_scopes = { array = controlled_states
+
+				EAI_available_INF = yes
+
+				if = { limit = { ROOT = { has_war = yes fuel_ratio < 0.5 } }
+					has_resources_amount = { resource = oil amount > 40 }
+				}
+				else_if = { limit = { OR = { check_variable = { ROOT.resource@aluminium < -4 } check_variable = { ROOT.resource_imported@aluminium > 16 } } }
+					has_resources_amount = { resource = aluminium amount > 40 }
+				}
+				else_if = { limit = { OR = { check_variable = { ROOT.resource@rubber < -4 } check_variable = { ROOT.resource_imported@rubber > 16 } } }
+					has_resources_amount = { resource = rubber amount > 40 }
+				}
+				else_if = { limit = { OR = { check_variable = { ROOT.resource@tungsten < -4 } check_variable = { ROOT.resource_imported@tungsten > 16 } } }
+					has_resources_amount = { resource = tungsten amount > 40 }
+				}
+				else_if = { limit = { OR = { check_variable = { ROOT.resource@steel < -4 } check_variable = { ROOT.resource_imported@steel > 16 } } }
+					has_resources_amount = { resource = steel amount > 40 }
+				}
+				else_if = { limit = { OR = { check_variable = { ROOT.resource@chromium < -4 } check_variable = { ROOT.resource_imported@chromium > 16 } } }
+					has_resources_amount = { resource = chromium amount > 40 }
+				}
+				else = { always = no }
 			}
 		}
 
@@ -325,27 +344,29 @@ EAI_get_shared_slot_scores = {
 
 	set_country_flag = EAI_shared_slot_scores
 
-	every_state = { limit = { EAI_available_SHARED = yes }
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_SHARED = yes }
 
-		EAI_get_shared_slot_score = yes
+			EAI_get_shared_slot_score = yes
 
-		for_each_loop = { array = ROOT.EAI_shared_slot_scores
+			for_each_loop = { array = ROOT.EAI_shared_slot_scores
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_shared_slot_score > EAI_shared_slot_score } }
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_shared_slot_score > EAI_shared_slot_score } }
 
-					add_to_array = { array = ROOT.EAI_shared_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+						add_to_array = { array = ROOT.EAI_shared_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
-		}
 
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_shared_slot_scores = THIS.id }
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_shared_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -375,26 +396,29 @@ EAI_get_infrastructure_slot_scores = {
 
 	set_country_flag = EAI_infrastructure_slot_scores
 
-	every_state = { limit = { EAI_available_INF = yes }
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_INF = yes }
 
-		EAI_get_infrastructure_slot_score = yes
+			EAI_get_infrastructure_slot_score = yes
 
-		for_each_loop = { array = ROOT.EAI_infrastructure_slot_scores
+			for_each_loop = { array = ROOT.EAI_infrastructure_slot_scores
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_infrastructure_slot_score > EAI_infrastructure_slot_score } }
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_infrastructure_slot_score > EAI_infrastructure_slot_score } }
 
-					add_to_array = { array = ROOT.EAI_infrastructure_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+						add_to_array = { array = ROOT.EAI_infrastructure_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_infrastructure_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_infrastructure_slot_scores = THIS.id }
-		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -428,27 +452,29 @@ EAI_get_resource_slot_scores = {
 
 	set_country_flag = EAI_resource_slot_scores
 
-	every_state = { limit = { EAI_available_INF = yes check_variable = { EAI_total_resources > 30 } }
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_INF = yes check_variable = { EAI_total_resources > 30 } }
 
-		EAI_get_resource_slot_score = yes
+			EAI_get_resource_slot_score = yes
 
-		for_each_loop = { array = ROOT.EAI_resource_slot_scores
+			for_each_loop = { array = ROOT.EAI_resource_slot_scores
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_resource_slot_score > EAI_resource_slot_score } }
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_resource_slot_score > EAI_resource_slot_score } }
 
-					add_to_array = { array = ROOT.EAI_resource_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+						add_to_array = { array = ROOT.EAI_resource_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
-		}
 
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_resource_slot_scores = THIS.id }
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_resource_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -498,7 +524,7 @@ EAI_get_resource_slot_score = {
 }
 EAI_set_resource_variables = {
 
-	ROOT = { # meta triggers in states have a scope issue
+	ROOT = {
 
 		set_temp_variable = { t3 = 0 }
 
@@ -628,27 +654,34 @@ EAI_get_radar_slot_scores = {
 
 	set_country_flag = EAI_radar_slot_scores
 
-	every_state = { limit = { EAI_available_RADAR = yes}
+	every_country = { limit = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
 
-		EAI_get_radar_slot_score = yes
+		add_to_temp_array = { array = temp_array value = THIS.id }
+	}
 
-		for_each_loop = { array = ROOT.EAI_radar_slot_scores
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_RADAR = yes }
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_radar_slot_score > EAI_radar_slot_score } }
+			EAI_get_radar_slot_score = yes
 
-					add_to_array = { array = ROOT.EAI_radar_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+			for_each_loop = { array = ROOT.EAI_radar_slot_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_radar_slot_score > EAI_radar_slot_score } }
+
+						add_to_array = { array = ROOT.EAI_radar_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
-		}
 
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_radar_slot_scores = THIS.id }
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_radar_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -661,7 +694,7 @@ EAI_get_radar_slot_scores = {
 	}
 }
 EAI_get_radar_slot_score = {
-	
+
 	set_variable = { EAI_radar_slot_score = 6 }
 	subtract_from_variable = { EAI_radar_slot_score = building_level@radar }
 
@@ -672,11 +705,18 @@ EAI_get_radar_slot_score = {
 	if = {
 		limit = {
 			NOT = {
-				any_state = {
-					NOT = { state = PREV } 
-					OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
-					CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
-					distance_to = { target = PREV value < 800 } 
+				any_neighbor_state = {
+					OR = {
+						AND = {
+							OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
+							check_variable = { PREV.distance_to@THIS < 400 }
+						}
+						any_neighbor_state = {
+							NOT = { check_variable = { THIS.id = PREV.PREV.id } }
+							OR = { has_state_flag = EAI_radar_site radar_station > 0 } 
+							check_variable = { PREV.PREV.distance_to@THIS < 400 }
+						}
+					}
 				}
 			}
 		}
@@ -690,27 +730,29 @@ EAI_get_airbase_slot_scores = {
 
 	set_country_flag = EAI_airbase_slot_scores
 
-	every_state = { limit = { EAI_available_AIR = yes }
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_AIR = yes }
 
-		EAI_get_airbase_slot_score = yes
+			EAI_get_airbase_slot_score = yes
 
-		for_each_loop = { array = ROOT.EAI_airbase_slot_scores
+			for_each_loop = { array = ROOT.EAI_airbase_slot_scores
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_airbase_slot_score > EAI_airbase_slot_score } }
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_airbase_slot_score > EAI_airbase_slot_score } }
 
-					add_to_array = { array = ROOT.EAI_airbase_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+						add_to_array = { array = ROOT.EAI_airbase_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
-		}
 
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_airbase_slot_scores = THIS.id }
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_airbase_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -733,7 +775,17 @@ EAI_get_airbase_slot_score = {
 	
 	if = { limit = { air_base > 0 } multiply_variable = { EAI_airbase_slot_score = 1.25 } }
 
-	if = { limit = { any_state = { CONTROLLER = { has_war_with = ROOT } distance_to = { target = PREV value < 500 } } } multiply_variable = { EAI_airbase_slot_score = 2 } }
+	if = {
+		limit = { 
+			any_of_scopes = { array = ROOT.enemies 
+				any_of_scopes = { array = controlled_states 
+					check_variable = { PREV.PREV.distance_to@THIS < 400 } 
+				} 
+			} 
+		} 
+		
+		multiply_variable = { EAI_airbase_slot_score = 2 } 
+	}
 }
 
 # antiair
@@ -741,27 +793,29 @@ EAI_get_antiair_slot_scores = {
 
 	set_country_flag = EAI_antiair_slot_scores
 
-	every_state = { limit = { EAI_available_AA = yes }
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_AA = yes }
 
-		EAI_get_antiair_slot_score = yes
+			EAI_get_antiair_slot_score = yes
 
-		for_each_loop = { array = ROOT.EAI_antiair_slot_scores
+			for_each_loop = { array = ROOT.EAI_antiair_slot_scores
 
-			var:v = {
-				if = { limit = { check_variable = { PREV.EAI_antiair_slot_score > EAI_antiair_slot_score } }
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_antiair_slot_score > EAI_antiair_slot_score } }
 
-					add_to_array = { array = ROOT.EAI_antiair_slot_scores index = i value = PREV.id }
-					set_temp_variable = { break = 1 }
-					PREV = { set_state_flag = insert_success }
+						add_to_array = { array = ROOT.EAI_antiair_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
 				}
 			}
-		}
 
-		if = { limit = { NOT = { has_state_flag = insert_success } }
-			
-			add_to_array = { ROOT.EAI_antiair_slot_scores = THIS.id }
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_array = { ROOT.EAI_antiair_slot_scores = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
 		}
-		else = { clr_state_flag = insert_success }
 	}
 
 	if = { limit = { has_country_flag = EAI_construction_logging }
@@ -1071,7 +1125,7 @@ EAI_priority_queue_INF_resource = {
 			EAI_get_resource_slot_scores = yes
 		}
 
-		set_temp_variable = { ROOT.EAI_building_type_selected = 1 }
+		set_temp_variable = { EAI_building_type_selected = 1 }
 
 		for_each_scope_loop = { array = EAI_resource_slot_scores
 
@@ -1163,7 +1217,7 @@ EAI_queue_AA = {
 EAI_queue_INF_supply = { 
 	if = {
 		limit = {
-			any_state = {
+			any_of_scopes = { array = controlled_states
 				EAI_available_INF = yes
 				free_building_slots = { building = infrastructure size > 5 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
@@ -1183,7 +1237,7 @@ EAI_queue_INF_supply = {
 	}
 	else_if = {
 		limit = {
-			any_state = {
+			any_of_scopes = { array = controlled_states
 				EAI_available_INF = yes
 				free_building_slots = { building = infrastructure size > 5 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
@@ -1267,7 +1321,7 @@ EAI_add_CIC = {
 }
 
 EAI_add_MIC = {
-	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION:EAI_add_ MIC in [?This.id] [This.GetName]" }
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_MIC in [?This.id] [This.GetName]" }
 	add_building_construction = { type = arms_factory level = 1 instant_build = no }
 }
 

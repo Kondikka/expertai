@@ -108,24 +108,28 @@ EAI_mobilize_army = {
 		has_country_flag = EAI_mobilize_army
 
 		any_neighbor_country = {
+
 			capital_scope = { has_state_flag = EAI_original_capital_@PREV }
-			any_state = {
-				is_controlled_by = PREV
+
+			any_of_scopes = { array = controlled_states
 				is_in_home_area = yes
 				any_neighbor_state = {
 					is_controlled_by = ROOT
 					is_in_home_area = yes
 				}
 			}
+
 			OR = {
 				has_added_tension_amount > 10
 				has_war = yes
-
-				any_other_country = { is_justifying_wargoal_against = PREV }
-				any_other_country = { has_wargoal_against = PREV }
-
 				is_justifying_wargoal_against = ROOT
 				has_wargoal_against = ROOT
+				any_other_country = { 
+					OR = {
+						is_justifying_wargoal_against = PREV 
+						has_wargoal_against = PREV
+					}
+				}
 			}
 		}
 	}
@@ -155,13 +159,6 @@ EAI_build_infantry = {
 	}
 }
 
-# excludes tags from certain production limits
-EAI_exclude_major_C = {
-	OR = {
-		original_tag = SOV
-	}
-}
-
 EAI_defend_core = {
 	OR = {
 		surrender_progress > 0.1 
@@ -178,6 +175,8 @@ EAI_pp_advisor_prio = {
 	has_available_idea_with_traits = { idea = silent_workhorse limit = 1 }
 	NOT = { has_idea_with_trait = silent_workhorse }
 }
+
+### occupation policies
 
 EAI_use_gentle_occupation = {
 	ROOT = {
