@@ -19,7 +19,7 @@ EAI_update_naval_invasion_target = {
 			}
 		}
 
-		every_enemy_country = { limit = { EAI_naval_invade = yes } 
+		every_country = { limit = { EAI_naval_invade = yes } 
 		
 			add_to_temp_array = { array = updated_naval_invasion_targets value = THIS.id }
 		}
@@ -86,7 +86,7 @@ EAI_update_naval_invasion_target = {
 					}
 					
 					# exception for historical invasions
-					any_of = { array = updated_naval_invasion_targets EAI_historical_invasion = yes }
+					any_of_scopes = { array = updated_naval_invasion_targets EAI_historical_invasion = yes }
 				}
 			}
 
@@ -145,13 +145,14 @@ EAI_update_naval_invasion_target = {
 					}
 				}
 
-				if = { limit = { var:faction_leader_invasion_target = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } } }
+				var:faction_leader_invasion_target = {
 
-					EAI_clear_naval_invasion_operation = yes
+					if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 
-					var:faction_leader_invasion_target = {
-
-						ROOT = { EAI_create_naval_invasion_operation = yes }
+						ROOT = { 
+							EAI_clear_naval_invasion_operation  = yes
+							EAI_create_naval_invasion_operation = yes
+						}
 
 						if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (faction leader)" } 
 					}
@@ -159,7 +160,7 @@ EAI_update_naval_invasion_target = {
 			}
 			
 			###################################################################
-			#	the strongest faction leader is currently invading somewhere - support it
+			#	the strongest faction member is currently invading somewhere - support it
 			###################################################################
 			
 			else_if = {
@@ -192,13 +193,14 @@ EAI_update_naval_invasion_target = {
 					}
 				}
 
-				if = { limit = { var:strongest_member_invasion_target = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } } }
+				var:strongest_member_invasion_target = {
 
-					EAI_clear_naval_invasion_operation = yes
+					if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 
-					var:strongest_member_invasion_target = {
-
-						ROOT = { EAI_create_naval_invasion_operation = yes }
+						ROOT = { 
+							EAI_clear_naval_invasion_operation  = yes
+							EAI_create_naval_invasion_operation = yes
+						}
 
 						if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: invading [This.GetName] (strongest faction leader)" } 
 					}
@@ -209,17 +211,13 @@ EAI_update_naval_invasion_target = {
 			#	no invasion underway - see if anything can be invaded
 			###################################################################
 		
-			else_if = {
-				limit = { 
-					NOT = { has_variable = EAI_naval_invasion_target } 
-					has_army_manpower = { size > 250000 }
-				}
+			else_if = { limit = { NOT = { has_variable = EAI_naval_invasion_target } }
 	
 				### historical invasions
 
 				if = { limit = { any_of_scopes = { array = updated_naval_invasion_targets EAI_historical_invasion = yes  } }
 					
-					random_scope_in_array = { array = updated_naval_invasion_targets limit = { EAI_historical_invasion = yes  }
+					random_scope_in_array = { array = updated_naval_invasion_targets limit = { EAI_historical_invasion = yes }
 						
 						ROOT = { EAI_create_naval_invasion_operation = yes }
 						
@@ -288,7 +286,7 @@ EAI_create_naval_invasion_operation = { # THIS = INVADER, PREV = TARGET
 	PREV = { set_country_flag = EAI_naval_invasion_from_@PREV }
 }
 
-EAI_clear_naval_invasion_operation = { # THIS = INVADER, PREV = TARGET
+EAI_clear_naval_invasion_operation = { # THIS = INVADER
 
 	if = { limit = { has_variable = EAI_naval_invasion_target }
 
