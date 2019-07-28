@@ -225,6 +225,9 @@ NDefines.NAI.GENERATE_WARGOAL_THREAT_BASELINE = 0.6
 
 --NDefines.NAI.MAX_EXTRA_WARGOAL_GENERATION = 5
 
+NDefines.NAI.LENDLEASE_FRACTION_OF_PRODUCTION = 0.25 --0.5
+NDefines.NAI.LENDLEASE_FRACTION_OF_STOCKPILE = 0.125 --0.25
+
 --------------------------------------------------------------------------------------------------------------
 -- ECONOMY
 --------------------------------------------------------------------------------------------------------------
@@ -360,17 +363,10 @@ NDefines.NAI.PLAN_MIN_SIZE_FOR_FALLBACK = 5000					                -- A country 
 -- NAVY AI
 --------------------------------------------------------------------------------------------------------------
 
--- all-screen taskforces will be shared between convoy defense, mine missions and patrols (in this prio) 
--- and these ratios limits the maximum ratio of these taskforces to allocate on type
-NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN = 0.40 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX = 0.70 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN_CONVOY_THREAT = 100 -- AI will increase screen assignment for escort missions as threate increases
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = 1500-- AI will increase screen assignment for escort missions as threate increases
-
-NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING = 0.05 -- maximum ratio of screens forces to be used in mine sweeping
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING = 0.10 -- maximum ratio of screens forces to be used in mine sweeping
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO = 0.8 -- if you have mines near your owned states, you will start priotize mine missions and will assign this ratio of screens
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO_MIN_MINES = 10 -- lowest mine for prioing mine missions
--- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO_MAX_MINES = 1000 -- highest mines for highest prio for mine missions
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO_MAX_MINES = 250 -- highest mines for highest prio for mine missions
 
 NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_LAYING = 0.05 -- maximum ratio of screens forces to be used in mine laying
 -- NDefines.NAI.MAX_SCREEN_FORCES_FOR_INVASION_SUPPORT = 0.0 -- max ratio of screens forces to be used in naval invasion missions
@@ -378,9 +374,6 @@ NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_LAYING = 0.05 -- maximum ratio of sc
 -- NDefines.NAI.MAX_PATROL_TO_STRIKE_FORCE_RATIO = 3.0	-- maximum patrol/strike force ratio
 
 NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.1 				-- ai will use at most this ratio of affordable fuel for naval training
-
--- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
-NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
 
 NDefines.NAI.MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 1.0 					-- ai will not train a taskforce if fully trained ships are above this ratio
 
@@ -401,48 +394,46 @@ NDefines.NAI.MAX_INVASION_SIZE = 18
 
 -- NDefines.NAI.NAVAL_MISSION_DISTANCE_BASE = 3500									-- Base value when AI is evaluating distance score to places
 -- NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000									-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+
 -- NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_PATROL_DIVISOR = 1						-- Divides patrol score when not defending
--- NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 2						-- Divides escort score when not defending
--- NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 50000							-- Extra patrol mission score near owned provinces
--- NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_OWNED = 1							-- Extra escort mission score near owned provinces
--- NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_CONTROLLED = 1						-- Extra patrol mission score near controlled provinces
--- NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_CONTROLLED = 1						-- Extra escort mission score near controlled provinces
+-- NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_OWNED = 500							-- Extra patrol mission score near owned provinces
+-- NDefines.NAI.NAVAL_MISSION_PATROL_NEAR_CONTROLLED = 120						-- Extra patrol mission score near controlled provinces
 
 NDefines.NAI.INVASION_DISTANCE_RANDOMNESS = 300									-- This higher the value the more unpredictable the invasions. Compares to actual map distance in pixels.
 
 -- NDefines.NAI.STRIKE_FLEET_MAX_DISTANCE_TO_COMBAT = 500.0						-- The strike fleet will not attempt to intervene in combats further away than this.
 
 NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 0.0
-NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 0
+-- NDefines.NAI.CONVOY_NEED_SAFETY_BUFFER = 0
 
 -- NDefines.NAI.CARRIER_TASKFORCE_MAX_CARRIER_COUNT = 4 		-- optimum carrier count for carrier taskforces
 -- NDefines.NAI.CAPITAL_TASKFORCE_MAX_CAPITAL_COUNT = 12 		-- optimum capital count for capital taskforces
--- NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = 12			-- optimum screen count for screen taskforces
+NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = 10			-- optimum screen count for screen taskforces
 NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = 10 				-- optimum sub count for sub taskforces
 
 -- NDefines.NAI.MIN_CAPITALS_FOR_CARRIER_TASKFORCE = 10			-- carrier fleets will at least have this amount of capitals
 -- NDefines.NAI.CAPITALS_TO_CARRIER_RATIO = 1.5				-- capital to carrier count in carrier taskfoces
-NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 4					-- screens to capital/carrier count in carrier & capital taskforces
+-- NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 4					-- screens to capital/carrier count in carrier & capital taskforces
 
--- NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
--- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
--- 	200, -- PATROL		
--- 	200, -- STRIKE FORCE 
--- 	200, -- CONVOY RAIDING
--- 	100, -- CONVOY ESCORT
--- 	200, -- MINES PLANTING	
--- 	100, -- MINES SWEEPING	
--- 	0, -- TRAIN
--- 	0, -- RESERVE_FLEET
--- 	100, -- NAVAL INVASION SUPPORT
--- }
+NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
+	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
+	200, -- PATROL		
+	200, -- STRIKE FORCE 
+	200, -- CONVOY RAIDING
+	100, -- CONVOY ESCORT
+	200, -- MINES PLANTING	
+	100, -- MINES SWEEPING	
+	0, -- TRAIN
+	0, -- RESERVE_FLEET
+	100, -- NAVAL INVASION SUPPORT
+}
 
 NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to get assigned to a mission
 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	3800, -- PATROL		
+	3800, -- PATROL - 100000	
 	1000, -- STRIKE FORCE 
 	1500, -- CONVOY RAIDING
-	1000, -- CONVOY ESCORT
+	3000, -- CONVOY ESCORT - 1000
 	-1, -- MINES PLANTING	
 	300, -- MINES SWEEPING	
 	0, -- TRAIN
@@ -455,13 +446,32 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 	1.5, -- PATROL		
 	6, -- STRIKE FORCE 
 	1.5, -- CONVOY RAIDING
-	4, -- CONVOY ESCORT
+	2, -- CONVOY ESCORT
 	2, -- MINES PLANTING
 	2, -- MINES SWEEPING
 	0, -- TRAIN
 	0, -- RESERVE_FLEET
 	10, -- NAVAL INVASION SUPPORT
 }
+
+-------------------------
+-- convoy escorts
+-------------------------
+
+-- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
+NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
+
+-- NDefines.NAI.CONVOY_ESCORT_SCORE_FROM_CONVOYS = 15 -- score for each convoy you have in area
+NDefines.NAI.CONVOY_ESCORT_MUL_FROM_NO_CONVOYS = 0 -- score multiplier when no convoys are around
+
+-- NDefines.NAI.NAVAL_MISSION_AGGRESSIVE_ESCORT_DIVISOR = 1 --2 -- Divides escort score when not defending
+-- NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_OWNED = 0 --300 -- Extra escort mission score near owned provinces
+-- NDefines.NAI.NAVAL_MISSION_ESCORT_NEAR_CONTROLLED = 0 --250 -- Extra escort mission score near controlled provinces
+
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN = 0.40 --0.20 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX = 0.85 --0.70 -- maximum ratio of all screen-ships forces to be used in convoy defense (increases up to max as AI loses convoys).
+-- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MIN_CONVOY_THREAT = 100 -- AI will increase screen assignment for escort missions as threate increases
+NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = 500 -- 1500 -- AI will increase screen assignment for escort missions as threate increases
 
 -------------------------
 -- convoy raiding
@@ -485,18 +495,7 @@ NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 1
 
 NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 400
 
---NDefines.NAI.AIR_CONTROLLED_TERRITORY_INTERCEPT_SCORE = 6                        -- [6]    -- Interception score per controlled state in mission region
---NDefines.NAI.AIR_ALLY_TERRITORY_INTERCEPT_SCORE = -400                           -- [-400] -- Interception score per ally controlled state in mission region
---NDefines.NAI.INTERCEPT_NAVAL_BOMBING_FACTOR = 35.0                               -- [35.0] -- Factors the weight of intercepting naval bombers in sea regions where friendly ships are
---NDefines.NAI.AIR_CAS_SCORE_FACTOR = 25.0                                         -- [25.0] -- Factor applied to (friendly units) x (enemy units)) to get CAS score for region
---NDefines.NAI.AIR_ENEMY_SUPERIORITY_FACTOR = 5.0                                  -- [5.0]  -- How much enemy air superiority counts relative to own
 --NDefines.NAI.AIR_SUPERIORITY_FACTOR = 2.5                                        -- [2.5]  -- Factor for air superiority score
---NDefines.NAI.AIR_MIN_ASSIGN_SCORE = 10                                           -- [10]   -- Minimum total score for region to be considered for air missions
---NDefines.NAI.AIR_MIN_REASSIGN_SCORE = 25                                         -- [25]   -- Minimum total score for region to be considered for reassigning air missions
---NDefines.NAI.AIR_WING_SIZE_FACTOR = 1.0                                          -- [1.0]  -- Impact on air score of assigning wings to mission
---NDefines.NAI.AIR_MISSION_MIN_COVEREAGE = 0.2                                     -- [0.2]  -- Between 0 and 1 limit for % coverage for air mission to be considered
---NDefines.NAI.AIR_BASE_PRIORITY_DISTANCE_FACTOR = 25.0                            -- [25.0] -- Weight of distance between region and airbase for airbase priority score
---NDefines.NAI.AIR_BASE_DANGER_ZONE_WEIGHT = 100                                   -- [100]  -- Score used per province taken by enemy in a state to determine how dangerous it is to use an air base
 --NDefines.NAI.AIR_SCORE_DISTANCE_IMPACT = 0.3                                     -- [0.3]  -- Effect of distance applied to the score calculations
 --NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 4                              -- [4]    -- Amount of days between air ai updates priorities for air wings ( from 1 to N )
 --NDefines.NAI.NUM_HOURS_SINCE_LAST_COMBAT_TO_SUPPORT_UNITS_VIA_AIR = 72           -- [72]   -- units will be considered in combat if they are just out of their last combat for air supporting
@@ -512,6 +511,12 @@ NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 1.0                                     
 --NDefines.NAI.NAVAL_STRIKE_PLANES_PER_ARMY = 0                                    -- [0]    -- Amount of planes requested per enemy army
 NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 40                                   -- [20]   -- Amount of bombers requested per enemy ship
 -- NDefines.NAI.NAVAL_MIN_EXCORT_WINGS = 1                                         -- [0]    -- Min amount of airwings requested to excort operations
+
+-- NDefines.NAI.MINES_SWEEPING_PLANES_PER_MAX_MINES = 0 			-- Amount of air wings request for mines sweeping when there is max amount of mines planted by enemy in certain region
+-- NDefines.NAI.MINES_PLANTING_PLANES_PER_MAX_DESIRE = 0			-- Amount of air wings request for mines planting when there is max desire for it.
+-- NDefines.NAI.MINES_PLANTING_DESIRE_PER_HOME_STATE = 0.0			-- Scoring for how much do we want to plant naval mines with our air wings if the naval region is adjacent to a home state. Multiple adjacent states increases the score. Max sum of score is 1.0.
+-- NDefines.NAI.MINES_PLANTING_DESIRE_PER_ENEMY_STATE = 0.0		-- Scoring for how much do we want to plant naval mines with our air wings if the naval region is adjacent to the enemy state. Multiple adjacent states increases the score. Max sum of score is 1.0.
+-- NDefines.NAI.MINES_PLANTING_DESIRE_PER_NAVAL_THREAT = 0		-- How much threat must be generated in the naval region, in order to get the maximum desire to plant naval mines in there.
 
 NDefines.NAI.PORT_STRIKE_PLANES_PER_SHIP = 20                                    -- [10]   -- Amount of bombers request per enemy ship in the port
 
