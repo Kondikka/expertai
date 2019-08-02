@@ -5,6 +5,7 @@
 # ROOT = SENDER, THIS = TARGET
 # conditions for sending volunteers to a country
 EAI_send_volunteers = {
+
 	THIS = { # target
 		has_war = yes
 		
@@ -87,6 +88,7 @@ EAI_send_volunteers = {
 }
 
 EAI_historical_volunteers = {
+
 	OR = {
 		AND = {
 			ROOT = { original_tag = SOV has_government = communism }
@@ -118,6 +120,35 @@ EAI_historical_volunteers = {
 			OR = { original_tag = ENG is_subject_of = ENG } has_government = democratic
 
 			date > 1941.1.1
+		}
+	}
+}
+
+EAI_send_expeditionary = { # hardcoded ai blocks this in some situations
+
+	ROOT = { NOT = { surrender_progress > 0 } }
+
+	THIS = { has_war_together_with = ROOT }
+
+	OR = {
+
+		# minors send to majors/overlord
+		AND = {
+			ROOT = { is_major = no }
+
+			THIS = {
+				OR = {
+					AND = { is_in_faction_with = ROOT is_major = yes }
+					ROOT = { is_subject_of = PREV }
+				}
+			}
+		}
+
+		# warlords send to china
+		AND = {
+			ROOT = { EAI_asian_minor = yes }
+
+			THIS = { original_tag = CHI }
 		}
 	}
 }

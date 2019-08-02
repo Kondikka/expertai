@@ -12,7 +12,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_infantry_division_limit } } 
 		
-			set_country_flag = EAI_infantry_division_limit
+			set_country_flag = { flag = EAI_infantry_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: infantry" }  
 		}
 	}
@@ -24,7 +24,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_anti_tank_division_limit } } 
 		
-			set_country_flag = EAI_anti_tank_division_limit
+			set_country_flag = { flag = EAI_anti_tank_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: anti tank" }  
 		}
 	}
@@ -36,7 +36,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_armored_division_limit } } 
 		
-			set_country_flag = EAI_armored_division_limit
+			set_country_flag = { flag = EAI_armored_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: armor [?EAI_arm_bat_count] > [?EAI_armor_division_cap]" }  
 		}
 	}
@@ -48,7 +48,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_light_armor_division_limit } } 
 		
-			set_country_flag = EAI_light_armor_division_limit
+			set_country_flag = { flag = EAI_light_armor_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: EAI_light_armor_division_limit" }  
 		}
 	}
@@ -60,7 +60,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_medium_armor_division_limit } } 
 		
-			set_country_flag = EAI_medium_armor_division_limit
+			set_country_flag = { flag = EAI_medium_armor_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: EAI_medium_armor_division_limit" }  
 		}
 	}
@@ -72,7 +72,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_heavy_armor_division_limit } } 
 		
-			set_country_flag = EAI_heavy_armor_division_limit
+			set_country_flag = { flag = EAI_heavy_armor_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: EAI_heavy_armor_division_limit" }  
 		}
 	}
@@ -84,7 +84,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_modern_armor_division_limit } } 
 		
-			set_country_flag = EAI_modern_armor_division_limit
+			set_country_flag = { flag = EAI_modern_armor_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: EAI_modern_armor_division_limit" }  
 		}
 	}
@@ -96,7 +96,7 @@ EAI_check_division_limits = {
 
 		if = { limit = { NOT = { has_country_flag = EAI_motorized_division_limit } } 
 		
-			set_country_flag = EAI_motorized_division_limit
+			set_country_flag = { flag = EAI_motorized_division_limit value = 1 days = 18 }
 			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: motorized" }  
 		}
 	}
@@ -141,12 +141,15 @@ EAI_calculate_division_cap = {
 	set_variable = { EAI_armor_division_cap = num_of_military_factories }
 	multiply_variable = { EAI_armor_division_cap = 1.4 }
 
+	# increase with difficulty settings
 	if = { limit = { has_country_flag = EAI_difficulty_bonus_hard_active } multiply_variable = { EAI_armor_division_cap = 1.25 } }
 	else_if = { limit = { has_country_flag = EAI_difficulty_bonus_very_hard_active } multiply_variable = { EAI_armor_division_cap = 1.50 } }
 	else_if = { limit = { has_country_flag = EAI_difficulty_bonus_insane_active } multiply_variable = { EAI_armor_division_cap = 1.75 } }
 
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } } multiply_variable = { EAI_armor_division_cap = 0.4 } }
-
+	# reduce if it has no armor focus
+	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } } multiply_variable = { EAI_armor_division_cap = 0.25 } }
+	
+	# reduce if it has low fuel
 	if = { limit = { fuel_ratio < 0.5 } multiply_variable = { EAI_armor_division_cap = 0.5 } }
 	
 	### limits
