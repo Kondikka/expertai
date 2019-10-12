@@ -126,61 +126,39 @@ scripted_diplomatic_actions = {
                 FROM = { OR = { is_in_faction_with = ROOT is_subject_of = ROOT } }
                 ROOT = { is_subject_of = PREV } 
             }
-            NOT = { ROOT = { has_country_flag = EAI_ignore_borders_from_@PREV } }
         }
 
         selectable = {
             ROOT = { NOT = { has_country_flag = EAI_avoid_borders_diplomacy_REQUESTED } }
         }
 
-        icon = 1
-
-        on_sent_effect = {
-            ROOT = { set_country_flag = { flag = EAI_avoid_borders_diplomacy_REQUESTED value = 1 days = 2 } }
-		}
-
-        complete_effect = {
-            ROOT = { 
-                clr_country_flag = EAI_avoid_borders_diplomacy_REQUESTED
-
-                set_country_flag = EAI_ignore_borders_from_@PREV
-            }
-		}
-
-        ai_acceptance = {
-			EAI_acceptance = {
-                base = 1
-            }
-		}
-
-        ai_desire = {
-			factor = -1
-		}
-	}
-
-    EAI_avoid_borders_cancel_diplomacy = {
-	
-        allowed = { always = yes }
-
-        visible = { 
-            ROOT = { has_country_flag = EAI_ignore_borders_from_@PREV }
-        }
-
-        selectable = {
-            ROOT = { NOT = { has_country_flag = EAI_avoid_borders_cancel_diplomacy_REQUESTED } }
-        }
+        requires_acceptance = no
+        show_acceptance_on_action_button = no
 
         icon = 1
 
-        on_sent_effect = {
-            ROOT = { set_country_flag = { flag = EAI_avoid_borders_cancel_diplomacy_REQUESTED value = 1 days = 2 } }
-		}
-
         complete_effect = {
-            ROOT = { 
-                clr_country_flag = EAI_avoid_borders_cancel_diplomacy_REQUESTED
 
-                clr_country_flag = EAI_ignore_borders_from_@PREV
+            ROOT = { 
+
+                set_country_flag = EAI_show_border_avoidance_window
+                
+                every_country = {
+                    limit = {
+                        OR = { 
+                            is_in_faction_with = ROOT
+                            is_subject_of = ROOT
+                            ROOT = { is_subject_of = PREV }
+							has_military_access_to = ROOT
+                        }
+
+                       any_other_country = {
+                           PREV = { has_country_flag = EAI_ignore_borders_from_@PREV }
+                       }
+                    }
+
+                    add_to_array = { array = ROOT.EAI_border_avoidance_countries_with_rules_array value = THIS.id }
+                }
             }
 		}
 

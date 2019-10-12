@@ -69,6 +69,44 @@ on_actions = {
 			}
 		}
 	}
+	on_bi_yearly_pulse = {
+		effect = {
+
+			if = { limit = { NOT = { has_country_flag = EAI_on_bi_yearly_pulse_checked } } # on_bi_yearly_pulse triggers 24x per pulse?
+
+				set_country_flag = { flag = EAI_on_bi_yearly_pulse_checked value = 1 days = 10 }
+
+				# clear border avoidance flags if no player is on its side anymore
+				if = { 
+					limit = { 
+						is_ai = yes 
+
+						any_other_country = {
+							PREV = { has_country_flag = EAI_ignore_borders_from_@PREV }
+						}
+
+						NOT = {
+							any_country = {
+								is_ai = no
+
+								OR = { 
+									is_in_faction_with = PREV
+									is_subject_of = PREV
+									PREV = { is_subject_of = PREV }
+									PREV = { has_military_access_to = PREV }
+								}
+							}
+						}
+					}
+
+					every_other_country = { limit = { PREV = { has_country_flag = EAI_ignore_borders_from_@PREV } }
+
+						PREV = { clr_country_flag = EAI_ignore_borders_from_@PREV }
+					}
+				}
+			}
+		}
+	}
 	on_puppet = {
 		effect = {
 
