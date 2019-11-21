@@ -33,6 +33,19 @@ EAI_naval_invade = {
 			strength_ratio = { tag = ROOT ratio < 1.0 }
 		
 			EAI_historical_invasion = yes
+
+			naval_strength_comparison = {
+				other = ROOT
+				ratio < 2.0
+				sub_unit_def_weights = {
+					carrier = 1
+					battleship = 1
+					battle_cruiser = 1
+					destroyer = 1
+					light_cruiser = 1
+					heavy_cruiser = 1
+				}
+			}
 		}
 	}
 
@@ -53,6 +66,8 @@ EAI_naval_invade = {
 EAI_stop_naval_invasion = { 
 
 	OR = {
+		EAI_invasion_restriction = yes
+
 		# invalid invasion
 		NOT = { EAI_naval_invade = yes }
 
@@ -120,19 +135,7 @@ EAI_invasion_restriction = {
 		AND = { # uninvadeable countries
 			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
-			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN } is_in_faction_with = GER } 
-		}
-
-		AND = { # USA
-			ROOT = { original_tag = USA } 
-			
-			THIS = { GER = { EAI_PREV_on_same_side_with_THIS = yes } } 
-
-			ROOT = {
-				has_war_with = JAP
-
-				date < 1944.1.1
-			}
+			THIS = { OR = { original_tag = FRA original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN } is_in_faction_with = GER } 
 		}
 		
 		AND = { # JAP
@@ -177,6 +180,7 @@ EAI_invasion_restriction = {
 EAI_historical_invasion = { 
 
 	NOT = {
+		EAI_invasion_restriction = yes
 		EAI_PREV_on_same_side_with_THIS = yes
 		has_country_flag = EAI_stop_invasions_@ROOT
 	}
@@ -184,8 +188,8 @@ EAI_historical_invasion = {
 	OR = {
 		# axis invasion in norway
 		AND = { 
-			NOT = { has_global_flag = EAI_GER_dont_invade_NOR }
 			ROOT = { GER = { EAI_PREV_on_same_side_with_THIS = yes } }
+
 			THIS = { original_tag = NOR } 
 		}
 		
