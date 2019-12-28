@@ -145,7 +145,7 @@ NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	       
 
 NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 --7
 NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.25 --0.1
-NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 365 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
+NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 270 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
 --NDefines.NAI.LOW_PRIO_TEMPLATE_PENALTY_FOR_FRONTS = 100000		-- penalty to make ai less likely to assign low prio units to fronts
@@ -154,7 +154,7 @@ NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 365 --180 --50                       
 -- DIVISION PRODUCTION
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0 --1 		        			-- How many units a country wants is partially based on how much military industry that is available
+NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0.03 --1 		        			-- How many units a country wants is partially based on how much military industry that is available
 
 NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_WARTIME = 0.2 				-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during war time
 NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.1     		-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during peace time
@@ -186,7 +186,7 @@ NDefines.NAI.STOP_TRAINING_EQUIPMENT_LEVEL = 0.7 --0.8                          
 -- EQUIPMENT PRODUCTION
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.5 -- 0.25	-- Base value for how much of currently used equipment the AI will at least strive to have in stock
+-- NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.5 -- 0.25	-- Base value for how much of currently used equipment the AI will at least strive to have in stock
 
 NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 1
 NDefines.NAI.NEEDED_NAVAL_FACTORIES_EXPENSIVE_SHIP_BONUS = 1000
