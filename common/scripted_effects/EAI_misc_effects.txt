@@ -2,6 +2,69 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
+EAI_calculate_fuel_need = {
+
+	### air
+
+	set_temp_variable = { air_force_size = 0 }
+	while_loop_effect = { limit = { check_variable = { air_force_size < 15000 } }
+
+		if = { 
+			limit = {
+				meta_trigger = {
+					text = { NOT = { has_deployed_air_force_size = { size > [x] } } }
+					x = "[?air_force_size]"
+				}
+			} 
+		
+			set_temp_variable = { break = 1 }
+		}
+		else = {
+			add_to_temp_variable = { air_force_size = 500 }
+		}
+	}
+
+	multiply_temp_variable = { air_force_size = 1.8 } # fuel consumption estimate
+
+	### land
+
+	set_temp_variable = { armor_size = 0 }
+
+	set_temp_variable = { armor_size = num_battalions_with_type@medium_armor }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@medium_sp_anti_air_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@medium_sp_artillery_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@medium_tank_destroyer_brigade }
+
+	add_to_temp_variable = { armor_size = num_battalions_with_type@heavy_armor }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@heavy_sp_anti_air_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@heavy_sp_artillery_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@heavy_tank_destroyer_brigade }
+
+	add_to_temp_variable = { armor_size = num_battalions_with_type@modern_armor }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@modern_sp_anti_air_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@modern_sp_artillery_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@modern_tank_destroyer_brigade }
+
+	add_to_temp_variable = { armor_size = num_battalions_with_type@light_armor }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@light_sp_anti_air_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@light_sp_artillery_brigade }
+	add_to_temp_variable = { armor_size = num_battalions_with_type@light_tank_destroyer_brigade }
+
+	multiply_temp_variable = { armor_size = 50 } # fuel consumption estimate
+
+	### navy
+
+	set_temp_variable = { navy_size = num_ships }
+
+	multiply_temp_variable = { navy_size = 60 } # fuel consumption estimate
+
+	### total
+
+	set_variable = { EAI_max_fuel_consumption_estimate = air_force_size }
+	add_to_variable = { EAI_max_fuel_consumption_estimate = armor_size }
+	add_to_variable = { EAI_max_fuel_consumption_estimate = navy_size }
+}
+
 # command power cost when changing an ally's military focuses
 EAI_calculate_config_cp_cost = {
 
