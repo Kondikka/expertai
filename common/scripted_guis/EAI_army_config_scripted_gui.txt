@@ -545,6 +545,24 @@ scripted_gui = {
 				if = { limit = { NOT = { has_country_flag = EAI_config_ARMY_GLOBAL } }
 					set_country_flag = EAI_army_focuses_edited
 				}
+
+				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
+
+					for_each_scope_loop = { array = EAI_config_country_list_selected_country_array
+
+						if = {
+							limit = {
+								is_ai = yes
+
+								NOT = { has_country_flag = EAI_player_is_configuring_this_country has_country_flag = EAI_AI_is_configuring_this_country }
+							}
+
+							EAI_apply_global_focuses = yes
+						}
+					}
+
+					EAI_clear_all_OVERRIDE_focuses = yes 
+				}
 			}
 			EAI_config_ARMY_cancel_click = {
 				clr_country_flag = EAI_player_is_configuring_army_focuses
@@ -566,26 +584,38 @@ scripted_gui = {
 					EAI_clear_all_OVERRIDE_focuses = yes
 				}
 
-				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
-					every_country = {
-						limit = {
-							is_ai = yes
-						}
+				# if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
 
-						clr_country_flag = EAI_army_config_triggered
+				# 	for_each_scope_loop = { array = EAI_config_country_list_selected_country_array
+
+				# 		if = {
+				# 			limit = {
+				# 				is_ai = yes
+
+				# 				NOT = { has_country_flag = EAI_player_is_configuring_this_country has_country_flag = EAI_AI_is_configuring_this_country }
+				# 			}
+
+				# 			clr_country_flag = EAI_army_config_triggered
 					
-						EAI_clear_all_focuses = yes
-			
-						EAI_clear_all_OVERRIDE_focuses = yes
-					}
-				}
+				# 			EAI_clear_all_focuses = yes
+				
+				# 			EAI_clear_all_OVERRIDE_focuses = yes
+				# 		}
+				# 	}
+				# }
 			}
 		}
 		
 		triggers = {
 			EAI_config_ARMY_confirm_click_enabled = {
+
 				var:EAI_configuration_target = {
 					EAI_has_OVERRIDE_focuses = yes
+				}
+
+				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
+
+					check_variable = { EAI_config_country_list_selected_country_array^num > 0 }
 				}
 			}
 			EAI_config_ARMY_reset_click_enabled = {
@@ -694,16 +724,15 @@ scripted_gui = {
 				clr_country_flag = EAI_config_STOCKPILE
 				
 				if = { limit = { has_country_flag = EAI_config_ARMY_GLOBAL }
-					every_country = {
-						limit = {
-							is_ai = yes
-							NOT = { 
-								has_country_flag = EAI_army_config_triggered 
-								EAI_has_OVERRIDE_focuses = yes
-							}
-						}
 
-						EAI_apply_global_focuses = yes
+					for_each_scope_loop = { array = EAI_config_country_list_selected_country_array
+
+						if = { limit = { EAI_has_OVERRIDE_focuses = yes }
+
+							EAI_clear_modified_focuses = yes
+		
+							clr_country_flag = EAI_army_config_triggered
+						}
 					}
 
 					EAI_clear_all_OVERRIDE_focuses = yes 
@@ -1627,6 +1656,16 @@ scripted_gui = {
 					else = { clear_variable = EAI_FOCUS/AIR/ground_bomber_OVERRIDE }
 				}
 			}
+			EAI_config_ARMY_A2c_click = {
+				ROOT = { clear_variable = EAI_config_ARMY_show_category }
+
+				var:EAI_configuration_target = {
+					if = { limit = { NOT = { check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_NO_GROUND_AIR } } }
+						set_variable = { EAI_FOCUS/AIR/ground_bomber_OVERRIDE = global.EAI_NO_GROUND_AIR }
+					}
+					else = { clear_variable = EAI_FOCUS/AIR/ground_bomber_OVERRIDE }
+				}
+			}
 		}
 
 		triggers = {
@@ -1638,6 +1677,9 @@ scripted_gui = {
 
 			}
 			EAI_config_ARMY_A2b_click_enabled = {
+
+			}
+			EAI_config_ARMY_A2c_click_enabled = {
 
 			}
 		}

@@ -15,6 +15,7 @@
 @BUILD_COST_DOCKYARD = 6400
 @BUILD_COST_REFINERY = 14500
 @BUILD_COST_SILO = 5000
+@CONVERSION_COST_MIL_TO_CIV = 9000
 
 EAI_get_building_values = {
 
@@ -24,46 +25,57 @@ EAI_get_building_values = {
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_infrastructure_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 2 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 2 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_AIRBASE }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_air_base_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 3 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 3 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_ANTIAIR }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_anti_air_building_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 4 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 4 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_RADAR }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_radar_station_factor }
 	}
 
-	if = { limit = { check_variable = { EAI_building_type_selected = 5 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 5 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_MILITARY_FACTORY }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_arms_factory_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 6 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 6 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_CIVILIAN_FACTORY }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_industrial_complex_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 7 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 7 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_DOCKYARD }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_dockyard_factor }
 	}
 	
-	if = { limit = { check_variable = { EAI_building_type_selected = 8 } }
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 8 } }
 
 		set_temp_variable = { EAI_building_cost = @BUILD_COST_REFINERY }
 		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_synthetic_refinery_factor }
+	}
+
+	else_if = { limit = { check_variable = { EAI_building_type_selected = 9 } }
+
+		set_temp_variable = { EAI_building_cost = @CONVERSION_COST_MIL_TO_CIV }
+
+		set_temp_variable = { t1 = modifier@conversion_cost_mil_to_civ_factor }
+		add_to_temp_variable = { t1 = 1.0 }
+		multiply_temp_variable = { EAI_building_cost = t1 }
+
+		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_industrial_complex_factor }
 	}
 
 	add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_buildings_factor }
@@ -150,39 +162,45 @@ EAI_add_finished_building = {
 		add_building_construction = { type = infrastructure level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 2 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 2 } } }
 
 		add_building_construction = { type = air_base level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 3 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 3 } } }
 
 		add_building_construction = { type = anti_air_building level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 4 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 4 } } }
 
 		add_building_construction = { type = radar_station level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 5 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 5 } } }
 
 		add_building_construction = { type = arms_factory level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 6 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 6 } } }
 
 		add_building_construction = { type = industrial_complex level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 7 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 7 } } }
 
 		add_building_construction = { type = dockyard level = 1 instant_build = yes }
 	}
 
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 8 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 8 } } }
 
 		add_building_construction = { type = synthetic_refinery level = 1 instant_build = yes }
+	}
+
+	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 9 } } }
+
+		remove_building = { type = arms_factory level = 1 }
+		add_building_construction = { type = industrial_complex level = 1 instant_build = yes }
 	}
 }
 
@@ -195,6 +213,8 @@ EAI_priority_constructions = {
 	EAI_improve_north_africa_infrastructure = yes
 
 	EAI_resource_extraction = yes
+
+	EAI_convert_factories_to_civ = yes
 }
 
 ### priority construction strategies
@@ -298,6 +318,64 @@ EAI_resource_extraction = {
 		}
 
 		EAI_priority_queue_INF_resource = yes
+	}
+}
+
+EAI_convert_factories_to_civ = {
+
+	### track steel shortage
+
+	if = {
+		limit = {
+			# there is a steel deficit
+			check_variable = { resource@steel < 0 }
+			
+			# total steel needed for production
+			set_temp_variable = { steel_needed = resource_consumed@steel }
+			multiply_temp_variable = { steel_needed = -1 }
+			add_to_temp_variable = { steel_needed = resource@steel }
+
+			# deficit is >25% of total need
+			set_temp_variable = { steel_deficit = resource@steel }
+			divide_temp_variable = { steel_deficit = steel_needed }
+			check_variable = { steel_deficit > 0.25 }
+		}
+
+		add_to_variable = { EAI_resource_shortage_months = 1 }
+	}
+	else = {
+		subtract_from_variable = { EAI_resource_shortage_months = 1 }
+	}
+
+	clamp_variable = { var = EAI_resource_shortage_months min = 0 max = 3 }
+
+	###
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_construction_project_active }
+
+			NOT = { num_of_civilian_factories_available_for_projects < 5 }
+
+			# resource shortage
+			check_variable = { EAI_resource_shortage_months = 3 }
+
+			# over 50% of factories are mil
+			set_temp_variable = { mil_factories = num_of_military_factories }
+			divide_temp_variable = { mil_factories = num_of_factories }
+			check_variable = { mil_factories > 0.4 }
+
+			# no factory slots left
+			NOT = {
+				any_of_scopes = { array = controlled_states
+					EAI_available_SHARED = yes
+				}
+			}
+		}
+
+		EAI_priority_convert_MIC_to_CIC = yes
+
+		set_variable = { EAI_resource_shortage_months = 0 }
 	}
 }
 
@@ -839,6 +917,58 @@ EAI_get_antiair_slot_score = {
 	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_antiair_slot_score = 4 } }
 }
 
+# mil to civ conversion
+EAI_get_mil_to_civ_conversion_slot_scores = {
+
+	set_temp_variable = { EAI_has_mil_to_civ_conversion_slot_scores = 1 }
+
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { check_variable = { building_level@arms_factory > 0 } }
+
+			EAI_get_mil_to_civ_conversion_slot_score = yes
+
+			for_each_loop = { array = EAI_mil_to_civ_conversion_slot_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_mil_to_civ_conversion_slot_score > EAI_mil_to_civ_conversion_slot_score } }
+
+						add_to_temp_array = { array = EAI_mil_to_civ_conversion_slot_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_temp_array = { array = EAI_mil_to_civ_conversion_slot_scores value = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
+		}
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_logging }
+
+		log = "======= PRINTING EAI_mil_to_civ_conversion_slot_scores ======="
+		for_each_scope_loop = { array = EAI_mil_to_civ_conversion_slot_scores
+			log = "[?EAI_mil_to_civ_conversion_slot_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_mil_to_civ_conversion_slot_score = {
+
+	set_variable = { EAI_mil_to_civ_conversion_slot_score = building_level@infrastructure }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_mil_to_civ_conversion_slot_score = 1.1 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_mil_to_civ_conversion_slot_score = 2 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_mil_to_civ_conversion_slot_score = 4 } }
+
+	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_mil_to_civ_conversion_slot_score = 4 } }
+}
+
 ######################################################
 
 ### functions for AI construction
@@ -1181,6 +1311,33 @@ EAI_queue_AA = {
 			EAI_add_AA = yes
 			set_temp_variable = { break = 1 }
 			set_state_flag = { flag = EAI_aa_queued value = 1 days = 1 }
+		}
+	}
+}
+
+# mil to civ conversion
+EAI_priority_convert_MIC_to_CIC = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_construction_project_active } }
+
+		if = { limit = { check_variable = { EAI_has_mil_to_civ_conversion_slot_scores = 0 } }
+		
+			EAI_get_mil_to_civ_conversion_slot_scores = yes
+		}
+
+		set_temp_variable = { EAI_building_type_selected = 9 }
+
+		for_each_scope_loop = { array = EAI_mil_to_civ_conversion_slot_scores
+
+			if = { 
+				limit = {
+					check_variable = { building_level@arms_factory > 0 }
+				}
+
+				EAI_start_priority_construction = yes
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: mic conversion in [?This.id] [This.GetName]"
+				set_temp_variable = { break = 1 }
+			}
 		}
 	}
 }

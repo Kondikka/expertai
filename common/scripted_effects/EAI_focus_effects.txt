@@ -213,21 +213,191 @@ EAI_copy_focuses = {
 }
 
 EAI_apply_global_focuses = {
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/land_doctrine_OVERRIDE = ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE = ROOT.EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/AIR/air_doctrine_OVERRIDE = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/AIR/air_doctrine_OVERRIDE = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE = ROOT.EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE } }
+
+	if = {
+		limit = {
+			NOT = {
+				is_researching_technology = mobile_warfare
+				is_researching_technology = superior_firepower
+				is_researching_technology = trench_warfare
+				is_researching_technology = mass_assault
+
+				has_tech = delay is_researching_technology = delay
+				has_tech = sup_delay is_researching_technology = sup_delay
+				has_tech = grand_battle_plan is_researching_technology = grand_battle_plan
+				has_tech = pocket_defence is_researching_technology = pocket_defence
+			}
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE = global.EAI_MA_DOCTRINE } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_26W_INF_WIDTH }
+							check_variable = { EAI_FOCUS/LAND/infantry_width_OVERRIDE = global.EAI_26W_INF_WIDTH }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/infantry_width_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE = global.EAI_26W_INF_WIDTH } }
+						}
+					}
+				}
+			}
+		}
+
+		if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/land_doctrine_OVERRIDE = ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE } }
+		if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE = ROOT.EAI_FOCUS/LAND/land_doctrine_path_OVERRIDE } }
+	}
+	
+	if = {
+		limit = {
+			NOT = {
+				is_researching_technology = air_superiority
+			    is_researching_technology = formation_flying
+				is_researching_technology = force_rotation
+
+				has_tech = infrastructure_destruction is_researching_technology = infrastructure_destruction
+				has_tech = home_defence is_researching_technology = home_defence
+				has_tech = dive_bombing is_researching_technology = dive_bombing
+				has_tech = fighter_baiting is_researching_technology = fighter_baiting
+			}
+		}
+
+		if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/AIR/air_doctrine_OVERRIDE = ROOT.EAI_FOCUS/AIR/air_doctrine_OVERRIDE } }
+	}
+	
+	if = {
+		limit = {
+			NOT = {
+				is_researching_technology = fleet_in_being
+				is_researching_technology = trade_interdiction
+				is_researching_technology = base_strike
+
+				has_tech = battlefleet_concentration is_researching_technology = battlefleet_concentration
+				has_tech = convoy_sailing is_researching_technology = convoy_sailing
+				has_tech = submarine_operations is_researching_technology = submarine_operations
+
+				has_tech = convoy_interdiction_ti is_researching_technology = convoy_interdiction_ti
+				has_tech = raider_patrols is_researching_technology = raider_patrols
+				has_tech = carrier_operations is_researching_technology = carrier_operations
+
+				has_tech = carrier_primacy is_researching_technology = carrier_primacy
+				has_tech = submarine_operations_bs is_researching_technology = submarine_operations_bs
+				has_tech = convoy_escorts_bs is_researching_technology = convoy_escorts_bs
+			}
+		}
+
+		if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE } } set_variable = { EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE = ROOT.EAI_FOCUS/NAVY/naval_doctrine_OVERRIDE } }
+	}
+
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/infantry_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/infantry_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/infantry_design_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/infantry_width_OVERRIDE = ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE } }
+	if = { 
+		limit = { 
+			ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE } 
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE = global.EAI_26W_INF_WIDTH } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+							check_variable = { EAI_FOCUS/LAND/land_doctrine_OVERRIDE = global.EAI_MA_DOCTRINE }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/land_doctrine_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/land_doctrine_OVERRIDE = global.EAI_MA_DOCTRINE } }
+						}
+					}
+				}
+			}
+		} 
+	
+		set_variable = { EAI_FOCUS/LAND/infantry_width_OVERRIDE = ROOT.EAI_FOCUS/LAND/infantry_width_OVERRIDE } 
+	}
+	if = { 
+		limit = { 
+			ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE }
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+							check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/attachment_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT } }
+						}
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
+							check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/attachment_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT } }
+						}
+					}
+				}
+			}
+		} 
+		
+		set_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE } 	
+	}
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/armor_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/armor_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/armor_design_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/medium_armor_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/medium_armor_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/medium_armor_design_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/heavy_armor_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/heavy_armor_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/heavy_armor_design_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/armor_width_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/armor_width_OVERRIDE = ROOT.EAI_FOCUS/LAND/armor_width_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/motorized_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/motorized_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/motorized_design_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/antitank_design_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/antitank_design_OVERRIDE = ROOT.EAI_FOCUS/LAND/antitank_design_OVERRIDE } }
-	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE }  }
+	if = { 
+		limit = { 
+			ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE }
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
+							check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/armor_focus_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS } }
+						}
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT } } # incompatible
+			
+				THIS = { 
+					OR = {
+						NOT = { 
+							check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
+							check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
+						}
+						AND = {
+							ROOT = { has_variable = EAI_FOCUS/LAND/armor_focus_OVERRIDE }
+							NOT = { check_variable = { ROOT.EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS } }
+						}
+					}
+				}
+			}
+		} 
+		
+		set_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = ROOT.EAI_FOCUS/LAND/attachment_OVERRIDE } 
+	}
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/LAND/spec_ops_OVERRIDE } } set_variable = { EAI_FOCUS/LAND/spec_ops_OVERRIDE = ROOT.EAI_FOCUS/LAND/spec_ops_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/AIR/heavy_fighter_OVERRIDE } } set_variable = { EAI_FOCUS/AIR/heavy_fighter_OVERRIDE = ROOT.EAI_FOCUS/AIR/heavy_fighter_OVERRIDE } }
 	if = { limit = { ROOT = { has_variable = ROOT.EAI_FOCUS/AIR/ground_bomber_OVERRIDE } } set_variable = { EAI_FOCUS/AIR/ground_bomber_OVERRIDE = ROOT.EAI_FOCUS/AIR/ground_bomber_OVERRIDE } }
