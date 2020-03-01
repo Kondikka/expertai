@@ -17,17 +17,28 @@ EAI_default_production_minors = {
 #########################################################
 
 EAI_GER_default_air = {
+	allowed = { tag = GER }
 	enable = { 
-		original_tag = GER 
+		always = yes
 	}
 
-	ai_strategy = { type = air_factory_balance                                  value = 55 }
+	ai_strategy = { type = air_factory_balance                                  value = 75 }
+}
+EAI_GER_more_air = {
+	allowed = { tag = GER }
+	enable = { 
+		date < 1939.1.1
+		has_war = no
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = air_factory_balance value = 35 }
+	ai_strategy = { type = equipment_production_min_factories id = fighter value = 10 }
 }
 EAI_GER_increase_armor_production = {
+	allowed = { tag = GER }
 	enable = {
-		original_tag = GER
-
-		has_army_manpower = { size > 550000 }
+		has_army_manpower = { size > 950000 }
 		
 		OR = { has_war = no num_of_military_factories > 50 }
 		
@@ -46,13 +57,12 @@ EAI_GER_increase_armor_production = {
 
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = medium_tank_equipment value = 50 }
-	ai_strategy = { type = equipment_variant_production_factor id = heavy_tank_equipment value = 50 }
+	ai_strategy = { type = equipment_variant_production_factor id = medium_tank_equipment value = 15 }
+	ai_strategy = { type = equipment_variant_production_factor id = heavy_tank_equipment value = 15 }
 }
 EAI_GER_avoid_light_tank_production = {
+	allowed = { tag = GER }
 	enable = {
-		original_tag = GER
-
 		has_army_manpower = { size > 550000 }
 		
 		OR = { has_war = no num_of_military_factories > 50 }
@@ -72,10 +82,47 @@ EAI_GER_avoid_light_tank_production = {
 	}
 
 	abort_when_not_enabled = yes
-
-	ai_strategy = { type = equipment_production_min_factories id = armor value = 15 }
 	
 	ai_strategy = { type = equipment_variant_production_factor id = light_tank_equipment value = -200 }
+}
+EAI_GER_build_950k_army = {
+	allowed = { tag = GER }
+	enable = { 
+		date < 1940.1.1
+		has_war = no
+		has_army_manpower = { size < 950000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = infantry value = 500 }
+	ai_strategy = { type = force_build_armies value = 300 }
+}
+EAI_GER_artillery_1 = {
+	allowed = { tag = GER }
+	enable = { 
+		date < 1940.1.1
+		has_war = no
+		has_army_manpower = { size < 950000 }
+		check_variable = { EAI_FOCUS/LAND/infantry_design > global.EAI_A_INF_DESIGN }
+		has_equipment = { artillery_equipment < 1000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = artillery value = 5 }
+}
+EAI_GER_artillery_2 = {
+	allowed = { tag = GER }
+	enable = { 
+		date < 1940.1.1
+		has_war = no
+		num_of_military_factories > 40
+		has_army_manpower = { size < 950000 }
+		check_variable = { EAI_FOCUS/LAND/infantry_design > global.EAI_A_INF_DESIGN }
+		has_equipment = { artillery_equipment < 1000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = artillery value = 5 }
 }
 
 #########################################################
@@ -83,7 +130,8 @@ EAI_GER_avoid_light_tank_production = {
 #########################################################
 
 EAI_ITA_default_air = {
-	enable = { original_tag = ITA }
+	allowed = { tag = ITA }
+	enable = { always = yes }
 
 	ai_strategy = { type = air_factory_balance                                  value = 25 }
 }
@@ -93,8 +141,8 @@ EAI_ITA_default_air = {
 #########################################################
 
 EAI_JAP_focus_on_army = {
+	allowed = { tag = JAP }
 	enable = { 
-		original_tag = JAP 
 		has_army_manpower = { size > 550000 }
 	}
 	abort = {
@@ -104,9 +152,8 @@ EAI_JAP_focus_on_army = {
 	ai_strategy = { type = air_factory_balance                                  value = 50 }
 }
 EAI_JAP_focus_on_army_2 = {
+	allowed = { tag = JAP }
 	enable = {
-		original_tag = JAP
-
 		date < 1941.1.1
 		
 		OR = {
@@ -151,11 +198,9 @@ EAI_JAP_focus_on_army_2 = {
 	ai_strategy = { type = equipment_variant_production_factor id = suicide_craft_equipment      value = -100 }
 }
 EAI_JAP_increase_artillery_production = {
+	allowed = { tag = JAP }
 	enable = { 
 		date > 1936.7.1
-		
-		original_tag = JAP 
-		
 		NOT = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN } }
 		has_war = no
 		date < 1937.6.1
@@ -168,9 +213,8 @@ EAI_JAP_increase_artillery_production = {
 	ai_strategy = { type = equipment_variant_production_factor id = motorized_equipment value = -200 }
 }
 EAI_JAP_focus_on_capitals = {
-	enable = {  #
-		original_tag = JAP 
-		
+	allowed = { tag = JAP }
+	enable = {
 		EAI_BB_navy_production = yes
 		check_variable = { num_ships_with_type@battleship < 8 }
 		date < 1942.1.1
@@ -181,9 +225,8 @@ EAI_JAP_focus_on_capitals = {
 	ai_strategy = { type = equipment_production_min_factories id = capital_ship value = 10 }
 }
 EAI_JAP_focus_on_screens = {
+	allowed = { tag = JAP }
 	enable = { 
-		original_tag = JAP 
-		
 		EAI_DD_navy_production = yes
 		if = { limit = { EAI_BB_navy_production = yes }
 			NOT = { check_variable = { num_ships_with_type@battleship < 8 } }
@@ -212,9 +255,8 @@ EAI_JAP_focus_on_screens = {
 	ai_strategy = { type = equipment_production_min_factories id = convoy value = -2 }
 }
 EAI_JAP_focus_on_carriers = {
+	allowed = { tag = JAP }
 	enable = { 
-		original_tag = JAP 
-		
 		EAI_CV_navy_production = yes
 		EAI_BB_navy_production = yes
 		check_variable = { num_ships_with_type@battleship > 7 }
@@ -230,15 +272,15 @@ EAI_JAP_focus_on_carriers = {
 #########################################################
 
 EAI_SOV_default = {
-	enable = { original_tag = SOV }
+	allowed = { tag = SOV }
+	enable = { always = yes }
 
 	ai_strategy = { type = air_factory_balance                                  value = 40 }
 	ai_strategy = { type = equipment_production_factor id = armor               value = -25 }
 }
 EAI_SOV_increase_armor_production = {
+	allowed = { tag = SOV }
 	enable = {
-		tag = SOV
-
 		has_army_manpower = { type = infantry size > 3000000 }
 		
 		OR = {
@@ -260,9 +302,8 @@ EAI_SOV_increase_armor_production = {
 	ai_strategy = { type = equipment_production_factor id = armor               value = 50 }
 }
 EAI_SOV_focus_on_convoys = {
+	allowed = { tag = SOV }
 	enable = {
-		original_tag = SOV
-
 		has_war = no
 
 		stockpile_ratio = { archetype = convoy ratio < 400 }
@@ -275,9 +316,8 @@ EAI_SOV_focus_on_convoys = {
 	ai_strategy = { type = equipment_production_factor id = convoy 			                    value = 200 }
 }
 EAI_SOV_support_eq = {
+	allowed = { tag = SOV }
 	enable = {
-		original_tag = SOV
-
 		has_war = no
 
 		has_equipment = { support_equipment < 1000 }
@@ -295,9 +335,8 @@ EAI_SOV_support_eq = {
 	ai_strategy = { type = equipment_variant_production_factor id = support_equipment value = 150 }
 }
 EAI_SOV_artillery_eq = {
+	allowed = { tag = SOV }
 	enable = {
-		original_tag = SOV
-
 		has_war = no
 
 		if = { limit = { check_variable = { num_equipment@artillery_equipment < 100 } check_variable = { num_target_equipment_in_armies_k@artillery_equipment > 2000 } }
@@ -318,13 +357,14 @@ EAI_SOV_artillery_eq = {
 #########################################################
 
 EAI_ENG_default_air = {
-	enable = { original_tag = ENG }
+	allowed = { tag = ENG }
+	enable = { always = yes }
 	
 	ai_strategy = { type = air_factory_balance                                  value = 100 }
 }
 EAI_ENG_focus_on_fighters = {
+	allowed = { tag = ENG }
 	enable = { 
-		original_tag = ENG
 		has_deployed_air_force_size = { size < 3000 type = fighter }
 	}
 	abort = {
@@ -337,9 +377,8 @@ EAI_ENG_focus_on_fighters = {
 	ai_strategy = { type = equipment_variant_production_factor id = strat_bomber_equipment value = -99 }
 }
 EAI_ENG_focus_on_screens = {
+	allowed = { tag = ENG }
 	enable = { 
-		original_tag = ENG 
-
 		OR = {
 			EAI_DD_navy_production = yes
 			EAI_ASW_DD_navy_production = yes
@@ -365,7 +404,8 @@ EAI_ENG_focus_on_screens = {
 #########################################################
 
 EAI_FRA_default_air = {
-	enable = { tag = FRA }
+	allowed = { tag = FRA }
+	enable = { always = yes }
 	
 	ai_strategy = { type = air_factory_balance                                  value = 75 }
 }
@@ -375,14 +415,15 @@ EAI_FRA_default_air = {
 #########################################################
 
 EAI_USA_default_air = {
-	enable = { original_tag = USA }
+	allowed = { tag = USA }
+	enable = { always = yes }
 	
 	ai_strategy = { type = air_factory_balance                                  value = 100 }
 }
 EAI_USA_stockpile_for_lend_leasing = {
+	allowed = { tag = USA }
 	enable = {
 		is_historical_focus_on = yes
-		original_tag = USA
 		
 		date < 1939.1.1
 		has_war = no
@@ -400,7 +441,8 @@ EAI_USA_stockpile_for_lend_leasing = {
 	ai_strategy = { type = equipment_production_factor id = cas                 value = -100 }
 }
 EAI_USA_strategy = {
-	enable = { original_tag = USA is_major = yes }
+	allowed = { tag = USA }
+	enable = { is_major = yes }
 	
 	abort_when_not_enabled = yes
 

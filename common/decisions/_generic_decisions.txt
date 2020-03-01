@@ -1,4 +1,5 @@
 political_actions = {
+
 	
 	targeted_race_for_the_bomb = {
 
@@ -67,6 +68,14 @@ political_actions = {
 
 		available = {
 			has_stability < 1.0
+			if = {
+				limit = {
+					tag = SPR
+				}
+				NOT = {
+					has_idea = SPR_political_violence
+				}
+			}
 		}
 
 		visible = {
@@ -118,6 +127,11 @@ political_actions = {
 				has_available_idea_with_traits = { idea = silent_workhorse limit = 1 } 
 				NOT = { has_idea_with_trait = silent_workhorse } 
 			}
+			modifier = {
+				factor = 0
+				original_tag = SPR
+				NOT = { has_global_flag = spanish_civil_war }
+			}
 		}
 	}
 
@@ -129,6 +143,14 @@ political_actions = {
 			has_war = no
 			has_war_support > 0.2
 			has_stability < 1.0
+			if = {
+				limit = {
+					tag = SPR
+				}
+				NOT = {
+					has_idea = SPR_political_violence
+				}
+			}
 		}
 
 		visible = {
@@ -183,6 +205,11 @@ political_actions = {
 				has_available_idea_with_traits = { idea = silent_workhorse limit = 1 } 
 				NOT = { has_idea_with_trait = silent_workhorse } 
 			}
+			modifier = {
+				factor = 0
+				original_tag = SPR
+				NOT = { has_global_flag = spanish_civil_war }
+			}
 		}
 	}
 }
@@ -194,7 +221,7 @@ economy_decisions = {
 		icon = generic_construction
 
 		allowed = {
-			NOT = { OR = { tag = GER tag = FRA } }
+			NOT = { OR = { tag = GER tag = FRA original_tag = GER original_tag = FRA } }
 		}
 
 		cost = 50
@@ -277,6 +304,22 @@ propaganda_efforts = {
 			threat > 0.5
 			has_war_support < 0.5
 			has_offensive_war = no
+			if = {
+				limit = {
+					tag = SPR
+					has_dlc = "La Resistance"
+				}
+				NOT = {
+					has_idea = SPR_political_violence
+				}
+			}
+			if = {
+				limit = {
+					original_tag = SPR
+					has_dlc = "La Resistance"
+				}
+				has_global_flag = scw_over
+			}
 		}
 
 		visible = {
@@ -376,108 +419,21 @@ propaganda_efforts = {
 					has_offensive_war = yes
 				}
 			}
-		}
-
-		visible = {
-			FROM = {
-				NOT = { is_in_faction_with = ROOT }
-				OR = {
-					is_justifying_wargoal_against = ROOT
-					has_offensive_war_with = ROOT
+			if = {
+				limit = {
+					tag = SPR
+					has_dlc = "La Resistance"
 				}
-			}
-		}
-
-		days_remove = 90
-
-		fire_only_once = yes
-
-		cost = 75
-
-		modifier = {
-			war_support_weekly = 0.01
-		}
-
-		complete_effect = {
-			set_country_flag = war_propaganda_campaign_running
-
-			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DECISION: war_propaganda_against_warmonger" } #EAI
-		}
-		remove_effect = {
-			clr_country_flag = war_propaganda_campaign_running
-		}
-
-		ai_will_do = {
-			base = 0
-			modifier = { #EAI
-				add = 5000
-
-				OR = {
-					# has low war support
-					AND = {
-						has_war_support < 0.5
-
-						OR = {
-							threat > 0.5
-							has_war = yes
-							has_country_flag = EAI_mobilize_army
-						}
-					}
-
-					# taking tot_economic_mobilisation is possible 
-					AND = {
-						NOT = { has_idea = tot_economic_mobilisation }
-						any_enemy_country = {
-							ic_ratio = {
-								tag = ROOT
-								ratio > 0.5
-							}
-						}
-					}
-
-					# doesnt have women_in_the_workforce but has tot_economic_mobilisation
-					AND = {
-						has_idea = tot_economic_mobilisation
-						NOT = { has_decision = women_in_the_workforce }
-					}
-				}
-
-				# war support needed for total mobilization and women_in_the_workforce
 				NOT = {
-            	    AND = {
-            	        has_government = democratic
-            	        has_war_support > 0.79
-            	    }
-            	    AND = {
-            	        has_government = communism
-            	        has_war_support > 0.79
-            	    }
-            	    AND = {
-            	        has_government = fascism
-            	        has_war_support > 0.89
-            	    }
-            	    AND = {
-            	        has_government = neutrality
-            	        has_war_support > 0.84
-            	    }
-            	}
-			}
-		}
-	}
-
-	#Propaganda campaign against a neighbor
-	war_propaganda_against_warmonger_neighbor = {
-
-		icon = generic_prepare_civil_war
-
-		available = {
-			NOT = { has_country_flag = war_propaganda_campaign_running }
-			FROM = {
-				OR = {
-					has_offensive_war = yes 
-					is_justifying_wargoal_against = ROOT
-					has_war_with = ROOT
+					has_idea = SPR_political_violence
 				}
+			}
+			if = {
+				limit = {
+					original_tag = SPR
+					has_dlc = "La Resistance"
+				}
+				has_global_flag = scw_over
 			}
 		}
 
@@ -574,7 +530,7 @@ propaganda_efforts = {
 		ai_will_do = {
 			base = 0
 			modifier = { #EAI
-				add = 10000
+				add = 5000
 
 				OR = {
 					# has low war support
@@ -1693,6 +1649,7 @@ war_measures = {
         }
         visible = {
             has_war = yes
+            NOT = { tag = SPC }
         }
 
         fire_only_once = no
@@ -1799,6 +1756,12 @@ foreign_politics = {
         	NOT = { has_war_with = FROM }
         	any_enemy_country = {
 				has_attache_from = FROM
+			}
+			NOT = {
+				AND = {
+					original_tag = SPR
+					has_completed_focus = SPR_regional_defense_council_of_aragon
+				}
 			}
 		}
 
@@ -2951,7 +2914,7 @@ foreign_support = {
  			#Everyone
  		}
 
-		available = {
+ 		available = {
 			OR = {
 				AND = {
 					434 = { #Arunachal Pradesh

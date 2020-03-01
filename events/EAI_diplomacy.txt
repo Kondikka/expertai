@@ -49,44 +49,12 @@ country_event = {
 	}
 	immediate = {
 		FIN = {
+			add_to_array = { SOV.EAI_prepare_for_war_targets = THIS.id }
 			set_country_flag = { flag = EAI_declare_war_from_SOV value = 1 days = 180 }
 			set_country_flag = { flag = EAI_prepare_for_war_from_SOV value = 1 days = 180 }
 		}
 
 		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: winter war" } 
-	}
-	option = { name = "OK" }
-}
-
-# CHI: military access to warlord to stop the AI from garrisoning these borders
-country_event = { 
-	id = EAI_DM.3
-	hidden = yes
-	fire_only_once = yes
-	trigger = {
-		tag = CHI
-		
-		is_ai = yes
-		
-		is_historical_focus_on = yes
-		
-		CHI = { has_completed_focus = CHI_united_front }
-	}
-	immediate = {
-		if = { limit = { XSM = { is_ai = yes is_subject = no NOT = { has_war_with = ROOT } } }
-			give_military_access = XSM
-		}
-		if = { limit = { GXC = { is_ai = yes is_subject = no NOT = { has_war_with = ROOT } } }
-			give_military_access = GXC
-		}
-		if = { limit = { YUN = { is_ai = yes is_subject = no NOT = { has_war_with = ROOT } } }
-			give_military_access = YUN
-		}
-		if = { limit = { PRC = { is_ai = yes is_subject = no NOT = { has_war_with = ROOT } } }
-			give_military_access = PRC
-		}
-
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIPLO-AI-EVENT: china military access" } 
 	}
 	option = { name = "OK" }
 }
@@ -215,10 +183,11 @@ country_event = {
 			country_event = { id = EAI_DM.7 days = 30 }
 		}
 
-		GER = { set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 } }
+		GER = { add_to_array = { ROOT.EAI_prepare_for_war_targets = THIS.id } set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 } }
 
 		every_country = { limit = { OR = { is_in_faction_with = GER has_guaranteed = GER } is_neighbor_of = ROOT }
 
+			add_to_array = { ROOT.EAI_prepare_for_war_targets = THIS.id }
 			set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 }
 		}
 
@@ -721,6 +690,136 @@ country_event = {
 	option = { name = "OK" }
 }
 
+# GER: ask FIN to join war vs USSR
+country_event = { 
+	id = EAI_DM.24
+	title = EAI_DM.24.t
+	desc = EAI_DM.24.d
+	picture = "GFX_report_event_generic_sign_treaty2"
+	fire_only_once = yes
+	
+	trigger = {
+		is_historical_focus_on = yes
+		focus_progress = { focus = GER_ussr_war_goal progress > 0 }
+		NOT = { has_completed_focus = GER_ussr_war_goal }
+
+		FIN = { has_war = no }
+		
+		NOT = { 146 = { is_controlled_by = FIN } }
+
+		if = { limit = { GER = { has_war_with = NOR } }
+		
+			OR = { # dont join if norway hasnt fallen - otherwise finland will throw its entire army against norway
+				NOR = { has_capitulated = yes }
+				NOR = { exists = no }
+				NOR = { is_subject = yes }
+				NOR = { has_government = fascism }
+				FIN = { has_war_with = NOR }
+			}
+		}
+	}
+
+	# yes
+	option = { name = EAI_DM.24.o1 
+
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}
+	
+		FIN = { country_event = EAI_DM.25 }
+	}
+
+	# no
+	option = { name = EAI_DM.24.o2
+	
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+
+# FIN: accept GER request to join war
+country_event = { 
+	id = EAI_DM.25
+	title = EAI_DM.25.t
+	desc = EAI_DM.25.d
+	picture = "GFX_report_event_generic_sign_treaty2"
+	is_triggered_only = yes
+
+	# accept
+	option = { name = EAI_DM.25.o1 
+
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+				GER = { has_army_manpower = { size > 2000000 } }
+			}
+		}
+	
+		GER = { set_country_flag = { flag = EAI_FIN_joins_war_on_SOV value = 1 days = 365 } }
+
+		GER = { country_event = EAI_DM.26 }
+	}
+
+	# decline
+	option = { name = EAI_DM.25.o12
+
+		ai_chance = {
+			factor = 1
+		}
+	
+		GER = { country_event = EAI_DM.27 }
+	}
+}
+
+# FIN: accepts
+country_event = { 
+	id = EAI_DM.26
+	title = EAI_DM.26.t
+	desc = EAI_DM.26.d
+	picture = "GFX_report_event_generic_sign_treaty2"
+	is_triggered_only = yes
+
+	# decline
+	option = { name = EAI_DM.26.o1 
+	
+	}
+}
+
+# FIN: declines
+country_event = { 
+	id = EAI_DM.27
+	title = EAI_DM.27.t
+	desc = EAI_DM.27.d
+	picture = "GFX_report_event_generic_sign_treaty2"
+	is_triggered_only = yes
+
+	# accept
+	option = { name = EAI_DM.27.o1 
+	
+	}
+}
+
+country_event = { 
+	id = EAI_DM.28
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		GER = { 
+			FIN = { 
+				add_to_war = { targeted_alliance = PREV enemy = SOV hostility_reason = asked_to_join } 
+			}
+		}
+	}
+	option = {}
+}
+
 #######################################################
 # AI border gore fixes
 #######################################################
@@ -1085,6 +1184,40 @@ country_event = {
 				}
 				
 				ENG = { set_state_controller = PREV }
+			}
+		}
+	}
+	option = {}
+}
+
+# JAP puppets: transfer conquered territories to JAP
+country_event = { 
+	id = EAI_DM_borders.8
+	hidden = yes
+	mean_time_to_happen = { days = 20 }
+	trigger = {
+		is_ai = yes
+
+		JAP = { is_ai = yes }
+		
+		is_puppet_of = JAP
+		
+		any_of_scopes = { array = controlled_states
+
+			is_fully_controlled_by = ROOT
+			NOT = { is_owned_by = ROOT }
+		}
+	}
+	immediate = {
+		for_each_scope_loop = { array = controlled_states
+		
+			if = {
+				limit = {
+					is_fully_controlled_by = ROOT
+					NOT = { is_owned_by = ROOT }
+				}
+				
+				JAP = { set_state_controller = PREV }
 			}
 		}
 	}

@@ -10,9 +10,13 @@
 # protect
 # influence
 
+########################
+#	EAI
+########################
+
 EAI_SIA_avoid_JAP_border = {
+	allowed = { tag = SIA }
 	enable = { 
-		tag = SIA
 		is_in_faction_with = JAP
 		JAP = { num_divisions > 15 }
 	}
@@ -20,18 +24,6 @@ EAI_SIA_avoid_JAP_border = {
 	abort_when_not_enabled = yes
 
 	ai_strategy = { type = dont_defend_ally_borders id = "JAP" value = 5000 }
-}
-
-JAP_default = {
-	enable = {
-		original_tag = JAP
-	}
-	
-	ai_strategy = {
-		type = consider_weak
-		id = "CHI"
-		value = 50
-	}
 }
 
 EAI_dont_justify_on_axis = {
@@ -50,8 +42,8 @@ EAI_dont_justify_on_axis = {
 }
 
 EAI_ignore_SOV = {
+	allowed = { tag = JAP }
 	enable = {
-		original_tag = JAP
 		is_historical_focus_on = yes
 		date < 1942.1.1
 	}
@@ -67,6 +59,117 @@ EAI_ignore_SOV = {
 		type = declare_war
 		id = "SOV"
 		value = -500
+	}
+}
+
+EAI_chinese_war = {
+	allowed = { tag = JAP }
+	enable = {
+		focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
+		NOT = { has_completed_focus = JAP_intervene_in_china }
+	}
+	abort = {
+		has_completed_focus = JAP_intervene_in_china
+	}
+	
+	ai_strategy = {
+		type = conquer
+		id = "CHI"			
+		value = 100
+	}
+}
+
+EAI_chinese_war_2 = {
+	allowed = { tag = JAP }
+	enable = {
+		OR = { 
+			has_war_with = CHI
+			
+			AND = {
+				focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
+				NOT = { has_completed_focus = JAP_intervene_in_china }
+			}
+		}
+		NOT = { has_war_with = SHX }
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = { 
+					has_war_with = CHI
+					
+					AND = {
+						focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
+						NOT = { has_completed_focus = JAP_intervene_in_china }
+					}
+				}
+				NOT = { has_war_with = SHX }
+			}
+		}
+	}
+	
+	ai_strategy = {
+		type = conquer
+		id = "SHX"			
+		value = 100
+	}
+}
+
+EAI_JAP_garrison = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+		NOT = { any_enemy_country = { is_major = yes NOT = { original_tag = CHI } } }
+		CHI = { NOT = { EAI_is_not_independent = yes } }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = garrison value = -200 }
+}
+
+EAI_JAP_garrison_home = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war = yes
+		alliance_naval_strength_ratio < 0.5
+	}
+	abort_when_not_enabled = yes
+
+	### japan
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.25
+		states = { 
+			533
+			282
+			532
+			534
+			535
+			531
+			529
+			530
+			528
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+########################
+#	vanilla
+########################
+
+JAP_default = {
+	allowed = { tag = JAP }
+	enable = {
+		always = yes
+	}
+	
+	ai_strategy = {
+		type = consider_weak
+		id = "CHI"
+		value = 50
 	}
 }
 
@@ -122,8 +225,8 @@ southern_expansion = {
 }
 
 northern_expansion = {
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
 		has_completed_focus = JAP_prepare_for_war_with_the_soviet_union
 		country_exists = SOV
 	}
@@ -141,8 +244,8 @@ northern_expansion = {
 }
 
 chinese_war = {
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
 		OR = {
 			focus_progress = { focus = JAP_intervene_in_china progress > 0.5 }
 			has_completed_focus = JAP_intervene_in_china
@@ -174,62 +277,9 @@ chinese_war = {
 	}		
 }
 
-EAI_chinese_war = {
-	enable = {
-		tag = JAP
-		focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
-		NOT = { has_completed_focus = JAP_intervene_in_china }
-	}
-	abort = {
-		has_completed_focus = JAP_intervene_in_china
-	}
-	
-	ai_strategy = {
-		type = conquer
-		id = "CHI"			
-		value = 100
-	}
-}
-
-EAI_chinese_war_2 = {
-	enable = {
-		tag = JAP
-		OR = { 
-			has_war_with = CHI
-			
-			AND = {
-				focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
-				NOT = { has_completed_focus = JAP_intervene_in_china }
-			}
-		}
-		NOT = { has_war_with = SHX }
-	}
-	abort = {
-		NOT = {
-			AND = {
-				OR = { 
-					has_war_with = CHI
-					
-					AND = {
-						focus_progress = { focus = JAP_intervene_in_china progress > 0.0 }
-						NOT = { has_completed_focus = JAP_intervene_in_china }
-					}
-				}
-				NOT = { has_war_with = SHX }
-			}
-		}
-	}
-	
-	ai_strategy = {
-		type = conquer
-		id = "SHX"			
-		value = 100
-	}
-}
-
 strike_usa = {
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
 		has_completed_focus = JAP_secure_the_philippines
 		country_exists = USA
 	}
@@ -247,8 +297,8 @@ strike_usa = {
 }
 
 germany_ally = {
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
 		has_completed_focus = JAP_technological_exchange
 		country_exists = GER
 	}
@@ -309,9 +359,8 @@ germany_ally = {
 #	}
 #}
 all_china_must_prosper_in_my_prosperity_sphere_XSM = {
-
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
 		
 		OR = {
 			NOT = { country_exists = CHI }
@@ -348,10 +397,8 @@ all_china_must_prosper_in_my_prosperity_sphere_XSM = {
 	}
 }
 all_china_must_prosper_in_my_prosperity_sphere_GXC = {
-
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
-		
 		OR = {
 			NOT = { country_exists = CHI }
 			CHI = {
@@ -387,10 +434,8 @@ all_china_must_prosper_in_my_prosperity_sphere_GXC = {
 	}
 }
 all_china_must_prosper_in_my_prosperity_sphere_SHX = {
-
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
-		
 		OR = {
 			NOT = { country_exists = CHI }
 			CHI = {
@@ -426,10 +471,8 @@ all_china_must_prosper_in_my_prosperity_sphere_SHX = {
 	}
 }
 all_china_must_prosper_in_my_prosperity_sphere_YUN = {
-
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
-		
 		OR = {
 			NOT = { country_exists = CHI }
 			CHI = {
@@ -466,10 +509,8 @@ all_china_must_prosper_in_my_prosperity_sphere_YUN = {
 
 }
 all_china_must_prosper_in_my_prosperity_sphere_PRC = {
-
+	allowed = { tag = JAP }
 	enable = {
-		tag = JAP
-		
 		OR = {
 			NOT = { country_exists = CHI }
 			CHI = {

@@ -10,6 +10,10 @@
 # protect
 # influence
 
+########################
+#	EAI
+########################
+
 EAI_no_docking_rights_for_ITA_outside_europe = {
 	enable = { 
 		NOT = {
@@ -22,14 +26,14 @@ EAI_no_docking_rights_for_ITA_outside_europe = {
 
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = befriend id = "ITA" value = -4 }
+	ai_strategy = { type = diplo_action_desire id = ITA target = docking_rights value = -200 }
+	ai_strategy = { type = diplo_action_acceptance id = ITA target = docking_rights value = -200 }
 }
 
 EAI_ITA_joins_axis_0 = {
+	allowed = { tag = ITA }
 	enable = {
 		is_historical_focus_on = yes
-
-		OR = { tag = ITA AND = { ITA = { is_ai = yes } tag = GER } }
 
 		NOT = { 
 			ITA = { is_in_faction = yes }
@@ -39,10 +43,16 @@ EAI_ITA_joins_axis_0 = {
 	
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = alliance   	id = "GER"     value = -500 }
-	ai_strategy = { type = alliance   	id = "ITA"     value = -500 }
+	ai_strategy = { type = diplo_action_desire id = GER target = join_faction value = -500 }
+	ai_strategy = { type = diplo_action_acceptance id = GER target = offer_join_faction value = -500 }
 }
 EAI_ITA_joins_axis_1 = {
+	allowed = { 
+		OR = { 
+			tag = ITA 
+			tag = GER 
+		} 
+	}
 	enable = {
 		is_historical_focus_on = yes
 
@@ -95,12 +105,11 @@ EAI_ITA_joins_axis_1 = {
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = alliance id = "GER" value = 1000 }
-	ai_strategy = { type = alliance id = "ITA" value = 1000 }
+	ai_strategy = { type = diplo_action_desire id = ITA target = join_faction value = 1000 }
+	ai_strategy = { type = diplo_action_acceptance id = GER target = offer_join_faction value = 1000 }
 }
 
-#ignore yugoslavia
-EAI_i_yug = {
+EAI_ignore_yug = {
 	enable = {
 		tag = ITA
 		is_historical_focus_on = yes
@@ -117,8 +126,7 @@ EAI_i_yug = {
 	}
 }
 
-#ignore greece
-EAI_i_GRE = {
+EAI_ignore_GRE = {
 	enable = {
 		tag = ITA
 		is_historical_focus_on = yes
@@ -165,7 +173,98 @@ EAI_ITA_warprep_ENG = {
 	}
 }
 
+EAI_ITA_garrison_home = {
+	allowed = { tag = ITA }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
 
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.15
+		states = { 
+			451
+			663
+			450
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ITA_garrison_north_africa = {
+	allowed = { tag = ITA }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.15
+		states = { 
+			115
+			156
+			117
+			2
+			157
+			162
+			161
+			158
+			160
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ITA_north_africa_east = {
+	allowed = { tag = ITA }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			region = 126
+			any_neighbor_state = { CONTROLLER = { original_tag = FRA } }
+		}
+		value = 100
+	}
+}
+
+EAI_ITA_north_africa_west = {
+	allowed = { tag = ITA }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				region = 126
+				state = 452
+				state = 447
+				state = 446
+				state = 453
+				state = 454
+			}
+			any_neighbor_state = { CONTROLLER = { original_tag = ENG } }
+		}
+		value = 300
+	}
+}
+
+########################
+#	vanilla
+########################
 
 albania_war_goal = {
 	enable = {

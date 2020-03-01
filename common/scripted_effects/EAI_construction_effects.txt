@@ -6,215 +6,357 @@
 # 	priority construction AI
 ######################################################
 
-@BUILD_COST_INFRASTRUCTURE = 3000
-@BUILD_COST_AIRBASE = 1250
-@BUILD_COST_ANTIAIR = 2500
-@BUILD_COST_RADAR = 3375
-@BUILD_COST_MILITARY_FACTORY = 7200
-@BUILD_COST_CIVILIAN_FACTORY = 10800
-@BUILD_COST_DOCKYARD = 6400
-@BUILD_COST_REFINERY = 14500
-@BUILD_COST_SILO = 5000
-@CONVERSION_COST_MIL_TO_CIV = 9000
+EAI_PC_set_global_variables = {
 
-EAI_get_building_values = {
+	### BUILDING CONSTRUCTION COSTS
 
-	if = { limit = { check_variable = { EAI_building_type_selected = 1 } }
+	set_variable = { global.EAI_PC_BUILDING_INFRASTRUCTURE_COST   = 3000 }
+	set_variable = { global.EAI_PC_BUILDING_AIRBASE_COST          = 1250 }
+	set_variable = { global.EAI_PC_BUILDING_ANTIAIR_COST          = 2500 }
+	set_variable = { global.EAI_PC_BUILDING_RADAR_COST            = 3375 }
+	set_variable = { global.EAI_PC_BUILDING_MILITARY_FACTORY_COST = 7200 }
+	set_variable = { global.EAI_PC_BUILDING_CIVILIAN_FACTORY_COST = 10800 }
+	set_variable = { global.EAI_PC_BUILDING_DOCKYARD_COST         = 6400 }
+	set_variable = { global.EAI_PC_BUILDING_REFINERY_COST         = 14500 }
+	set_variable = { global.EAI_PC_CONVERSION_COST_MIL_TO_CIV     = 9000 }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_INFRASTRUCTURE }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_infrastructure_factor }
+	###
+
+	every_country = {
+		resize_array = { array = EAI_PC_project_array value = 0 size = 5 }
+
+		add_dynamic_modifier = { modifier = EAI_PC_project_assigned_factories_modifier }
+	}
+}
+
+EAI_PC_get_building_values = {
+
+	if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 1 } }
+
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_INFRASTRUCTURE_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_infrastructure_factor }
 	}
 	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 2 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 2 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_AIRBASE }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_air_base_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_AIRBASE_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_air_base_factor }
 	}
 	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 3 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 3 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_ANTIAIR }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_anti_air_building_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_ANTIAIR_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_anti_air_building_factor }
 	}
 	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 4 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 4 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_RADAR }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_radar_station_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_RADAR_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_radar_station_factor }
 	}
 
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 5 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 5 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_MILITARY_FACTORY }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_arms_factory_factor }
-	}
-	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 6 } }
-
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_CIVILIAN_FACTORY }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_industrial_complex_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_MILITARY_FACTORY_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_arms_factory_factor }
 	}
 	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 7 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 6 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_DOCKYARD }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_dockyard_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_CIVILIAN_FACTORY_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_industrial_complex_factor }
 	}
 	
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 8 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 7 } }
 
-		set_temp_variable = { EAI_building_cost = @BUILD_COST_REFINERY }
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_synthetic_refinery_factor }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_DOCKYARD_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_dockyard_factor }
+	}
+	
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 8 } }
+
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_BUILDING_REFINERY_COST }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_synthetic_refinery_factor }
 	}
 
-	else_if = { limit = { check_variable = { EAI_building_type_selected = 9 } }
+	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 9 } }
 
-		set_temp_variable = { EAI_building_cost = @CONVERSION_COST_MIL_TO_CIV }
+		set_temp_variable = { EAI_building_cost = global.EAI_PC_CONVERSION_COST_MIL_TO_CIV }
 
 		set_temp_variable = { t1 = modifier@conversion_cost_mil_to_civ_factor }
 		add_to_temp_variable = { t1 = 1.0 }
-		multiply_temp_variable = { EAI_building_cost = t1 }
+		multiply_temp_variable = { EAI_PC_building_cost = t1 }
 
-		add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_industrial_complex_factor }
+		add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_industrial_complex_factor }
 	}
 
-	add_to_temp_variable = { EAI_construction_speed = modifier@production_speed_buildings_factor }
+	add_to_temp_variable = { EAI_PC_construction_speed = modifier@production_speed_buildings_factor }
 }
 
-EAI_start_priority_construction = {
+EAI_PC_get_available_project = {
 
-	THIS = {
-
-		### get infrastructure level, set target state
-
-		set_temp_variable = { EAI_target_state_infra_speed = infrastructure_level }
-		set_state_flag = EAI_construction_target_state_@ROOT
-		set_variable = { ROOT.EAI_construction_target_state = THIS.id }
-	}
-
-	ROOT = {
-
-		### get construction speed modifiers and set building cost
-
-		set_temp_variable = { EAI_construction_speed = 1 }
-
-		EAI_get_building_values = yes
-
-		### infrastructure effect (5-8 use infrastructure effect)
-
-		if = { limit = { check_variable = { EAI_building_type_selected > 4 } }
-
-			multiply_temp_variable = { EAI_target_state_infra_speed = 0.1 }
-			add_to_temp_variable = { EAI_target_state_infra_speed = 1 }
-			multiply_temp_variable = { EAI_construction_speed = EAI_target_state_infra_speed }
-		}
-
-		### assign factories
-
-		if = { limit = { num_of_civilian_factories_available_for_projects > 30 } set_temp_variable = { EAI_assigned_factories = 15 } }
-		else_if = { limit = { num_of_civilian_factories_available_for_projects > 15 } set_temp_variable = { EAI_assigned_factories = 10 } }
-		else = { set_temp_variable = { EAI_assigned_factories = 5 } }
-
-		### total factory output
-
-		multiply_temp_variable = { EAI_construction_speed = 5 }
-		multiply_temp_variable = { EAI_construction_speed = EAI_assigned_factories }
-
-		### days to build
-
-		divide_temp_variable = { EAI_building_cost = EAI_construction_speed }
-		set_variable = { EAI_construction_duration = EAI_building_cost }
-		round_variable = EAI_construction_duration
-
-		### active project building type
-
-		set_variable = { EAI_active_project_building_type = EAI_building_type_selected }
+	for_each_loop = { array = EAI_PC_project_array
 		
-		### start construction
+		if = { limit = { check_variable = { v = 0 } }
 
-		set_country_flag = EAI_construction_project_active
-
-		meta_effect = {
-			text = { activate_decision = EAI_construction_CICx[x]_decision }
-			x = "[?EAI_assigned_factories]"
+			set_variable = { EAI_PC_new_project = i }
+			set_temp_variable = { break = 1 }
 		}
 	}
-
-	if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: building type [?Root.EAI_active_project_building_type] at [This.GetName]" } 
 }
 
-EAI_end_construction = {
+EAI_PC_add_finished_building = {
 
-	var:EAI_construction_target_state = {
-
-		clr_state_flag = EAI_construction_target_state_@ROOT
-	}
-
-	clear_variable = EAI_construction_target_state
-	clear_variable = EAI_active_project_building_type
-	clr_country_flag = EAI_construction_project_active
-}
-
-EAI_add_finished_building = {
-
-	if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 1 } } }
+	if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 1 } } }
 
 		add_building_construction = { type = infrastructure level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 2 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 2 } } }
 
 		add_building_construction = { type = air_base level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 3 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 3 } } }
 
 		add_building_construction = { type = anti_air_building level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 4 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 4 } } }
 
 		add_building_construction = { type = radar_station level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 5 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 5 } } }
 
 		add_building_construction = { type = arms_factory level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 6 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 6 } } }
 
 		add_building_construction = { type = industrial_complex level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 7 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 7 } } }
 
 		add_building_construction = { type = dockyard level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 8 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 8 } } }
 
 		add_building_construction = { type = synthetic_refinery level = 1 instant_build = yes }
 	}
 
-	else_if = { limit = { ROOT = { check_variable = { EAI_active_project_building_type = 9 } } }
+	else_if = { limit = { ROOT = { check_variable = { EAI_PC_project_building_type^EAI_PC_project = 9 } } }
 
 		remove_building = { type = arms_factory level = 1 }
 		add_building_construction = { type = industrial_complex level = 1 instant_build = yes }
 	}
 }
 
-###
+EAI_PC_init_project = {
 
-EAI_priority_constructions = {
+	ROOT = {
 
-	EAI_important_radar_constructions = yes
+		### get construction speed modifiers and set building cost
 
-	EAI_improve_north_africa_infrastructure = yes
+		set_temp_variable = { EAI_PC_construction_speed = 1 }
 
-	EAI_resource_extraction = yes
+		EAI_PC_get_building_values = yes
 
-	EAI_convert_factories_to_civ = yes
+		### infrastructure effect (5-8 use infrastructure effect)
+
+		if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type > 4 } }
+
+			set_temp_variable = { EAI_PC_target_state_infra_speed = PREV.infrastructure_level }
+			multiply_temp_variable = { EAI_PC_target_state_infra_speed = 0.1 }
+			add_to_temp_variable = { EAI_PC_target_state_infra_speed = 1 }
+			multiply_temp_variable = { EAI_PC_construction_speed = EAI_PC_target_state_infra_speed }
+		}
+
+		### total factory output
+
+		multiply_temp_variable = { EAI_PC_construction_speed = 5 }
+		multiply_temp_variable = { EAI_PC_construction_speed = EAI_PC_project_assigned_factories^EAI_PC_project_type }
+
+		### days to build
+
+		divide_temp_variable = { EAI_PC_building_cost = EAI_PC_construction_speed }
+
+		set_variable = { EAI_PC_project_construction_duration^EAI_PC_project = EAI_PC_building_cost }
+		round_variable = EAI_PC_project_construction_duration^EAI_PC_project
+	}
+}
+
+### projects
+
+@AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECTS_TOTAL = 0.35
+@AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECT = 0.15
+@AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT = 3
+
+# create a new project
+EAI_PC_start_project = {
+
+	# is not already building the same type of building here
+	if = { 
+		limit = { 
+			if = { limit = { is_in_array = { THIS.EAI_PC_projects_in_state = ROOT.id } }
+
+				NOT = { check_variable = { ROOT.EAI_PC_project_building_type^THIS.EAI_PC_project_target_state_@ROOT = ROOT.EAI_PC_project_building_type^-1 } }
+			}
+			else = { always = yes }
+		}
+
+		ROOT = {
+
+			set_temp_variable = { EAI_PC_project_assigned_factories^-1 = 0 }
+
+			# check that the ai can afford to assign factories to a new project
+			set_temp_variable = { max_factories_on_projects = num_of_civilian_factories_available_for_projects }
+			add_to_temp_variable = { max_factories_on_projects = EAI_PC_assigned_factories_total }
+			multiply_temp_variable = { max_factories_on_projects = @AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECTS_TOTAL }
+
+			set_temp_variable = { min_factories_on_projects = EAI_PC_assigned_factories_total }
+			add_to_temp_variable = { min_factories_on_projects = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
+
+			if = { limit = { check_variable = { min_factories_on_projects < max_factories_on_projects } }
+
+				if = { limit = { has_country_flag = EAI_construction_logging } log = "max_factories_on_projects = [?max_factories_on_projects], min_factories_on_projects = [?min_factories_on_projects], EAI_PC_assigned_factories_total = [?EAI_PC_assigned_factories_total]" }
+
+				set_temp_variable = { EAI_PC_project_assigned_factories^-1 = max_factories_on_projects }
+				subtract_from_temp_variable = { EAI_PC_project_assigned_factories^-1 = EAI_PC_assigned_factories_total }
+				round_temp_variable = EAI_PC_project_assigned_factories^-1
+				clamp_temp_variable = { var = EAI_PC_project_assigned_factories^-1 min = 3 max = 15 }
+			}
+		}
+
+		if = { limit = { check_variable = { EAI_PC_project_assigned_factories^-1 > 0 } }
+
+			ROOT = { EAI_PC_get_available_project = yes }
+
+			if = { limit = { ROOT = { has_variable = EAI_PC_new_project } }
+
+				ROOT = { 
+					set_variable = { EAI_PC_project = EAI_PC_new_project } 
+					set_variable = { EAI_PC_project_type = -1 } 
+				}
+
+				EAI_PC_init_project = yes
+
+				THIS = {
+
+					add_to_array = { EAI_PC_projects_in_state = ROOT.id }
+					set_variable = { EAI_PC_project_target_state_@ROOT = ROOT.EAI_PC_project }
+					set_variable = { ROOT.EAI_PC_project_array^ROOT.EAI_PC_project = THIS.id }
+					CONTROLLER = { set_variable = { ROOT.EAI_PC_project_target_country^ROOT.EAI_PC_project = THIS.id } }
+				}
+
+				ROOT = {
+
+					### active project variables
+
+					set_variable = { EAI_PC_project_assigned_factories^EAI_PC_project = EAI_PC_project_assigned_factories^-1 }
+					set_variable = { EAI_PC_project_building_type^EAI_PC_project = ROOT.EAI_PC_project_building_type^-1 }
+
+					add_to_variable = { EAI_PC_assigned_factories_total = EAI_PC_project_assigned_factories^EAI_PC_project }
+					force_update_dynamic_modifier = yes
+
+					### activate project
+
+					add_to_variable = { EAI_PC_active_projects = 1 }
+
+					meta_effect = {
+						text = { 
+							activate_decision = EAI_PC_project_[x]_decision
+						}
+						x = "[?ROOT.EAI_PC_project]"
+					}
+
+					clear_variable = EAI_PC_project
+					clear_variable = EAI_PC_project_type
+					clear_variable = EAI_PC_new_project
+
+					if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: type = [?ROOT.EAI_PC_project_building_type^-1], civ = [?EAI_PC_project_assigned_factories^-1], loc = [PREV.GetName]" }
+				}
+			}
+		}
+	}
+}
+
+# executed when a project finishes a building
+EAI_PC_complete_project = {
+
+	if = { limit = { check_variable = { EAI_PC_project_array^EAI_PC_project < 0 } }
+
+		set_variable = { EAI_PC_project_type = EAI_PC_project } 
+
+		var:EAI_PC_project_array^EAI_PC_project = {
+
+			if = {
+				limit = {
+					CONTROLLER = {
+						tag = ROOT
+					}
+					EAI_PC_building_slot_available = yes
+				}
+				
+				EAI_PC_add_finished_building = yes
+			}
+			
+			ROOT = { EAI_PC_end_project = yes }
+		}
+	}
+
+	clear_variable = EAI_PC_project
+	clear_variable = EAI_PC_project_type
+}
+
+# resets a project
+EAI_PC_end_project = {
+
+	if = { limit = { check_variable = { EAI_PC_project_array^EAI_PC_project < 0 } }
+
+		var:EAI_PC_project_array^EAI_PC_project = {
+			clear_variable = EAI_PC_project_target_state_@PREV
+			remove_from_array = { array = EAI_PC_projects_in_state value = PREV.id }
+		}
+
+		meta_effect = {
+			text = {
+				set_variable = { EAI_PC_project_array^EAI_PC_project = 1 }
+				country_event = { id = EAI_PC_event.1[x] hours = 26 } 
+			}
+			x = "[?EAI_PC_project]"
+		}
+
+		subtract_from_variable = { EAI_PC_assigned_factories_total = EAI_PC_project_assigned_factories^EAI_PC_project }
+		force_update_dynamic_modifier = yes
+
+		clear_variable = EAI_PC_project_assigned_factories^EAI_PC_project
+		clear_variable = EAI_PC_project_building_type^EAI_PC_project
+		clear_variable = EAI_PC_project_construction_duration^EAI_PC_project
+		clear_variable = EAI_PC_project_target_country^EAI_PC_project
+	}
+
+	clear_variable = EAI_PC_project
+}
+
+##########################################
+
+EAI_priority_construction_strategies = {
+
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } }
+
+		EAI_important_radar_constructions = yes
+
+		EAI_build_supply_line_GER_SOV = yes
+
+		EAI_improve_north_africa_infrastructure = yes
+
+		EAI_resource_extraction = yes
+
+		EAI_convert_factories_to_civ = yes
+	}
 }
 
 ### priority construction strategies
@@ -223,17 +365,17 @@ EAI_important_radar_constructions = {
 
 	if = { 
 		limit = { 
-			NOT = { has_country_flag = EAI_construction_project_active } 
+			check_variable = { ROOT.EAI_PC_active_projects < 5 } 
 			threat > 0.3
 			num_of_civilian_factories_available_for_projects > 15
 			any_of_scopes = { array = controlled_states EAI_radar_location_2 = yes EAI_available_RADAR = yes }
 		}
 
-		set_temp_variable = { EAI_building_type_selected = 4 }
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 4 }
 
-		random_scope_in_array = { array = controlled_states limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes }
+		random_scope_in_array = { array = controlled_states limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes EAI_PC_can_build_project = yes }
 
-			EAI_start_priority_construction = yes
+			EAI_PC_start_project = yes
 		}
 	}
 }
@@ -242,7 +384,7 @@ EAI_improve_north_africa_infrastructure = {
 
 	if = { 
 		limit = { 
-			NOT = { has_country_flag = EAI_construction_project_active } 
+			check_variable = { ROOT.EAI_PC_active_projects < 5 } 
 			has_war = yes 
 			num_of_civilian_factories_available_for_projects > 15
 			any_enemy_country = {
@@ -258,7 +400,7 @@ EAI_improve_north_africa_infrastructure = {
 			}
 		}
 
-		set_temp_variable = { EAI_building_type_selected = 1 }
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
 
 		set_temp_variable = { EAI_best_target = 0 }
 		set_temp_variable = { EAI_best_target_score = 0 }
@@ -270,7 +412,7 @@ EAI_improve_north_africa_infrastructure = {
 				limit = { 
 					OR = { region = 126 state = 452 state = 447 state = 446 } 
 					is_coastal = yes 
-					free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+					EAI_PC_can_build_project = yes
 					infrastructure < 8 
 				}
 
@@ -291,7 +433,7 @@ EAI_improve_north_africa_infrastructure = {
 		# target was found
 		if = { limit = { check_variable = { EAI_best_target_score > 0 } }
 
-			var:EAI_best_target = { EAI_start_priority_construction = yes }
+			var:EAI_best_target = { EAI_PC_start_project = yes }
 		}
 	}
 }
@@ -300,19 +442,20 @@ EAI_resource_extraction = {
 	
 	if = {
 		limit = {
-			num_of_civilian_factories_available_for_projects > 45
+			num_of_civilian_factories_available_for_projects > 30
 
+			# any state exists with significant resources and there is a need for it
 			any_of_scopes = { array = controlled_states
 
-				EAI_available_INF = yes
+				EAI_PC_can_build_project = yes
 
 				OR = {
-					AND = { ROOT = { has_war = yes fuel_ratio < 0.5 } has_resources_amount = { resource = oil amount > 40 } }
-					AND = { OR = { check_variable = { ROOT.resource@aluminium < -4 } check_variable = { ROOT.resource_imported@aluminium > 16 } } has_resources_amount = { resource = aluminium amount > 40 } }
-					AND = { OR = { check_variable = { ROOT.resource@rubber < -4 } check_variable = { ROOT.resource_imported@rubber > 16 } } has_resources_amount = { resource = rubber amount > 40 } }
-					AND = { OR = { check_variable = { ROOT.resource@tungsten < -4 } check_variable = { ROOT.resource_imported@tungsten > 16 } } has_resources_amount = { resource = tungsten amount > 40 } }
-					AND = { OR = { check_variable = { ROOT.resource@steel < -4 } check_variable = { ROOT.resource_imported@steel > 16 } } has_resources_amount = { resource = steel amount > 40 } }
-					AND = { OR = { check_variable = { ROOT.resource@chromium < -4 } check_variable = { ROOT.resource_imported@chromium > 16 } } has_resources_amount = { resource = chromium amount > 40 } }
+					AND = { has_resources_amount = { resource = oil amount > 20 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
+					AND = { has_resources_amount = { resource = aluminium amount > 20 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
+					AND = { has_resources_amount = { resource = rubber amount > 20 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
+					AND = { has_resources_amount = { resource = tungsten amount > 20 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
+					AND = { has_resources_amount = { resource = steel amount > 20 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
+					AND = { has_resources_amount = { resource = chromium amount > 20 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
 				}
 			}
 		}
@@ -353,7 +496,7 @@ EAI_convert_factories_to_civ = {
 
 	if = {
 		limit = {
-			NOT = { has_country_flag = EAI_construction_project_active }
+			check_variable = { ROOT.EAI_PC_active_projects < 5 }
 
 			NOT = { num_of_civilian_factories_available_for_projects < 5 }
 
@@ -374,8 +517,126 @@ EAI_convert_factories_to_civ = {
 		}
 
 		EAI_priority_convert_MIC_to_CIC = yes
+	}
+}
 
-		set_variable = { EAI_resource_shortage_months = 0 }
+EAI_build_supply_line_GER_SOV = {
+
+	if = { 
+		limit = {
+			tag = GER
+			has_war_with = SOV
+			SOV = { has_capitulated = no }
+		}
+
+		set_temp_variable = { supply_line_start = GER.capital }
+		set_temp_variable = { supply_line_target = SOV.capital }
+		EAI_build_supply_line = yes
+	}
+
+	else_if = { 
+		limit = {
+			tag = SOV
+			has_war_with = GER
+			GER = { 
+				has_capitulated = no
+				surrender_progress > 0.1
+			}
+		}
+
+		set_temp_variable = { supply_line_start = SOV.capital }
+		set_temp_variable = { supply_line_target = GER.capital }
+		EAI_build_supply_line = yes
+	}
+}
+
+EAI_build_supply_line_JAP_RAJ = {
+
+	if = { 
+		limit = {
+			tag = JAP
+			has_war_with = RAJ
+		}
+
+		613 = { set_temp_variable = { supply_line_start = THIS.id } }
+		439 = { set_temp_variable = { supply_line_target = THIS.id } }
+		EAI_build_supply_line = yes
+	}
+}
+
+###
+
+EAI_build_supply_line = {
+
+	set_temp_variable = { pathfind_start = supply_line_start }
+	set_temp_variable = { pathfind_target = supply_line_target }
+	set_temp_variable = { pathfind_type = 1 }
+	set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
+	EAI_PATHFIND/get_path = yes
+	
+	if = { limit = { check_variable = { pathfind_success = 1 } }
+
+		### build a route to the front
+
+		for_each_scope_loop = { array = pathfind_path
+
+			if = { limit = { EAI_PC_can_build_project = yes }
+
+				log = "[THIS.GetName] [?ROOT.EAI_PC_project_building_type^-1]"
+
+				EAI_PC_start_project = yes
+
+				set_temp_variable = { break = 1 }
+			}
+		}
+
+		### build along the front
+
+		if = { limit = { check_variable = { break = 0 } }
+
+			set_temp_variable = { front_intersection = pathfind_path^num }
+			subtract_from_temp_variable = { front_intersection = 1 }
+			set_temp_variable = { front_intersection = pathfind_path^front_intersection }
+
+			add_to_temp_array = { front_states = front_intersection }
+			add_to_temp_array = { explore_states = front_intersection }
+
+			while_loop_effect = { limit = { check_variable = { explore_states^num > 0 } }
+
+				clear_temp_array = neighbor_states
+
+				for_each_scope_loop = { array = explore_states
+
+					# max infrastructure
+					if = { limit = { EAI_PC_can_build_project = yes }
+
+						EAI_PC_start_project = yes
+						
+						set_temp_variable = { break = 1 }
+					}
+
+					# check neighbors
+					else = {
+						every_neighbor_state = {
+							limit = { 
+								is_controlled_by = ROOT 
+								NOT = { is_in_array = { front_states = THIS.id } } 
+								any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+							}
+
+							add_to_temp_array = { front_states = THIS.id }
+							add_to_temp_array = { neighbor_states = THIS.id }
+						}
+					}
+				}
+
+				clear_temp_array = explore_states
+				for_each_loop = { array = neighbor_states break = break_2
+				
+					add_to_temp_array = { explore_states = v }
+				}
+			}
+		}
 	}
 }
 
@@ -402,6 +663,9 @@ EAI_clear_construction_scores = {
 
 	set_temp_variable = { EAI_has_antiair_slot_scores = 0 }
 	clear_temp_array = EAI_antiair_slot_scores
+
+	set_temp_variable = { EAI_has_mil_to_civ_conversion_slot_scores = 0 }
+	clear_temp_array = EAI_mil_to_civ_conversion_slot_scores
 }
 
 # shared slots
@@ -519,7 +783,7 @@ EAI_get_resource_slot_scores = {
 
 	for_each_scope_loop = { array = controlled_states
 		
-		if = { limit = { EAI_available_INF = yes check_variable = { EAI_total_resources > 30 } }
+		if = { limit = { EAI_available_INF = yes check_variable = { EAI_total_resources > 20 } }
 
 			EAI_get_resource_slot_score = yes
 
@@ -555,28 +819,28 @@ EAI_get_resource_slot_score = {
 
 	set_temp_variable = { t3 = 0 }
 
-	set_temp_variable = { t2 = EAI_oil }
+	set_temp_variable = { t2 = resource@oil }
 	if = { limit = { ROOT = { has_war = yes fuel_ratio < 0.5 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 
-	set_temp_variable = { t2 = EAI_aluminium }
-	if = { limit = { OR = { check_variable = { ROOT.resource@aluminium < -4 } check_variable = { ROOT.resource_imported@aluminium > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	set_temp_variable = { t2 = resource@aluminium }
+	if = { limit = { check_variable = { ROOT.EAI_needs_aluminium = 3 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 
-	set_temp_variable = { t2 = EAI_rubber }
-	if = { limit = { OR = { check_variable = { ROOT.resource@rubber < -4 } check_variable = { ROOT.resource_imported@rubber > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	set_temp_variable = { t2 = resource@rubber }
+	if = { limit = { check_variable = { ROOT.EAI_needs_rubber = 3 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 
-	set_temp_variable = { t2 = EAI_tungsten }
-	if = { limit = { OR = { check_variable = { ROOT.resource@tungsten < -4 } check_variable = { ROOT.resource_imported@tungsten > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	set_temp_variable = { t2 = resource@tungsten }
+	if = { limit = { check_variable = { ROOT.EAI_needs_tungsten = 3 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 
-	set_temp_variable = { t2 = EAI_steel }
-	if = { limit = { OR = { check_variable = { ROOT.resource@steel < -4 } check_variable = { ROOT.resource_imported@steel > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	set_temp_variable = { t2 = resource@steel }
+	if = { limit = { check_variable = { ROOT.EAI_needs_steel = 3 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 
-	set_temp_variable = { t2 = EAI_chromium }
-	if = { limit = { OR = { check_variable = { ROOT.resource@chromium < -4 } check_variable = { ROOT.resource_imported@chromium > 4 } } } multiply_temp_variable = { t2 = 4 } }
+	set_temp_variable = { t2 = resource@chromium }
+	if = { limit = { check_variable = { ROOT.EAI_needs_chromium = 3 } } multiply_temp_variable = { t2 = 4 } }
 	add_to_temp_variable = { t3 = t2 }
 	
 	set_variable = { EAI_resource_slot_score = t3 }
@@ -588,130 +852,13 @@ EAI_get_resource_slot_score = {
 	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_resource_slot_score = 1.2 } }
 }
 EAI_set_resource_variables = {
-
-	ROOT = {
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = oil amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_oil = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = aluminium amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_aluminium = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = rubber amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_rubber = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = tungsten amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_tungsten = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = steel amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_steel = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-
-		set_temp_variable = { t3 = 0 }
-
-		while_loop_effect = { limit = { check_variable = { t3 < 200 } }
-
-			if = { 
-				limit = {
-					meta_trigger = {
-						text = { PREV = { NOT = { has_resources_amount = { resource = chromium amount > [x] } } } }
-						x = "[?t3]"
-					}
-				}
-
-				set_variable = { PREV.EAI_chromium = t3 }
-				set_temp_variable = { break = 1 }
-			}
-
-			add_to_temp_variable = { t3 = 1 }
-		}
-	}
 	
-	set_variable = { EAI_total_resources = EAI_oil }
-	add_to_variable = { EAI_total_resources = EAI_aluminium }
-	add_to_variable = { EAI_total_resources = EAI_rubber }
-	add_to_variable = { EAI_total_resources = EAI_tungsten }
-	add_to_variable = { EAI_total_resources = EAI_steel }
-	add_to_variable = { EAI_total_resources = EAI_chromium }
+	set_variable = { EAI_total_resources = resource@oil }
+	add_to_variable = { EAI_total_resources = resource@aluminium }
+	add_to_variable = { EAI_total_resources = resource@rubber }
+	add_to_variable = { EAI_total_resources = resource@tungsten }
+	add_to_variable = { EAI_total_resources = resource@steel }
+	add_to_variable = { EAI_total_resources = resource@chromium }
 }
 
 # radar
@@ -1202,7 +1349,7 @@ EAI_queue_INF_resource = {
 		EAI_get_resource_slot_scores = yes
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_project_active }
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects > 4 } }
 	
 		for_each_scope_loop = { array = EAI_resource_slot_scores
 
@@ -1222,23 +1369,20 @@ EAI_queue_INF_resource = {
 }
 EAI_priority_queue_INF_resource = {
 
-	if = { limit = { NOT = { has_country_flag = EAI_construction_project_active } }
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } }
 
 		if = { limit = { check_variable = { EAI_has_resource_slot_scores = 0 } }
 
 			EAI_get_resource_slot_scores = yes
 		}
 
-		set_temp_variable = { EAI_building_type_selected = 1 }
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
 
 		for_each_scope_loop = { array = EAI_resource_slot_scores
 
-			if = { 
-				limit = {
-					EAI_available_INF = yes
-				}
+			if = { limit = { EAI_PC_can_build_project = yes }
 
-				EAI_start_priority_construction = yes
+				EAI_PC_start_project = yes
 				set_temp_variable = { break = 1 }
 			}
 		}
@@ -1318,24 +1462,20 @@ EAI_queue_AA = {
 # mil to civ conversion
 EAI_priority_convert_MIC_to_CIC = {
 
-	if = { limit = { NOT = { has_country_flag = EAI_construction_project_active } }
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } }
 
 		if = { limit = { check_variable = { EAI_has_mil_to_civ_conversion_slot_scores = 0 } }
 		
 			EAI_get_mil_to_civ_conversion_slot_scores = yes
 		}
 
-		set_temp_variable = { EAI_building_type_selected = 9 }
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 9 }
 
 		for_each_scope_loop = { array = EAI_mil_to_civ_conversion_slot_scores
 
-			if = { 
-				limit = {
-					check_variable = { building_level@arms_factory > 0 }
-				}
+			if = { limit = { EAI_PC_can_build_project = yes }
 
-				EAI_start_priority_construction = yes
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: mic conversion in [?This.id] [This.GetName]"
+				EAI_PC_start_project = yes
 				set_temp_variable = { break = 1 }
 			}
 		}

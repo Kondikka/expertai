@@ -11,6 +11,11 @@
 # influence
 # contain
 # area_priority
+# building_target
+
+########################
+#	EAI
+########################
 
 # focus on barbarossa
 EAI_axis_prep_for_barbarossa = {
@@ -154,7 +159,8 @@ EAI_no_docking_rights_for_GER_outside_europe = {
 
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = befriend id = "GER" value = -4 }
+	ai_strategy = { type = diplo_action_desire id = GER target = docking_rights value = -200 }
+	ai_strategy = { type = diplo_action_acceptance id = GER target = docking_rights value = -200 }
 }
 
 EAI_asia_minors_dont_ally_GER = {
@@ -192,9 +198,8 @@ EAI_asia_minors_dont_ally_GER_2 = {
 }
 
 EAI_GER_prep_for_maginot = {
+	allowed = { tag = GER }
 	enable = {
-		original_tag = GER
-		
 		is_historical_focus_on = yes
 		
 		focus_progress = { focus = GER_around_maginot progress > 0 }
@@ -219,12 +224,21 @@ EAI_GER_prep_for_maginot = {
 	ai_strategy = { type = conquer id = "BEL" value = 200 }
 	ai_strategy = { type = conquer id = "HOL" value = 200 }
 	ai_strategy = { type = garrison value = -200 }
+	ai_strategy = {
+		type = front_unit_request
+
+		country_trigger = {
+
+			OR = { tag = BEL tag = HOL tag = LUX }
+		}
+
+		value = 200
+	}
 }
 
 EAI_GER_ignore_ITA = {
+	allowed = { tag = GER }
 	enable = {
-		original_tag = GER
-		
 		is_historical_focus_on = yes
 		
 		has_war_with = FRA
@@ -255,12 +269,11 @@ EAI_GER_ignore_FIN = {
 }
 
 EAI_GER_warprep = {
+	allowed = { tag = GER }
 	enable = {
 		is_historical_focus_on = yes
 
 		date < 1941.1.1
-		
-		original_tag = GER
 		
 		focus_progress = { focus = GER_danzig_or_war progress > 0 }
 		
@@ -281,11 +294,10 @@ EAI_GER_warprep = {
 }
 
 EAI_GER_wardec_YUG = {
+	allowed = { tag = GER }
 	enable = {
 		is_historical_focus_on = yes
 
-		original_tag = GER
-		
 		has_completed_focus = GER_demand_slovenia
 	}
 
@@ -297,10 +309,9 @@ EAI_GER_wardec_YUG = {
 }
 
 EAI_invasion_of_yugoslavia = {
+	allowed = { tag = GER }
 	enable = {
 		is_historical_focus_on = yes
-		
-		original_tag = GER
 		
 		focus_progress = { focus = GER_demand_slovenia progress > 0 }
 
@@ -314,12 +325,11 @@ EAI_invasion_of_yugoslavia = {
 }
 
 EAI_portuguese_trade_relation = {
+	allowed = { tag = GER }
 	enable = {
 		is_historical_focus_on = yes
 
 		date > 1940.1.1
-		
-		original_tag = GER
 		
 		has_political_power > 100
 		
@@ -344,9 +354,9 @@ EAI_portuguese_trade_relation = {
 	}
 }
 
-EAI_i_spr = { #why is GER using 50 divisions to guard against Spain?
+EAI_ignore_spr = {
+	allowed = { tag = GER }
 	enable = {
-		tag = GER
 		is_historical_focus_on = yes
 		has_government = fascism
 		has_war_with = SOV
@@ -366,9 +376,9 @@ EAI_i_spr = { #why is GER using 50 divisions to guard against Spain?
 	}
 }
 
-EAI_i_bnl = {
+EAI_ignore_bnl = {
+	allowed = { tag = GER }
 	enable = {
-		tag = GER
 		is_historical_focus_on = yes
 		has_government = fascism
 		NOT = { 
@@ -429,6 +439,77 @@ EAI_ignore_SWE = {
 	ai_strategy = { type = antagonize id = "GER" value = -2000 }
 }
 
+EAI_dont_die_in_mountains2 = {
+	allowed = { tag = GER }
+	enable = {
+		country_exists = SWI
+
+		NOT = { 
+			SWI = { has_country_flag = EAI_declare_war_from_GER }
+
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_puppet = yes }
+			is_in_faction_with = FRA
+		}
+	}
+	abort = {
+		OR = { 
+			SWI = { has_country_flag = EAI_declare_war_from_GER }
+
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_puppet = yes }
+			is_in_faction_with = FRA
+		}
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "SWI"
+		value = 500
+	}
+}
+
+EAI_GER_garrison_atlantic_wall = {
+	allowed = { tag = GER }
+	enable = {
+		any_enemy_country = { is_ai = no is_major = yes naval_strength_ratio = { tag = GER ratio > 1.0 } }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.15
+		states = { 
+			99
+			58
+			59
+			56
+			36
+			7
+			35
+			6
+			29
+			758
+			15
+			14
+			30
+			23
+			19
+			31
+			22
+			21
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+########################
+#	vanilla
+########################
+
 danzig_of_war_preparation = {
 	enable = {
 		tag = GER
@@ -464,38 +545,6 @@ danzig_of_war_preparation = {
 }
 
 dont_die_in_mountains = {
-	enable = {
-		tag = GER
-		country_exists = SWI
-
-		NOT = { 
-			SWI = { has_country_flag = EAI_declare_war_from_GER }
-
-			FRA = { has_capitulated = yes }
-			FRA = { exists = no }
-			FRA = { is_puppet = yes }
-			is_in_faction_with = FRA
-		}
-	}
-	abort = {
-		OR = { 
-			SWI = { has_country_flag = EAI_declare_war_from_GER }
-
-			FRA = { has_capitulated = yes }
-			FRA = { exists = no }
-			FRA = { is_puppet = yes }
-			is_in_faction_with = FRA
-		}
-	}
-	
-	ai_strategy = {
-		type = ignore
-		id = "SWI"
-		value = 500
-	}
-}
-
-EAI_dont_die_in_mountains2 = {
 	enable = {
 		tag = GER
 		country_exists = SWI
@@ -565,7 +614,6 @@ soviet_ally = {
 		value = 200
 	}	
 }
-
 
 italy_ally = {
 	enable = {
@@ -704,6 +752,7 @@ spain_ally = {
 		tag = GER
 		has_completed_focus = GER_nationalist_spain_ally
 		country_exists = SPR
+		NOT = { has_dlc = "La Resistance" }
 		SPR = { has_government = fascism } # TODO Find way to detect dynamic revolter tag
 	}
 	abort = {
@@ -718,6 +767,32 @@ spain_ally = {
 	ai_strategy = {
 		type = alliance
 		id = "SPR"			
+		value = 100
+	}	
+}
+
+spain_ally_resistance = {
+	enable = {
+		tag = GER
+		has_completed_focus = GER_nationalist_spain_ally
+		country_exists = SPA
+		has_dlc = "La Resistance"
+	}
+	abort = {
+		OR = {
+			NOT = { country_exists = SPA }
+			SPA = { has_completed_focus = SPA_join_the_allies }
+		}
+	}
+	
+	ai_strategy = {
+		type = befriend
+		id = "SPA"			
+		value = 100
+	}
+	ai_strategy = {
+		type = alliance
+		id = "SPA"			
 		value = 100
 	}	
 }
@@ -974,5 +1049,50 @@ make_sure_poland_is_ganked_before_we_move = {
 		type = declare_war
 		id = "LUX"
 		value = -2000 
+	}
+}
+
+spain_scw_support_GER_resistance = {
+	enable = {
+		tag = GER
+		has_government = fascism
+		country_exists = SPA
+		has_dlc = "La Resistance"
+	}
+	abort = {
+		OR = {
+			NOT = { country_exists = SPA }
+			SPA = { has_completed_focus = SPA_join_the_allies }
+		}
+	}
+	
+	ai_strategy = {
+		type = support
+		id = "SPA"
+		value = 100
+	}
+	ai_strategy = {
+		type = send_volunteers_desire
+		id = "SPA"
+		value = 100
+	}	
+}
+
+GER_we_are_bad_at_espionage_because_it_is_expensive_and_not_tanks = {
+	enable = {
+		tag = GER
+		has_government = fascism
+		has_dlc = "La Resistance"
+		num_of_civilian_factories < 90
+		num_of_civilian_factories > 30
+	}
+	abort = {
+		OR = {
+			num_of_civilian_factories > 90
+		}
+	}
+	ai_strategy = {
+		type = intelligence_agency_usable_factories
+		value = -20
 	}
 }

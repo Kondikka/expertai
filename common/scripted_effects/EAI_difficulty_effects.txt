@@ -181,7 +181,7 @@ EAI_dd_spawn_inf = {
 
 	if = { limit = { check_variable = { EAI_dd_inf_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: inf" } 
+		if = { limit = { ROOT = { has_country_flag = EAI_difficulty_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: inf" } 
 
 		ROOT = { add_manpower = -9000 }
 		
@@ -229,7 +229,7 @@ EAI_dd_spawn_mot = {
 
 	if = { limit = { check_variable = { EAI_dd_mot_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: mot" } 
+		if = { limit = { ROOT = { has_country_flag = EAI_difficulty_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: mot" } 
 
 		ROOT = { add_manpower = -9000 }
 		
@@ -246,7 +246,7 @@ EAI_dd_spawn_arm = {
 
 	if = { limit = { check_variable = { EAI_dd_arm_template > 0 } ROOT = { has_manpower > 9000 } }
 
-		if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: arm" } 
+		if = { limit = { ROOT = { has_country_flag = EAI_difficulty_logging } } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | REINFORCEMENTS: arm" } 
 
 		ROOT = { add_manpower = -9000 }
 
@@ -324,6 +324,7 @@ EAI_dd_spawn_arm = {
 ######################################################
 
 EAI_custom_bonus_shift_click = { 
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.2 }
@@ -340,6 +341,7 @@ EAI_custom_bonus_shift_click = {
 	}
 }
 EAI_custom_bonus_control_click = { 
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.05 }
@@ -356,6 +358,7 @@ EAI_custom_bonus_control_click = {
 	}
 }
 EAI_custom_bonus_click = { 
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.01 }
@@ -372,6 +375,7 @@ EAI_custom_bonus_click = {
 	}
 }
 EAI_custom_bonus_shift_right_click = {
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.2 }
@@ -388,6 +392,7 @@ EAI_custom_bonus_shift_right_click = {
 	}
 }
 EAI_custom_bonus_control_right_click = { 
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.05 }
@@ -404,6 +409,7 @@ EAI_custom_bonus_control_right_click = {
 	}
 }
 EAI_custom_bonus_right_click = { 
+
 	meta_effect = {
 		text = {
 			set_temp_variable = { t1 = 0.01 }
@@ -423,36 +429,39 @@ EAI_custom_bonus_right_click = {
 ### country variable localization issue fix
 
 EAI_get_custom_bonus_settings = {
-	set_temp_variable = { settings = 30 }
-	while_loop_effect = { limit = { check_variable = { settings > 0 } }
+
+	set_temp_variable = { custom_bonus_settings = 31 }
+	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { var:EAI_configuration_target = { set_variable = { Root.EAI_custom_bonus_[x]_temp = This.EAI_custom_bonus_[x] } } }
-			x = "[?settings]"
+			x = "[?custom_bonus_settings]"
 		}
-		subtract_from_temp_variable = { settings = 1 }
+		subtract_from_temp_variable = { custom_bonus_settings = 1 }
 	}
 }
 EAI_set_custom_bonus_settings = {
-	set_temp_variable = { settings = 30 }
-	while_loop_effect = { limit = { check_variable = { settings > 0 } }
+
+	set_temp_variable = { custom_bonus_settings = 31 }
+	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { 
 				var:EAI_configuration_target = { set_variable = { This.EAI_custom_bonus_[x] = Root.EAI_custom_bonus_[x]_temp } } 
 			}
-			x = "[?settings]"
+			x = "[?custom_bonus_settings]"
 		}
-		subtract_from_temp_variable = { settings = 1 }
+		subtract_from_temp_variable = { custom_bonus_settings = 1 }
 	}
 	var:EAI_configuration_target = { force_update_dynamic_modifier = yes }
 }
 EAI_clear_custom_bonus_settings = {
-	set_temp_variable = { settings = 30 }
-	while_loop_effect = { limit = { check_variable = { settings > 0 } }
+
+	set_temp_variable = { custom_bonus_settings = 31 }
+	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { clear_variable = Root.EAI_custom_bonus_[x]_temp }
-			x = "[?settings]"
+			x = "[?custom_bonus_settings]"
 		}
-		subtract_from_temp_variable = { settings = 1 }
+		subtract_from_temp_variable = { custom_bonus_settings = 1 }
 	}
 }
 
@@ -461,61 +470,44 @@ EAI_clear_custom_bonus_settings = {
 ######################################################
 
 # two equipment cost reduction ideas cant be allowed to be active at the same time so the highest is used
-EAI_fix_production_boost = { 
-	if = { 
-		limit = { 
-			has_country_flag = EAI_difficulty_bonus_hard_active
-			check_variable = { EAI_desperate_defense_level > 3 }
+EAI_fix_equipment_modifier_conflict = { 
+		
+	if = { limit = { has_variable = EAI_difficulty_equipment_bonus_active has_variable = EAI_dd_equipment_bonus_active }
+
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | DD: EAI_fix_equipment_modifier_conflict" } 
+
+		if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 1 } }
+
+			if = { limit = { check_variable = { EAI_dd_equipment_bonus_active > 3 } }
+
+				EAI_clear_equipment_modifier_HARD = yes	
+			}
+			else = {
+				EAI_clear_equipment_modifier_DD = yes
+			}
 		}
 		
-		EAI_clear_equipment_modifier_HARD = yes
-	}
-	
-	if = { 
-		limit = { 
-			has_country_flag = EAI_difficulty_bonus_very_hard_active
-			check_variable = { EAI_desperate_defense_level > 6 }
+		else_if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 2 } }
+
+			if = { limit = { check_variable = { EAI_dd_equipment_bonus_active > 6 } }
+
+				EAI_clear_equipment_modifier_VERY_HARD = yes	
+			}
+			else = {
+				EAI_clear_equipment_modifier_DD = yes
+			}
 		}
 		
-		EAI_clear_equipment_modifier_VERY_HARD = yes
-	}
-	
-	if = { 
-		limit = { 
-			has_country_flag = EAI_difficulty_bonus_insane_active
-			check_variable = { EAI_desperate_defense_level > 13 }
+		else_if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 3 } }
+
+			if = { limit = { check_variable = { EAI_dd_equipment_bonus_active > 13 } }
+
+				EAI_clear_equipment_modifier_INSANE = yes	
+			}
+			else = {
+				EAI_clear_equipment_modifier_DD = yes
+			}
 		}
-		
-		EAI_clear_equipment_modifier_INSANE = yes
-	}
-	
-	##########################################################
-	
-	if = { 
-		limit = { 
-			check_variable = { EAI_desperate_defense_level < 4 }
-			has_country_flag = EAI_difficulty_bonus_hard_active
-		}
-		
-		EAI_clear_equipment_modifier_DD = yes
-	}
-	
-	if = { 
-		limit = { 
-			check_variable = { EAI_desperate_defense_level < 7 }
-			has_country_flag = EAI_difficulty_bonus_very_hard_active
-		}
-		
-		EAI_clear_equipment_modifier_DD = yes
-	}
-	
-	if = { 
-		limit = { 
-			check_variable = { EAI_desperate_defense_level < 14 }
-			has_country_flag = EAI_difficulty_bonus_insane_active
-		}
-		
-		EAI_clear_equipment_modifier_DD = yes
 	}
 }
 
@@ -523,9 +515,9 @@ EAI_fix_production_boost = {
 #	difficulty bonus #CB
 ######################################################
 
-### difficulty bonus presets
+### custom difficulty bonus presets
 
-EAI_clear_difficulty_bonus_modifiers = {
+EAI_clear_difficulty_custom_modifiers = {
 
 	meta_effect = {
 		text = {
@@ -589,6 +581,8 @@ EAI_clear_difficulty_bonus_modifiers = {
 			clear_variable = [x]EAI_custom_bonus_29
 			#autonomy_gain_global_factor
 			clear_variable = [x]EAI_custom_bonus_30
+			#resistance_damage_to_garrison
+			clear_variable = [x]EAI_custom_bonus_31
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -596,7 +590,7 @@ EAI_clear_difficulty_bonus_modifiers = {
 	if = { limit = { has_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier } } remove_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier } }
 	if = { limit = { has_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier } } remove_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier } }
 }
-EAI_set_hard_difficulty_modifiers = {
+EAI_set_hard_difficulty_custom_modifiers = {
 
 	meta_effect = {
 		text = {
@@ -649,7 +643,7 @@ EAI_set_hard_difficulty_modifiers = {
 			#army_defense_factor 
 			set_variable = { [x]EAI_custom_bonus_24 = 0.0 }
 			#adaptive eq cost reduction 
-			set_variable = { [x]EAI_custom_bonus_25 = 0 }
+			set_variable = { [x]EAI_custom_bonus_25 = 1 }
 			#free convoys
 			set_variable = { [x]EAI_custom_bonus_26 = 0 }
 			#max building slots
@@ -660,6 +654,8 @@ EAI_set_hard_difficulty_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_29 = 0 }
 			#autonomy_gain_global_factor
 			set_variable = { [x]EAI_custom_bonus_30 = 0 }
+			#resistance_damage_to_garrison
+			set_variable = { [x]EAI_custom_bonus_31 = -0.25 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -670,7 +666,7 @@ EAI_set_hard_difficulty_modifiers = {
 
 	force_update_dynamic_modifier = yes
 }
-EAI_set_very_hard_difficulty_modifiers = {
+EAI_set_very_hard_difficulty_custom_modifiers = {
 
 	meta_effect = {
 		text = {
@@ -723,7 +719,7 @@ EAI_set_very_hard_difficulty_modifiers = {
 			#army_defense_factor 
 			set_variable = { [x]EAI_custom_bonus_24 = 0.0 }
 			#adaptive eq cost reduction 
-			set_variable = { [x]EAI_custom_bonus_25 = 0 }
+			set_variable = { [x]EAI_custom_bonus_25 = 2 }
 			#free convoys
 			set_variable = { [x]EAI_custom_bonus_26 = 0 }
 			#max building slots
@@ -734,6 +730,8 @@ EAI_set_very_hard_difficulty_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_29 = 0 }
 			#autonomy_gain_global_factor
 			set_variable = { [x]EAI_custom_bonus_30 = 0 }
+			#resistance_damage_to_garrison
+			set_variable = { [x]EAI_custom_bonus_31 = -0.5 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -744,7 +742,7 @@ EAI_set_very_hard_difficulty_modifiers = {
 
 	force_update_dynamic_modifier = yes
 }
-EAI_set_insane_difficulty_modifiers = {
+EAI_set_insane_difficulty_custom_modifiers = {
 
 	meta_effect = {
 		text = {
@@ -797,7 +795,7 @@ EAI_set_insane_difficulty_modifiers = {
 			#army_defense_factor 
 			set_variable = { [x]EAI_custom_bonus_24 = 0.0 }
 			#adaptive eq cost reduction 
-			set_variable = { [x]EAI_custom_bonus_25 = 0 }
+			set_variable = { [x]EAI_custom_bonus_25 = 3 }
 			#free convoys
 			set_variable = { [x]EAI_custom_bonus_26 = 0 }
 			#max building slots
@@ -808,6 +806,8 @@ EAI_set_insane_difficulty_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_29 = 0 }
 			#autonomy_gain_global_factor
 			set_variable = { [x]EAI_custom_bonus_30 = 0 }
+			#resistance_damage_to_garrison
+			set_variable = { [x]EAI_custom_bonus_31 = -0.75 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -821,23 +821,37 @@ EAI_set_insane_difficulty_modifiers = {
 
 ###
 
-EAI_clear_difficulty_bonus = {
-	clr_country_flag = EAI_country_bonus_active
+EAI_clear_active_difficulty_bonus = {
+
+	clr_country_flag = EAI_difficulty_bonus_active
+	
+	clr_country_flag = EAI_dynamic_difficulty_bonus_active
 
 	EAI_clear_equipment_modifier_HARD = yes
 	EAI_clear_equipment_modifier_VERY_HARD = yes
 	EAI_clear_equipment_modifier_INSANE = yes
 
 	if = { limit = { ROOT = { has_country_flag = EAI_config_COUNTRY } }
-		EAI_clear_difficulty_bonus_modifiers = yes
+	
+		EAI_clear_difficulty_custom_modifiers = yes
 	}
 
-	if = { limit = { has_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier } } remove_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier } }
-	if = { limit = { has_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier } } remove_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier } }
+	if = { limit = { has_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier } } 
+	
+		remove_dynamic_modifier = { modifier = EAI_difficulty_bonus_modifier }
+	}
+	
+	if = { limit = { has_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier } } 
+	
+		remove_dynamic_modifier = { modifier = EAI_dynamic_difficulty_bonus_modifier }
+	}
 }
 
 EAI_apply_equipment_modifier_HARD = {
-	set_country_flag = EAI_difficulty_bonus_hard_active
+
+	if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_apply_equipment_modifier_HARD" } 
+
+	set_variable = { EAI_difficulty_equipment_bonus_active = 1 }
 
 	if = { limit = { has_equipment = { infantry_equipment < 5000 } } add_ideas = EAI_HARD/infantry_equipment_bonus else = { remove_ideas = EAI_HARD/infantry_equipment_bonus } }
 	if = { limit = { has_equipment = { support_equipment < 500 } } add_ideas = EAI_HARD/support_equipment_bonus else = { remove_ideas = EAI_HARD/support_equipment_bonus } }
@@ -876,59 +890,72 @@ EAI_apply_equipment_modifier_HARD = {
 	if = { limit = { EAI_cas_bonus_trigger = yes } add_ideas = EAI_HARD/CAS_equipment else = { remove_ideas = EAI_HARD/CAS_equipment } }
 	if = { limit = { EAI_tac_bonus_trigger = yes } add_ideas = { EAI_HARD/tac_bomber_equipment EAI_HARD/jet_tac_bomber_equipment } else = { remove_ideas = { EAI_HARD/tac_bomber_equipment EAI_HARD/jet_tac_bomber_equipment } } }
 	if = { limit = { EAI_str_bonus_trigger = yes } add_ideas = { EAI_HARD/strat_bomber_equipment EAI_HARD/jet_strat_bomber_equipment } else = { remove_ideas = { EAI_HARD/strat_bomber_equipment EAI_HARD/jet_strat_bomber_equipment } } }
+
+	EAI_fix_equipment_modifier_conflict = yes
 }
 EAI_clear_equipment_modifier_HARD = {
-	clr_country_flag = EAI_difficulty_bonus_hard_active
 
-	remove_ideas = {
-		EAI_HARD/infantry_equipment_bonus
-		EAI_HARD/support_equipment_bonus
+	if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 1 } }
 
-		EAI_HARD/artillery_equipment_bonus
-		EAI_HARD/rocket_artillery_equipment_bonus
-		EAI_HARD/motorized_rocket_equipment_bonus
-		
-		EAI_HARD/motorized_equipment_bonus
-		EAI_HARD/mechanized_equipment_bonus
-		
-		EAI_HARD/anti_tank_equipment_bonus
-		EAI_HARD/anti_air_equipment_bonus
-		
-		EAI_HARD/light_tank_equipment_bonus
-		EAI_HARD/light_tank_artillery_equipment_bonus
-		EAI_HARD/light_tank_destroyer_equipment_bonus
-		EAI_HARD/light_tank_aa_equipment_bonus
-		
-		EAI_HARD/medium_tank_equipment_bonus
-		EAI_HARD/medium_tank_artillery_equipment_bonus
-		EAI_HARD/medium_tank_destroyer_equipment_bonus
-		EAI_HARD/medium_tank_aa_equipment_bonus
-		
-		EAI_HARD/heavy_tank_equipment_bonus
-		EAI_HARD/heavy_tank_artillery_equipment_bonus
-		EAI_HARD/heavy_tank_destroyer_equipment_bonus
-		EAI_HARD/heavy_tank_aa_equipment_bonus
-		
-		EAI_HARD/modern_tank_equipment_bonus
-		EAI_HARD/modern_tank_artillery_equipment_bonus
-		EAI_HARD/modern_tank_destroyer_equipment_bonus
-		EAI_HARD/modern_tank_aa_equipment_bonus
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_clear_equipment_modifier_HARD" } 
 
-		EAI_HARD/fighter_equipment 
-		EAI_HARD/cv_fighter_equipment 
-		EAI_HARD/jet_fighter_equipment 
-		EAI_HARD/heavy_fighter_equipment
+		clear_variable = EAI_difficulty_equipment_bonus_active
 
-		EAI_HARD/CAS_equipment         
-		EAI_HARD/tac_bomber_equipment  
-		EAI_HARD/jet_tac_bomber_equipment  
-		EAI_HARD/strat_bomber_equipment
-		EAI_HARD/jet_strat_bomber_equipment
+		remove_ideas = {
+			EAI_HARD/infantry_equipment_bonus
+			EAI_HARD/support_equipment_bonus
+
+			EAI_HARD/artillery_equipment_bonus
+			EAI_HARD/rocket_artillery_equipment_bonus
+			EAI_HARD/motorized_rocket_equipment_bonus
+			
+			EAI_HARD/motorized_equipment_bonus
+			EAI_HARD/mechanized_equipment_bonus
+			
+			EAI_HARD/anti_tank_equipment_bonus
+			EAI_HARD/anti_air_equipment_bonus
+			
+			EAI_HARD/light_tank_equipment_bonus
+			EAI_HARD/light_tank_artillery_equipment_bonus
+			EAI_HARD/light_tank_destroyer_equipment_bonus
+			EAI_HARD/light_tank_aa_equipment_bonus
+			
+			EAI_HARD/medium_tank_equipment_bonus
+			EAI_HARD/medium_tank_artillery_equipment_bonus
+			EAI_HARD/medium_tank_destroyer_equipment_bonus
+			EAI_HARD/medium_tank_aa_equipment_bonus
+			
+			EAI_HARD/heavy_tank_equipment_bonus
+			EAI_HARD/heavy_tank_artillery_equipment_bonus
+			EAI_HARD/heavy_tank_destroyer_equipment_bonus
+			EAI_HARD/heavy_tank_aa_equipment_bonus
+			
+			EAI_HARD/modern_tank_equipment_bonus
+			EAI_HARD/modern_tank_artillery_equipment_bonus
+			EAI_HARD/modern_tank_destroyer_equipment_bonus
+			EAI_HARD/modern_tank_aa_equipment_bonus
+
+			EAI_HARD/fighter_equipment 
+			EAI_HARD/cv_fighter_equipment 
+			EAI_HARD/jet_fighter_equipment 
+			EAI_HARD/heavy_fighter_equipment
+
+			EAI_HARD/CAS_equipment         
+			EAI_HARD/tac_bomber_equipment  
+			EAI_HARD/jet_tac_bomber_equipment  
+			EAI_HARD/strat_bomber_equipment
+			EAI_HARD/jet_strat_bomber_equipment
+		}
+
+		EAI_fix_equipment_modifier_conflict = yes
 	}
 }
 
 EAI_apply_equipment_modifier_VERY_HARD = {
-	set_country_flag = EAI_difficulty_bonus_very_hard_active
+
+	if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_apply_equipment_modifier_VERY_HARD" } 
+
+	set_variable = { EAI_difficulty_equipment_bonus_active = 2 }
 
 	if = { limit = { has_equipment = { infantry_equipment < 5000 } } add_ideas = EAI_VERY_HARD/infantry_equipment_bonus else = { remove_ideas = EAI_VERY_HARD/infantry_equipment_bonus } }
 	if = { limit = { has_equipment = { support_equipment < 500 } } add_ideas = EAI_VERY_HARD/support_equipment_bonus else = { remove_ideas = EAI_VERY_HARD/support_equipment_bonus } }
@@ -967,59 +994,72 @@ EAI_apply_equipment_modifier_VERY_HARD = {
 	if = { limit = { EAI_cas_bonus_trigger = yes } add_ideas = EAI_VERY_HARD/CAS_equipment else = { remove_ideas = EAI_VERY_HARD/CAS_equipment } }
 	if = { limit = { EAI_tac_bonus_trigger = yes } add_ideas = { EAI_VERY_HARD/tac_bomber_equipment EAI_VERY_HARD/jet_tac_bomber_equipment } else = { remove_ideas = { EAI_VERY_HARD/tac_bomber_equipment EAI_VERY_HARD/jet_tac_bomber_equipment } } }
 	if = { limit = { EAI_str_bonus_trigger = yes } add_ideas = { EAI_VERY_HARD/strat_bomber_equipment EAI_VERY_HARD/jet_strat_bomber_equipment } else = { remove_ideas = { EAI_VERY_HARD/strat_bomber_equipment EAI_VERY_HARD/jet_strat_bomber_equipment } } }
+
+	EAI_fix_equipment_modifier_conflict = yes
 }
 EAI_clear_equipment_modifier_VERY_HARD = {
-	clr_country_flag = EAI_difficulty_bonus_very_hard_active
 
-	remove_ideas = {
-		EAI_VERY_HARD/infantry_equipment_bonus
-		EAI_VERY_HARD/support_equipment_bonus
-		
-		EAI_VERY_HARD/artillery_equipment_bonus
-		EAI_VERY_HARD/rocket_artillery_equipment_bonus
-		EAI_VERY_HARD/motorized_rocket_equipment_bonus
-		
-		EAI_VERY_HARD/motorized_equipment_bonus
-		EAI_VERY_HARD/mechanized_equipment_bonus
-		
-		EAI_VERY_HARD/anti_tank_equipment_bonus
-		EAI_VERY_HARD/anti_air_equipment_bonus
-		
-		EAI_VERY_HARD/light_tank_equipment_bonus
-		EAI_VERY_HARD/light_tank_artillery_equipment_bonus
-		EAI_VERY_HARD/light_tank_destroyer_equipment_bonus
-		EAI_VERY_HARD/light_tank_aa_equipment_bonus
-		
-		EAI_VERY_HARD/medium_tank_equipment_bonus
-		EAI_VERY_HARD/medium_tank_artillery_equipment_bonus
-		EAI_VERY_HARD/medium_tank_destroyer_equipment_bonus
-		EAI_VERY_HARD/medium_tank_aa_equipment_bonus
-		
-		EAI_VERY_HARD/heavy_tank_equipment_bonus
-		EAI_VERY_HARD/heavy_tank_artillery_equipment_bonus
-		EAI_VERY_HARD/heavy_tank_destroyer_equipment_bonus
-		EAI_VERY_HARD/heavy_tank_aa_equipment_bonus
-		
-		EAI_VERY_HARD/modern_tank_equipment_bonus
-		EAI_VERY_HARD/modern_tank_artillery_equipment_bonus
-		EAI_VERY_HARD/modern_tank_destroyer_equipment_bonus
-		EAI_VERY_HARD/modern_tank_aa_equipment_bonus
+	if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 2 } }
 
-		EAI_VERY_HARD/fighter_equipment 
-		EAI_VERY_HARD/cv_fighter_equipment 
-		EAI_VERY_HARD/jet_fighter_equipment 
-		EAI_VERY_HARD/heavy_fighter_equipment
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_clear_equipment_modifier_VERY_HARD" } 
 
-		EAI_VERY_HARD/CAS_equipment         
-		EAI_VERY_HARD/tac_bomber_equipment  
-		EAI_VERY_HARD/jet_tac_bomber_equipment  
-		EAI_VERY_HARD/strat_bomber_equipment
-		EAI_VERY_HARD/jet_strat_bomber_equipment
+		clear_variable = EAI_difficulty_equipment_bonus_active
+
+		remove_ideas = {
+			EAI_VERY_HARD/infantry_equipment_bonus
+			EAI_VERY_HARD/support_equipment_bonus
+			
+			EAI_VERY_HARD/artillery_equipment_bonus
+			EAI_VERY_HARD/rocket_artillery_equipment_bonus
+			EAI_VERY_HARD/motorized_rocket_equipment_bonus
+			
+			EAI_VERY_HARD/motorized_equipment_bonus
+			EAI_VERY_HARD/mechanized_equipment_bonus
+			
+			EAI_VERY_HARD/anti_tank_equipment_bonus
+			EAI_VERY_HARD/anti_air_equipment_bonus
+			
+			EAI_VERY_HARD/light_tank_equipment_bonus
+			EAI_VERY_HARD/light_tank_artillery_equipment_bonus
+			EAI_VERY_HARD/light_tank_destroyer_equipment_bonus
+			EAI_VERY_HARD/light_tank_aa_equipment_bonus
+			
+			EAI_VERY_HARD/medium_tank_equipment_bonus
+			EAI_VERY_HARD/medium_tank_artillery_equipment_bonus
+			EAI_VERY_HARD/medium_tank_destroyer_equipment_bonus
+			EAI_VERY_HARD/medium_tank_aa_equipment_bonus
+			
+			EAI_VERY_HARD/heavy_tank_equipment_bonus
+			EAI_VERY_HARD/heavy_tank_artillery_equipment_bonus
+			EAI_VERY_HARD/heavy_tank_destroyer_equipment_bonus
+			EAI_VERY_HARD/heavy_tank_aa_equipment_bonus
+			
+			EAI_VERY_HARD/modern_tank_equipment_bonus
+			EAI_VERY_HARD/modern_tank_artillery_equipment_bonus
+			EAI_VERY_HARD/modern_tank_destroyer_equipment_bonus
+			EAI_VERY_HARD/modern_tank_aa_equipment_bonus
+
+			EAI_VERY_HARD/fighter_equipment 
+			EAI_VERY_HARD/cv_fighter_equipment 
+			EAI_VERY_HARD/jet_fighter_equipment 
+			EAI_VERY_HARD/heavy_fighter_equipment
+
+			EAI_VERY_HARD/CAS_equipment         
+			EAI_VERY_HARD/tac_bomber_equipment  
+			EAI_VERY_HARD/jet_tac_bomber_equipment  
+			EAI_VERY_HARD/strat_bomber_equipment
+			EAI_VERY_HARD/jet_strat_bomber_equipment
+		}
+
+		EAI_fix_equipment_modifier_conflict = yes
 	}
 }
 
 EAI_apply_equipment_modifier_INSANE = {
-	set_country_flag = EAI_difficulty_bonus_insane_active
+
+	if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_apply_equipment_modifier_INSANE" } 
+
+	set_variable = { EAI_difficulty_equipment_bonus_active = 3 }
 
 	if = { limit = { has_equipment = { infantry_equipment < 5000 } } add_ideas = EAI_INSANE/infantry_equipment_bonus else = { remove_ideas = EAI_INSANE/infantry_equipment_bonus } }
 	if = { limit = { has_equipment = { support_equipment < 500 } } add_ideas = EAI_INSANE/support_equipment_bonus else = { remove_ideas = EAI_INSANE/support_equipment_bonus } }
@@ -1058,54 +1098,64 @@ EAI_apply_equipment_modifier_INSANE = {
 	if = { limit = { EAI_cas_bonus_trigger = yes } add_ideas = EAI_INSANE/CAS_equipment else = { remove_ideas = EAI_INSANE/CAS_equipment } }
 	if = { limit = { EAI_tac_bonus_trigger = yes } add_ideas = { EAI_INSANE/tac_bomber_equipment EAI_INSANE/jet_tac_bomber_equipment } else = { remove_ideas = { EAI_INSANE/tac_bomber_equipment EAI_INSANE/jet_tac_bomber_equipment } } }
 	if = { limit = { EAI_str_bonus_trigger = yes } add_ideas = { EAI_INSANE/strat_bomber_equipment EAI_INSANE/jet_strat_bomber_equipment } else = { remove_ideas = { EAI_INSANE/strat_bomber_equipment EAI_INSANE/jet_strat_bomber_equipment } } }
+
+	EAI_fix_equipment_modifier_conflict = yes
 }
 EAI_clear_equipment_modifier_INSANE = {
-	clr_country_flag = EAI_difficulty_bonus_insane_active
 
-	remove_ideas = {
-		EAI_INSANE/infantry_equipment_bonus
-		EAI_INSANE/support_equipment_bonus
-		
-		EAI_INSANE/artillery_equipment_bonus
-		EAI_INSANE/rocket_artillery_equipment_bonus
-		EAI_INSANE/motorized_rocket_equipment_bonus
-		
-		EAI_INSANE/motorized_equipment_bonus
-		EAI_INSANE/mechanized_equipment_bonus
-		
-		EAI_INSANE/anti_tank_equipment_bonus
-		EAI_INSANE/anti_air_equipment_bonus
-		
-		EAI_INSANE/light_tank_equipment_bonus
-		EAI_INSANE/light_tank_artillery_equipment_bonus
-		EAI_INSANE/light_tank_destroyer_equipment_bonus
-		EAI_INSANE/light_tank_aa_equipment_bonus
-		
-		EAI_INSANE/medium_tank_equipment_bonus
-		EAI_INSANE/medium_tank_artillery_equipment_bonus
-		EAI_INSANE/medium_tank_destroyer_equipment_bonus
-		EAI_INSANE/medium_tank_aa_equipment_bonus
-		
-		EAI_INSANE/heavy_tank_equipment_bonus
-		EAI_INSANE/heavy_tank_artillery_equipment_bonus
-		EAI_INSANE/heavy_tank_destroyer_equipment_bonus
-		EAI_INSANE/heavy_tank_aa_equipment_bonus
-		
-		EAI_INSANE/modern_tank_equipment_bonus
-		EAI_INSANE/modern_tank_artillery_equipment_bonus
-		EAI_INSANE/modern_tank_destroyer_equipment_bonus
-		EAI_INSANE/modern_tank_aa_equipment_bonus
+	if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 3 } }
 
-		EAI_INSANE/fighter_equipment 
-		EAI_INSANE/cv_fighter_equipment 
-		EAI_INSANE/jet_fighter_equipment 
-		EAI_INSANE/heavy_fighter_equipment
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | EAI_clear_equipment_modifier_INSANE" } 
 
-		EAI_INSANE/CAS_equipment         
-		EAI_INSANE/tac_bomber_equipment  
-		EAI_INSANE/jet_tac_bomber_equipment  
-		EAI_INSANE/strat_bomber_equipment
-		EAI_INSANE/jet_strat_bomber_equipment
+		clear_variable = EAI_difficulty_equipment_bonus_active
+
+		remove_ideas = {
+			EAI_INSANE/infantry_equipment_bonus
+			EAI_INSANE/support_equipment_bonus
+			
+			EAI_INSANE/artillery_equipment_bonus
+			EAI_INSANE/rocket_artillery_equipment_bonus
+			EAI_INSANE/motorized_rocket_equipment_bonus
+			
+			EAI_INSANE/motorized_equipment_bonus
+			EAI_INSANE/mechanized_equipment_bonus
+			
+			EAI_INSANE/anti_tank_equipment_bonus
+			EAI_INSANE/anti_air_equipment_bonus
+			
+			EAI_INSANE/light_tank_equipment_bonus
+			EAI_INSANE/light_tank_artillery_equipment_bonus
+			EAI_INSANE/light_tank_destroyer_equipment_bonus
+			EAI_INSANE/light_tank_aa_equipment_bonus
+			
+			EAI_INSANE/medium_tank_equipment_bonus
+			EAI_INSANE/medium_tank_artillery_equipment_bonus
+			EAI_INSANE/medium_tank_destroyer_equipment_bonus
+			EAI_INSANE/medium_tank_aa_equipment_bonus
+			
+			EAI_INSANE/heavy_tank_equipment_bonus
+			EAI_INSANE/heavy_tank_artillery_equipment_bonus
+			EAI_INSANE/heavy_tank_destroyer_equipment_bonus
+			EAI_INSANE/heavy_tank_aa_equipment_bonus
+			
+			EAI_INSANE/modern_tank_equipment_bonus
+			EAI_INSANE/modern_tank_artillery_equipment_bonus
+			EAI_INSANE/modern_tank_destroyer_equipment_bonus
+			EAI_INSANE/modern_tank_aa_equipment_bonus
+
+			EAI_INSANE/fighter_equipment 
+			EAI_INSANE/cv_fighter_equipment 
+			EAI_INSANE/jet_fighter_equipment 
+			EAI_INSANE/heavy_fighter_equipment
+
+			EAI_INSANE/CAS_equipment         
+			EAI_INSANE/tac_bomber_equipment  
+			EAI_INSANE/jet_tac_bomber_equipment  
+			EAI_INSANE/strat_bomber_equipment
+			EAI_INSANE/jet_strat_bomber_equipment
+		}
+
+		EAI_fix_equipment_modifier_conflict = yes
 	}
 }
 
@@ -1113,13 +1163,16 @@ EAI_clear_equipment_modifier_INSANE = {
 #	desperate defense
 ######################################################
 
-EAI_clear_desperate_defense = {
+EAI_clear_active_desperate_defense = {
+
 	clr_country_flag = EAI_desperate_defense_active
 	
 	clr_country_flag = EAI_dynamic_desperate_defense_active
 	
 	EAI_clear_equipment_modifier_DD = yes
-	
+
+	clear_variable = EAI_desperate_defense_level
+
 	remove_ideas = {
 		EAI_desperate_defense_1 
 		EAI_desperate_defense_2 
@@ -1145,7 +1198,10 @@ EAI_clear_desperate_defense = {
 }
 
 EAI_apply_equipment_modifier_DD = {
+
 	if = { limit = { has_variable = EAI_desperate_defense_level }
+
+		set_variable = { EAI_dd_equipment_bonus_active = EAI_desperate_defense_level }
 
 		meta_effect = {
 			text = {
@@ -1190,13 +1246,16 @@ EAI_apply_equipment_modifier_DD = {
 				if = { limit = { EAI_str_bonus_trigger = yes } add_ideas = { EAI_DD_[x]/strat_bomber_equipment EAI_DD_[x]/jet_strat_bomber_equipment } else = { remove_ideas = { EAI_DD_[x]/strat_bomber_equipment EAI_DD_[x]/jet_strat_bomber_equipment } } }
 			}
 
-			x = "[?EAI_desperate_defense_level|.0]"
+			x = "[?EAI_dd_equipment_bonus_active|.0]"
 		}
 
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: applying equipment modifier [?EAI_desperate_defense_level]" } 
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | DD: applying equipment modifier [?EAI_desperate_defense_level]" } 
 	}
+
+	EAI_fix_equipment_modifier_conflict = yes
 }
 EAI_clear_equipment_modifier_DD = {
+
 	if = { limit = { has_variable = EAI_desperate_defense_level }
 
 		meta_effect = {
@@ -1250,9 +1309,13 @@ EAI_clear_equipment_modifier_DD = {
 				}
 			}
 	
-			x = "[?EAI_desperate_defense_level|.0]"
+			x = "[?EAI_dd_equipment_bonus_active|.0]"
 		}
+
+		clear_variable = EAI_dd_equipment_bonus_active
 	
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | DESPERATE DEFENSE: removing equipment modifier [?EAI_desperate_defense_level]" } 
+		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [This.GetName] | DD: removing equipment modifier [?EAI_desperate_defense_level]" } 
 	}
+
+	EAI_fix_equipment_modifier_conflict = yes
 }

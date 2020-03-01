@@ -131,30 +131,26 @@ EAI_update_naval_invasion_target = {
 			else_if = {
 				limit = {
 					NOT = { is_faction_leader = yes }
-					
-					any_enemy_country = {
 
-						any_enemy_country = {
-
-							is_ai = yes
+					OR = {
+						var:faction_leader = { 
+							has_variable = EAI_naval_invasion_target
 							NOT = { tag = ROOT }
 							has_capitulated = no
-							OR = {
-								AND = { is_in_faction_with = ROOT is_faction_leader = yes }
-								AND = { is_in_faction = no ROOT = { is_subject_of = PREV } }
-							}
-							PREV = { has_country_flag = EAI_naval_invasion_from_@PREV }
+							var:EAI_naval_invasion_target = { is_major = yes }
+							set_temp_variable = { leader_invasion_target = EAI_naval_invasion_target }
 						}
-						
-						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
-
-						is_major = yes
-
-						set_temp_variable = { faction_leader_invasion_target = THIS.id }
+						var:overlord = { 
+							has_variable = EAI_naval_invasion_target
+							NOT = { tag = ROOT }
+							has_capitulated = no
+							var:EAI_naval_invasion_target = { is_major = yes }
+							set_temp_variable = { leader_invasion_target = EAI_naval_invasion_target }
+						}
 					}
 				}
 
-				var:faction_leader_invasion_target = {
+				var:leader_invasion_target = {
 
 					if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
 
@@ -180,25 +176,17 @@ EAI_update_naval_invasion_target = {
 						is_faction_leader = no
 						has_capitulated = yes
 					}
-				
-					any_enemy_country = {
 
-						any_enemy_country = {
-							
-							is_ai = yes
-							NOT = { tag = ROOT }
-							is_in_faction_with = ROOT
-							NOT = {
-								any_allied_country = {
-									strength_ratio = { tag = ROOT ratio > 1.0 }
-								}
+					any_allied_country = {
+						NOT = { tag = ROOT }
+						has_variable = EAI_naval_invasion_target
+						NOT = {
+							any_allied_country = {
+								NOT = { tag = ROOT }
+								strength_ratio = { tag = PREV ratio > 1.0 }
 							}
-							PREV = { has_country_flag = EAI_naval_invasion_from_@PREV }
 						}
-						
-						NOT = { has_country_flag = EAI_stop_invasions_@ROOT }
-
-						set_temp_variable = { strongest_member_invasion_target = THIS.id }
+						set_temp_variable = { strongest_member_invasion_target = EAI_naval_invasion_target }
 					}
 				}
 
@@ -282,6 +270,7 @@ EAI_update_naval_invasion_target = {
 EAI_create_naval_invasion_operation = { # THIS = INVADER, PREV = TARGET
 
 	set_country_flag = { flag = EAI_naval_invasion_min_duration value = 1 days = 60 }	
+	set_country_flag = { flag = EAI_naval_invasion_max_duration value = 1 days = 180 }	
 	set_variable = { EAI_naval_invasion_target = PREV.id }
 
 	for_each_scope_loop = { array = PREV.controlled_states

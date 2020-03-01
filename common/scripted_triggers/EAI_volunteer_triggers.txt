@@ -95,7 +95,7 @@ EAI_historical_volunteers = {
 
 			OR = {
 				AND = { original_tag = CHI has_war_with = JAP date < 1940.1.1 }
-				AND = { original_tag = SPR has_government = communism has_civil_war = yes }
+				AND = { original_tag = SPR NOT = { EAI_fascist_nation = yes } has_civil_war = yes }
 			}
 		}
 
@@ -104,7 +104,7 @@ EAI_historical_volunteers = {
 
 			OR = {
 				AND = { OR = { original_tag = JAP original_tag = MEN } has_government = fascism has_war_with = CHI }
-				AND = { original_tag = SPR has_government = fascism has_civil_war = yes }
+				AND = { original_tag = SPR EAI_fascist_nation = yes has_civil_war = yes }
 			}
 		}
 
@@ -126,7 +126,27 @@ EAI_historical_volunteers = {
 
 EAI_send_expeditionary = { # hardcoded ai blocks this in some situations
 
-	ROOT = { NOT = { surrender_progress > 0 } }
+	ROOT = {
+
+		NOT = { surrender_progress > 0 }
+
+		NOT = {
+			any_neighbor_country = {
+				has_war_with = ROOT
+			}
+		}
+
+		NOT = {
+			any_of_scopes = { array = controlled_states
+				
+				any_state = {
+					
+					CONTROLLER = { has_war_with = ROOT }
+					distance_to = { target = PREV value < 800 } 
+				}
+			}
+		}
+	}
 
 	THIS = { has_war_together_with = ROOT }
 
@@ -149,6 +169,20 @@ EAI_send_expeditionary = { # hardcoded ai blocks this in some situations
 			ROOT = { EAI_asian_minor = yes }
 
 			THIS = { original_tag = CHI }
+		}
+	}
+
+	EAI_expeditionary_restrictions = yes
+}
+
+EAI_expeditionary_restrictions = {
+
+	NOT = {
+
+		#
+		AND = {
+			ROOT = { OR = { tag = EGY tag = MAL tag = RAJ } }
+			THIS = { OR = { tag = ENG is_in_faction_with = ENG } }
 		}
 	}
 }

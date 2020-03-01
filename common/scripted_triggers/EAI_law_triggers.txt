@@ -177,7 +177,7 @@ EAI_can_take_war_economy = {
 			NOT = { has_decision = women_in_the_workforce }
 
 			has_manpower < 10000
-			NOT = { has_country_flag = EAI_mobilizing_manpower }
+			NOT = { conscription_ratio < 0.99 }
 		}
 
 		AND = { # downgrade when low on manpower
@@ -192,7 +192,7 @@ EAI_can_take_war_economy = {
 				has_idea = service_by_requirement
 			}
 
-			NOT = { has_country_flag = EAI_mobilizing_manpower }
+			NOT = { conscription_ratio < 0.99 }
 
 			NOT = { # switch tech first
 				AND = {
@@ -381,7 +381,7 @@ EAI_can_take_volunteer_only = {
 
 	NOT = { original_tag = USA }
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	has_manpower < 750000
 
@@ -415,7 +415,7 @@ EAI_can_take_limited_conscription = {
 
 	has_war_support > 0.15
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	OR = {
 		original_tag = SOV
@@ -483,7 +483,7 @@ EAI_can_take_extensive_conscription = {
 		has_war_support > 0.25
 	}
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	OR = {
 		original_tag = SOV
@@ -564,7 +564,7 @@ EAI_can_take_service_by_requirement = {
 		has_war_support > 0.65
 	}
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	has_manpower < 1000000
 
@@ -644,7 +644,7 @@ EAI_can_take_all_adults_serve = {
 
 	NOT = { has_tech = modern_blitzkrieg } # mobile warfare countries should get manpower techs before getting this law
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	has_manpower < 250000
 
@@ -724,7 +724,7 @@ EAI_can_take_scraping_the_barrel = {
 		has_tech = nd_conscription
 	}
 
-	NOT = { has_country_flag = EAI_mobilizing_manpower } # wait for mobilization before upgrading again
+	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	has_manpower < 250000
 
@@ -916,6 +916,19 @@ EAI_can_take_export_focus = {
 		check_variable = { var = EAI_average_resource_need value = 0.15 compare = greater_than_or_equals }
 	}
 
+	# when switching down, see if the AI cant fulfill needs by trading
+	if = { limit = { OR = { has_idea = free_trade } }
+
+		count_triggers = {
+			amount = 2
+			
+			check_variable = { EAI_aluminium_resource_shortage = 3 }
+			check_variable = { EAI_rubber_resource_shortage = 3 }
+			check_variable = { EAI_tungsten_resource_shortage = 3 }
+			check_variable = { EAI_steel_resource_shortage = 3 }
+			check_variable = { EAI_chromium_resource_shortage = 3 }
+		}
+	}
 
 	NOT = { EAI_pp_advisor_prio = yes }
 
@@ -945,6 +958,20 @@ EAI_can_take_limited_exports = {
 	### normal range: >= 60%
 
 	check_variable = { var = EAI_average_resource_need value = 0.60 compare = greater_than_or_equals }
+
+	# when switching down, see if the AI cant fulfill needs by trading
+	if = { limit = { OR = { has_idea = free_trade has_idea = export_focus } }
+
+		count_triggers = {
+			amount = 2
+			
+			check_variable = { EAI_aluminium_resource_shortage = 3 }
+			check_variable = { EAI_rubber_resource_shortage = 3 }
+			check_variable = { EAI_tungsten_resource_shortage = 3 }
+			check_variable = { EAI_steel_resource_shortage = 3 }
+			check_variable = { EAI_chromium_resource_shortage = 3 }
+		}
+	}
 
 	NOT = { EAI_pp_advisor_prio = yes }
 	

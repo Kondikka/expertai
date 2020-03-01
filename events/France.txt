@@ -167,18 +167,14 @@ country_event = {
 
 ### The Fall of France
 
-# The Battle is Lost
+#hidden pre-event to check before capitulation
 country_event = {
-	id = france.10
-	title = france.10.t
-	desc = france.10.d
-	picture = GFX_report_event_german_parade_paris
-	
-	fire_only_once = yes
-	
+	id = france.101
+	hidden = yes
 	trigger = {
 		tag = FRA
 		has_war_with = GER
+		has_government = democratic
 		16 = { is_controlled_by = GER }
 		is_in_faction_with = ENG
 		ENG = { has_war_with = GER }
@@ -190,7 +186,6 @@ country_event = {
 			}
 		}
 		has_civil_war = no
-		
 		#Don't fire if France has pushed pretty far into ITA or GER
 		NOT = {
 			any_state = {
@@ -229,10 +224,21 @@ country_event = {
 			}
 		}
 	}
-	
-	mean_time_to_happen = {
-		days = 2
+	mean_time_to_happen = { days = 2 }
+	immediate = {
+		country_event = france.10
 	}
+}
+# The Battle is Lost
+country_event = {
+	id = france.10
+	title = france.10.t
+	desc = france.10.d
+	picture = GFX_report_event_german_parade_paris
+	
+	fire_only_once = yes
+	
+	is_triggered_only = yes
 
 	immediate = {
 		set_global_flag = achievement_france_surrender
@@ -242,6 +248,7 @@ country_event = {
 		name = france.10.a
 		trigger = { is_ai = no }
 		set_country_flag = become_vichy
+		save_global_event_target_as = vichy_france
 		set_global_flag = fall_of_france
 		GER = { country_event = france.14 }
 		custom_effect_tooltip = france.10.a_tt
@@ -253,6 +260,7 @@ country_event = {
 			factor = 85
 		}
 		set_global_flag = fall_of_france
+		save_global_event_target_as = free_france
 		GER = { country_event = france.14 }
 		custom_effect_tooltip = france.10.b_tt
 	}
@@ -261,7 +269,7 @@ country_event = {
 		ai_chance = {
 			factor = 15
 			modifier = {
-				factor = 0 #EAI
+				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
@@ -272,6 +280,18 @@ country_event = {
 			}
 		}
 		custom_effect_tooltip = GAME_OVER_TT
+	}
+	option = { # decide to fight on
+		name = france.10.e
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		trigger = { has_war_support > 0.7 }
+		add_stability = -0.05
 	}
 }
 
@@ -361,6 +381,7 @@ country_event = {
 		trigger = { is_ai = no }
 		set_country_flag = become_vichy
 		set_global_flag = fall_of_france
+		save_global_event_target_as = vichy_france
 		GER = { country_event = france.14 }
 		custom_effect_tooltip = france.10.a_tt
 		# Switches to Vichy if GER accepts
@@ -368,8 +389,22 @@ country_event = {
 	option = { # Become Free France
 		name = france.13.b
 		GER = { country_event = france.14 }
+		save_global_event_target_as = free_france
 		custom_effect_tooltip = france.10.b_tt
 		set_global_flag = fall_of_france
+	}
+	option = { # decide to fight on
+		name = france.10.e
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		trigger = { has_war_support > 0.7 }
+		add_stability = -0.05
+		custom_effect_tooltip = france_continue_the_fight_tt
 	}
 }
 
@@ -390,7 +425,7 @@ country_event = {
 		}
 		trigger = {
 			has_government = fascism
-			OR = { NOT = { has_global_flag = EAI_aggressive_GER } is_ai = no is_historical_focus_on = no } #EAI
+			not = { has_dlc = "La Resistance" }
 		}
 		#Set same cosmetic tag they would get on capitulation
 		FRA = {
@@ -508,15 +543,25 @@ country_event = {
 			limit = {
 				31 = { #Midi-Pyrinees
 					owner = { original_tag = FRA }
-					is_controlled_by = SPR
+					controller = { original_tag = SPR }
 				}
 			}
-			SPR = {
+			random_other_country = {
+				limit = {
+					original_tag = SPR
+					has_war_with = FRA
+				}
 				transfer_state = 31
 			}
 		}
 		FRA = {
 			set_capital = 539
+			if = {
+				limit = {
+					has_dlc = "La Resistance"
+				}
+				
+			}
 			hidden_effect = {
 					set_state_controller = 26
 					set_state_controller = 22
@@ -616,8 +661,7 @@ country_event = {
 				ideology = fascism
 				size = 0.9
 				capital = 26
-				#states = { 26 21 22 31 25 20 32 33 1 735 677 680 554 458 462 461 513 459 460 665 553 272 556 543 706 708 713 741 286 671 670 268 557 514 515 }
-				states = { 26 21 22 31 25 20 32 33 1 735 677 680 554 458 665 458 460 513 459 461 462 553 268 } #EAI
+				states = { 26 21 22 31 25 20 32 33 1 735 677 680 554 458 462 461 513 459 460 665 553 272 556 543 706 708 713 268 557 514 515 776 777 778 779 780 781 782 786 }
 				states_filter = {
 					owner = { original_tag = FRA }
 					OR = {		
@@ -801,10 +845,14 @@ country_event = {
 			limit = {
 				31 = { #Midi-Pyrinees
 					owner = { original_tag = FRA }
-					is_controlled_by = SPR
+					controller = { original_tag = SPR }
 				}
 			}
-			SPR = {
+			random_other_country = {
+				limit = {
+					original_tag = SPR
+					has_war_with = FRA
+				}
 				transfer_state = 31
 			}
 		}
@@ -964,7 +1012,199 @@ country_event = {
 			FRA = { news_event = { id = france.20 days = 1 } }
 		}
 	}
-
+	option = { # Agree - Fascism - LaR
+		name = france.14.a
+		ai_chance = { 
+			factor = 50 
+		}
+		trigger = {
+			has_government = fascism
+			has_dlc = "La Resistance"
+		}
+		FRA = { 
+			set_cosmetic_tag = FRA_FREE 
+			add_ideas = FRA_defeatism
+			load_focus_tree = free_french_focus
+			if = {
+				limit = {
+					capital_scope = {
+						NOT = {
+							state = 16
+							state = 635
+						}
+					}
+					controls_state = 635
+				}
+				set_capital = 635
+			}
+			country_event = france.20
+			every_owned_state = {
+				limit = { 
+					is_controlled_by = ITA 
+					is_core_of = FRA
+				}
+				set_state_flag = vichy_italian_conquest
+			}
+		}
+		custom_effect_tooltip = establishing_vichy_tt
+		hidden_effect = {
+			create_dynamic_country = {
+				original_tag = FRA
+				save_event_target_as = vichy_france
+				every_state = { #transfer French colonial empire
+					limit = {
+						is_controlled_by = FRA
+						is_owned_by = FRA
+						OR = {
+							is_on_continent = africa
+							is_core_of = VIN
+							is_core_of = CAM
+							is_core_of = LAO
+							is_core_of = LEB
+							is_core_of = SYR
+						}
+					}
+					event_target:vichy_france = { transfer_state = PREV }
+				}
+				every_state = {
+					limit = { #set up Vichy continental holdings
+						OR = {
+							state = 735
+							state = 21
+							state = 32
+							state = 20
+							state = 26
+							state = 22
+							state = 31
+							state = 25
+							state = 33
+							state = 1
+						}
+						CONTROLLER = { 
+							OR = {
+								original_tag = FRA
+								has_war_with = FRA
+							} 
+						} #failsafe for weird shit (tm)
+					}
+					add_core_of = PREV
+					event_target:vichy_france = { transfer_state = PREV }
+				}
+				every_state = { #set up cores for French cores
+					limit = {
+						is_core_of = FRA
+						NOT = {
+							is_controlled_by = event_target:vichy_france
+						}
+					}
+					add_core_of = PREV
+				}
+				if = { 
+					limit = { ITA = { has_war_with = FRA } }
+					every_owned_state = {
+						limit = {
+							OR = {
+								state = 21
+								state = 1
+								state = 735
+							}
+							has_state_flag = vichy_italian_conquest
+						}
+						ITA = { transfer_state = PREV }
+					}
+					
+					if = {
+						limit = {
+							21 = { is_controlled_by = ITA }
+							735 = { is_controlled_by = ITA } 
+						}
+						ITA = { transfer_state = 32 }
+					}
+					
+				}
+				set_rule = { 
+					can_join_factions = no 
+					can_create_factions = no
+					can_not_declare_war = yes
+				}
+				set_capital = 26
+				set_politics = {
+					ruling_party = fascism
+					elections_allowed = no
+				}
+				set_popularities = {
+					democratic = 22
+					fascism = 46
+					neutrality = 30
+					communism = 2
+				}
+				set_cosmetic_tag = FRA_VICHY
+				create_country_leader = {
+					name = "Philippe Pétain"
+					desc = "POLITICS_PHILIPPE_PÉTAIN_DESC"
+					picture = "Portrait_France_Philippe_Petain.dds"
+					expire = "1965.1.1"
+					ideology = fascism_ideology
+					traits = {
+						
+					}
+				}
+				add_ideas = FRA_occupation_costs_4
+				load_focus_tree = vichy_french_focus
+				FRA = {
+					transfer_units_fraction = {
+						target = event_target:vichy_france
+						size = 0.9
+						stockpile_ratio = 0.7
+						army_ratio = 0.5
+						navy_ratio = 0.85
+						air_ratio = 1.0
+					}
+				}
+				if = {
+					limit = { FRA = { has_country_flag = become_vichy } }
+					change_tag_from = FRA
+				}
+			}
+		}
+		random_country = {
+			limit = {
+				has_focus_tree = vichy_french_focus
+			}
+			GER = {
+				give_guarantee = PREV
+			}
+			every_unit_leader = {
+				limit = {
+					has_id = 101 #de Gaulle
+				}
+				set_nationality = FRA
+			}
+			every_army_leader = {
+				limit = {
+					NOT = { has_trait = old_guard }
+				}
+				set_nationality = FRA
+			}
+			FRA = {
+				every_unit_leader = {
+					limit = {
+						OR = {
+							has_trait = old_guard
+							has_trait = old_guard_navy
+						}
+					}
+					set_nationality = PREV.PREV
+				}
+				every_navy_leader = {
+					limit = {
+						has_id = 102 #Darlan
+					}
+					set_nationality = PREV.PREV
+				}
+			}
+		}
+	}
 	option = { # Conquer everything!
 		name = france.14.b
 		trigger = { OR = { has_global_flag = EAI_aggressive_GER is_historical_focus_on = no is_ai = no } } #EAI
@@ -972,7 +1212,7 @@ country_event = {
 			factor = 50 
 			modifier = {
 				is_historical_focus_on = yes
-				NOT = { has_global_flag = EAI_aggressive_GER }
+				NOT = { has_global_flag = EAI_aggressive_GER } #EAI
 				factor = 0
 			}
 		}
@@ -1109,6 +1349,7 @@ country_event = {
 				}
 			}
 		}
+		
 		name = france.20.a
 	}
 }
@@ -1122,6 +1363,9 @@ country_event = {
 	
 	trigger = {
 		NOT = { has_government = communism }
+		NOT = { has_idea = FRA_matignon_agreements }
+		has_completed_focus = FRA_form_the_popular_front
+		NOT = { has_country_flag = FRA_popular_front_cooldown }
 		tag = FRA
 		date > 1936.4.1
 		date < 1938.1.1
@@ -1129,7 +1373,7 @@ country_event = {
 
 	fire_only_once = yes
 	
-	mean_time_to_happen = {	days = 60	}
+	mean_time_to_happen = {	days = 60 }
 
 	option = {
 		ai_chance = {
@@ -1138,64 +1382,43 @@ country_event = {
 		name = france.21.a
 		add_timed_idea = {
 			idea = FRA_factory_strikes
-			days = 90
+			days = 360
 		}
-		set_country_flag = france.21.a_chosen
 	}
+}
+
+# French strikes
+country_event = {
+	id = france.22
+	title = france.21.t
+	desc = france.21.d
+	picture = GFX_report_event_worker_protests
+	
+	is_triggered_only = yes
+
+	option = {
+		ai_chance = {
+			base = 15
+		}
+		name = france.21.a
+		add_timed_idea = {
+			idea = FRA_factory_strikes
+			days = 60
+		}
+		hidden_effect = {
+			country_event = { id = france.23 days = 60 }
+		}
+	}
+
 	option = {
 		ai_chance = {
 			base = 85
 		}
 		name = france.21.b
-		add_timed_idea = {
-			idea = FRA_matignon_agreements
-			days = 365
-		}
-		add_popularity = {
-			ideology = communism
-			popularity = 0.07
-		}		
+		add_political_power = -50
 	}
 }
-# Revoke Worker rights
-country_event = {
-	id = france.22
-	title = france.22.t
-	desc = france.22.d
-	picture = GFX_report_event_airplane_factory
-	
-	trigger = {
-		NOT = { has_government = communism }
-		has_idea = FRA_matignon_agreements
-		date > 1936.7.1
-	}
 
-	fire_only_once = yes
-
-	mean_time_to_happen = {	days = 90	}
-	option = {
-		ai_chance = {
-			factor = 2
-		}
-		add_stability = 0.05
-		name = france.22.a
-	}
-	option = {
-		name = france.22.b
-		ai_chance = { 
-			factor = 10
-			modifier = {
-				factor = 0
-				communism > 0.4
-			}
-		}
-		remove_ideas =  FRA_matignon_agreements
-		add_popularity = {
-			ideology = communism
-			popularity = 0.05
-		}
-	}	
-}
 # Strikes are over
 country_event = {
 	id = france.23
@@ -1203,15 +1426,9 @@ country_event = {
 	desc = france.23.d
 	picture = GFX_report_event_airplane_factory
 
-
-	trigger = {
-		NOT = { has_idea = FRA_factory_strikes }
-		has_country_flag = france.21.a_chosen
-	}
+	is_triggered_only = yes
 
 	fire_only_once = yes
-	
-	mean_time_to_happen = {	days = 2	}
 
 	option = {
 		name = france.23.a
@@ -1390,7 +1607,7 @@ country_event = {
 			}
 		}
 		if = {
-			limit = { NOT = { has_completed_focus = FRA_little_entente } }
+			limit = { NOT = { has_completed_focus = FRA_strengthen_the_little_entente } }
 			add_stability = 0.05
 		}
 	}
@@ -1628,19 +1845,36 @@ country_event = {
     is_triggered_only = yes
 
     immediate = {
-    	random_other_country = {
-			limit = {
-				original_tag = SPR
-				has_government = fascism
-			}
-			FRA = {
-				add_ai_strategy = {
-					type = befriend
-					id = "PREV"
-					value = 200
+    	if = {
+    		limit = {
+    			NOT = { has_dlc = "La Resistance" }
+    		}
+    		random_other_country = {
+				limit = {
+					original_tag = SPR
+					has_government = fascism
+				}
+				FRA = {
+					add_ai_strategy = {
+						type = befriend
+						id = PREV
+						value = 200
+					}
 				}
 			}
-		}
+    	}
+    	if = {
+    		limit = {
+    			has_dlc = "La Resistance"
+    		}
+			FRA = {
+					add_ai_strategy = {
+						type = befriend
+					id = "SPA"
+						value = 200
+					}
+			}
+    	}
     }
 
     option = {

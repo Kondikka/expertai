@@ -142,9 +142,9 @@ EAI_calculate_division_cap = {
 	multiply_variable = { EAI_armor_division_cap = 1.4 }
 
 	# increase with difficulty settings
-	if = { limit = { has_country_flag = EAI_difficulty_bonus_hard_active } multiply_variable = { EAI_armor_division_cap = 1.25 } }
-	else_if = { limit = { has_country_flag = EAI_difficulty_bonus_very_hard_active } multiply_variable = { EAI_armor_division_cap = 1.50 } }
-	else_if = { limit = { has_country_flag = EAI_difficulty_bonus_insane_active } multiply_variable = { EAI_armor_division_cap = 1.75 } }
+	if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 1 } } multiply_variable = { EAI_armor_division_cap = 1.25 } }
+	else_if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 2 } } multiply_variable = { EAI_armor_division_cap = 1.50 } }
+	else_if = { limit = { check_variable = { EAI_difficulty_equipment_bonus_active = 3 } } multiply_variable = { EAI_armor_division_cap = 1.75 } }
 
 	# reduce if it has no armor focus
 	if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } } multiply_variable = { EAI_armor_division_cap = 0.25 } }
@@ -164,21 +164,26 @@ EAI_calculate_division_cap = {
 # special modifiers applied to division cap
 EAI_special_infantry_division_limits = {
 
-	if = { # historical badness
+	#############################################
+	#	germany/europe
+	#############################################
+
+	if = { # france: limit ai
 		limit = { 
 			original_tag = FRA
 
+			GER = { is_ai = yes }
+
+			date < 1941.1.1
+
 			NOT = { EAI_has_difficulty_bonus = yes }
 			NOT = { EAI_player_intervening = yes }
-
-			GER = { is_ai = yes }
-			date < 1941.1.1
 		}
 
 		clamp_variable = { var = EAI_division_cap min = 0 max = 70 }
 	}
 
-	else_if = { # easier game for AI GER
+	else_if = { # low countries: limit ai
 		limit = { 
 			OR = {
 				original_tag = HOL
@@ -186,67 +191,88 @@ EAI_special_infantry_division_limits = {
 				original_tag = LUX
 			}
 
-			NOT = { EAI_has_difficulty_bonus = yes }
-			NOT = { EAI_player_intervening = yes }
-
-			date < 1941.1.1 
 			GER = { is_ai = yes is_major = yes has_government = fascism }
+
+			has_war = no
+			date < 1941.1.1 
+
+			NOT = { EAI_has_difficulty_bonus = yes }
+			NOT = { EAI_player_intervening = yes }
 		}
 
 		set_variable = { EAI_division_cap = 0 }
 	}
 
-	else_if = { # easier game for AI JAP
+	else_if = { # norway: limit ai
 		limit = { 
-			OR = { 
-				original_tag = XSM 
-				original_tag = PRC 
-				original_tag = YUN 
-				original_tag = GXC 
-				original_tag = SHX 
-			}
+			original_tag = NOR
+
+			GER = { is_ai = yes }
 
 			NOT = { EAI_has_difficulty_bonus = yes }
 			NOT = { EAI_player_intervening = yes }
-
-			NOT = { has_dlc = "Waking the Tiger" }
-			JAP = { is_ai = yes }
 		}
 
 		set_variable = { EAI_division_cap = 0 }
 	}
 
-	else_if = { # easier game for AI JAP 
+	else_if = { # poland: limit ai
 		limit = { 
-			original_tag = CHI
-
-			NOT = { EAI_has_difficulty_bonus = yes }
-			NOT = { EAI_player_intervening = yes }
-
-			NOT = { has_dlc = "Waking the Tiger" }
-			JAP = { is_ai = yes }
-		}
-
-		clamp_variable = { var = EAI_division_cap min = 0 max = 25 }
-	}
-
-	else_if = { # easier game for AI JAP 
-		limit = { 
-			original_tag = CHI
-
-			NOT = { EAI_has_difficulty_bonus = yes }
-			NOT = { EAI_player_intervening = yes }
+			original_tag = POL
 			
-			has_dlc = "Waking the Tiger"
-			JAP = { is_ai = yes }
+			NOT = { EAI_has_difficulty_bonus = yes }
+			NOT = { EAI_player_intervening = yes }
+
+			GER = { is_ai = yes } 
+			has_war = no
 			date < 1941.1.1
-			is_subject = no
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 40 }
+		clamp_variable = { var = EAI_division_cap min = 0 max = 30 }
 	}
 
-	else_if = { # easier game for AI JAP
+	#############################################
+	#	japan/pacific
+	#############################################
+
+	else_if = { # china: limit ai
+		limit = { 
+			original_tag = CHI
+
+			JAP = { is_ai = yes }
+
+			OR = {
+				check_variable = { global.EAI_sino_japanese_war = 0 } # favor japan
+				
+				AND = {
+					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+					CHI = { surrender_progress < 0.5 }
+				}
+			}
+
+			NOT = { EAI_has_difficulty_bonus = yes }
+			NOT = { EAI_player_intervening = yes }
+		}
+
+		if = {
+			limit = { 
+				NOT = { has_dlc = "Waking the Tiger" }
+			}
+
+			clamp_variable = { var = EAI_division_cap min = 0 max = 25 }
+		}
+		else_if = { 
+			limit = {
+				has_dlc = "Waking the Tiger"
+				date < 1941.1.1
+				is_subject = no
+			}
+
+			clamp_variable = { var = EAI_division_cap min = 0 max = 40 }
+		}
+	}
+
+	else_if = { # warlords: limit ai
 		limit = { 
 			OR = { 
 				original_tag = XSM 
@@ -256,24 +282,53 @@ EAI_special_infantry_division_limits = {
 				original_tag = SHX 
 			}
 
+			JAP = { is_ai = yes }
+
+			OR = {
+				check_variable = { global.EAI_sino_japanese_war = 0 } # favor japan
+
+				AND = {
+					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+					CHI = { surrender_progress < 0.5 }
+				}
+			}
+
 			NOT = { EAI_has_difficulty_bonus = yes }
 			NOT = { EAI_player_intervening = yes }
-
-			has_dlc = "Waking the Tiger"
-			JAP = { is_ai = yes }
 		}
 
-		set_variable = { EAI_division_cap = 3 }
+		if = { 
+			limit = { 
+				NOT = { has_dlc = "Waking the Tiger" }
+			}
+
+			set_variable = { EAI_division_cap = 0 }
+		}
+		else_if = { 
+			limit = {
+				has_dlc = "Waking the Tiger"
+			}
+
+			set_variable = { EAI_division_cap = 3 }
+		}
 	}
 
-	else_if = {
-		limit = { 
+	else_if = { # china: more divisions
+		limit = {
 			original_tag = CHI
 
 			is_subject = no
 
 			OR = {
 				JAP = { is_ai = no }
+
+				check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+
+				AND = {
+					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+					CHI = { surrender_progress > 0.5 }
+				}
+
 				EAI_has_difficulty_bonus = yes
 				EAI_player_intervening = yes
 			}
@@ -282,7 +337,7 @@ EAI_special_infantry_division_limits = {
 		clamp_variable = { var = EAI_division_cap min = 100 max = 500 }
 	}
 
-	else_if = { # easier game for AI JAP 
+	else_if = { # pacific: limit ai 
 		limit = { 
 			OR = { 
 				original_tag = PHI 
@@ -290,43 +345,64 @@ EAI_special_infantry_division_limits = {
 				original_tag = MAL 
 			}
 
+			JAP = { is_ai = yes is_major = yes has_government = fascism }
+
 			NOT = { EAI_has_difficulty_bonus = yes }
 			NOT = { EAI_player_intervening = yes }
- 
-			JAP = { is_ai = yes is_major = yes has_government = fascism }
 		}
 
 		clamp_variable = { var = EAI_division_cap min = 0 max = 2 }
 	}
 
-	else_if = { # easier invasion for AI GER 
-		limit = { 
-			original_tag = NOR
+	#############################################
+	#	middle east
+	#############################################
 
-			NOT = { EAI_has_difficulty_bonus = yes }
+	else_if = { # iran: limit ai
+		limit = { 
+			original_tag = PER 
+
 			NOT = { EAI_player_intervening = yes }
-
-			GER = { is_ai = yes }
-		}
-
-		set_variable = { EAI_division_cap = 0 }
-	}
-
-	else_if = { # easier game for AI GER 
-		limit = { 
-			original_tag = POL
+			NOT = { EAI_has_difficulty_bonus = yes }
 			
-			NOT = { EAI_has_difficulty_bonus = yes }
-			NOT = { EAI_player_intervening = yes }
+			SOV = { is_ai = yes }
 
-			GER = { is_ai = yes } 
-			date < 1941.1.1
+			ENG = { is_ai = yes }
+
+			is_historical_focus_on = yes
+
+			has_government = neutrality
+
+			has_war = no
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 30 }
+		clamp_variable = { var = EAI_division_cap min = 0 max = 5 }
 	}
 
-	else_if = {
+	else_if = { # iraq: limit ai
+		limit = { 
+			original_tag = IRQ 
+
+			NOT = { EAI_player_intervening = yes }
+			NOT = { EAI_has_difficulty_bonus = yes }
+
+			ENG = { is_ai = yes }
+
+			is_historical_focus_on = yes
+
+			has_government = neutrality
+
+			has_war = no
+		}
+
+		clamp_variable = { var = EAI_division_cap min = 0 max = 1 }
+	}
+
+	#############################################
+	#	other
+	#############################################
+
+	else_if = { # SOV army size
 		limit = { 
 			original_tag = SOV
 
@@ -378,49 +454,10 @@ EAI_special_infantry_division_limits = {
 		clamp_variable = { var = EAI_division_cap min = 0 max = 80 }
 	}
 
-	else_if = {
-		limit = { 
-			original_tag = PER 
+	#############################################
+	#	performance mode
+	#############################################
 
-			NOT = { EAI_player_intervening = yes }
-			NOT = { EAI_has_difficulty_bonus = yes }
-			
-			SOV = { is_ai = yes }
-
-			ENG = { is_ai = yes }
-
-			is_historical_focus_on = yes
-
-			has_government = neutrality
-
-			has_war = no
-		}
-
-		clamp_variable = { var = EAI_division_cap min = 0 max = 5 }
-	}
-
-	else_if = {
-		limit = { 
-			original_tag = IRQ 
-
-			NOT = { EAI_player_intervening = yes }
-			NOT = { EAI_has_difficulty_bonus = yes }
-
-			ENG = { is_ai = yes }
-
-			is_historical_focus_on = yes
-
-			has_government = neutrality
-
-			has_war = no
-		}
-
-		clamp_variable = { var = EAI_division_cap min = 0 max = 1 }
-	}
-
-	######################################################################
-
-	# performance mode
 	if = {
 		limit = {
 			has_global_flag = EAI_performance_mode

@@ -22,6 +22,30 @@ country_event = {
 			set_country_flag = { flag = EAI_delay value = 1 days = 20 } 
 		}
 
+		### operation targets
+
+		EAI_set_collaboration_target = yes
+
+		EAI_set_boost_resistance_target = yes
+
+		EAI_set_rescue_operative_target = yes
+
+		###
+
+		EAI_stop_air_production_strategy = yes
+
+		###
+
+		EAI_calculate_fielded_eq_ratio = yes
+
+		###
+
+		EAI_enable_garrison_state_strategies = yes
+
+		###
+
+		EAI_defensive_front_strategy = yes
+
 		### check the need to upgrade laws
 
 		EAI_upgrade_economy_law = yes
@@ -97,28 +121,6 @@ country_event = {
 			}
 		}
 
-		### occupation laws
-
-		EAI_check_for_bugged_occupation = yes
-
-		if = { limit = { EAI_use_gentle_occupation = yes } 
-
-			if = { limit = { NOT = { has_country_flag = EAI_use_gentle_occupation } }
-			
-				set_country_flag = EAI_use_gentle_occupation
-			}
-		}
-		else = { clr_country_flag = EAI_use_gentle_occupation }
-
-		if = { limit = { EAI_use_harshest_occupation = yes } 
-
-			if = { limit = { NOT = { has_country_flag = EAI_use_harshest_occupation } } 
-			
-				set_country_flag = EAI_use_harshest_occupation
-			}
-		}
-		else = { clr_country_flag = EAI_use_harshest_occupation }
-
 		### defend core strategy
 
 		if = { limit = { EAI_defend_core = yes } 
@@ -189,6 +191,12 @@ country_event = {
 
 	immediate = {
 
+		### resource needs
+
+		EAI_check_resource_shortages = yes
+		EAI_check_resource_needs = yes
+		EAI_resource_extraction_decisions = yes
+
 		### store PP for law changes
 
 		EAI_store_PP = yes
@@ -203,7 +211,7 @@ country_event = {
 
 		###
 
-		EAI_priority_constructions = yes
+		EAI_priority_construction_strategies = yes
 
 		###
 
@@ -323,6 +331,30 @@ country_event = {
 	option = {}
 }
 
+# GER advisor: switch himmler in
+country_event = {
+	id = EAI_background.6
+	hidden = yes
+	fire_only_once = yes
+	trigger = {
+		original_tag = GER
+		is_ai = yes
+		check_variable = { EAI_stored_pp > 149 }
+		has_idea = walther_funk
+		NOT = { has_idea = heinrich_himmler }
+		has_available_idea_with_traits = { idea = prince_of_terror limit = 1 } 
+		num_occupied_states > 5
+	}
+	immediate = {
+		subtract_from_variable = { EAI_store_PP = 150 }
+		remove_ideas = walther_funk
+		add_ideas = heinrich_himmler
+		
+		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | GER advisor event" } 
+	}
+	option = {}
+}
+
 # mobile warfare doctrine tech switch to manpower branch
 country_event = { 
 	id = EAI_background.3
@@ -334,7 +366,7 @@ country_event = {
 		has_manpower < 500000
 		has_tech = modern_blitzkrieg
 		NOT = { has_country_flag = EAI_volkssturm_taken }
-		NOT = { has_country_flag = EAI_mobilizing_manpower }
+		NOT = { conscription_ratio < 0.99 }
 	}
 	immediate = {
 		set_country_flag = EAI_volkssturm_taken

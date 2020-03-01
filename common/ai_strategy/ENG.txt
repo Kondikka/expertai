@@ -10,37 +10,30 @@
 # protect
 # influence
 
-EAI_CW_defend_BNL = {
-	enable = {
-		GER = { is_ai = no } # too difficult for the ai
-		OR = { original_tag = ENG is_subject_of = ENG }
-		NOT = {
-			AND = {
-				BEL = { has_capitulated = yes }
-				HOL = { has_capitulated = yes }
-			}
-		}
-		has_war_with = GER
-		is_in_faction_with = FRA
-	}
-
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = force_defend_ally_borders id = "BEL" value = 500 }
-	ai_strategy = { type = force_defend_ally_borders id = "HOL" value = 500 }
-}
+########################
+#	EAI
+########################
 
 EAI_CW_ignore_FRA = {
+	allowed = {
+		OR = {
+			tag = ENG
+			tag = CAN
+			tag = AST
+			tag = RAJ
+			tag = SAF
+			tag = NZL
+		}
+	}
 	enable = {
-		OR = { original_tag = ENG is_subject_of = ENG }
-
-		date > 1939.1.1
-		date < 1941.1.1
-		
 		is_historical_focus_on = yes
-		
+
 		GER = { is_ai = yes }
-		
+
+		OR = { tag = ENG is_subject_of = ENG }
+
+		GER = { has_country_flag = EAI_norway_invasion }
+						
 		has_war_with = GER
 		
 		is_in_faction_with = FRA
@@ -51,6 +44,14 @@ EAI_CW_ignore_FRA = {
 	abort_when_not_enabled = yes
 	
 	ai_strategy = { type = dont_defend_ally_borders id = "FRA" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "BEL" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "HOL" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "LUX" value = 500 }
+	ai_strategy = { # norway
+		type = front_unit_request
+		area = scandinavia
+		value = -200
+	}
 }
 
 EAI_CW_ignore_DEN = {
@@ -69,32 +70,12 @@ EAI_CW_ignore_DEN = {
 	ai_strategy = { type = dont_defend_ally_borders id = "DEN" value = 500 }
 }
 
-EAI_CW_ignore_BNL = {
-	enable = {
-		GER = { is_ai = yes }
-
-		OR = { original_tag = ENG is_subject_of = ENG }
-
-		date < 1941.1.1
-		
-		has_war_with = GER
-		
-		is_in_faction_with = FRA
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = dont_defend_ally_borders id = "BEL" value = 500 }
-	ai_strategy = { type = dont_defend_ally_borders id = "LUX" value = 500 }
-	ai_strategy = { type = dont_defend_ally_borders id = "HOL" value = 500 }
-}
-
 EAI_ENG_ignore_RAJ = {
+	allowed = { tag = ENG }
 	enable = {
-		original_tag = ENG
-		
 		any_enemy_country = {
 			capital_scope = { is_on_continent = europe }
+			has_capitulated = no
 		}
 	}
 	
@@ -106,8 +87,9 @@ EAI_ENG_ignore_RAJ = {
 }
 
 EAI_RAJ_ignore_ENG = {
+	allowed = { tag = RAJ }
 	enable = {
-		original_tag = RAJ
+		always = yes
 	}
 	
 	ai_strategy = { type = dont_defend_ally_borders id = "ENG" value = 500 }
@@ -115,8 +97,8 @@ EAI_RAJ_ignore_ENG = {
 }
 
 EAI_ENG_warprep_ITA = {
+	allowed = { tag = ENG }
 	enable = {
-		tag = ENG
 		has_government = democratic
 		is_historical_focus_on = yes
 		has_war_with = GER
@@ -133,42 +115,9 @@ EAI_ENG_warprep_ITA = {
 	}
 }
 
-EAI_ENG_warprep_ETH = {
+EAI_ignore_fin_eng = {
+	allowed = { tag = ENG }
 	enable = {
-		tag = ENG
-		date < 1941.1.1
-		has_government = democratic
-		is_historical_focus_on = yes
-		NOT = { 
-			FRA = { has_capitulated = yes }
-			FRA = { exists = no }
-			FRA = { is_subject = yes }
-		}
-		GER = { has_war_with = FRA }
-		NOT = { 
-			ITA = { has_capitulated = yes }
-			ITA = { exists = no }
-			ITA = { is_subject = yes }
-			is_in_faction_with = ITA
-			has_war_with = ITA
-		}
-		ITA = { has_government = fascism }
-		
-		ETH = { is_subject_of = ITA }
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = {
-		type = conquer
-		id = "ETH"
-		value = 100
-	}
-}
-
-EAI_i_fin_eng = {
-	enable = {
-		tag = ENG
 		country_exists = FIN
 		is_historical_focus_on = yes
 	}
@@ -186,9 +135,9 @@ EAI_i_fin_eng = {
 	}
 }
 
-EAI_i_fin_eng2 = {
+EAI_ignore_fin_eng2 = {
+	allowed = { tag = FIN }
 	enable = {
-		tag = FIN
 		country_exists = ENG
 		is_historical_focus_on = yes
 	}
@@ -203,6 +152,126 @@ EAI_i_fin_eng2 = {
 		value = 400
 	}
 }
+
+EAI_ENG_befriend_middle_east = {
+	allowed = { tag = FIN }
+	enable = { 
+		is_historical_focus_on = yes
+
+		ENG = { any_enemy_country = { is_major = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = YEM target = non_aggression_pact value = 500 }
+	ai_strategy = { type = diplo_action_desire id = SAU target = non_aggression_pact value = 500 }
+	ai_strategy = { type = diplo_action_desire id = OMA target = non_aggression_pact value = 500 }
+}
+
+EAI_ENG_befriend_middle_east_2 = {
+	enable = { 
+		is_historical_focus_on = yes
+
+		OR = {
+			tag = YEM
+			tag = SAU
+			tag = OMA
+		}
+		
+		ENG = { any_enemy_country = { is_major = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_acceptance id = ENG target = non_aggression_pact value = 500 }
+}
+
+EAI_ENG_garrison = {
+	allowed = { tag = ENG }
+	enable = {
+		is_in_faction_with = FRA
+		FRA = { has_capitulated = yes }
+		has_war_with = GER
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = garrison value = 50 }
+}
+
+EAI_ENG_garrison_home = {
+	allowed = { tag = ENG }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	### england
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.50
+		states = { 
+			127
+			126
+			125
+			123
+			338
+			122
+			129
+			130
+			132 
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ENG_garrison_singapore = {
+	allowed = { tag = ENG }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.25
+		states = { 
+			336
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ENG_north_africa_east = {
+	allowed = { tag = ENG }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				region = 126
+				state = 452
+				state = 447
+				state = 446
+				state = 453
+				state = 454
+			}
+			any_neighbor_state = { CONTROLLER = { original_tag = ITA } }
+		}
+		value = 100
+	}
+}
+
+########################
+#	vanilla
+########################
 
 protect_poland_against_germany = {
 	enable = {

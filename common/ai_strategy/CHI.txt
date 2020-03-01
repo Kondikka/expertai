@@ -1,3 +1,135 @@
+########################
+#	EAI
+########################
+
+EAI_CHI_ignore_warlords = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+
+		country_trigger = {
+			is_ai = yes
+
+			OR = {
+				tag = CHI
+				tag = XSM 
+				tag = PRC 
+				tag = YUN 
+				tag = GXC 
+				tag = SHX 
+			}
+		}
+
+		value = -200
+	}
+}
+
+EAI_CHI_ignore_other_countries = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+
+		has_war_with = JAP
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+
+		country_trigger = {
+			is_ai = yes
+
+			NOT = { has_war_with = FROM }
+		}
+
+		value = -200
+	}
+}
+
+EAI_CHI_garrison_coast = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		OR = {
+			JAP = { is_ai = no }
+			
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+			
+			AND = {
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+				CHI = { surrender_progress > 0.5 }
+			}
+		}
+
+		surrender_progress < 0.4
+
+		any_owned_state = { is_coastal = yes }
+
+		if = { limit = { NOT = { tag = CHI } }
+
+			NOT = { surrender_progress > 0 }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.35
+		states = { 
+			597
+			598
+			613
+			596
+			595
+			593
+			592
+			591
+			594
+			743
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+########################
+#	vanilla
+########################
+
 defend_against_jap = {
 	enable = {
 		original_tag = CHI
@@ -26,7 +158,6 @@ defend_against_jap = {
 }
 
 CHI_dont_mess_with_the_soviets = {
-
 	enable = {
 		original_tag = CHI
 		
