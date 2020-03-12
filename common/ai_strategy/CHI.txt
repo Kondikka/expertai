@@ -126,6 +126,142 @@ EAI_CHI_garrison_coast = {
 	}
 }
 
+EAI_CHI_defensive_vs_JAP_careful_north = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		has_war_with = JAP
+
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+			AND = {
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+				CHI = { surrender_progress > 0.5 }
+			}
+		}
+
+		has_defensive_war = yes
+		OR = {
+			surrender_progress > 0
+			has_country_flag = EAI_japanese_war_defense
+		}
+		NOT = { JAP = { surrender_progress > 0.2 } }
+		check_variable = { EAI_fielded_eq_ratio < 0.95 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 6
+		state_trigger = {
+			NOT = { is_coastal = yes }
+			CONTROLLER = {
+				OR = {
+					tag = JAP
+					has_war_together_with = JAP
+				}
+			}
+		}
+		ordertype = front
+		execute_order = no
+	}
+}
+
+EAI_CHI_defensive_vs_JAP_coastal = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		has_war = yes
+
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+			AND = {
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+				CHI = { surrender_progress > 0.5 }
+			}
+		}
+
+		check_variable = { EAI_fielded_eq_ratio > 0.5 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 4
+		state_trigger = {
+			is_coastal = yes
+		}
+		ordertype = front
+		execution_type = rush
+		execute_order = yes
+	}
+}
+
+EAI_CHI_defensive_vs_JAP_initial_defense = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		has_country_flag = EAI_japanese_war_defense
+		
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+			AND = {
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+				CHI = { surrender_progress > 0.5 }
+			}
+		}
+
+		surrender_progress < 0.1
+		NOT = { JAP = { surrender_progress > 0.2 } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		state_trigger = {
+			NOT = { is_coastal = yes }
+			CONTROLLER = {
+				OR = {
+					tag = JAP
+					has_war_together_with = JAP
+				}
+			}
+		}
+		ordertype = front
+		execute_order = no
+	}
+}
+
 ########################
 #	vanilla
 ########################

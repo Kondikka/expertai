@@ -156,6 +156,144 @@ EAI_JAP_garrison_home = {
 	}
 }
 
+EAI_JAP_offensive_vs_CHI_inland = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+		has_country_flag = EAI_JAP_offensive_vs_CHI_inland
+		check_variable = { EAI_fielded_eq_ratio > 0.9 }
+	}
+	abort = {
+		NOT = { check_variable = { EAI_fielded_eq_ratio > 0.75 } }
+	}
+
+	ai_strategy = {
+		type = front_control
+		priority = 6
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 165
+				region = 189
+				region = 200
+			}
+		}
+
+		execution_type = rush
+		execute_order = yes
+	}
+}
+
+EAI_JAP_offensive_vs_CHI_push_north = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		597 = { CONTROLLER = { has_war_together_with = JAP } }
+		607 = { CONTROLLER = { has_war_together_with = JAP } }
+	}
+	abort = {
+		NOT = { 
+			AND = {
+				has_war_with = CHI
+				check_variable = { EAI_fielded_eq_ratio > 0.70 }
+				597 = { CONTROLLER = { has_war_together_with = JAP } }
+				607 = { CONTROLLER = { has_war_together_with = JAP } }
+			}
+		}
+	}
+
+	# northern defense is likely broken - push
+	ai_strategy = {
+		type = front_control
+		priority = 4
+		state_trigger = {
+			OR = {
+				state = 597
+				state = 607
+			}
+		}
+		execution_type = rush
+	}
+}
+
+EAI_JAP_offensive_vs_CHI_coast = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+	}
+	abort = {
+		NOT = { 
+			AND = {
+				has_war_with = CHI
+				check_variable = { EAI_fielded_eq_ratio > 0.70 }
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	# push invasion regions
+	ai_strategy = {
+		type = front_control
+		priority = 0
+		state_trigger = {
+			is_coastal = yes
+		}
+		execution_type = rush
+		execute_order = yes
+	}
+}
+
+EAI_JAP_offensive_vs_CHI_north = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+	}
+
+	abort_when_not_enabled = yes
+
+	# northern front is hard to push - wait for invasions
+	ai_strategy = {
+		type = front_control
+		priority = 2
+		state_trigger = {
+			OR = {
+				region = 143
+				region = 144
+			}
+			NOT = { state = 597 }
+		}
+		execution_type = careful
+	}
+}
+
+EAI_JAP_stalemate = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war_with = CHI
+		CHI = { surrender_progress > 0.5 }
+		OR = {
+			NOT = {
+				MAN = { surrender_progress > 0 }
+				MEN = { surrender_progress > 0 }
+			}
+			CHI = { surrender_progress > 0.75 }
+		}
+		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		tag = CHI
+		execute_order = no
+	}
+}
+
 ########################
 #	vanilla
 ########################
