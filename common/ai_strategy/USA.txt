@@ -177,26 +177,41 @@ USA_save_india = { # in the case where japan has beaten china and is moving on i
 }
 
 USA_lose_fateful_lightning_from_terribly_swift_sword = {
-	enable = {
-		or = {
+
+	allowed = {
+		OR = {
 			tag = USA
 			tag = ENG # second breakfast protocol - activated
 		}
-		
+	}
+	enable = {
 		FRA = {
 			OR = {
 				has_capitulated = yes
 				controls_state = 16
 			}
 			has_war_with = GER
-			OR = {
-				is_in_faction_with = USA
-			}
+			is_in_faction_with = USA
 		}
 		OR = {
-			date > 1942.6.1
-			FRA = {
-				has_legitimacy > 75
+			AND = {
+				VIC = { 
+					is_ai = no 
+					has_war = no
+				}
+				is_historical_focus_on = yes
+				date > "1942.9.1"
+			}
+			AND = {
+				OR = {
+					is_historical_focus_on = no
+					VIC = { has_war = yes }
+				}
+				date > "1942.6.1"
+			}
+			AND = {
+				VIC = { is_ai = yes }
+				date > "1942.6.1"
 			}
 		}
 	}
@@ -211,6 +226,35 @@ USA_lose_fateful_lightning_from_terribly_swift_sword = {
 	ai_strategy = {
 		type = declare_war
 		id = VIC
-		value = 100 # we hateses them filthy Vichy Frenches
+		value = 500 # we hateses them filthy Vichy Frenches. strategy >= 500 forces declaration 
+	}
+}
+
+GER_is_bad = {
+	allowed = {
+		tag = USA
+	}
+	
+	enable = {
+		GER = {
+			exists = yes
+		}
+		NOT = { is_ally_with = GER }
+		ENG = {
+			has_war_with = GER
+		}
+		has_government = democratic
+		ENG = {
+			has_government = democratic
+		}
+		date > 1939.1.1
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = prepare_for_war
+		id = GER
+		value = 100
 	}
 }
