@@ -133,9 +133,13 @@
 #	priority = 100 # ai will prefer state of the highest prio strategy
 # }
 
+########################
+#	EAI
+########################
+
 EAI_agency_stop_upgrades = {
 	enable = {
-		is_major = yes
+		always = yes
 	}
 	
 	ai_strategy = {
@@ -152,8 +156,9 @@ EAI_agency_stop_upgrades = {
 	}
 }
 
+###
 
-EAI_build_intelligence_agency_as_major = {
+EAI_upgrade_intelligence_agency_as_major = {
 	enable = {
 		is_major = yes
 		date > 1937.1.1
@@ -167,15 +172,18 @@ EAI_build_intelligence_agency_as_major = {
 				divide_temp_variable = { max_upgrades = 31 }
 				divide_temp_variable = { max_upgrades = 4 } # one per 4 months
 				check_variable = { agency_upgrade_number < max_upgrades }
+			}
+		}
 
-				if = { limit = { GER = { is_ai = yes } }
+		if = { limit = { GER = { is_ai = yes } }
 
-					NOT = {
-						AND = {
-							tag = FRA
-							date < 1940.1.1
-						}
+			NOT = {
+				AND = {
+					OR = {
+						tag = FRA
+						tag = POL
 					}
+					date < 1940.1.1
 				}
 			}
 		}
@@ -196,6 +204,79 @@ EAI_build_intelligence_agency_as_major = {
 		value = -200
 	}
 }
+
+###
+
+EAI_build_intelligence_agency_as_minor = {
+	enable = {
+		is_major = no
+		date > 1937.1.1
+
+		NOT = { has_intelligence_agency = yes }
+
+		if = { limit = { GER = { is_ai = yes } }
+
+			NOT = {
+				AND = {
+					OR = {
+						tag = FRA
+						tag = POL
+					}
+					date < 1940.1.1
+				}
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = intelligence_agency_usable_factories
+		value = 150
+	}
+	ai_strategy = {
+		type = agency_ai_base_num_factories_factor
+		value = -200
+	}
+	ai_strategy = {
+		type = agency_ai_per_upgrade_factories_factor
+		value = -200
+	}
+}
+
+EAI_upgrade_intelligence_agency_as_minor = {
+	enable = {
+		is_major = no
+		date > 1937.1.1
+
+		has_intelligence_agency = yes
+
+		set_temp_variable = { max_upgrades = global.num_days }
+		subtract_from_temp_variable = { max_upgrades = 706640 }
+		divide_temp_variable = { max_upgrades = 31 }
+		divide_temp_variable = { max_upgrades = 12 } # one per 12 months
+		check_variable = { agency_upgrade_number < max_upgrades }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = intelligence_agency_usable_factories
+		value = 150
+	}
+	ai_strategy = {
+		type = agency_ai_base_num_factories_factor
+		value = -200
+	}
+	ai_strategy = {
+		type = agency_ai_per_upgrade_factories_factor
+		value = -200
+	}
+}
+
+########################
+#	vanilla
+########################
 
 build_intelligence_agency = {
 	enable = {
@@ -266,7 +347,7 @@ addintelligence_agency_normal_upgrade_prio = {
 	ai_strategy = {
 		type = intelligence_agency_branch_desire_factor
 		id = branch_defense
-		value = 1000
+		value = 3000
 	}
 	ai_strategy = {
 		type = intelligence_agency_branch_desire_factor
