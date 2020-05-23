@@ -4,9 +4,32 @@
 
 # pp stored separately for important things
 EAI_store_PP = {
+
+	### find the highest law cost and store enough pp for it
+
+	set_variable = { EAI_max_stored_pp = 150 }
+
+	set_temp_variable = { EAI_eco_law_cost = modifier@economy_cost_factor }
+	add_to_temp_variable = { EAI_eco_law_cost = 1 }
+	multiply_temp_variable = { EAI_eco_law_cost = 150 }
+
+	set_temp_variable = { EAI_man_law_cost = modifier@mobilization_laws_cost_factor }
+	add_to_temp_variable = { EAI_man_law_cost = 1 }
+	multiply_temp_variable = { EAI_man_law_cost = 150 }
+
+	set_temp_variable = { EAI_tra_law_cost = modifier@trade_laws_cost_factor }
+	add_to_temp_variable = { EAI_tra_law_cost = 1 }
+	multiply_temp_variable = { EAI_tra_law_cost = 150 }
+
+	if = { limit = { check_variable = { EAI_eco_law_cost > EAI_max_stored_pp } } set_variable = { EAI_max_stored_pp = EAI_eco_law_cost } }
+	if = { limit = { check_variable = { EAI_man_law_cost > EAI_max_stored_pp } } set_variable = { EAI_max_stored_pp = EAI_man_law_cost } }
+	if = { limit = { check_variable = { EAI_tra_law_cost > EAI_max_stored_pp } } set_variable = { EAI_max_stored_pp = EAI_tra_law_cost } }
+
     if = {
 		limit = {
 			has_political_power > 50
+
+			check_variable = { EAI_stored_PP < EAI_max_stored_pp }
 
 			### priorities
 
@@ -14,35 +37,11 @@ EAI_store_PP = {
 				EAI_pp_advisor_prio = yes 
 				EAI_can_take_women_in_the_workforce = yes
 			}
-
-			### find the highest law cost and store enough pp for it
-
-			set_temp_variable = { EAI_max_law_cost = 150 }
-
-			set_temp_variable = { EAI_eco_law_cost = modifier@economy_cost_factor }
-			add_to_temp_variable = { EAI_eco_law_cost = 1 }
-			multiply_temp_variable = { EAI_eco_law_cost = 150 }
-
-			set_temp_variable = { EAI_man_law_cost = modifier@mobilization_laws_cost_factor }
-			add_to_temp_variable = { EAI_man_law_cost = 1 }
-			multiply_temp_variable = { EAI_man_law_cost = 150 }
-
-			set_temp_variable = { EAI_tra_law_cost = modifier@trade_laws_cost_factor }
-			add_to_temp_variable = { EAI_tra_law_cost = 1 }
-			multiply_temp_variable = { EAI_tra_law_cost = 150 }
-
-			if = { limit = { check_variable = { EAI_eco_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_eco_law_cost } }
-			if = { limit = { check_variable = { EAI_man_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_man_law_cost } }
-			if = { limit = { check_variable = { EAI_tra_law_cost > EAI_max_law_cost } } set_temp_variable = { EAI_max_law_cost = EAI_tra_law_cost } }
-
-			check_variable = { EAI_stored_PP < EAI_max_law_cost }
 		}
 
 		add_political_power = -50
 
 		add_to_variable = { EAI_stored_PP = 50 }
-
-		#log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: stored pp = [?EAI_stored_PP]"
 	}
 }
 

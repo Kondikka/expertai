@@ -81,7 +81,7 @@ EAI_PC_get_building_values = {
 
 	else_if = { limit = { check_variable = { EAI_PC_project_building_type^EAI_PC_project_type = 9 } }
 
-		set_temp_variable = { EAI_building_cost = global.EAI_PC_CONVERSION_COST_MIL_TO_CIV }
+		set_temp_variable = { EAI_PC_building_cost = global.EAI_PC_CONVERSION_COST_MIL_TO_CIV }
 
 		set_temp_variable = { t1 = modifier@conversion_cost_mil_to_civ_factor }
 		add_to_temp_variable = { t1 = 1.0 }
@@ -219,7 +219,14 @@ EAI_PC_start_project = {
 			set_temp_variable = { min_factories_on_projects = EAI_PC_assigned_factories_total }
 			add_to_temp_variable = { min_factories_on_projects = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
 
-			if = { limit = { check_variable = { min_factories_on_projects < max_factories_on_projects } }
+			if = { limit = { check_variable = { EAI_PC_ignore_factory_limit = 1 } }
+
+				set_temp_variable = { EAI_PC_project_assigned_factories^-1 = num_of_civilian_factories_available_for_projects }
+				clamp_temp_variable = { var = EAI_PC_project_assigned_factories^-1 min = 0 max = 15 }
+
+				set_temp_variable = { EAI_PC_ignore_factory_limit = 0 }
+			}
+			else_if = { limit = { check_variable = { min_factories_on_projects < max_factories_on_projects } }
 
 				if = { limit = { has_country_flag = EAI_construction_logging } log = "max_factories_on_projects = [?max_factories_on_projects], min_factories_on_projects = [?min_factories_on_projects], EAI_PC_assigned_factories_total = [?EAI_PC_assigned_factories_total]" }
 
@@ -276,7 +283,7 @@ EAI_PC_start_project = {
 					clear_variable = EAI_PC_project_type
 					clear_variable = EAI_PC_new_project
 
-					if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: type = [?ROOT.EAI_PC_project_building_type^-1], civ = [?EAI_PC_project_assigned_factories^-1], loc = [PREV.GetName]" }
+					if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: type = [?ROOT.EAI_PC_project_building_type^-1], civ = [?EAI_PC_project_assigned_factories^-1], loc = [PREV.GetName], days = [?EAI_PC_project_construction_duration^EAI_PC_project]" }
 				}
 			}
 		}
@@ -345,19 +352,24 @@ EAI_PC_end_project = {
 
 EAI_priority_construction_strategies = {
 
-	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } EAI_PC_can_afford_project = yes }
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 }  }
+	
+		if = { limit = { EAI_PC_can_afford_project = yes }
 
-		EAI_important_radar_constructions = yes
+			EAI_important_radar_constructions = yes
 
-		EAI_build_supply_line_GER_SOV = yes
+			EAI_build_supply_line_GER_SOV = yes
 
-		EAI_build_supply_line_JAP_RAJ = yes
+			EAI_build_supply_line_JAP_RAJ = yes
 
-		EAI_improve_north_africa_infrastructure = yes
+			EAI_improve_north_africa_infrastructure = yes
 
-		EAI_resource_extraction = yes
+			EAI_resource_extraction = yes
 
-		EAI_convert_factories_to_civ = yes
+			EAI_convert_MIC_to_CIC_resource_shortage = yes
+		}
+
+		EAI_convert_MIC_to_CIC_industrial_expansion = yes
 	}
 }
 
@@ -466,7 +478,7 @@ EAI_resource_extraction = {
 	}
 }
 
-EAI_convert_factories_to_civ = {
+EAI_convert_MIC_to_CIC_resource_shortage = {
 
 	### track steel shortage
 
@@ -563,6 +575,23 @@ EAI_build_supply_line_JAP_RAJ = {
 		613 = { set_temp_variable = { supply_line_start = THIS.id } }
 		439 = { set_temp_variable = { supply_line_target = THIS.id } }
 		EAI_build_supply_line = yes
+	}
+}
+
+EAI_convert_MIC_to_CIC_industrial_expansion = {
+
+	if = { 
+		limit = { 
+			tag = SOV
+			has_idea = war_economy
+			num_of_military_factories > 30
+			date < 1937.1.1
+			has_war = no
+			num_of_civilian_factories_available_for_projects > 14
+		}
+
+		set_temp_variable = { EAI_PC_ignore_factory_limit = 1 }
+		EAI_priority_convert_MIC_to_CIC = yes
 	}
 }
 
