@@ -9,7 +9,7 @@ NDefines.NCountry.REINFORCEMENT_MANPOWER_DELIVERY_SPEED = 80 		-- Modifier for a
 
 
 	
-NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.10 -- 0.25
+NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.15 -- 0.25
 NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
 
 
