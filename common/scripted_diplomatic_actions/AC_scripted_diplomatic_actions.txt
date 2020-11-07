@@ -1,0 +1,169 @@
+scripted_diplomatic_actions = {
+
+    AC_request_construction_permission = {
+
+        icon = 1
+	
+        allowed = { always = yes }
+
+        visible = { 
+            NOT = {
+                has_war_with = ROOT
+                ROOT = { is_in_array = { array = AC_construction_permissions value = PREV.id } }
+            }
+        }
+
+        selectable = { 
+            hidden_trigger = {
+                NOT = { 
+                    ROOT = { has_country_flag = AC_request_construction_permission_REQUESTED }
+                } 
+            }
+        }
+
+        reject_effect = {
+            if = { limit = { ROOT = { is_ai = no } }
+                ROOT = { set_country_flag = { flag = AC_request_construction_permission_REQUESTED value = 1 days = 2 } }
+            }
+            else = {
+                ROOT = { set_country_flag = { flag = AC_request_construction_permission_REQUESTED value = 1 days = 365 } }
+            }
+		}
+
+        complete_effect = {
+
+            ROOT = { 
+                clr_country_flag = AC_request_construction_permission_REQUESTED
+
+                add_to_array = { AC_construction_permissions = PREV.id }
+            }
+		}
+
+        ai_acceptance = {
+			
+            AC_diplomacy_action_opinion_modifier = {
+                base = 0
+                
+                modifier = {
+                    add = 1
+                    FROM = { has_opinion = { target = ROOT value > 50 } }
+                }
+
+                modifier = {
+                    add = -1
+                    FROM = { has_opinion = { target = ROOT value < 0 } }
+                }
+            }
+            
+            same_ruling_party = {
+                base = 0
+                
+                modifier = {
+                    add = 1
+                    has_government = ROOT
+                }
+            }
+
+            in_faction = {
+                base = 0
+                
+                modifier = {
+                    add = 1
+                    is_in_faction_with = ROOT
+                }
+            }
+
+            puppet_opinion = {
+                base = 0
+                
+                modifier = {
+                    add = 1
+                    is_puppet_of = ROOT
+                }
+            }
+		}
+
+        ai_desire = {
+            factor = -1
+            
+            modifier = {
+                add = 101
+
+                has_war_together_with = ROOT
+
+                ROOT = { num_of_civilian_factories_available_for_projects > 15 }
+
+                if = { limit = { ROOT = { is_major = no } }
+
+                    ROOT = { any_neighbor_country = { tag = FROM } }
+                }
+            }
+        }
+	}
+
+    AC_revoke_construction_permission = {
+
+        icon = 1
+	
+        allowed = { always = yes }
+
+        visible = { 
+            FROM = { is_in_array = { array = AC_construction_permissions value = ROOT.id } }
+        }
+
+        selectable = { 
+            NOT = { 
+                ROOT = { has_country_flag = AC_revoke_construction_permission_REQUESTED }
+            } 
+        }
+
+        reject_effect = {
+            if = { limit = { is_ai = yes }
+                ROOT = { set_country_flag = { flag = AC_revoke_construction_permission_REQUESTED value = 1 days = 365 } }
+            }
+		}
+
+        complete_effect = {
+
+            ROOT = { clr_country_flag = AC_revoke_construction_permission_REQUESTED }
+
+            FROM = { 
+
+                remove_from_array = { array = AC_construction_permissions value = ROOT.id } 
+
+                # remove their projects in this country
+                if = { limit = { check_variable = { AC_active_projects > 0 } }
+
+					for_each_loop = { array = AC_project_array
+
+						if = { limit = { check_variable = { AC_project_target_country^i = ROOT.id } }
+
+							set_variable = { AC_project = i }
+							AC_end_project = yes
+						}
+					}
+				}
+            }
+		}
+
+        requires_acceptance = no
+
+        show_acceptance_on_action_button = no
+
+        ai_acceptance = {
+			
+            AC_acceptance = {
+                base = 1
+            }
+		}
+
+        ai_desire = {
+            factor = -1
+
+            modifier = {
+                add = 101
+                ROOT = { has_opinion = { target = PREV value < 0 } }
+            }
+        }
+	}
+}

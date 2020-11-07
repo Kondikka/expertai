@@ -1,0 +1,747 @@
+scripted_gui = {
+
+	BA_main_window = {
+
+		context_type = player_context
+
+		window_name = "BA_window"
+
+		parent_window_token = selected_country_view_diplomacy
+
+		dirty = ROOT.BA_refresh_gui
+
+		visible = {
+			has_country_flag = BA_show_border_avoidance_window
+		}
+
+		dynamic_lists = {
+
+			### new rules
+
+			BA_selected_country_grid = { array = BA_selected_country_array
+
+				change_scope = yes
+				entry_container = BA_selected_country_entry
+			}
+
+			### old rules
+
+			BA_countries_with_rules_grid = { array = BA_countries_with_rules_array
+
+				change_scope = yes
+				entry_container = BA_countries_with_rules_entry
+			}
+		}
+
+		properties = {
+
+			### new rules
+
+			BA_selected_country_flag_icon = {
+                image = "[This.GetFlag]"
+            }
+
+			### old rules
+
+			BA_countries_with_rules_flag_icon = {
+                image = "[This.GetFlag]"
+            }
+		}
+
+		effects = {
+
+			### buttons
+			
+			BA_set_button_click = {
+
+				for_each_scope_loop = { array = ROOT.BA_selected_country_array
+
+					# add rules against countries
+					for_each_scope_loop = { array = ROOT.BA_target_country_array
+
+						# avoidance on this country's borders
+						if = { 
+							limit = { 
+								NOT = { tag = PREV }
+								OR = { 
+									is_in_faction_with = ROOT
+									is_subject_of = ROOT
+									ROOT = { is_subject_of = PREV }
+									has_military_access_to = ROOT
+								}
+							}
+
+							if = { limit = { NOT = { is_in_array = { PREV.BA_active_friendly_country_rules = THIS.id } } }
+
+								PREV = { add_ai_strategy = { type = dont_defend_ally_borders id = PREV value = 5000 } }
+
+								add_to_array = { PREV.BA_active_friendly_country_rules = THIS.id }
+							}
+
+							if = { limit = { NOT = { is_in_array = { ROOT.BA_countries_with_rules_array = PREV.id } } }
+					
+								add_to_array = { ROOT.BA_countries_with_rules_array = PREV.id }
+							}
+						}
+
+						# avoidance against this country's borders
+						else_if = { limit = { NOT = { tag = PREV } }
+
+							if = { limit = { NOT = { is_in_array = { PREV.BA_active_other_country_rules = THIS.id } } }
+
+								add_to_array = { PREV.BA_active_other_country_rules = THIS.id }
+							}
+
+							if = { limit = { NOT = { is_in_array = { ROOT.BA_countries_with_rules_array = PREV.id } } }
+				
+								add_to_array = { ROOT.BA_countries_with_rules_array = PREV.id }
+							}
+						}
+					}
+
+					# add rules against states
+					for_each_scope_loop = { array = ROOT.BA_target_state_array
+
+						if = { limit = { NOT = { is_in_array = { PREV.BA_active_state_rules = THIS.id } } }
+
+							add_to_array = { PREV.BA_active_state_rules = THIS.id }
+						}
+
+						if = { limit = { NOT = { is_in_array = { ROOT.BA_countries_with_rules_array = PREV.id } } }
+				
+							add_to_array = { ROOT.BA_countries_with_rules_array = PREV.id }
+						}
+					}
+				}
+
+				if = { limit = { has_variable = ROOT.BA_countries_with_rules_selected }
+
+					clear_array = ROOT.BA_countries_with_rules_target_countries_array
+					clear_array = ROOT.BA_countries_with_rules_target_states_array
+
+					var:ROOT.BA_countries_with_rules_selected = {
+						
+						for_each_loop = { array = BA_active_friendly_country_rules
+
+							add_to_array = { ROOT.BA_countries_with_rules_target_countries_array = v }
+						}
+
+						for_each_loop = { array = BA_active_other_country_rules
+
+							add_to_array = { ROOT.BA_countries_with_rules_target_countries_array = v }
+						}
+
+						for_each_loop = { array = BA_active_state_rules
+
+							add_to_array = { ROOT.BA_countries_with_rules_target_states_array = v }
+						}
+					}
+				}
+
+				BA_refresh_gui = yes
+			}
+
+			BA_exit_button_click = {
+
+				clr_country_flag = BA_show_border_avoidance_window
+
+				clear_array = ROOT.BA_selected_country_array
+				clear_array = ROOT.BA_target_country_array
+				clear_array = ROOT.BA_target_state_array
+
+				clear_array = ROOT.BA_countries_with_rules_array
+				clear_array = ROOT.BA_countries_with_rules_target_countries_array
+				clear_array = ROOT.BA_countries_with_rules_target_states_array
+
+				clear_variable = ROOT.BA_countries_with_rules_selected
+
+				BA_refresh_gui = yes
+			}
+
+			BA_clear_all_button_click = {
+
+				for_each_scope_loop = { array = ROOT.BA_countries_with_rules_array
+
+					for_each_scope_loop = { array = PREV.BA_active_friendly_country_rules
+					
+						PREV = { add_ai_strategy = { type = dont_defend_ally_borders id = PREV value = -5000 } }
+					}
+
+					clear_array = BA_active_friendly_country_rules
+					clear_array = BA_active_other_country_rules
+					clear_array = BA_active_state_rules
+				}
+
+				clear_array = ROOT.BA_countries_with_rules_array
+				clear_array = ROOT.BA_countries_with_rules_target_countries_array
+				clear_array = ROOT.BA_countries_with_rules_target_states_array
+				
+				clear_variable = ROOT.BA_countries_with_rules_selected
+
+				BA_refresh_gui = yes
+			}
+
+			BA_clear_selected_countries_button_click = {
+
+				clear_array = ROOT.BA_selected_country_array
+
+				BA_refresh_gui = yes
+			}
+
+			BA_category_button_click = {
+
+				if = { limit = { check_variable = { BA_mode = 0 } }
+				
+					set_variable = { BA_mode = 1 }
+				}
+				else = {
+					clear_variable = BA_mode
+				}
+
+				BA_refresh_gui = yes
+			}
+
+			BA_clear_all_targets_button_click = {
+
+				clear_array = ROOT.BA_selected_country_array
+				clear_array = ROOT.BA_target_country_array
+				clear_array = ROOT.BA_target_state_array
+
+				BA_refresh_gui = yes
+			}
+
+			BA_add_faction_countries_button_click = {
+
+				for_each_scope_loop = {	array = ROOT.allies
+
+					if = { limit = { NOT = { is_in_array = { ROOT.BA_selected_country_array = THIS.id } } }
+
+						add_to_array = { ROOT.BA_selected_country_array = THIS.id }
+					}
+				}
+
+				for_each_scope_loop = {	array = ROOT.subjects
+
+					if = { limit = { NOT = { is_in_array = { ROOT.BA_selected_country_array = THIS.id } } }
+
+						add_to_array = { ROOT.BA_selected_country_array = THIS.id }
+					}
+				}
+
+				BA_refresh_gui = yes
+			}
+
+			### new rules
+
+			BA_selected_country_flag_icon_click = {
+
+				remove_from_array = { ROOT.BA_selected_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			### old rules
+
+			# select a country that has active rules
+			BA_countries_with_rules_flag_icon_click = {
+
+				set_variable = { ROOT.BA_countries_with_rules_selected = THIS.id }
+
+				clear_array = ROOT.BA_countries_with_rules_target_countries_array
+				clear_array = ROOT.BA_countries_with_rules_target_states_array
+
+				for_each_loop = { array = BA_active_friendly_country_rules
+
+					add_to_array = { ROOT.BA_countries_with_rules_target_countries_array = v }
+				}
+
+				for_each_loop = { array = BA_active_other_country_rules
+
+					add_to_array = { ROOT.BA_countries_with_rules_target_countries_array = v }
+				}
+
+				for_each_loop = { array = BA_active_state_rules
+
+					add_to_array = { ROOT.BA_countries_with_rules_target_states_array = v }
+				}
+
+				BA_refresh_gui = yes
+			}
+
+			# clear all rules for this country
+			BA_countries_with_rules_flag_icon_control_click = {
+
+				every_country = { 
+					
+					if = { limit = { is_in_array = { PREV.BA_active_friendly_country_rules = THIS.id } }
+
+						PREV = { add_ai_strategy = { type = dont_defend_ally_borders id = PREV value = -5000 } }
+						remove_from_array = { PREV.BA_active_friendly_country_rules = THIS.id }
+					}
+
+					if = { limit = { is_in_array = { PREV.BA_active_other_country_rules = THIS.id } }
+
+						remove_from_array = { PREV.BA_active_other_country_rules = THIS.id }
+					}
+				}
+
+				every_state = { limit = { is_in_array = { PREV.BA_active_state_rules = THIS.id } }
+
+					remove_from_array = { PREV.BA_active_state_rules = THIS.id }
+				}
+
+				clear_array = ROOT.BA_countries_with_rules_target_countries_array
+				clear_array = ROOT.BA_countries_with_rules_target_states_array
+
+				remove_from_array = { ROOT.BA_countries_with_rules_array = THIS.id }
+
+				clear_variable = ROOT.BA_countries_with_rules_selected
+
+				BA_refresh_gui = yes
+			}
+		}
+
+		triggers = {
+
+			BA_set_button_click_enabled = {
+
+				check_variable = { ROOT.BA_selected_country_array^num > 0 }
+
+				OR = {
+					check_variable = { ROOT.BA_target_country_array^num > 0 }
+					check_variable = { ROOT.BA_target_state_array^num > 0 }
+				}
+
+				NOT = { 
+					AND = {
+						check_variable = { ROOT.BA_selected_country_array^num = 1 }
+						check_variable = { ROOT.BA_target_country_array^num = 1 }
+						check_variable = { ROOT.BA_target_state_array^num = 0 }
+						check_variable = { ROOT.BA_target_country_array^0 = ROOT.BA_selected_country_array^0 }
+					}
+				}
+			}
+
+			BA_clear_all_button_click_enabled = {
+
+				check_variable = { ROOT.BA_countries_with_rules_array^num > 0 }
+			}
+
+			BA_clear_selected_countries_button_visible = {
+
+				check_variable = { ROOT.BA_selected_country_array^num > 0 }
+			}
+
+			BA_clear_all_targets_button_click_enabled = {
+
+				OR = {
+					check_variable = { ROOT.BA_selected_country_array^num > 0 }
+					check_variable = { ROOT.BA_target_country_array^num > 0 }
+					check_variable = { ROOT.BA_target_state_array^num > 0 }
+				}
+			}
+		}
+	}
+
+	BA_country_mode = {
+
+		context_type = player_context
+
+		window_name = "BA_country_window"
+
+		parent_window_token = selected_country_view_diplomacy
+
+		dirty = ROOT.BA_refresh_gui
+
+		visible = {
+			has_country_flag = BA_show_border_avoidance_window
+			check_variable = { BA_mode = 0 }
+		}
+
+		dynamic_lists = {
+
+			### new rules
+
+			BA_target_country_grid = { array = BA_target_country_array
+
+				change_scope = yes
+				entry_container = BA_target_country_entry
+			}
+
+			### old rules
+
+			BA_countries_with_rules_target_countries_grid = { array = BA_countries_with_rules_target_countries_array
+
+				change_scope = yes
+				entry_container = BA_countries_with_rules_target_countries_entry
+			}
+		}
+
+		properties = {
+
+			### new rules
+
+			BA_target_country_flag_icon = {
+                image = "[This.GetFlag]"
+            }
+
+
+			### old rules
+
+			BA_countries_with_rules_target_countries_flag_icon = {
+                image = "[This.GetFlag]"
+            }
+		}
+
+		effects = {
+
+			### new rules
+
+			BA_target_country_flag_icon_click = {
+
+				remove_from_array = { ROOT.BA_target_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_clear_target_countries_button_click = {
+
+				clear_array = ROOT.BA_target_country_array
+
+				BA_refresh_gui = yes
+			}
+
+			### old rules
+
+			BA_countries_with_rules_target_countries_flag_icon_click = {
+
+				var:ROOT.BA_countries_with_rules_selected = {
+
+					if = { limit = { is_in_array = { BA_active_friendly_country_rules = PREV.id } }
+
+						add_ai_strategy = { type = dont_defend_ally_borders id = PREV value = -5000 }
+						remove_from_array = { BA_active_friendly_country_rules = PREV.id }
+					}
+
+					if = { limit = { is_in_array = { BA_active_other_country_rules = PREV.id } }
+
+						remove_from_array = { BA_active_other_country_rules = PREV.id }
+					}
+
+					remove_from_array = { ROOT.BA_countries_with_rules_target_countries_array = PREV.id }
+
+					if = { 
+						limit = { 
+							check_variable = { ROOT.BA_countries_with_rules_target_countries_array^num = 0 }
+							check_variable = { ROOT.BA_countries_with_rules_target_states_array^num = 0 }
+						}
+
+						clear_variable = ROOT.BA_countries_with_rules_selected
+					}
+				}
+
+				BA_refresh_gui = yes
+			}
+		}
+
+		triggers = {
+
+			BA_clear_target_countries_button_visible = {
+
+				check_variable = { ROOT.BA_target_country_array^num > 0 }
+			}
+		}
+	}
+
+	BA_state_mode = {
+
+		context_type = player_context
+
+		window_name = "BA_state_window"
+
+		parent_window_token = selected_country_view_diplomacy
+
+		dirty = ROOT.BA_refresh_gui
+
+		visible = {
+			has_country_flag = BA_show_border_avoidance_window
+			check_variable = { BA_mode = 1 }
+		}
+
+		dynamic_lists = {
+
+			### new rules
+
+			BA_target_state_grid = { array = BA_target_state_array
+
+				change_scope = yes
+				entry_container = BA_target_state_entry
+			}
+
+			### old rules
+
+			BA_countries_with_rules_target_states_grid = { array = BA_countries_with_rules_target_states_array
+
+				change_scope = yes
+				entry_container = BA_countries_with_rules_target_states_entry
+			}
+		}
+
+		properties = {
+
+			### new rules
+
+			BA_target_state_flag_icon = {
+                image = "[This.GetName]"
+            }
+
+			### old rules
+
+			BA_countries_with_rules_target_states_flag_icon = {
+                image = "[This.GetName]"
+            }
+		}
+
+		effects = {
+
+			### new rules
+
+			BA_target_state_flag_icon_click = {
+
+				remove_from_array = { ROOT.BA_target_state_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_clear_target_states_button_click = {
+
+				clear_array = ROOT.BA_target_state_array
+
+				BA_refresh_gui = yes
+			}
+
+			### old rules
+
+			BA_countries_with_rules_target_states_flag_icon_click = {
+
+				var:ROOT.BA_countries_with_rules_selected = {
+
+					remove_from_array = { BA_active_state_rules = PREV.id }
+
+					remove_from_array = { ROOT.BA_countries_with_rules_target_states_array = PREV.id }
+
+					if = { 
+						limit = { 
+							check_variable = { ROOT.BA_countries_with_rules_target_countries_array^num = 0 }
+							check_variable = { ROOT.BA_countries_with_rules_target_states_array^num = 0 }
+						}
+
+						clear_variable = ROOT.BA_countries_with_rules_selected
+						remove_from_array = { ROOT.BA_countries_with_rules_array = THIS.id }
+					}
+				}
+
+				BA_refresh_gui = yes
+			}
+		}
+
+		triggers = {
+
+			BA_clear_target_states_button_visible = {
+
+				check_variable = { ROOT.BA_target_state_array^num > 0 }
+			}
+		}
+	}
+
+	BA_selected_country = {
+
+		context_type = selected_country_context
+
+		window_name = "BA_selected_country_window"
+
+		parent_window_token = selected_country_view_diplomacy
+
+		visible = {
+
+			ROOT = { 
+				has_country_flag = BA_show_border_avoidance_window
+				check_variable = { BA_mode = 0 }
+			}
+		}
+
+		effects = {
+
+			###
+
+			BA_add_selected_country_button_click = {
+
+				add_to_array = { ROOT.BA_selected_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_remove_selected_country_button_click = {
+
+				remove_from_array = { ROOT.BA_selected_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			###
+
+			BA_add_target_country_button_click = {
+
+				add_to_array = { ROOT.BA_target_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_remove_target_country_button_click = {
+
+				remove_from_array = { ROOT.BA_target_country_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+		}
+
+		triggers = {
+
+			###
+
+			BA_add_selected_country_button_visible = {
+
+				THIS = {
+					is_ai = yes
+					OR = { 
+						is_in_faction_with = ROOT
+						is_subject_of = ROOT
+						ROOT = { is_subject_of = PREV }
+						has_military_access_to = ROOT
+					}
+				}
+
+				NOT = {
+					is_in_array = { ROOT.BA_selected_country_array = THIS.id } 
+				}
+			}
+
+			BA_remove_selected_country_button_visible = {
+
+				is_in_array = { ROOT.BA_selected_country_array = THIS.id } 
+			}
+
+			###
+
+			BA_add_target_country_button_visible = {
+
+				NOT = {
+					is_in_array = { ROOT.BA_target_country_array = THIS.id }
+				}
+			}
+
+			BA_remove_target_country_button_visible = {
+
+				is_in_array = { ROOT.BA_target_country_array = THIS.id }
+			}
+		}
+	}
+
+	BA_selected_state = {
+
+		context_type = selected_state_context
+
+		window_name = "BA_selected_state_window"
+
+		parent_window_token = selected_country_view_diplomacy
+
+		visible = {
+
+			ROOT = {
+				has_country_flag = BA_show_border_avoidance_window
+				check_variable = { BA_mode = 1 }
+			}
+
+			THIS = {
+				
+			}
+		}
+
+		effects = {
+
+			###
+
+			BA_add_selected_country_button_click = {
+
+				CONTROLLER = { add_to_array = { ROOT.BA_selected_country_array = THIS.id } }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_remove_selected_country_button_click = {
+
+				CONTROLLER = { remove_from_array = { ROOT.BA_selected_country_array = THIS.id } }
+
+				BA_refresh_gui = yes
+			}
+
+			###
+
+			BA_add_target_state_button_click = {
+
+				add_to_array = { ROOT.BA_target_state_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+
+			BA_remove_target_state_button_click = {
+
+				remove_from_array = { ROOT.BA_target_state_array = THIS.id }
+
+				BA_refresh_gui = yes
+			}
+		}
+
+		triggers = {
+
+			###
+
+			BA_add_selected_country_button_visible = {
+
+				CONTROLLER = {
+					is_ai = yes
+					OR = {
+						is_in_faction_with = ROOT
+						is_subject_of = ROOT
+						ROOT = { is_subject_of = PREV }
+						has_military_access_to = ROOT
+					}
+					NOT = {
+						is_in_array = { ROOT.BA_selected_country_array = THIS.id } 
+					}
+				}
+			}
+
+			BA_remove_selected_country_button_visible = {
+
+				CONTROLLER = {
+					is_in_array = { ROOT.BA_selected_country_array = THIS.id } 
+				}
+			}
+
+			###
+
+			BA_add_target_state_button_visible = {
+
+				NOT = {
+					is_in_array = { ROOT.BA_target_state_array = THIS.id }
+				}
+			}
+
+			BA_remove_target_state_button_visible = {
+
+				is_in_array = { ROOT.BA_target_state_array = THIS.id }
+			}
+		}
+	}
+}

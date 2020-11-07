@@ -1,0 +1,172 @@
+############################################################################################################
+#	AC mod - on actions
+############################################################################################################
+
+on_actions = {
+	on_startup = {
+		effect = {
+
+			# AC_set_global_variables
+			random_country = { country_event = AC_event.101 }
+		}
+	}
+
+	on_daily = {
+		effect = {
+
+			### cancel invalid projects
+
+			if = { limit = { check_variable = { AC_active_projects > 0 } }
+
+				for_each_loop = { array = AC_project_array
+
+					if = { limit = { check_variable = { v < 0 } }
+
+						set_variable = { AC_project_type = i }
+
+						if = { 
+							limit = { 
+								OR = {
+									CONTROLLER = { has_war_with = ROOT } # target state controller at war with project owner
+									
+									var:v = { NOT = { AC_building_slot_available = yes } } # building slot unavailable in target state
+								}
+							}
+
+							set_variable = { AC_project = i }
+							log = "AC - [GetDate] [This.GetTag] - on_daily - deleted invalid project [?AC_project] in [?AC_project_array^AC_project] [?AC_project_array^AC_project.GetName]"
+							AC_end_project = yes
+						}
+					}
+				}
+
+				clear_variable = AC_project_type
+			}
+
+			### assist repair
+
+			if = { limit = { has_variable = AC_assist_repair_target }
+
+				if = {
+					limit = {
+						var:AC_assist_repair_target = {
+							OR = {
+								NOT = { has_idea = AC_assist_repair_target_idea }
+								exists = no
+								has_war_with = ROOT
+								NOT = { is_in_array = { array = ROOT.AC_construction_permissions value = THIS.id } }
+							}
+						}
+					}
+
+					AC_end_assist_repair = yes
+				}
+			}
+
+			### for updating games with old AC versions or adding the mod after startup
+
+			if = { limit = { is_ai = no check_variable = { global.AC_version < 2.01 } }
+
+				AC_set_global_variables = yes
+			}
+		}
+	}
+
+	on_annex = { #ROOT is winner #FROM gets annexed - For civil wars on_civil_war_end is also fired
+		effect = {
+
+			FROM = {
+
+				### projects
+
+				# remove all projects by the annexed country
+				if = { limit = { check_variable = { AC_active_projects > 0 } }
+
+					for_each_loop = { array = AC_project_array
+
+						if = { limit = { check_variable = { v < 0 } }
+
+							set_variable = { AC_project = i }
+							AC_end_project = yes
+						}
+					}
+				}
+
+				# remove permissions given to this country
+				every_other_country = { limit = { PREV = { is_in_array = { array = AC_construction_permissions value = PREV.id } } }
+
+					PREV = { remove_from_array = { array = AC_construction_permissions value = PREV.id } }
+				}
+
+				# remove permission this country has given
+				every_other_country = { limit = { is_in_array = { array = AC_construction_permissions value = PREV.id } }
+
+					remove_from_array = { array = AC_construction_permissions value = PREV.id }
+				}
+
+				### assist repair
+
+				if = { limit = { has_variable = AC_assist_repair_target_from }
+
+					var:AC_assist_repair_target_from = { AC_end_assist_repair = yes }
+				}
+
+				if = { limit = { has_variable = AC_assist_repair_target }
+
+					AC_end_assist_repair = yes
+				}
+			}
+		}
+	}
+
+	on_state_control_changed = { #ROOT is new controller #FROM is old controller #FROM.FROM is state ID
+		effect = {
+
+			FROM.FROM = {
+
+				if = { limit = { check_variable = { AC_projects_in_state^num > 0 } }
+
+					for_each_scope_loop = { array = AC_projects_in_state
+
+						### remove any invalid projects from state
+
+						if = {
+							limit = {
+								NOT = {
+									is_in_array = { array = AC_construction_permissions value = ROOT.id }
+									tag = ROOT
+									is_in_faction_with = ROOT
+									is_subject_of = ROOT
+									ROOT = { is_subject_of = PREV }
+								}
+							}
+
+							add_to_array = { PREV.AC_remove_projects = THIS.id }
+						}
+
+						### update project target country
+
+						else = {
+							
+							meta_effect = { # remove target decision from old controller
+								text = { var:AC_project_target_country^PREV.AC_project_target_state_@THIS = { remove_targeted_decision = { target = PREV decision = AC_project_[x]_target_decision } } }
+								x = "[?PREV.AC_project_target_state_@THIS]"
+							}
+
+							set_variable = { AC_project_target_country^PREV.AC_project_target_state_@THIS = ROOT.id }
+						}
+					}
+
+					for_each_scope_loop = { array = AC_remove_projects
+
+						set_variable = { AC_project = PREV.AC_project_target_state_@THIS }
+						log = "AC - [GetDate] [This.GetTag] - on_state_control_changed - deleted invalid project [?AC_project] in [?AC_project_array^AC_project] [?AC_project_array^AC_project.GetName]"
+						AC_end_project = yes
+					}
+
+					clear_array = AC_remove_projects
+				}
+			}
+		}
+	}
+}

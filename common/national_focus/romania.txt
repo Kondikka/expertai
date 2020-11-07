@@ -644,7 +644,7 @@
 
 		cancel_if_invalid = yes
 		continue_if_invalid = no
-		available_if_capitulated = yes
+		available_if_capitulated = no
 		search_filters = { FOCUS_FILTER_POLITICAL }
 
 		completion_reward = {
@@ -1039,7 +1039,7 @@
 
 		completion_reward = {
 			random_owned_controlled_state = {
-				prioritize = { 81 79 }
+				prioritize = { 79 81 }
 				limit = {
 					free_building_slots = {
 						building = arms_factory
@@ -1056,7 +1056,7 @@
 				set_state_flag = ROM_national_defense_industry_AF1
 			}
 			random_owned_controlled_state = {
-				prioritize = { 81 79 }
+				prioritize = { 79 81 }
 				limit = {
 					free_building_slots = {
 						building = arms_factory
@@ -1258,7 +1258,7 @@
 
 		completion_reward = {
 			random_owned_controlled_state = {
-				prioritize = { 46 }
+				prioritize = { 79 }
 				limit = {
 					ROOT = { has_full_control_of_state = PREV } 
 					free_building_slots = {
@@ -1423,6 +1423,7 @@
 
 		completion_reward = {
 			random_owned_controlled_state = {
+				prioritize = { 81 }
 				limit = {
 					ROOT = { has_full_control_of_state = PREV }
 					free_building_slots = {
@@ -1581,6 +1582,51 @@
 		completion_reward = {
 			add_ideas = ROM_balkans_dominance
 			set_rule = { can_create_factions = yes }
+			if = {
+				limit = { 
+					#has_dlc = "Battle for the Bosporus" #TODO
+				}
+				every_other_country = {
+					limit = {
+						has_opinion_modifier = BFTB_balkan_pact_ally
+					}
+					remove_opinion_modifier = {
+						target = ROM
+						modifier = BFTB_balkan_pact_ally
+					}
+					hidden_effect = {
+						ROOT = {
+							remove_opinion_modifier = {
+								target = PREV
+								modifier = BFTB_balkan_pact_ally
+							}
+						}
+					}
+				}
+			}
+			hidden_effect = {
+				if = { 
+					limit = {
+						#has_dlc = "Battle for the Bosporus" #TODO
+					}
+					remove_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_balkan_pact_enemy
+					}
+					remove_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_balkan_pact_enemy
+					}
+					add_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_incongruous_neighbors
+					}
+					add_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_incongruous_neighbors
+					}
+				}
+			}
 		}
 	}
 
@@ -1747,7 +1793,7 @@
 			is_subject = no
 			YUG = {
 				exists = yes
-				is_puppet = no
+				is_subject = no
 				NOT = {
 					is_in_faction_with = ROM
 				}
@@ -1763,6 +1809,8 @@
 			YUG = {
 				has_war = yes
 			}
+			YUG = { is_subject_of = ROOT }
+			YUG = { exists = no }
 			has_wargoal_against = YUG
 		}
 
@@ -1773,16 +1821,22 @@
 		completion_reward = {
 			#Only split if YUG is not at war
 			if = {
-				limit = { YUG = { has_war = yes } }
+				limit = {
+					YUG = {
+						OR = {
+							has_war = yes
+							is_subject = yes
+						}
+					}
+				}
 				create_wargoal = {
 					type = annex_everything
 					target = YUG
 				}
-				else = {				
-					YUG = {
-						country_event = DOD_romania.60
-					}
-				}
+			}
+			else = {
+				unlock_decision_category_tooltip = ROM_dividing_yugo
+				set_country_flag = invited_to_split_yugo
 			}
 		}
 	}
@@ -1887,7 +1941,7 @@
 			is_subject = no
 			communism < 0.5
 			fascism < 0.5
-			democratic < 0.5
+			neutrality < 0.5
 		}
 
 		bypass = {
@@ -1911,71 +1965,16 @@
 				}
 				id = 550
 			}
+			set_politics = {
+				ruling_party = neutrality
+				elections_allowed = no
+			}
+			set_political_party = {
+				ideology = neutrality
+				popularity = 65
+			}
 			remove_ideas = neutrality_idea
-		}
-	}
-
-	focus = {
-		id = ROM_king_michaels_coup
-		icon = GFX_focus_rom_coup
-		prerequisite = { focus = ROM_institute_royal_dictatorship }
-		x = 2
-		y = 1
-		relative_position_id = ROM_institute_royal_dictatorship
-
-		cost = 10
-		
-		historical_ai = { surrender_progress > 0.5 } #EAI
-
-		ai_will_do = {
-			factor = 1
-			modifier = { #EAI
-				factor = 0
-				NOT = { surrender_progress > 0.5 }
-			}
-			modifier = {
-				factor = 0
-				has_completed_focus = ROM_his_majestys_loyal_government
-			}
-		}
-
-		available = {
-			is_subject = no
-			OR = {
-				has_war = yes
-				threat > 0.25
-			}
-		}
-
-		bypass = {
-
-		}
-
-		cancel_if_invalid = yes
-		continue_if_invalid = no
-		available_if_capitulated = no
-
-		completion_reward = {
-			create_country_leader = {
-				name = "Michael I"
-				desc = "POLITICS_MICHAEL_I_DESC"
-				picture = GFX_Portrait_romania_michael_i				
-				expire = "1965.1.1"
-				ideology = despotism
-				traits = {
-				}
-			}
-			if = {
-				limit = {
-					has_idea = ROM_king_carol_ii_hedonist
-				}
-				remove_ideas = ROM_king_carol_ii_hedonist
-			}
-			hidden_effect = {
-				news_event = { id = news.322 days = 1 }
-			}
-			
-		}
+		}		
 	}
 
 	focus = {
@@ -2148,7 +2147,7 @@
 		id = ROM_revise_the_constitution
 		icon = GFX_goal_generic_forceful_treaty
 		prerequisite = { focus = ROM_institute_royal_dictatorship }
-		x = 0
+		x = 2
 		y = 1
 		relative_position_id = ROM_institute_royal_dictatorship
 
@@ -2173,12 +2172,7 @@
 		continue_if_invalid = no
 		available_if_capitulated = yes
 		search_filters = { FOCUS_FILTER_MANPOWER }
-		completion_reward = {
-			
-			set_politics = {
-				ruling_party = neutrality
-				elections_allowed = no
-			}
+		completion_reward = {			
 			add_country_leader_trait = camarilla_leader
 			add_ideas = ROM_the_sentinel_of_the_motherland
 		}
@@ -2188,7 +2182,7 @@
 		id = ROM_the_royal_foundation
 		icon = GFX_focus_research
 		prerequisite = { focus = ROM_revise_the_constitution }
-		x = 2
+		x = 1
 		y = 1
 		relative_position_id = ROM_revise_the_constitution
 
@@ -2221,9 +2215,9 @@
 		icon = GFX_goal_generic_improve_relations
 		prerequisite = { focus = ROM_revise_the_constitution }
 		mutually_exclusive = { focus = ROM_his_majestys_loyal_government }
-		x = 0
-		y = 1
-		relative_position_id = ROM_revise_the_constitution
+		x = 1
+		y = 2
+		relative_position_id = ROM_institute_royal_dictatorship
 
 		cost = 10
 
@@ -2252,7 +2246,7 @@
 		id = ROM_appoint_soviet_friendly_government
 		icon = GFX_goal_support_communism
 		prerequisite = { focus = ROM_flexible_foreign_policy }
-		x = -1
+		x = 0
 		y = 1
 		relative_position_id = ROM_flexible_foreign_policy
 
@@ -2275,7 +2269,6 @@
 			SOV = {
 				is_faction_leader = yes
 				has_government = communism
-				NOT = { has_war_with = ROM}
 			}
 		}
 
@@ -2320,6 +2313,68 @@
 			add_stability = -0.05
 			add_opinion_modifier = { modifier = ROM_appoint_soviet_friendly_government target = SOV }
 			SOV = { add_opinion_modifier = { modifier = ROM_appoint_soviet_friendly_government target = ROOT } }
+			if = {
+				limit = { 
+					#has_dlc = "Battle for the Bosporus" #TODO
+					NOT = {
+						is_in_faction_with = TUR
+						TUR = { is_faction_leader = yes }
+					}
+				}
+				every_other_country = {
+					limit = {
+						has_opinion_modifier = BFTB_balkan_pact_ally
+					}
+					remove_opinion_modifier = {
+						target = ROM
+						modifier = BFTB_balkan_pact_ally
+					}
+					if = {
+						limit = {
+							NOT = {	is_in_faction_with = TUR }
+							TUR = { is_faction_leader = no }
+						}
+						hidden_effect = {
+							ROOT = {
+								remove_opinion_modifier = {
+									target = PREV
+									modifier = BFTB_balkan_pact_ally
+								}
+							}
+						}
+					}
+				}
+			}
+			hidden_effect = { 
+				set_country_flag = can_change_sides_com 
+				if = { 
+					limit = {
+						#has_dlc = "Battle for the Bosporus" #TODO
+						NOT = {
+							is_in_faction_with = TUR
+							TUR = { is_faction_leader = yes }
+						}
+					}
+					remove_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_balkan_pact_enemy
+					}
+					remove_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_balkan_pact_enemy
+					}
+					add_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_incongruous_neighbors
+					}
+					add_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_incongruous_neighbors
+					}
+				}
+			}
+			unlock_decision_category_tooltip = ROM_change_sides
+			unlock_decision_tooltip = ROM_change_sides_to_commintern
 		}
 	}
 
@@ -2374,7 +2429,7 @@
 		id = ROM_appoint_german_friendly_government
 		icon = GFX_goal_support_fascism
 		prerequisite = { focus = ROM_flexible_foreign_policy }
-		x = 1
+		x = -2
 		y = 1
 		relative_position_id = ROM_flexible_foreign_policy
 
@@ -2399,7 +2454,6 @@
 			GER = {
 				is_faction_leader = yes
 				has_government = fascism
-				NOT = { has_war_with = ROM }
 			}
 		}
 
@@ -2446,7 +2500,68 @@
 			add_stability = -0.05
 			add_opinion_modifier = { modifier = ROM_appoint_german_friendly_government target = GER }
 			GER = { add_opinion_modifier = { modifier = ROM_appoint_german_friendly_government target = ROOT } }
-			
+			if = {
+				limit = { 
+					has_dlc = "Battle for the Bosporus"
+					NOT = {
+						is_in_faction_with = TUR
+						TUR = { is_faction_leader = yes }
+					}
+				}
+				every_other_country = {
+					limit = {
+						has_opinion_modifier = BFTB_balkan_pact_ally
+					}
+					remove_opinion_modifier = {
+						target = ROM
+						modifier = BFTB_balkan_pact_ally
+					}
+					if = {
+						limit = {
+							is_in_faction_with = TUR
+							TUR = { is_faction_leader = no }
+						}
+						hidden_effect = {
+							ROOT = {
+								remove_opinion_modifier = {
+									target = PREV
+									modifier = BFTB_balkan_pact_ally
+								}
+							}
+						}
+					}
+				}
+			}
+			hidden_effect = { 
+				set_country_flag = can_change_sides_fas
+				if = { 
+					limit = {
+						has_dlc = "Battle for the Bosporus"
+						NOT = {
+							is_in_faction_with = TUR
+							TUR = { is_faction_leader = yes }
+						}
+					}
+					remove_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_balkan_pact_enemy
+					}
+					remove_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_balkan_pact_enemy
+					}
+					add_opinion_modifier = {
+						target = BUL
+						modifier = BFTB_incongruous_neighbors
+					}
+					add_opinion_modifier = {
+						target = HUN
+						modifier = BFTB_incongruous_neighbors
+					}
+				}
+			}
+			unlock_decision_category_tooltip = ROM_change_sides
+			unlock_decision_tooltip = ROM_change_sides_to_allies
 			#Cancel guarantees
 			diplomatic_relation = {
 				country = YUG
@@ -2498,6 +2613,23 @@
 		available_if_capitulated = no
 
 		completion_reward = {
+			create_country_leader = {
+				name = "Ion Antonescu"
+				desc = "POLITICS_ION_ANTONESCU_DESC"
+				picture = "Portrait_Romania_Ion_Antonescu.dds"
+				expire = "1965.1.1"
+				ideology = fascism_ideology
+				traits = {
+					#
+				}
+			}
+
+			set_party_name = { 
+			    ideology = fascism
+			    long_name = ROM_fascism_party2_long
+			    name = ROM_fascism_party2
+			}
+
 			if = {
 				limit = { has_idea = ROM_the_sentinel_of_the_motherland }
 				swap_ideas = {
@@ -2535,20 +2667,14 @@
 		icon = GFX_focus_rom_abdicate
 		prerequisite = { focus = ROM_iron_guard focus = ROM_securitate }
 		mutually_exclusive = { focus = ROM_handle_the_king }
-		x = -1
+		x = -1				
 		y = 2
-		relative_position_id = ROM_appoint_german_friendly_government
+		relative_position_id = ROM_appoint_soviet_friendly_government
 
 		cost = 10
-		
-		historical_ai = { #EAI
-			has_completed_focus = ROM_invite_german_advisors
-		}
 
 		ai_will_do = {
 			factor = 9
-			
-			modifier = { factor = 0 is_historical_focus_on = yes } #EAI
 		}
 
 		available = {
@@ -2575,51 +2701,35 @@
 				limit = { has_country_leader = { id = 550 } }
 				retire_country_leader = yes
 			}
-			
-			if = { #EAI FIX
-				limit = { 
-					check_variable = { party_popularity@democratic > party_popularity@neutrality }
-					check_variable = { party_popularity@democratic > party_popularity@fascism }
-					check_variable = { party_popularity@democratic > party_popularity@communism }
+			if = {
+				limit = {
+					democratic > 0.35
 				}
 				set_politics = {
 					ruling_party = democratic
 					elections_allowed = yes
 				}
-			}
-			else_if = {
-				limit = { 
-					check_variable = { party_popularity@communism > party_popularity@neutrality }
-					check_variable = { party_popularity@communism > party_popularity@fascism }
-					check_variable = { party_popularity@communism > party_popularity@democratic }
-				}
-				set_politics = {
-					ruling_party = communism
-					elections_allowed = yes
-				}
-			}
-			else_if = {
-				limit = { 
-					check_variable = { party_popularity@fascism > party_popularity@neutrality }
-					check_variable = { party_popularity@fascism > party_popularity@communism }
-					check_variable = { party_popularity@fascism > party_popularity@democratic }
-				}
-				set_politics = {
-					ruling_party = fascism
-					elections_allowed = no
-				}
-			}
-			if = {
-				limit = {
-					has_idea = ROM_constitutional_guarantees
-				}				
 				else = {
 					if = {
 						limit = {
-							has_idea = ROM_securitate
+							communism > 0.35
 						}
-					}
-				}
+						set_politics = {
+							ruling_party = communism
+							elections_allowed = no
+						}
+
+						else = {
+							limit = {
+								fascism > 0.35
+							}
+							set_politics = {
+								ruling_party = fascism
+								elections_allowed = no
+							}
+						}
+					}					
+				}				
 			}
 
 			swap_ideas = {
@@ -2635,10 +2745,82 @@
 	}
 
 	focus = {
+		id = ROM_king_michaels_coup
+		icon = GFX_focus_rom_coup
+		prerequisite = { focus = ROM_force_abdication }
+		x = 0
+		y = 1
+		relative_position_id = ROM_force_abdication
+
+		cost = 10
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				has_completed_focus = ROM_iron_guard
+			}
+		}
+
+		available = {
+			is_subject = no
+			OR = {
+				has_war = yes
+				threat > 0.25
+			}
+		}
+
+		bypass = {
+
+		}
+
+		cancel_if_invalid = yes
+		continue_if_invalid = no
+		available_if_capitulated = no
+
+		completion_reward = {
+			unlock_decision_category_tooltip = ROM_change_sides
+			create_country_leader = {
+				name = "Michael I"
+				desc = "POLITICS_MICHAEL_I_DESC"
+				picture = GFX_Portrait_romania_michael_i				
+				expire = "1965.1.1"
+				ideology = liberalism
+				traits = {
+				}
+			}
+			set_politics = {
+				ruling_party = democratic
+				elections_allowed = yes
+			}
+			set_political_party = {
+				ideology = democratic
+				popularity = 50
+			}
+			if = {
+				limit = {
+					has_idea = ROM_king_carol_ii_hedonist
+				}
+				remove_ideas = ROM_king_carol_ii_hedonist
+			}
+			remove_ideas = ROM_iron_guard
+			hidden_effect = {
+				news_event = { id = news.322 days = 1 }
+				set_country_flag = can_change_sides_dem
+				set_country_flag = can_change_sides_com
+				set_country_flag = can_change_sides_fas				
+			}
+			unlock_decision_tooltip = ROM_change_sides_to_allies
+			unlock_decision_tooltip = ROM_change_sides_to_axis
+			unlock_decision_tooltip = ROM_change_sides_to_commintern
+		}
+	}
+
+	focus = {
 		id = ROM_appoint_allied_friendly_government
 		icon = GFX_goal_support_democracy
 		prerequisite = { focus = ROM_flexible_foreign_policy }
-		x = 3
+		x = 2
 		y = 1
 		relative_position_id = ROM_flexible_foreign_policy
 
@@ -2661,7 +2843,6 @@
 			ENG = {
 				is_faction_leader = yes
 				has_government = democratic
-				NOT = { has_war_with = ROM }
 			}
 		}
 
@@ -2703,6 +2884,9 @@
 				popularity = 0.35
 				ideology = democratic
 			}
+			hidden_effect = { set_country_flag = can_change_sides_dem }
+			unlock_decision_category_tooltip = ROM_change_sides
+			unlock_decision_tooltip = ROM_change_sides_to_allies
 			add_stability = -0.05
 			add_opinion_modifier = { modifier = ROM_appoint_allied_friendly_government target = ENG }
 			ENG = { add_opinion_modifier = { modifier = ROM_appoint_allied_friendly_government target = ROOT } }

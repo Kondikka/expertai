@@ -1,0 +1,299 @@
+﻿############################################################################################################
+#	AC mod - events
+############################################################################################################
+
+add_namespace = AC_event
+
+### avoids error spam from meta effects
+
+country_event = { 
+	id = AC_event.0
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { AC_complete_project = yes AC_refresh_gui = yes }
+	option = {}
+}
+country_event = { 
+	id = AC_event.1
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { AC_end_project = yes AC_refresh_gui = yes }
+	option = {}
+}
+
+### cancelled projects need to wait a day for the decision to reset properly
+
+country_event = { 
+	id = AC_event.10
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		subtract_from_variable = { AC_active_projects = 1 } 
+		set_variable = { AC_project_array^0 = 0 }
+		AC_refresh_gui = yes
+	}
+	option = {}
+}
+country_event = { 
+	id = AC_event.11
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		subtract_from_variable = { AC_active_projects = 1 } 
+		set_variable = { AC_project_array^1 = 0 }
+		AC_refresh_gui = yes
+	}
+	option = {}
+}
+country_event = { 
+	id = AC_event.12
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		subtract_from_variable = { AC_active_projects = 1 } 
+		set_variable = { AC_project_array^2 = 0 }
+		AC_refresh_gui = yes
+	}
+	option = {}
+}
+country_event = { 
+	id = AC_event.13
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		subtract_from_variable = { AC_active_projects = 1 } 
+		set_variable = { AC_project_array^3 = 0 }
+		AC_refresh_gui = yes
+	}
+	option = {}
+}
+country_event = { 
+	id = AC_event.14
+	hidden = yes
+	is_triggered_only = yes
+	immediate = { 
+		subtract_from_variable = { AC_active_projects = 1 } 
+		set_variable = { AC_project_array^4 = 0 }
+		AC_refresh_gui = yes
+	}
+	option = {}
+}
+
+# remove invalid construction permissions
+country_event = {
+	id = AC_event.100
+	hidden = yes
+	mean_time_to_happen = { days = 20 }
+
+	trigger = { NOT = { has_global_flag = AC_check_permissions } }
+
+	immediate = {
+
+		set_global_flag = { flag = AC_check_permissions value = 1 days = 20 }
+
+		every_country = { limit = { check_variable = { AC_construction_permissions^num > 0 } }
+
+			for_each_scope_loop = { array = AC_construction_permissions
+
+				if = {
+					limit = {
+						OR = {
+							has_war_with = PREV
+							exists = no
+						}
+					}
+
+					add_to_array = { PREV.AC_remove_permissions = THIS.id }
+				}
+			}
+
+			for_each_scope_loop = { array = AC_remove_permissions
+
+				remove_from_array = { array = PREV.AC_construction_permissions value = THIS.id }
+			}
+
+			clear_array = AC_remove_permissions
+		}
+	}
+
+	option = {}
+}
+
+# on_startup effect
+country_event = {
+	id = AC_event.101
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = { AC_set_global_variables = yes }
+
+	option = {}
+}
+
+############################################################################################################
+#	AC mod - ai events
+############################################################################################################
+
+add_namespace = AC_ai_event
+
+@AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECTS_TOTAL = 0.25
+@AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECT = 0.15
+@AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT = 3
+@AI_MAX_BUILD_AMOUNT = 3
+@AI_MAX_EXPENSIVE_BUILD_AMOUNT = 1
+@AI_EXPENSIVE_BUILDING_COST = 3000
+@AI_MIN_STATE_SCORE_FOR_PROJECT = 100
+
+# AI uses this event to create projects
+country_event = {
+	id = AC_ai_event.0
+	hidden = yes
+
+	mean_time_to_happen = { 
+		days = 120 
+		
+		modifier = { factor = 0.75 num_of_civilian_factories_available_for_projects > 60 }
+		modifier = { factor = 0.75 num_of_civilian_factories_available_for_projects > 120 }
+	}
+
+	trigger = {
+
+		is_ai = yes
+
+		check_variable = { AC_construction_permissions^num > 0 }
+
+		num_of_civilian_factories_available_for_projects > 15
+
+		has_political_power > 10
+		
+		# check that the ai can afford to assign factories to a new project
+		set_temp_variable = { t1 = num_of_civilian_factories_available_for_projects }
+		add_to_temp_variable = { t1 = AC_assigned_factories_total }
+		multiply_temp_variable = { t1 = @AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECTS_TOTAL }
+		set_temp_variable = { t2 = AC_assigned_factories_total }
+		add_to_temp_variable = { t2 = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
+		check_variable = { t2 < t1 }
+
+		meta_trigger = {
+			text = { check_variable = { AC_active_projects < [x] } }
+			x = "[AC_GetMaxProjects]"
+		}
+	}
+
+	immediate = {
+
+		############################################################
+		# 	find the state with the best score for a project
+		############################################################
+
+		set_temp_variable = { AC_AI_best_score = -1 }
+		set_temp_variable = { AC_AI_best_target = -1 }
+		set_temp_variable = { AC_AI_best_type = -1 }
+
+		for_each_scope_loop = { array = AC_construction_permissions
+
+			# modifier 
+			if = { limit = { any_owned_state = { is_controlled_by = PREV days_since_last_strategic_bombing < 10 } any_enemy_country = { has_deployed_air_force_size = { size > 800 type = strategic_bomber } } } ROOT = { set_country_flag = AC_AI_antiair_needed } }
+
+			for_each_scope_loop = { array = controlled_states
+
+				if = { 
+					limit = { 
+						free_building_slots = { building = infrastructure size < 10 include_locked = no } # not impassable state
+						NOT = { 
+							is_in_array = { array = AC_projects_in_state value = ROOT.id } 
+							PREV = { has_war_with = ROOT }
+						}
+					}
+					
+					AC_AI_get_infrastructure_score = yes
+					AC_AI_get_airbase_score = yes
+					AC_AI_get_antiair_score = yes
+					AC_AI_get_radar_score = yes
+				}
+			}
+
+			ROOT = { clr_country_flag = AC_AI_antiair_needed }
+		}
+
+		if = { limit = { NOT = { check_variable = { AC_AI_best_score < @AI_MIN_STATE_SCORE_FOR_PROJECT } } }
+
+			set_variable = { AC_project_type = -1 }
+
+
+			############################################################
+			# 	set building type
+			############################################################
+
+			set_variable = { AC_project_building_type^-1 = AC_AI_best_type }
+
+
+			############################################################
+			# 	set assigned factories
+			############################################################
+
+			set_temp_variable = { AC_AI_factories = num_of_civilian_factories_available_for_projects }
+			add_to_temp_variable = { AC_AI_factories = AC_assigned_factories_total }
+			multiply_temp_variable = { AC_AI_factories = @AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
+			clamp_temp_variable = { var = AC_AI_factories min = 1 max = 15 }
+
+			set_temp_variable = { t1 = num_of_civilian_factories_available_for_projects }
+			add_to_temp_variable = { t1 = AC_assigned_factories_total }
+			multiply_temp_variable = { t1 = @AI_MAX_FRACTION_OF_FACTORIES_TO_ASSIGN_ON_PROJECTS_TOTAL }
+			subtract_from_temp_variable = { t1 = AC_assigned_factories_total }
+			clamp_temp_variable = { var = AC_AI_factories min = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT max = t1 }
+
+			subtract_from_temp_variable = { AC_AI_factories = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
+			multiply_temp_variable = { AC_AI_factories = random }
+			add_to_temp_variable = { AC_AI_factories = @AI_MIN_NUM_OF_FACTORIES_TO_ASSIGN_ON_PROJECT }
+
+			round_temp_variable = AC_AI_factories
+			set_variable = { AC_project_assigned_factories^-1 = AC_AI_factories }
+
+
+			############################################################
+			# 	set build amount
+			############################################################
+
+			set_variable = { AC_project_build_amount^-1 = @AI_MAX_BUILD_AMOUNT }
+
+			AC_get_building_values = yes
+			if = { limit = { NOT = { check_variable = { AC_building_cost < @AI_EXPENSIVE_BUILDING_COST } } }
+				clamp_variable = { var = AC_project_build_amount^-1 min = 1 max = @AI_MAX_EXPENSIVE_BUILD_AMOUNT }
+			}
+
+			# get max possible build amount
+			while_loop_effect = { limit = { check_variable = { AC_project_build_amount^-1 > 2 } }
+				
+				if = { 		limit = { check_variable = { AC_project_building_type^-1 = 1 } var:AC_AI_best_target = { AC_building_infra_available = yes } } set_temp_variable = { break = 1 } }
+				else_if = { limit = { check_variable = { AC_project_building_type^-1 = 2 } var:AC_AI_best_target = { AC_building_airbase_available = yes } } set_temp_variable = { break = 1 } }
+				else_if = { limit = { check_variable = { AC_project_building_type^-1 = 3 } var:AC_AI_best_target = { AC_building_antiair_available = yes } } set_temp_variable = { break = 1 } }
+				else_if = { limit = { check_variable = { AC_project_building_type^-1 = 4 } var:AC_AI_best_target = { AC_building_radar_available = yes } } set_temp_variable = { break = 1 } }
+				else = { subtract_from_variable = { AC_project_build_amount^-1 = 1 } }
+			}
+
+			# limit build amount to available PP
+			AC_calc_pp_cost = yes
+			while_loop_effect = { limit = { check_variable = { AC_project_political_power_cost^-1 > political_power } }
+				
+				subtract_from_variable = { AC_project_build_amount^-1 = 1 }
+				AC_calc_pp_cost = yes
+			}
+
+			multiply_variable = { AC_project_build_amount^-1 = random }
+			clamp_variable = { var = AC_project_build_amount^-1 min = 1 max = @AI_MAX_BUILD_AMOUNT }
+			round_variable = AC_project_build_amount^-1
+
+
+			############################################################
+			# 	start project
+			############################################################
+
+			var:AC_AI_best_target = { AC_start_project = yes }
+
+			log = "AC - [GetDate] [This.GetTag] project type [?AC_project_building_type^-1] ([?AC_project_assigned_factories^-1]xCIC x [?AC_project_build_amount^-1]) in [?AC_AI_best_target.GetName], score = [?AC_AI_best_score], factories: [?AC_assigned_factories_total]"
+		}
+	}
+
+	option = {}
+}

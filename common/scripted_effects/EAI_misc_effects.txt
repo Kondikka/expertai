@@ -2,6 +2,12 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
+EAI_refresh_gui = {
+
+	if = { limit = { check_variable = { ROOT.EAI_refresh_gui = 0 } } set_variable = { ROOT.EAI_refresh_gui = 1 } }
+	else = { set_variable = { ROOT.EAI_refresh_gui = 0 } }
+}
+
 ### simulate naval training for xp (game AI never training its navy workaround)
 
 EAI_train_navy = {
@@ -23,42 +29,12 @@ EAI_calc_air_force_sizes = {
 
 	### allied air size
 		
-	while_loop_effect = { limit = { check_variable = { friendly_air_force_size < 50000 } }
-
-		if = {
-			limit = { 
-				meta_trigger = {
-					text = { has_deployed_air_force_size = { size > [x] type = fighter } }
-					x = "[?friendly_air_force_size]"
-				}
-			}
-
-			add_to_temp_variable = { friendly_air_force_size = 100 }
-		}
-		else = { set_temp_variable = { break = 1 } }
-	}
-
+	set_temp_variable = { friendly_air_force_size = num_deployed_planes }
 	add_to_temp_variable = { friendly_air_force_size = num_equipment@fighter_equipment }
 
 	for_each_scope_loop = { array = allies
 
-		while_loop_effect = { limit = { check_variable = { air_force_size_@THIS < 50000 } }
-
-			if = {
-				limit = { 
-					meta_trigger = {
-						text = { has_deployed_air_force_size = { size > [x] type = fighter } }
-						x = "[?air_force_size_@THIS]"
-					}
-				}
-
-				add_to_temp_variable = { air_force_size_@THIS = 100 }
-			}
-			else = { set_temp_variable = { break = 1 } }
-		}
-
-		set_temp_variable = { break = 0 }
-		add_to_temp_variable = { friendly_air_force_size = air_force_size_@THIS }
+		set_temp_variable = { friendly_air_force_size = num_deployed_planes }
 		add_to_temp_variable = { friendly_air_force_size = num_equipment@fighter_equipment }
 	}
 
@@ -66,21 +42,7 @@ EAI_calc_air_force_sizes = {
 
 	every_enemy_country = {
 
-		while_loop_effect = { limit = { check_variable = { air_force_size_@THIS < 50000 } }
-
-			if = {
-				limit = { 
-					meta_trigger = {
-						text = { has_deployed_air_force_size = { size > [x] type = fighter } }
-						x = "[?air_force_size_@THIS]"
-					}
-				}
-
-				add_to_temp_variable = { air_force_size_@THIS = 100 }
-			}
-			else = { set_temp_variable = { break = 1 } }
-		}
-
+		set_temp_variable = { air_force_size_@THIS = num_deployed_planes }
 		add_to_temp_variable = { air_force_size_@THIS = num_equipment@fighter_equipment }
 
 		if = { limit = { is_in_faction = yes NOT = { is_faction_leader = yes } }
@@ -633,23 +595,7 @@ EAI_calculate_fuel_need = {
 
 	### air
 
-	set_temp_variable = { air_force_size = 0 }
-	while_loop_effect = { limit = { check_variable = { air_force_size < 15000 } }
-
-		if = { 
-			limit = {
-				meta_trigger = {
-					text = { NOT = { has_deployed_air_force_size = { size > [x] } } }
-					x = "[?air_force_size]"
-				}
-			} 
-		
-			set_temp_variable = { break = 1 }
-		}
-		else = {
-			add_to_temp_variable = { air_force_size = 500 }
-		}
-	}
+	set_temp_variable = { air_force_size = num_deployed_planes }
 
 	multiply_temp_variable = { air_force_size = 1.8 } # fuel consumption estimate
 
@@ -1101,5 +1047,23 @@ EAI_armor_intel_check = {
 
 			add_to_temp_variable = { piercing_value = 2 }
 		}
+	}
+}
+
+EAI_test_effect = {
+
+	log = "test"
+
+	if = {
+		limit = {
+			meta_trigger = {
+				text = { always = yes }
+			}
+		}
+
+		log = "yes"
+	}
+	else = {
+		log = "no"
 	}
 }

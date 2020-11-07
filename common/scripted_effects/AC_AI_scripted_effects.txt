@@ -1,0 +1,181 @@
+############################################################################################################
+#	AC mod - scripted effects
+############################################################################################################
+
+AC_AI_get_infrastructure_score = {
+
+	if = { limit = { infrastructure < 10 }
+
+		############### score
+
+		set_temp_variable = { AC_AI_score = 0 }
+
+		set_temp_variable = { t1 = 100 }
+		set_temp_variable = { t2 = building_level@infrastructure }
+		multiply_temp_variable = { t2 = 10 }
+		subtract_from_temp_variable = { t1 = t2 }
+		add_to_temp_variable = { AC_AI_score = t1 }
+
+		if = { limit = { ROOT = { divisions_in_state = { state = PREV size > 4 } } } multiply_temp_variable = { AC_AI_score = 2 } }
+		if = { limit = { ROOT = { divisions_in_state = { state = PREV size > 9 } } } multiply_temp_variable = { AC_AI_score = 2 } }
+		if = { limit = { ROOT = { divisions_in_state = { state = PREV size > 14 } } } multiply_temp_variable = { AC_AI_score = 2 } }
+
+		#log = "infrastructure score = [?AC_AI_score] in [This.GetName]"
+
+		###############
+
+		if = { limit = { check_variable = { AC_AI_score > AC_AI_best_score } }
+
+			set_temp_variable = { AC_AI_best_score = AC_AI_score }
+			set_temp_variable = { AC_AI_best_target = THIS.id }
+			set_temp_variable = { AC_AI_best_type = 1 }
+		}
+	}
+}
+
+AC_AI_get_airbase_score = {
+
+	if = { 
+		limit = { 
+			air_base < 10 
+
+			PREV = { has_full_control_of_state = PREV }
+		}
+
+		############### score
+
+		set_temp_variable = { AC_AI_score = 0 }
+
+		set_temp_variable = { t1 = building_level@air_base }
+		multiply_temp_variable = { t1 = 10 }
+		add_to_temp_variable = { AC_AI_score = t1 }
+
+		if = { limit = { any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } } } multiply_temp_variable = { AC_AI_score = 1.5 } }
+
+		if = {
+			limit = { 
+				any_of_scopes = { array = ROOT.enemies 
+					any_of_scopes = { array = controlled_states 
+						check_variable = { PREV.PREV.distance_to@THIS < 400 } 
+					} 
+				} 
+			} 
+			
+			multiply_variable = { AC_AI_score = 1.5 } 
+		}
+
+		#log = "airbase score = [?AC_AI_score] in [This.GetName]"
+
+		###############
+
+		if = { limit = { check_variable = { AC_AI_score > AC_AI_best_score } }
+
+			set_temp_variable = { AC_AI_best_score = AC_AI_score }
+			set_temp_variable = { AC_AI_best_target = THIS.id }
+			set_temp_variable = { AC_AI_best_type = 2 }
+		}
+	}
+}
+
+AC_AI_get_antiair_score = {
+
+	if = { 
+		limit = { 
+			anti_air_building < 5
+
+			PREV = { has_full_control_of_state = PREV }
+
+			CONTROLLER = { has_war_together_with = ROOT }
+		}
+
+		############### score
+
+		set_temp_variable = { AC_AI_score = 0 }
+
+		# ref
+		set_temp_variable = { t1 = building_level@synthetic_refinery }
+		multiply_temp_variable = { t1 = 10 }
+		add_to_temp_variable = { AC_AI_score = t1 }
+
+		# mic
+		set_temp_variable = { t1 = building_level@industrial_complex }
+		multiply_temp_variable = { t1 = 5 }
+		add_to_temp_variable = { AC_AI_score = t1 }
+
+		# cic
+		set_temp_variable = { t1 = building_level@arms_factory }
+		multiply_temp_variable = { t1 = 7 }
+		add_to_temp_variable = { AC_AI_score = t1 }
+
+		if = { limit = { ROOT = { NOT = { has_country_flag = AC_AI_antiair_needed } } } multiply_temp_variable = { AC_AI_score = 0.1 } }
+
+		#log = "antiair score = [?AC_AI_score] in [This.GetName]"
+
+		###############
+
+		if = { limit = { check_variable = { AC_AI_score > AC_AI_best_score } }
+
+			set_temp_variable = { AC_AI_best_score = AC_AI_score }
+			set_temp_variable = { AC_AI_best_target = THIS.id }
+			set_temp_variable = { AC_AI_best_type = 3 }
+		}
+	}
+}
+
+AC_AI_get_radar_score = {
+
+	if = { 
+		limit = {
+			ROOT = { has_tech = radio_detection }
+
+			PREV = { has_full_control_of_state = PREV }
+
+			if = { 		limit = { ROOT = { has_tech = advanced_centimetric_radar } } radar_station < 6 }
+			else_if = { limit = { ROOT = { has_tech = improved_centimetric_radar } } radar_station < 5 }
+			else_if = { limit = { ROOT = { has_tech = centimetric_radar } }          radar_station < 4 }
+			else_if = { limit = { ROOT = { has_tech = improved_decimetric_radar } }  radar_station < 3 }
+			else_if = { limit = { ROOT = { has_tech = decimetric_radar } }           radar_station < 2 }
+			else_if = { limit = { ROOT = { has_tech = radio_detection } }            radar_station < 1 }
+			else = { always = no }
+		}
+
+		############### score
+
+		set_temp_variable = { AC_AI_score = 0 }
+
+		if = { limit = { AC_radar_location = yes } add_to_temp_variable = { AC_AI_score = 125 } }
+
+		if = {
+			limit = {
+				NOT = {
+					any_neighbor_state = {
+						OR = {
+							AND = {
+								radar_station > 0
+								check_variable = { PREV.distance_to@THIS < 400 }
+							}
+							any_neighbor_state = {
+								NOT = { check_variable = { THIS.id = PREV.PREV.id } }
+								radar_station > 0
+								check_variable = { PREV.PREV.distance_to@THIS < 400 }
+							}
+						}
+					}
+				}
+			}
+
+			add_to_temp_variable = { AC_AI_score = 100 }
+		}
+
+		#log = "radar score = [?AC_AI_score] in [This.GetName]"
+
+		###############
+
+		if = { limit = { check_variable = { AC_AI_score > AC_AI_best_score } }
+
+			set_temp_variable = { AC_AI_best_score = AC_AI_score }
+			set_temp_variable = { AC_AI_best_target = THIS.id }
+			set_temp_variable = { AC_AI_best_type = 4 }
+		}
+	}
+}

@@ -5543,11 +5543,16 @@ focus_tree = {
 		bypass = {
 			OR = {
 				NOT = {
-					YUG = { owns_state = 102 }
+					OR = {
+						YUG = { owns_state = 102 }
+						102 = { owner = { is_subject_of = YUG } }
+					}
 				}
 				has_war_with = YUG
 				is_in_faction_with = YUG
 				YUG = { is_subject_of = GER }
+				YUG = { has_non_aggression_pact_with = GER }
+				YUG = { has_opinion_modifier = tripartite_pact_opinion }
 			}
 		}
 		cancel_if_invalid = yes
@@ -5642,19 +5647,51 @@ focus_tree = {
 		available = {
 			is_puppet = no
 			NOT = { is_in_faction_with = YUG }
+			NOT = { YUG = { has_non_aggression_pact_with = GER } }
+			NOT = { YUG = { has_opinion_modifier = tripartite_pact_opinion } }
 			OR = {
 				AND = {
 					country_exists = YUG
 					NOT = { has_war_with = YUG }
-					owns_state = 102
+					OR = {
+						owns_state = 102
+						102 = { owner = { is_subject_of = YUG } }
+					}
 				}
 				AND = {
 					NOT = { country_exists = YUG }
-					owns_state = 102
-					owns_state = 45
-					owns_state = 106
-					owns_state = 103
-					owns_state = 105
+					OR = {
+						owns_state = 102
+						102 = { owner = { is_subject_of = YUG } }
+					}
+					OR = {
+						owns_state = 45
+						45 = { owner = { is_subject_of = YUG } }
+					}
+					OR = { #Macedonia
+						owns_state = 106
+						106 = { owner = { is_subject_of = YUG } }
+					}
+					OR = { #New Southern Serbia state
+						owns_state = 803
+						803 = { owner = { is_subject_of = YUG } }
+					}
+					OR = { #Herzegovina
+						owns_state = 803
+						804 = { owner = { is_subject_of = YUG } }
+					}
+					OR = { #Kosovo
+						owns_state = 803
+						802 = { owner = { is_subject_of = YUG } }
+					}
+					OR = {
+						owns_state = 103
+						103 = { owner = { is_subject_of = YUG } }
+					}
+					OR = {
+						owns_state = 105
+						105 = { owner = { is_subject_of = YUG } }
+					}
 				}
 			}
 			OR = {
@@ -5670,15 +5707,20 @@ focus_tree = {
 		bypass = {
 			OR = {	
 				is_in_faction_with = YUG
+				YUG = { has_non_aggression_pact_with = GER }
+				YUG = { has_opinion_modifier = tripartite_pact_opinion }
 				NOT = { country_exists = YUG }
 				NOT = {
 					OR = {
 						YUG = {
 							owns_state = 45
 						}
+						45 = { owner = { is_subject_of = YUG } }
+						
 						YUG = {
 							owns_state = 106
 						}
+						106 = { owner = { is_subject_of = YUG } }
 					}
 				}
 				AND = {
@@ -5754,6 +5796,8 @@ focus_tree = {
 							OR = {
 								106 = { is_owned_by = YUG }
 								106 = { is_owned_by = GER }
+								803 = { is_owned_by = YUG }
+								803 = { is_owned_by = GER }
 							}
 						}
 						BUL = { 
@@ -5769,11 +5813,26 @@ focus_tree = {
 							OR = {
 								106 = { is_owned_by = YUG }
 								106 = { is_owned_by = GER }
+								803 = { is_owned_by = YUG }
+								803 = { is_owned_by = GER }
 							}
 						}
 						BUL = {
 							add_opinion_modifier = { target = GER modifier = GER_first_ljubljana_award_GER }
-							transfer_state = 106
+							if = {
+								limit = {
+									106 = { is_owned_by = YUG }
+									106 = { is_owned_by = GER }
+								}
+								transfer_state = 106
+							}
+							if = {
+								limit = {
+									803 = { is_owned_by = YUG }
+									803 = { is_owned_by = GER }
+								}
+								transfer_state = 803
+							}
 						}
 					}
 				}
@@ -5812,7 +5871,11 @@ focus_tree = {
 						if = {
 							limit = { owns_state = 44 }
 							transfer_state = 105
-						}	
+						}
+						if = {
+							limit = { owns_state = 44 }
+							transfer_state = 802
+						}
 					}
 				}
 				every_other_country = {
@@ -6027,7 +6090,7 @@ focus_tree = {
 		y = 1
 		relative_position_id = GER_fate_of_yugoslavia
 		cost = 10
-		historical_ai = {
+		historical_ai = { #EAI
 
 			date > 1940.6.1
 			
@@ -6124,7 +6187,7 @@ focus_tree = {
 		y = 0
 		cost = 10
 		ai_will_do = {
-			factor = 1
+			factor = 7
 		}
 		search_filters = { FOCUS_FILTER_POLITICAL }
 		completion_reward = {
@@ -8259,6 +8322,7 @@ focus_tree = {
 							has_government = communism
 							has_government = fascism
 						}
+						is_in_faction = no
 						exists = yes
 					}
 				}
@@ -8274,6 +8338,7 @@ focus_tree = {
 							has_government = fascism
 						}
 					}
+					is_in_faction = no
 					exists = yes
 				}
 				ROM = {
