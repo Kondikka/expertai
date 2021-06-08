@@ -81,11 +81,41 @@ EAI_ignore_fin2 = {
 	}
 }
 
+EAI_SOV_ignore_claims = { # if these countries dont fold in the justification event, dont go to war
+	allowed = {
+		OR = {
+			tag = EST
+			tag = LAT
+			tag = LIT
+			tag = ROM
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+		SOV = {
+			GER = { EAI_THIS_is_threat_to_PREV = yes }
+			OR = {
+				is_justifying_wargoal_against = ROOT
+				has_wargoal_against = ROOT
+			}
+		}
+	}
+
+	reversed = yes
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = ignore_claim id = "SOV" value = 1000 }
+	ai_strategy = { type = declare_war id = "SOV" value = -5000 }
+}
+
 EAI_conquer_est = {
 	allowed = { tag = SOV }
 	enable = {
 		date < 1941.1.1
 		date > 1940.1.1
+		NOT = { has_wargoal_against = EST }
+		NOT = { is_justifying_wargoal_against = EST }
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = EST
 		NOT = { 13 = { is_controlled_by = SOV } }
@@ -106,6 +136,8 @@ EAI_conquer_lat = {
 	enable = {
 		date < 1941.1.1
 		date > 1940.1.1
+		NOT = { has_wargoal_against = LAT }
+		NOT = { is_justifying_wargoal_against = LAT }
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = LAT
 		NOT = { 12 = { is_controlled_by = SOV } }
@@ -126,6 +158,8 @@ EAI_conquer_lit = {
 	enable = {
 		date < 1941.1.1
 		date > 1940.1.1
+		NOT = { has_wargoal_against = LIT }
+		NOT = { is_justifying_wargoal_against = LIT }
 		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
 		country_exists = LIT
 		NOT = { 189 = { is_controlled_by = SOV } }
@@ -146,11 +180,14 @@ EAI_conquer_rom = {
 	enable = {
 		date < 1942.1.1
 		date > 1940.1.1
+		NOT = { has_wargoal_against = ROM }
+		NOT = { is_justifying_wargoal_against = ROM }
 		has_global_flag = sov_yes_pact
 		country_exists = ROM
 		NOT = { 78 = { is_controlled_by = SOV } }
 		has_war = no
 		is_historical_focus_on = yes
+		NOT = { has_wargoal_against = ROM }
 	}
 	
 	abort_when_not_enabled = yes
@@ -337,6 +374,71 @@ EAI_SOV_eastern_garrison = {
 		value = -85
 	}
 }
+
+#
+EAI_SOV_border_garrison = {
+	allowed = {
+		tag = SOV
+	}
+	enable = {
+		has_war = yes
+
+		has_government = communism
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+
+		country_trigger = {
+
+			is_neighbor_of = FROM
+
+			NOT = { 
+				has_war_with = FROM
+
+				is_justifying_wargoal_against = FROM
+				FROM = { is_justifying_wargoal_against = PREV }
+
+				has_wargoal_against = FROM
+				FROM = { has_wargoal_against = PREV }
+
+				FROM = { EAI_justifying_wargoal_via_focus_vs_PREV = yes }
+			}
+
+			if = { limit = { is_major = yes }
+
+				NOT = { 
+					AND = { 
+						has_government = communism 
+						FROM = { has_government = communism }
+					} 
+				}
+			}
+
+			OR = {
+				has_non_aggression_pact_with = FROM
+
+				has_focus_tree = generic_focus
+
+				AND = { # generic countries cant declare wars through focuses
+					strength_ratio = { tag = FROM ratio < 0.25 } 
+					is_in_faction = no 
+					is_subject = no
+				}
+				
+				is_guaranteed_by = FROM
+
+				AND = { has_government = communism PREV = { has_government = communism } }
+			}
+		}
+
+		value = -200
+	}
+}
+
+# finnish front
 
 ########################
 #	vanilla

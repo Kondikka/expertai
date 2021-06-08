@@ -1,4 +1,4 @@
-version="1.9.1"
+version="1"
 tags={
 	"Gameplay"
 	"Fixes"
@@ -8,5 +8,5 @@ tags={
 }
 name="Expert AI 4.0"
 picture="thumb.jpg"
-supported_version="1.9.1"
+supported_version="1.10.*"
 remote_file_id="741805475"

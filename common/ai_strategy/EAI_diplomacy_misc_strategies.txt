@@ -710,7 +710,13 @@ EAI_BUL_joins_axis_1 = {
 			}
 		}
 
-		BUL = { GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+		if = { limit = { has_dlc = "Battle for the Bosporus" }
+		
+			BUL = { has_completed_focus = BUL_join_the_tripartite_pact }
+		}
+		else = {
+			BUL = { GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+		}
 
 		BUL = { NOT = { EAI_is_not_independent = yes } }
 				
@@ -721,6 +727,47 @@ EAI_BUL_joins_axis_1 = {
 
 	ai_strategy = { type = diplo_action_desire id = BUL target = offer_join_faction value = 1000 }
 	ai_strategy = { type = diplo_action_acceptance id = GER target = offer_join_faction value = 1000 }
+}
+EAI_BUL_befriend_GER = {
+	allowed = { 
+		tag = BUL 
+	}
+	enable = {
+		is_historical_focus_on = yes
+
+		country_exists = GER
+
+		OR = {
+			has_government = neutrality
+			has_government = fascism
+		}
+
+		focus_progress = {
+			focus = BUL_bulgarian_irredentism
+			progress > 0.1
+		}
+
+		NOT = {
+			GER = {
+				has_opinion	= {
+					target = ROOT
+					value > 40
+				}
+			}
+		}
+
+		GER = {
+			has_war = yes
+			is_major = yes
+			is_faction_leader = yes
+			NOT = { POL = { EAI_THIS_is_threat_to_PREV = yes } }
+			NOT = { FRA = { EAI_THIS_is_threat_to_PREV = yes } }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = GER target = improve_relation value = 20000 }
 }
 
 ###

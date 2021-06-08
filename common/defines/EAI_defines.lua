@@ -54,7 +54,7 @@ NDefines.NAI.RESEARCH_WITH_XP_AI_WEIGHT_MULT = 1.5 				-- AI will bump score of 
 -- DESIGNS
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.REFIT_SHIP_RELUCTANCE = 500							-- How often to consider refitting to new equipment variants for ships in the field
+NDefines.NAI.REFIT_SHIP_RELUCTANCE = 5000							-- How often to consider refitting to new equipment variants for ships in the field
 NDefines.NAI.REFIT_SHIP_PERCENTAGE_OF_FORCES = 0.0				-- How big part of the navy that should be considered for refitting
 
 NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
