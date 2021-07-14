@@ -6,6 +6,25 @@ on_actions = {
 	on_daily = {
 		effect = {
 
+			############################################################
+			# Save compatibility
+			############################################################
+
+			if = { limit = { check_variable = { global.EAI_version < 4.53 } }
+
+				set_variable = { global.EAI_version = 4.53 }
+
+				EAI_create_north_african_states_array = yes
+			}
+
+			############################################################
+
+			if = { limit = { NOT = { has_global_flag = EAI_day_var_incremented } }
+
+				set_global_flag = { flag = EAI_day_var_incremented days = 1 value = 1 }
+				add_to_variable = { global.EAI_day = 1 }
+			}
+
 			### cancel invalid projects
 
 			if = { limit = { check_variable = { EAI_PC_active_projects > 0 } }
@@ -32,12 +51,6 @@ on_actions = {
 				}
 
 				clear_variable = EAI_PC_project_type
-			}
-
-			# old version compatibility
-			if = { limit = { is_ai = no check_variable = { global.EAI_version < 4.5 } }
-
-				set_variable = { global.EAI_version = 4.5 }
 			}
 
 			### ai scripts
@@ -111,6 +124,51 @@ on_actions = {
 
 					remove_from_array = { array = ROOT.EAI_prepare_for_war_targets value = THIS.id }
 				}
+			}
+
+			if = {
+				limit = {
+					tag = GER
+					NOT = { has_completed_focus = GER_ussr_war_goal }
+					focus_progress = { focus = GER_ussr_war_goal progress > 0.1 }
+					NOT = { SOV = { has_country_flag = EAI_SOV_eastern_garrison } }
+				}
+
+				SOV = { set_country_flag = { flag = EAI_SOV_eastern_garrison days = 300 value = 1 } }
+			}
+
+			if = {
+				limit = {
+					OR = { tag = ITA tag = ENG }
+					is_ai = yes
+					has_war = yes
+				}
+
+				set_variable = { EAI_NA_states_controlled = 0 }
+
+				for_each_scope_loop = { array = global.EAI_north_african_states
+
+					if = { limit = { is_controlled_by = ROOT }
+
+						add_to_variable = { ROOT.EAI_NA_states_controlled = 1 }
+					}
+				}
+
+				# % of states controlled
+				divide_variable = { EAI_NA_states_controlled = global.EAI_north_african_states^num }
+
+				### AI becomes passive if the % of NA states controlled is greater than % allowed
+
+				set_temp_variable = { a = 1944 }
+				set_temp_variable = { b = global.year }
+				subtract_from_temp_variable = { a = b }
+				clamp_temp_variable = { var = a min = 0 max = 4 }
+
+				# fraction_allowed_to_control = 0.5 - 1.0
+				set_variable = { EAI_NA_fraction_allowed_to_control = 4 }
+				subtract_from_variable = { EAI_NA_fraction_allowed_to_control = a }
+				multiply_variable = { EAI_NA_fraction_allowed_to_control = 0.125 }
+				add_to_variable = { EAI_NA_fraction_allowed_to_control = 0.5 }
 			}
 		}
 	}

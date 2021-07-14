@@ -132,13 +132,35 @@ EAI_PATHFIND/check_success_conditions = {
 
 	if = {
 		limit = {
+
 			OR = {
 				check_variable = { current = pathfind_target }
 				
 				# supply line - reached enemy front line
 				if = { limit = { check_variable = { pathfind_type = 1 } }
 
-					var:current = { any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } } }
+					var:pathfind_target = {
+
+						CONTROLLER = {
+
+							set_temp_variable = { pathfind_target_controller = THIS.id }
+						}
+					}
+
+					var:current = { 
+
+						any_neighbor_state = { 
+
+							CONTROLLER = {
+								
+								NOT = { tag = ROOT }
+
+								OR = {
+									tag = var:pathfind_target_controller
+								}
+							}
+						}
+					}
 				}
 				else = { always = no }
 			}

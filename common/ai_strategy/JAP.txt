@@ -275,18 +275,48 @@ EAI_JAP_offensive_vs_CHI_north = {
 	}
 }
 
-EAI_JAP_stalemate = {
+EAI_JAP_stalemate_vs_CHI = {
 	allowed = { tag = JAP }
 	enable = {
 		has_war_with = CHI
+		CHI = { is_ai = yes }
 		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-		CHI = { surrender_progress > 0.5 }
+
+		# Create some offensives every once in a while to make the front seem active
+		set_temp_variable = { day = global.EAI_day }
+		modulo_temp_variable = { day = 30 }
 		OR = {
-			NOT = {
-				MAN = { surrender_progress > 0 }
-				MEN = { surrender_progress > 0 }
+			check_variable = { day < 28 }
+			CHI = { surrender_progress > 0.6 }
+			check_variable = { EAI_fielded_eq_ratio < 0.9 }
+		}
+
+		### Conditions
+		
+		OR = {
+
+			# Stop attacks when JAP has pushed far enough
+			AND = { 
+
+				CHI = { surrender_progress > 0.5 }
+
+				# Keep pushing if JAP's puppets are losing ground
+				OR = {
+
+					NOT = {
+						MAN = { is_in_faction_with = JAP surrender_progress > 0 }
+						MEN = { is_in_faction_with = JAP surrender_progress > 0 }
+					}
+
+					CHI = { surrender_progress > 0.75 }
+				}
 			}
-			CHI = { surrender_progress > 0.75 }
+
+			# Stop attacks if JAP is losing the war
+			AND = {
+
+				JAP = { surrender_progress > 0.2 }
+			}
 		}
 	}
 
@@ -296,6 +326,50 @@ EAI_JAP_stalemate = {
 		type = front_control
 		priority = 10
 		tag = CHI
+		execute_order = no
+	}
+}
+
+EAI_CHI_stalemate_vs_JAP = {
+	allowed = { tag = CHI }
+	enable = {
+		has_war_with = JAP
+		JAP = { is_ai = yes }
+		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+
+		# Create some offensives every once in a while to make the front seem active
+		set_temp_variable = { day = global.EAI_day }
+		modulo_temp_variable = { day = 30 }
+		OR = {
+			check_variable = { day < 28 }
+			CHI = { surrender_progress < 0.5 }
+			check_variable = { EAI_fielded_eq_ratio < 0.9 }
+		}
+		
+		### Conditions
+
+		# Attack if JAP is losing the war
+		NOT = { JAP = { surrender_progress > 0.2 } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		tag = JAP
+		execute_order = no
+	}
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		tag = MAN
+		execute_order = no
+	}
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		tag = MEN
 		execute_order = no
 	}
 }

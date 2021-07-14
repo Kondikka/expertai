@@ -397,59 +397,95 @@ EAI_important_radar_constructions = {
 EAI_improve_north_africa_infrastructure = {
 
 	if = { 
-		limit = { 
-			check_variable = { ROOT.EAI_PC_active_projects < 5 } 
-			has_war = yes 
-			num_of_civilian_factories_available_for_projects > 15
-			any_enemy_country = {
-				any_of_scopes = { array = controlled_states
-					OR = { region = 126 region = 128 } 
-				}
-			}
-			any_of_scopes = { array = controlled_states
-				OR = { region = 126 state = 452 state = 447 state = 446 } 
-				is_coastal = yes 
-				free_building_slots = { building = infrastructure size > 0 include_locked = no } 
-				infrastructure < 8
-			}
+		limit = {
+			tag = ITA
+			date > 1937.6.1
 		}
 
-		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
-
-		set_temp_variable = { EAI_best_target = 0 }
-		set_temp_variable = { EAI_best_target_score = 0 }
-
-		# find the best target
-		for_each_scope_loop = { array = controlled_states 
-		
-			if = {
-				limit = { 
-					OR = { region = 126 state = 452 state = 447 state = 446 } 
-					is_coastal = yes 
-					EAI_PC_can_build_project = yes
-					infrastructure < 8 
-				}
-
-				# get score
-				set_variable = { EAI_score = 10 }
-				subtract_from_variable = { EAI_score = building_level@infrastructure }
-				if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
-
-				# compare with best score
-				if = { limit = { check_variable = { EAI_score > EAI_best_target_score } } 
-
-					set_temp_variable = { EAI_best_target = THIS.id } 
-					set_temp_variable = { EAI_best_target_score = EAI_score } 
-				}
-			}
-		}
-
-		# target was found
-		if = { limit = { check_variable = { EAI_best_target_score > 0 } }
-
-			var:EAI_best_target = { EAI_PC_start_project = yes }
-		}
+		set_temp_variable = { supply_line_start = 448.id } # tripoli
+		set_temp_variable = { supply_line_target = 446.id } # cairo
+		EAI_build_supply_line = yes
 	}
+
+	if = { 
+		limit = {
+			tag = ENG
+			date > 1937.6.1
+		}
+
+		set_temp_variable = { supply_line_start = 446.id }
+		set_temp_variable = { supply_line_target = 448.id }
+		EAI_build_supply_line = yes
+	}
+
+	# if = { 
+	# 	limit = { 
+	# 		check_variable = { ROOT.EAI_PC_active_projects < 5 } 
+
+	# 		OR = {
+	# 			AND = {
+	# 				has_war = yes 
+					
+	# 				num_of_civilian_factories_available_for_projects > 15
+			
+	# 				any_enemy_country = {
+	# 					any_of_scopes = { array = controlled_states
+	# 						OR = { region = 126 region = 128 } 
+	# 					}
+	# 				}
+	# 			}
+
+	# 			AND = {
+	# 				tag = ITA
+	# 				date > 1938.1.1
+	# 			}
+	# 		}
+
+	# 		any_of_scopes = { array = controlled_states
+
+	# 			OR = { region = 126 state = 452 state = 447 state = 446 } 
+	# 			is_coastal = yes 
+	# 			free_building_slots = { building = infrastructure size > 0 include_locked = no } 
+	# 			infrastructure < 8
+	# 		}
+	# 	}
+
+	# 	set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
+
+	# 	set_temp_variable = { EAI_best_target = 0 }
+	# 	set_temp_variable = { EAI_best_target_score = 0 }
+
+	# 	# find the best target
+	# 	for_each_scope_loop = { array = controlled_states 
+		
+	# 		if = {
+	# 			limit = { 
+	# 				OR = { region = 126 state = 452 state = 447 state = 446 } 
+	# 				is_coastal = yes 
+	# 				EAI_PC_can_build_project = yes
+	# 				infrastructure < 8 
+	# 			}
+
+	# 			# get score
+	# 			set_variable = { EAI_score = 10 }
+	# 			subtract_from_variable = { EAI_score = building_level@infrastructure }
+	# 			if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
+
+	# 			# compare with best score
+	# 			if = { limit = { check_variable = { EAI_score > EAI_best_target_score } } 
+
+	# 				set_temp_variable = { EAI_best_target = THIS.id } 
+	# 				set_temp_variable = { EAI_best_target_score = EAI_score } 
+	# 			}
+	# 		}
+	# 	}
+
+	# 	# target was found
+	# 	if = { limit = { check_variable = { EAI_best_target_score > 0 } }
+
+	# 		var:EAI_best_target = { EAI_PC_start_project = yes }
+	# 	}
+	# }
 }
 
 EAI_resource_extraction = {
@@ -610,19 +646,42 @@ EAI_build_supply_line = {
 
 		### build a route to the front
 
-		for_each_scope_loop = { array = pathfind_path
+		set_temp_variable = { target_id = pathfind_path^0 }
+		for_each_loop = { array = pathfind_path
 
-			if = { limit = { EAI_PC_can_build_project = yes }
+			var:v = {
 
-				EAI_PC_start_project = yes
+				if = { limit = { EAI_PC_can_build_project = yes }
 
-				set_temp_variable = { break = 1 }
+					var:target_id = {
+
+						if = { limit = { check_variable = { PREV.building_level@infrastructure < THIS.building_level@infrastructure } }
+
+							set_temp_variable = { target_id = pathfind_path^i }
+						}
+					}
+
+					set_temp_variable = { building_path_to_front = 1 }
+				}
 			}
+		}
+
+		if = { limit = { check_variable = { building_path_to_front = 1 } }
+
+			var:target_id = { EAI_PC_start_project = yes }
 		}
 
 		### build along the front
 
-		if = { limit = { check_variable = { break = 0 } }
+		if = { limit = { check_variable = { building_path_to_front = 0 } }
+
+			var:supply_line_target = {
+
+				CONTROLLER = {
+
+					set_temp_variable = { supply_line_target_controller = THIS.id }
+				}
+			}
 
 			set_temp_variable = { front_intersection = pathfind_path^num }
 			subtract_from_temp_variable = { front_intersection = 1 }
@@ -650,8 +709,20 @@ EAI_build_supply_line = {
 						every_neighbor_state = {
 							limit = { 
 								is_controlled_by = ROOT 
+
 								NOT = { is_in_array = { front_states = THIS.id } } 
-								any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+
+								any_neighbor_state = { 
+
+									CONTROLLER = {
+
+										NOT = { tag = ROOT }
+
+										OR = {
+											tag = var:supply_line_target_controller
+										}
+									}
+								}
 							}
 
 							add_to_temp_array = { front_states = THIS.id }
