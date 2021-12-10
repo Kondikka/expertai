@@ -14,6 +14,71 @@
 #	EAI
 ########################
 
+EAI_wardec_FIN_on_historical_date = {
+	allowed = { original_tag = SOV }
+	enable = {
+		has_country_flag = EAI_SOV_take_finland
+	}
+	abort_when_not_enabled = yes
+	ai_strategy = { type = ignore_claim id = "FIN" value = 5000 }
+	ai_strategy = { type = ignore id = "FIN" value = 5000 }
+	ai_strategy = { type = declare_war id = "FIN" value = -5000 }
+}
+
+EAI_SOV_take_finland = {
+	allowed = { original_tag = SOV }
+	enable = {
+		OR = {
+			has_war_with = FIN
+			AND = {
+				focus_progress = { focus = SOV_secure_leningrad progress > 0 }
+				NOT = { has_completed_focus = SOV_secure_leningrad }
+			}
+			has_country_flag = EAI_SOV_take_finland
+		}
+		FIN = { is_in_faction = no }
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+	}
+	abort_when_not_enabled = yes
+	ai_strategy = {
+		type = front_control
+		country_trigger = {
+			tag = FIN
+		}
+		ordertype = front
+		execute_order = yes
+		execution_type = rush
+	}
+	ai_strategy = {
+		type = front_unit_request
+		tag = FIN
+		value = 100
+	}
+}
+
+EAI_SOV_foreign_experts_USA_relation = {
+	allowed = { tag = SOV }
+	enable = {
+		NOT = { 
+			has_country_flag = SOV_gosproyektstroy_level_2_flag
+			has_country_flag = SOV_gosproyektstroy_upgrade_in_progress_flag
+		}
+		OR = {
+			has_completed_focus = SOV_foreign_experts
+			focus_progress = { focus = SOV_foreign_experts progress > 0.75 }
+		}
+		USA = {
+			has_opinion = {
+				target = SOV
+				value < 30
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = diplo_action_desire id = USA target = improve_relation value = 20000 }
+}
+
 EAI_ignore_pol = {
 	allowed = { tag = SOV }
 	enable = {
@@ -448,115 +513,7 @@ EAI_SOV_border_garrison = {
 	}
 }
 
-# finnish front
-
-########################
-#	vanilla
-########################
-
-southern_thrust = {
-	enable = {
-		tag = SOV
-		has_completed_focus = SOV_southern_thrust
-		OR = {
-			country_exists = IRQ
-			country_exists = PER
-			country_exists = AFG
-		}
-	}
-	abort = {
-		NOT = {
-			country_exists = IRQ
-			country_exists = PER
-			country_exists = AFG
-		}
-	}
-	
-	ai_strategy = {
-		type = antagonize
-		id = "PER"			
-		value = 200
-	}
-	ai_strategy = {
-		type = antagonize
-		id = "AFG"			
-		value = 150
-	}	
-	ai_strategy = {
-		type = antagonize
-		id = "IRQ"			
-		value = 100
-	}	
-}
-
-claims_on_poland = {
-	enable = {
-		tag = SOV
-		has_completed_focus = SOV_claims_on_poland
-		country_exists = POL
-	}
-	abort = {
-		NOT = {
-			country_exists = POL
-		}
-	}
-	
-	ai_strategy = {
-		type = antagonize
-		id = "POL"			
-		value = 200
-	}	
-}
-
-claims_on_baltic = {
-	enable = {
-		tag = SOV
-		has_completed_focus = SOV_claims_on_baltic
-		OR = {
-			country_exists = LAT
-			country_exists = LIT
-		}
-	}
-	abort = {
-		NOT = {
-			country_exists = LAT
-			country_exists = LIT
-		}
-	}
-	
-	ai_strategy = {
-		type = antagonize
-		id = "LAT"			
-		value = 200
-	}	
-	ai_strategy = {
-		type = antagonize
-		id = "LIT"			
-		value = 200
-	}
-}
-
-claims_on_finland = {
-	enable = {
-		tag = SOV
-		has_completed_focus = SOV_baltic_security
-		country_exists = FIN
-		is_historical_focus_on = no
-	}
-	abort = {
-		NOT = {
-			country_exists = FIN
-		}
-	}
-	
-	ai_strategy = {
-		type = antagonize
-		id = "FIN"			
-		value = 200
-	}	
-}
-
-stop_early_conquest = {
+EAI_stop_early_conquest = {
 	enable = {
 		tag = SOV
 		NOT = { date > 1939.11.1 }
@@ -607,10 +564,138 @@ stop_early_conquest = {
  	}
 }
 
-claims_on_turkey = {
+########################
+#	vanilla
+########################
+
+southern_thrust = {
+	allowed = {
+		original_tag = SOV
+	}
 	enable = {
-		tag = SOV
-		has_completed_focus = SOV_claim_on_the_straits
+		has_completed_focus = SOV_the_southern_thrust
+		OR = {
+			country_exists = IRQ
+			country_exists = PER
+			country_exists = AFG
+		}
+	}
+	abort = {
+		NOT = {
+			country_exists = IRQ
+			country_exists = PER
+			country_exists = AFG
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "PER"			
+		value = 200
+	}
+	ai_strategy = {
+		type = antagonize
+		id = "AFG"			
+		value = 150
+	}	
+	ai_strategy = {
+		type = antagonize
+		id = "IRQ"			
+		value = 100
+	}	
+}
+
+claims_on_poland = {
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_completed_focus = SOV_claims_on_poland
+		country_exists = POL
+	}
+	abort = {
+		NOT = {
+			country_exists = POL
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "POL"			
+		value = 200
+	}	
+}
+
+claims_on_baltic = {
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_completed_focus = SOV_claims_in_baltic
+		OR = {
+			country_exists = LAT
+			country_exists = LIT
+		}
+	}
+	abort = {
+		NOT = {
+			country_exists = LAT
+			country_exists = LIT
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "LAT"			
+		value = 200
+	}	
+	ai_strategy = {
+		type = antagonize
+		id = "LIT"			
+		value = 200
+	}
+	ai_strategy = {
+		type = antagonize
+		id = "EST"			
+		value = 200
+	}
+}
+
+claims_on_finland = {
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_completed_focus = SOV_baltic_security
+		country_exists = FIN
+		NOT = { controls_state = 146 } #Karelija
+		date > 1940.8.1
+	}
+	abort = {
+		OR = {
+			NOT = {
+				country_exists = FIN
+			}
+			FIN = {
+				has_government = ROOT
+			}
+			controls_state = 146 #Karelija
+		}
+	}
+	
+	ai_strategy = {
+		type = antagonize
+		id = "FIN"			
+		value = 200
+	}	
+}
+
+claims_on_turkey = {
+	allowed = {
+		original_tag = SOV
+	}
+	enable = {
+		has_completed_focus = SOV_demand_balkan_submission
 		country_exists = TUR
 	}
 	abort = {
@@ -627,9 +712,11 @@ claims_on_turkey = {
 }
 
 claims_on_romania = {
+	allowed = {
+		original_tag = SOV
+	}
 	enable = {
-		tag = SOV
-		has_completed_focus = SOV_claim_bessarabia
+		has_completed_focus = SOV_claim_on_bessarabia
 		country_exists = ROM
 	}
 	abort = {
@@ -646,9 +733,11 @@ claims_on_romania = {
 }
 
 claims_on_sinkiang = {
+	allowed = {
+		original_tag = SOV
+	}
 	enable = {
-		tag = SOV
-		has_completed_focus = SOV_claim_on_sinkiang
+		has_completed_focus = SOV_spheres_of_influence_in_china
 		country_exists = CHI
 	}
 	abort = {
@@ -687,10 +776,12 @@ japan_ally = {
 }
 
 germany_ally = {
+	allowed = {
+		original_tag = SOV
+	}
 	enable = {
-		tag = SOV
 		OR = { 
-			has_completed_focus = SOV_anti_capitalist_diplomacy
+			has_completed_focus = SOV_anti_capitalist_policies
 			GER = { has_completed_focus = GER_soviet_ally }
 		}
 		country_exists = GER
@@ -712,9 +803,11 @@ germany_ally = {
 }
 
 germany_enemy = {
+	allowed = {
+		original_tag = SOV
+	}
 	enable = {
-		tag = SOV
-		has_completed_focus = SOV_anti_fascist_diplomacy
+		has_completed_focus = SOV_anti_fascist_policies
 		country_exists = GER
 		OR = {
 			date > 1942.1.1

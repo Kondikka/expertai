@@ -10,7 +10,7 @@ EAI_PC_set_global_variables = {
 
 	### BUILDING CONSTRUCTION COSTS
 
-	set_variable = { global.EAI_PC_BUILDING_INFRASTRUCTURE_COST   = 3000 }
+	set_variable = { global.EAI_PC_BUILDING_INFRASTRUCTURE_COST   = 6000 }
 	set_variable = { global.EAI_PC_BUILDING_AIRBASE_COST          = 1250 }
 	set_variable = { global.EAI_PC_BUILDING_ANTIAIR_COST          = 2500 }
 	set_variable = { global.EAI_PC_BUILDING_RADAR_COST            = 3375 }
@@ -279,11 +279,11 @@ EAI_PC_start_project = {
 						x = "[?ROOT.EAI_PC_project]"
 					}
 
+					if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: type = [?ROOT.EAI_PC_project_building_type^-1], civ = [?EAI_PC_project_assigned_factories^-1], loc = [PREV.GetName], days = [?EAI_PC_project_construction_duration^EAI_PC_project]" }
+
 					clear_variable = EAI_PC_project
 					clear_variable = EAI_PC_project_type
 					clear_variable = EAI_PC_new_project
-
-					if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIORITY CONSTRUCTION: type = [?ROOT.EAI_PC_project_building_type^-1], civ = [?EAI_PC_project_assigned_factories^-1], loc = [PREV.GetName], days = [?EAI_PC_project_construction_duration^EAI_PC_project]" }
 				}
 			}
 		}
@@ -358,11 +358,11 @@ EAI_priority_construction_strategies = {
 
 			EAI_important_radar_constructions = yes
 
-			EAI_build_supply_line_GER_SOV = yes
+			# EAI_build_supply_line_GER_SOV = yes
 
-			EAI_build_supply_line_JAP_RAJ = yes
+			# EAI_build_supply_line_JAP_RAJ = yes
 
-			EAI_improve_north_africa_infrastructure = yes
+			# EAI_improve_north_africa_infrastructure = yes
 
 			EAI_resource_extraction = yes
 
@@ -385,6 +385,8 @@ EAI_important_radar_constructions = {
 			any_of_scopes = { array = controlled_states EAI_radar_location_2 = yes EAI_available_RADAR = yes }
 		}
 
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_important_radar_constructions" }
+
 		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 4 }
 
 		random_scope_in_array = { array = controlled_states limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes EAI_PC_can_build_project = yes }
@@ -405,6 +407,8 @@ EAI_improve_north_africa_infrastructure = {
 		set_temp_variable = { supply_line_start = 448.id } # tripoli
 		set_temp_variable = { supply_line_target = 446.id } # cairo
 		EAI_build_supply_line = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_improve_north_africa_infrastructure" }
 	}
 
 	if = { 
@@ -416,76 +420,9 @@ EAI_improve_north_africa_infrastructure = {
 		set_temp_variable = { supply_line_start = 446.id }
 		set_temp_variable = { supply_line_target = 448.id }
 		EAI_build_supply_line = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_improve_north_africa_infrastructure" }
 	}
-
-	# if = { 
-	# 	limit = { 
-	# 		check_variable = { ROOT.EAI_PC_active_projects < 5 } 
-
-	# 		OR = {
-	# 			AND = {
-	# 				has_war = yes 
-					
-	# 				num_of_civilian_factories_available_for_projects > 15
-			
-	# 				any_enemy_country = {
-	# 					any_of_scopes = { array = controlled_states
-	# 						OR = { region = 126 region = 128 } 
-	# 					}
-	# 				}
-	# 			}
-
-	# 			AND = {
-	# 				tag = ITA
-	# 				date > 1938.1.1
-	# 			}
-	# 		}
-
-	# 		any_of_scopes = { array = controlled_states
-
-	# 			OR = { region = 126 state = 452 state = 447 state = 446 } 
-	# 			is_coastal = yes 
-	# 			free_building_slots = { building = infrastructure size > 0 include_locked = no } 
-	# 			infrastructure < 8
-	# 		}
-	# 	}
-
-	# 	set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
-
-	# 	set_temp_variable = { EAI_best_target = 0 }
-	# 	set_temp_variable = { EAI_best_target_score = 0 }
-
-	# 	# find the best target
-	# 	for_each_scope_loop = { array = controlled_states 
-		
-	# 		if = {
-	# 			limit = { 
-	# 				OR = { region = 126 state = 452 state = 447 state = 446 } 
-	# 				is_coastal = yes 
-	# 				EAI_PC_can_build_project = yes
-	# 				infrastructure < 8 
-	# 			}
-
-	# 			# get score
-	# 			set_variable = { EAI_score = 10 }
-	# 			subtract_from_variable = { EAI_score = building_level@infrastructure }
-	# 			if = { limit = { NOT = { EAI_no_enemy_border = yes } } multiply_variable = { EAI_score = 1.5 } }
-
-	# 			# compare with best score
-	# 			if = { limit = { check_variable = { EAI_score > EAI_best_target_score } } 
-
-	# 				set_temp_variable = { EAI_best_target = THIS.id } 
-	# 				set_temp_variable = { EAI_best_target_score = EAI_score } 
-	# 			}
-	# 		}
-	# 	}
-
-	# 	# target was found
-	# 	if = { limit = { check_variable = { EAI_best_target_score > 0 } }
-
-	# 		var:EAI_best_target = { EAI_PC_start_project = yes }
-	# 	}
-	# }
 }
 
 EAI_resource_extraction = {
@@ -500,15 +437,17 @@ EAI_resource_extraction = {
 				EAI_PC_can_build_project = yes
 
 				OR = {
-					AND = { has_resources_amount = { resource = oil amount > 20 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
-					AND = { has_resources_amount = { resource = aluminium amount > 20 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
-					AND = { has_resources_amount = { resource = rubber amount > 20 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
-					AND = { has_resources_amount = { resource = tungsten amount > 20 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
-					AND = { has_resources_amount = { resource = steel amount > 20 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
-					AND = { has_resources_amount = { resource = chromium amount > 20 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
+					AND = { has_resources_amount = { resource = oil amount > 50 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
+					AND = { has_resources_amount = { resource = aluminium amount > 50 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
+					AND = { has_resources_amount = { resource = rubber amount > 50 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
+					AND = { has_resources_amount = { resource = tungsten amount > 50 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
+					AND = { has_resources_amount = { resource = steel amount > 50 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
+					AND = { has_resources_amount = { resource = chromium amount > 50 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
 				}
 			}
 		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_resource_extraction" }
 
 		EAI_priority_queue_INF_resource = yes
 	}
@@ -565,6 +504,8 @@ EAI_convert_MIC_to_CIC_resource_shortage = {
 				}
 			}
 		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_convert_MIC_to_CIC_resource_shortage" }
 
 		EAI_priority_convert_MIC_to_CIC = yes
 	}
@@ -625,6 +566,8 @@ EAI_convert_MIC_to_CIC_industrial_expansion = {
 			has_war = no
 			num_of_civilian_factories_available_for_projects > 14
 		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_convert_MIC_to_CIC_industrial_expansion" }
 
 		set_temp_variable = { EAI_PC_ignore_factory_limit = 1 }
 		EAI_priority_convert_MIC_to_CIC = yes
@@ -799,7 +742,7 @@ EAI_get_shared_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_shared_slot_scores ======="
 		for_each_scope_loop = { array = EAI_shared_slot_scores
@@ -851,7 +794,7 @@ EAI_get_infrastructure_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 	
 		log = "======= PRINTING EAI_infrastructure_slot_scores ======="
 		for_each_scope_loop = { array = EAI_infrastructure_slot_scores
@@ -862,7 +805,7 @@ EAI_get_infrastructure_slot_scores = {
 }
 EAI_get_infrastructure_slot_score = {
 	
-	set_variable = { EAI_infrastructure_slot_score = 11 }
+	set_variable = { EAI_infrastructure_slot_score = 6 }
 	set_temp_variable = { t1 = building_level@infrastructure }
 	multiply_temp_variable = { t1 = 1.5 }
 	subtract_from_variable = { EAI_infrastructure_slot_score = t1 }
@@ -907,7 +850,7 @@ EAI_get_resource_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_resource_slot_scores ======="
 		for_each_scope_loop = { array = EAI_resource_slot_scores
@@ -992,7 +935,7 @@ EAI_get_radar_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_radar_slot_scores ======="
 		for_each_scope_loop = { array = EAI_radar_slot_scores
@@ -1063,7 +1006,7 @@ EAI_get_airbase_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_airbase_slot_scores ======="
 		for_each_scope_loop = { array = EAI_airbase_slot_scores
@@ -1126,7 +1069,7 @@ EAI_get_antiair_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_antiair_slot_scores ======="
 		for_each_scope_loop = { array = EAI_antiair_slot_scores
@@ -1195,7 +1138,7 @@ EAI_get_mil_to_civ_conversion_slot_scores = {
 		}
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging }
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
 
 		log = "======= PRINTING EAI_mil_to_civ_conversion_slot_scores ======="
 		for_each_scope_loop = { array = EAI_mil_to_civ_conversion_slot_scores
@@ -1224,6 +1167,8 @@ EAI_get_mil_to_civ_conversion_slot_score = {
 # civilian factories
 EAI_queue_CIC = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_CIC" }
+
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 
 		EAI_get_shared_slot_scores = yes
@@ -1234,7 +1179,7 @@ EAI_queue_CIC = {
 		if = { 
 			limit = {
 				EAI_available_SHARED = yes
-				infrastructure > 3
+				infrastructure > 1
 			}
 
 			EAI_add_CIC = yes
@@ -1248,6 +1193,8 @@ EAI_queue_CIC = {
 	}
 }
 EAI_queue_CIC_2 = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_CIC_2" }
 
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 	
@@ -1270,6 +1217,8 @@ EAI_queue_CIC_2 = {
 # military factories
 EAI_queue_MIC = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_MIC" }
+
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 	
 		EAI_get_shared_slot_scores = yes
@@ -1280,7 +1229,7 @@ EAI_queue_MIC = {
 		if = { 
 			limit = { 
 				EAI_available_SHARED = yes
-				infrastructure > 3
+				infrastructure > 1
 			}
 
 			EAI_add_MIC = yes
@@ -1294,6 +1243,8 @@ EAI_queue_MIC = {
 	}
 }
 EAI_queue_MIC_2 = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_MIC_2" }
 
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 	
@@ -1315,6 +1266,8 @@ EAI_queue_MIC_2 = {
 
 # dockayrds
 EAI_queue_NIC = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_NIC" }
 
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 	
@@ -1342,6 +1295,8 @@ EAI_queue_NIC = {
 
 # refineries
 EAI_queue_REF = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_REF" }
 
 	if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
 	
@@ -1385,7 +1340,7 @@ EAI_queue_REF = {
 					EAI_add_REF = yes
 					set_temp_variable = { break = 1 }
 
-					if = { limit = { ROOT = { has_country_flag = EAI_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [This.GetName]" } 
+					if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: replacing MIC with REF in [This.GetName]" } 
 				}
 				else = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
 			}
@@ -1395,6 +1350,8 @@ EAI_queue_REF = {
 
 # silos
 EAI_queue_SILO = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_SILO" }
 
 	if = { limit = { has_tech = fuel_silos }
 
@@ -1422,6 +1379,8 @@ EAI_queue_SILO = {
 # infrastructure
 EAI_queue_INF = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_INF" }
+
 	if = { limit = { check_variable = { EAI_has_infrastructure_slot_scores = 0 } }
 	
 		EAI_get_infrastructure_slot_scores = yes
@@ -1444,6 +1403,8 @@ EAI_queue_INF = {
 
 # infrastructure for resources
 EAI_queue_INF_resource = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_INF_resource" }
 
 	if = { limit = { check_variable = { EAI_has_resource_slot_scores = 0 } }
 	
@@ -1471,6 +1432,8 @@ EAI_queue_INF_resource = {
 }
 EAI_priority_queue_INF_resource = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_priority_queue_INF_resource" }
+
 	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } }
 
 		if = { limit = { check_variable = { EAI_has_resource_slot_scores = 0 } }
@@ -1493,6 +1456,8 @@ EAI_priority_queue_INF_resource = {
 
 # radar
 EAI_queue_RADAR = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_RADAR" }
 
 	if = { limit = { has_tech = radio_detection }
 
@@ -1520,6 +1485,8 @@ EAI_queue_RADAR = {
 # airbase
 EAI_queue_AIR = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_AIR" }
+
 	if = { limit = { check_variable = { EAI_has_airbase_slot_scores = 0 } }
 	
 		EAI_get_airbase_slot_scores = yes
@@ -1540,6 +1507,8 @@ EAI_queue_AIR = {
 
 # antiair
 EAI_queue_AA = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_AA" }
 
 	if = { limit = { check_variable = { EAI_has_antiair_slot_scores = 0 } }
 	
@@ -1563,6 +1532,8 @@ EAI_queue_AA = {
 
 # mil to civ conversion
 EAI_priority_convert_MIC_to_CIC = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_priority_convert_MIC_to_CIC" }
 
 	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 } }
 
@@ -1588,11 +1559,14 @@ EAI_priority_convert_MIC_to_CIC = {
 
 # for building INF to increase supply
 EAI_queue_INF_supply = { 
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_INF_supply" }
+
 	if = {
 		limit = {
 			any_of_scopes = { array = controlled_states
 				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				free_building_slots = { building = infrastructure size > 2 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
 				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
 			}
@@ -1601,7 +1575,7 @@ EAI_queue_INF_supply = {
 		random_scope_in_array = { array = controlled_states
 			limit = {
 				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				free_building_slots = { building = infrastructure size > 2 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
 				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT strength_ratio = { tag = ROOT ratio > 0.5 } } }
 			}
@@ -1612,7 +1586,7 @@ EAI_queue_INF_supply = {
 		limit = {
 			any_of_scopes = { array = controlled_states
 				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				free_building_slots = { building = infrastructure size > 2 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
 				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
 			}
@@ -1620,7 +1594,7 @@ EAI_queue_INF_supply = {
 		random_scope_in_array = { array = controlled_states
 			limit = {
 				EAI_available_INF = yes
-				free_building_slots = { building = infrastructure size > 5 include_locked = no }
+				free_building_slots = { building = infrastructure size > 2 include_locked = no }
 				ROOT = { divisions_in_state = { state = PREV size > 5 } }
 				any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
 			}
@@ -1631,6 +1605,8 @@ EAI_queue_INF_supply = {
 
 # build forts on victory points in a state
 EAI_queue_FORT_CITIES = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_FORT_CITIES" }
 	
 	random_scope_in_array = { array = controlled_states
 		limit = {
@@ -1645,6 +1621,8 @@ EAI_queue_FORT_CITIES = {
 
 # build forts on every border province of a state
 EAI_queue_FORT_BORDER = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_FORT_BORDER" }
 
 	random_scope_in_array = { array = controlled_states
 		limit = { 
@@ -1661,6 +1639,8 @@ EAI_queue_FORT_BORDER = {
 # build coastal forts on naval bases in a state
 EAI_queue_CFORT_BASES = {
 
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_CFORT_BASES" }
+
 	random_scope_in_array = { array = controlled_states
 		limit = { 
 			is_controlled_by = ROOT 
@@ -1676,6 +1656,8 @@ EAI_queue_CFORT_BASES = {
 
 # build coastal forts on every coastal province in a state
 EAI_queue_CFORT_COAST = {
+
+	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_queue_CFORT_COAST" }
 
 	random_scope_in_array = { array = controlled_states
 		limit = { 
@@ -1694,26 +1676,31 @@ EAI_queue_CFORT_COAST = {
 EAI_add_CIC = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_CIC in [?This.id] [This.GetName]" }
 	add_building_construction = { type = industrial_complex level = 1 instant_build = no }
+	add_to_variable = { ROOT.EAI_construction_CIC_added = 1 }
 }
 
 EAI_add_MIC = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_MIC in [?This.id] [This.GetName]" }
 	add_building_construction = { type = arms_factory level = 1 instant_build = no }
+	add_to_variable = { ROOT.EAI_construction_MIC_added = 1 }
 }
 
 EAI_add_NIC = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_NIC in [?This.id] [This.GetName]" }
 	add_building_construction = { type = dockyard level = 1 instant_build = no }
+	add_to_variable = { ROOT.EAI_construction_NIC_added = 1 }
 }
 
 EAI_add_REF = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_REF in [?This.id] [This.GetName]" }
 	add_building_construction = { type = synthetic_refinery level = 1 instant_build = no }
+	add_to_variable = { ROOT.EAI_construction_REF_added = 1 }
 }
 
 EAI_add_INF = {
 	if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_add_INF in [?This.id] [This.GetName]" }
 	add_building_construction = { type = infrastructure level = 1 instant_build = no }
+	add_to_variable = { ROOT.EAI_construction_INF_added = 1 }
 }
 
 EAI_add_RADAR = {

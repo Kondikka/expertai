@@ -38,7 +38,13 @@ country_event = {
 	}
 	option = { # Refuse
 		name = france.1.b
-		ai_chance = { factor = 25 }
+		ai_chance = { 
+			factor = 25 
+			modifier = {
+				is_historical_focus_on = yes
+				factor = 0
+			}
+		}
 		JAP = {
 			country_event = { days = 5 id = japan.7 }
 		}
@@ -555,7 +561,7 @@ country_event = {
 			}
 		}
 		FRA = {
-			set_capital = 539
+			set_capital = { state = 539 }
 			if = {
 				limit = {
 					has_dlc = "La Resistance"
@@ -692,7 +698,7 @@ country_event = {
 		random_other_country = {
 			limit = { original_tag = FRA has_government = fascism }
 			ROOT = { puppet = PREV }
-			set_capital = 26
+			set_capital = { state = 26 }
 			set_politics = {
 				ruling_party = fascism
 				elections_allowed = no
@@ -879,7 +885,7 @@ country_event = {
             }
         }
 		FRA = {
-			set_capital = 539
+			set_capital = { state = 539 }
 			hidden_effect = {
 					set_state_controller = 26
 					set_state_controller = 22
@@ -1011,7 +1017,7 @@ country_event = {
 		random_other_country = {
 			limit = { original_tag = FRA has_government = neutrality }
 			ROOT = { puppet = PREV }
-			set_capital = 26
+			set_capital = { state = 26 }
 			set_politics = {
 				ruling_party = neutrality
 				elections_allowed = no
@@ -1057,7 +1063,7 @@ country_event = {
 					}
 					controls_state = 635
 				}
-				set_capital = 635
+				set_capital = { state = 635 }
 			}
 			country_event = france.20
 			every_owned_state = {
@@ -1149,7 +1155,7 @@ country_event = {
 					can_create_factions = no
 					can_not_declare_war = yes
 				}
-				set_capital = 26
+				set_capital = { state = 26 }
 				set_politics = {
 					ruling_party = fascism
 					elections_allowed = no
@@ -1360,18 +1366,17 @@ country_event = {
 		custom_effect_tooltip = france.20.a_tt
 		set_country_flag = france_de_gaulle
 		hidden_effect =  {
-			create_country_leader = {
-				name = "Charles de Gaulle"
-				desc = "POLITICS_CHARLES_DE_GAULLE_DESC"
-				picture = "Portrait_France_Charles_De_Gaulle.dds"
-				expire = "1965.1.1"
-				ideology = conservatism
-				traits = {
-					
+			add_country_leader_role = {
+				character = FRA_charles_de_gaulle
+				country_leader = {
+					expire = "1965.1.1"
+					ideology = conservatism
+					traits = {
+					}	
 				}
-			}
+				promote_leader = yes				
+			}		
 		}
-		
 		name = france.20.a
 	}
 }
@@ -1526,7 +1531,10 @@ country_event = {
 			factor = 90
 			modifier = {
 				factor = 0
-				is_in_faction_with = YUG
+				OR = {
+					is_in_faction_with = YUG
+					has_war_with = GER
+				}
 			}
 		}
 		if = {
@@ -1574,8 +1582,15 @@ country_event = {
 				is_in_faction_with = GER
 			}
 		}
-		add_political_power = -200
-		add_opinion_modifier = { target = GER modifier = condemn_aggression }
+		if = {
+			limit = {
+				NOT = {
+					has_war_with = GER
+				}
+			}
+			add_political_power = -200
+			add_opinion_modifier = { target = GER modifier = condemn_aggression }
+		}
 		YUG = { 
 			country_event = { id = yugoslavia.4 days = 1 }
 			add_opinion_modifier = { target = FRA modifier = offered_support }
@@ -1663,9 +1678,9 @@ country_event = {
 	desc = france.26.d
 	picture = GFX_report_event_hitler_croatia_handshake
 
-	is_triggered_only	= yes
+	is_triggered_only = yes
 
-	option = {
+	option = { #stand together
 		name = france.26.a
 		ai_chance = {
 			factor = 90
@@ -1855,44 +1870,45 @@ country_event = {
 
 # Édouard Daladier Resigns
 country_event = {
-    id = france.31
-    title = france.31.t
-    desc = france.31.d
-    picture = GFX_report_event_german_parade_paris
- 
-    fire_only_once = yes
- 
-    trigger = {
-        original_tag = FRA
-        has_government = democratic
-        has_global_flag = fall_of_france
-        NOT = { has_country_flag = france_de_gaulle }
-    } 
+	id = france.31
+	title = france.31.t
+	desc = france.31.d
+	picture = GFX_report_event_german_parade_paris
 
-    mean_time_to_happen = {
-        days = 7
-    }
+	fire_only_once = yes
 
-    option = {
-        name = france.31.a
-        retire_country_leader = yes
-        create_country_leader = {
-        	name = "Paul Reynaud"
-        	desc = "POLITICS_PAUL_REYNAUD_DESC"
-        	picture = "Portrait_France_Paul_Reynaud.dds"
-        	expire = "1965.1.1"
-        	ideology = liberalism
-        	traits = {
-            }
-        }
-        set_country_flag = daladier_resigned
-      }
+	trigger = {
+		original_tag = FRA
+		has_government = democratic
+		has_global_flag = fall_of_france
+		NOT = { has_country_flag = france_de_gaulle }
+	} 
+
+	mean_time_to_happen = {
+		days = 7
+	}
+
+	option = {
+		name = france.31.a
+		retire_country_leader = yes
+		add_country_leader_role = {
+			character = FRA_paul_reynaud
+			country_leader = {
+				expire = "1965.1.1"
+				ideology = liberalism
+				traits = {
+				}
+			}
+			promote_leader = yes
+		}
+		set_country_flag = daladier_resigned
+	}
 }
 
 # Hidden event to add AI values for nationalist spain if France is going fascist
 country_event = {
-    id = france.32
-    hidden = yes
+	id = france.32
+	hidden = yes
  
     fire_only_once = yes
 
@@ -1932,8 +1948,8 @@ country_event = {
     }
 
     option = {
-        name = france.32.a
-     }
+		name = france.32.a
+    }
 }
 
 # Britain is at peace after annexing France in the Franco-British Union

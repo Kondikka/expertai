@@ -2,6 +2,76 @@
 #	Expert AI mod - scripted law AI triggers
 ######################################################
 
+EAI_law_upgrade_special_prio = {
+
+	if = { limit = { has_focus_tree = soviet_focus has_completed_focus = SOV_the_centre }
+
+		has_completed_focus = SOV_secure_the_administration
+	}
+	else = { always = yes }
+}
+
+EAI_store_pp_prio = {
+
+	NOT = {
+
+		AND = {
+			date < 1938.1.1
+			has_available_idea_with_traits = { idea = silent_workhorse limit = 1 }
+			NOT = { has_idea_with_trait = silent_workhorse }
+		}
+
+		AND = {
+			EAI_can_take_women_in_the_workforce = yes
+		}
+	}
+
+	### Law cost reduction
+	
+	if = { limit = { has_focus_tree = soviet_focus has_completed_focus = SOV_the_centre has_country_flag = EAI_improved_worker_conditions_taken }
+
+		OR = {
+			has_completed_focus = SOV_secure_the_administration
+			focus_progress = { focus = SOV_secure_the_administration progress > 0 }
+		}
+	}
+	else = { always = yes }
+
+	### SOV really needs to get these done
+
+	if = {
+		limit = {
+			has_focus_tree = soviet_focus
+			has_completed_focus = SOV_claims_in_baltic
+			is_historical_focus_on = yes
+			is_subject = no
+			date > 1940.4.1
+			date < 1941.1.1
+			has_political_power < 100
+		}
+
+		NOT = {
+			any_country =  {
+				OR = { tag = EST tag = LAT tag = LIT }
+
+				NOT = { has_war_with = ROOT }
+
+				# SOV_basic_ultimatum_triggers
+				country_exists = THIS
+				NOT = { has_war_with = ROOT }
+				NOT = { is_in_faction_with = ROOT } #CAN'T SEND ULTIMATUMS TO ALLIES OR SUBJECTS
+				#OR = { #Can send Ultimatum to non-allies or puppets (but not to faction allies)
+				#	NOT = { is_in_faction_with = ROOT }
+				#	is_Subject_of = ROOT
+				#}
+				NOT = { has_country_flag = SOV_ultimatum_sent_flag }
+			}
+		}
+	}
+}
+
+###
+
 EAI_can_upgrade_economy_law = {
 	OR = {
 		EAI_can_take_civilian_economy = yes
@@ -51,7 +121,7 @@ EAI_can_take_civilian_economy = {
 
 	NOT = { original_tag = USA }
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -82,7 +152,7 @@ EAI_can_take_low_economic_mobilisation = {
 
 	date < 1938.1.1
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -131,7 +201,7 @@ EAI_can_take_partial_economic_mobilisation = {
 
 	has_war_support > 0.25 # to avoid the AI having to demobilize
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -232,19 +302,19 @@ EAI_can_take_war_economy = {
 		}
 	}
 
+	### Country specific stuff
+
 	has_war_support > 0.55 # to avoid the AI having to demobilize
 
-
-	###
-
 	if = { limit = { original_tag = JAP }
+
 		OR = {
 			has_completed_focus = JAP_national_mobilization_law
 			is_historical_focus_on = no
 		}
 	}
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -378,7 +448,7 @@ EAI_can_take_volunteer_only = {
 
 	has_manpower < 750000
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -411,11 +481,18 @@ EAI_can_take_limited_conscription = {
 	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	OR = {
-		original_tag = SOV
 		has_manpower < 750000
+
+		AND = {
+			has_war = yes
+			set_temp_variable = { manpower_reserve = manpower_k }
+			multiply_temp_variable = { manpower_reserve = 10 }
+			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+			check_variable = { manpower_reserve > 0.4 }
+		}
 	}
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -479,11 +556,18 @@ EAI_can_take_extensive_conscription = {
 	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
 	OR = {
-		original_tag = SOV
 		has_manpower < 250000
+
+		AND = {
+			has_war = yes
+			set_temp_variable = { manpower_reserve = manpower_k }
+			multiply_temp_variable = { manpower_reserve = 10 }
+			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+			check_variable = { manpower_reserve > 0.4 }
+		}
 	}
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -559,7 +643,17 @@ EAI_can_take_service_by_requirement = {
 
 	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
-	has_manpower < 1000000
+	OR = {
+		has_manpower < 1000000
+
+		AND = {
+			has_war = yes
+			set_temp_variable = { manpower_reserve = manpower_k }
+			multiply_temp_variable = { manpower_reserve = 10 }
+			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+			check_variable = { manpower_reserve > 0.4 }
+		}
+	}
 
 	########## LAW REQUIREMENTS
 
@@ -639,7 +733,17 @@ EAI_can_take_all_adults_serve = {
 
 	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
-	has_manpower < 250000
+	OR = {
+		has_manpower < 250000
+
+		AND = {
+			has_war = yes
+			set_temp_variable = { manpower_reserve = manpower_k }
+			multiply_temp_variable = { manpower_reserve = 10 }
+			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+			check_variable = { manpower_reserve > 0.2 }
+		}
+	}
 
 	amount_manpower_in_deployment_queue < 250000
 
@@ -719,7 +823,17 @@ EAI_can_take_scraping_the_barrel = {
 
 	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
-	has_manpower < 250000
+	OR = {
+		has_manpower < 250000
+
+		AND = {
+			has_war = yes
+			set_temp_variable = { manpower_reserve = manpower_k }
+			multiply_temp_variable = { manpower_reserve = 10 }
+			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+			check_variable = { manpower_reserve > 0.1 }
+		}
+	}
 
 	amount_manpower_in_deployment_queue < 250000
 
@@ -844,15 +958,15 @@ EAI_can_take_free_trade = {
 		has_government = neutrality
 		has_government = democratic
 		NOT = { EAI_major_country = yes }
-		AND = { tag = GER date < 1938.6.1 }
-		AND = { tag = SOV date < 1940.6.1 }
+		# AND = { tag = GER date < 1938.6.1 }
+		# AND = { tag = SOV date < 1940.6.1 }
 	}
 
 	###
 
 	check_variable = { var = EAI_average_resource_need value = 0.15 compare = less_than }
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 		
 	########## LAW REQUIREMENTS
 
@@ -932,7 +1046,7 @@ EAI_can_take_export_focus = {
 		}
 	}
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -975,7 +1089,7 @@ EAI_can_take_limited_exports = {
 		}
 	}
 
-	NOT = { EAI_pp_advisor_prio = yes }
+	EAI_store_pp_prio = yes
 	
 	########## LAW REQUIREMENTS
 

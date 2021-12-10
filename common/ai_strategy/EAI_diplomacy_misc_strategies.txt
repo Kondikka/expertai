@@ -2,16 +2,48 @@
 #	Expert AI mod - diplomacy
 ############################################################################################################
 
-# Operation Countenance - stop allies from sending troops
 EAI_operation_countenance = {
-	enable = { 
-		has_global_flag = EAI_operation_countenance_started
-		capital_scope = { is_on_continent = europe }
-		is_in_faction_with = PER
+	allowed = { OR = { tag = ENG tag = SOV tag = RAJ } }
+	enable = {
+		has_global_flag = EAI_operation_countenance
+		is_neighbor_of = PER
 	}
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = dont_defend_ally_borders id = "PER" value = 5000 }
+	ai_strategy = { type = conquer id = "PER" value = 200 }
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		tag = PER
+
+		execution_type = rush
+		execute_order = yes
+	}
+	ai_strategy = {
+		type = front_unit_request
+		tag = PER 				
+		value = 100				
+	}
+}
+
+EAI_operation_countenance_PER = { # Without this, the invasion becomes a clusterfuck of hundreds of thousands of troops instead of a minor operation with 1k casualties
+	allowed = { tag = PER }
+	enable = {
+		has_global_flag = EAI_operation_countenance
+		SOV = { is_ai = yes } # No freebies for players
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		tag = SOV 				
+		value = -200				
+	}
+	ai_strategy = {
+		type = front_unit_request
+		tag = RAJ 				
+		value = -200				
+	}
 }
 
 ### Comintern should not give access to allies
@@ -170,7 +202,7 @@ EAI_GER_SOV_non_aggression_pact = {
 	ai_strategy = { type = diplo_action_desire id = SOV target = non_aggression_pact value = 500 }
 	ai_strategy = { type = diplo_action_acceptance id = SOV target = non_aggression_pact value = 500 }
 }
-EAI_SOV_GER_non_aggression_pact = { 
+EAI_SOV_GER_non_aggression_pact = {
 	allowed = { tag = SOV }
 	enable = {
 		is_historical_focus_on = yes
@@ -179,10 +211,6 @@ EAI_SOV_GER_non_aggression_pact = {
 		SOV = { has_government = communism }
 		
 		GER = { has_completed_focus = GER_mol_rib_pact }
-		
-		NOT = {
-			SOV = { has_completed_focus = SOV_war_with_germany }
-		}
 		
 		NOT = {
 			GER = { has_war_with = SOV }
@@ -221,7 +249,7 @@ EAI_break_non_aggression_pact = {
 
 ### NAP between JAP and comintern
 
-EAI_JAP_SOV_non_aggression_pact = { 
+EAI_JAP_SOV_non_aggression_pact = {
 	allowed = {
 		OR = {
 			tag = JAP
@@ -245,7 +273,6 @@ EAI_JAP_SOV_non_aggression_pact = {
 		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
 
 		NOT = {
-			SOV = { has_completed_focus = SOV_war_with_japan }
 			JAP = { has_war_with = SOV }
 			JAP = { has_capitulated = yes is_subject = yes }
 			SOV = { has_capitulated = yes is_subject = yes }
@@ -283,7 +310,6 @@ EAI_JAP_SOV_non_aggression_pact_2 = {
 		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
 
 		NOT = {
-			SOV = { has_completed_focus = SOV_war_with_japan }
 			JAP = { has_war_with = SOV }
 			JAP = { has_capitulated = yes is_subject = yes }
 			SOV = { has_capitulated = yes is_subject = yes }

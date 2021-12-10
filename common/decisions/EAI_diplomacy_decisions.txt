@@ -232,7 +232,7 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 					}
 					
 					EAI_clear_naval_invasion_operation = yes
-					country_event = EAI_background.0 # update strategies
+					country_event = EAI_monthly_update.0 # update strategies
 				}
 
 				clr_country_flag = EAI_show_naval_invasion_decisions
@@ -271,7 +271,7 @@ EAI_diplomacy_naval_invasion_DECISIONS = {
 					}
 					
 					EAI_clear_naval_invasion_operation = yes
-					country_event = EAI_background.0 # update strategies
+					country_event = EAI_monthly_update.0 # update strategies
 				}
 
 				clr_country_flag = EAI_show_naval_invasion_decisions
@@ -331,7 +331,7 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 					}
 
 					EAI_clear_lend_lease_targets = yes
-					country_event = EAI_background.0 # update strategies
+					country_event = EAI_monthly_update.0 # update strategies
 				}
 
 				clr_country_flag = EAI_show_lend_lease_decisions
@@ -365,131 +365,11 @@ EAI_diplomacy_lend_lease_DECISIONS = {
 						EAI_PREV_on_same_side_with_THIS = yes
 					}
 					
-					country_event = EAI_background.0 # update strategies
+					country_event = EAI_monthly_update.0 # update strategies
 				}
 
 				clr_country_flag = EAI_show_lend_lease_decisions
 			}
-		}
-	}
-}
-
-operations = {
-
-	EAI_operation_countenance = {
-	    allowed = {}
-
-	    visible = {
-
-			always = no
-	    }
-
-	    available = {
-
-	    	always = no
-	    }
-
-		days_remove = 35
-
-		complete_effect = {
-
-			if = { limit = { is_ai = yes } 
-
-				PER = { add_to_array = { ROOT.EAI_prepare_for_war_targets = THIS.id } set_country_flag = { flag = EAI_prepare_for_war_from_@ROOT value = 1 days = 35 } }
-			}
-			if = { limit = { RAJ = { is_in_faction_with = ENG is_ai = yes } } 
-
-				PER = { add_to_array = { ROOT.EAI_prepare_for_war_targets = RAJ.id } set_country_flag = { flag = EAI_prepare_for_war_from_RAJ value = 1 days = 35 } }
-			}
-		}
-
-	    remove_effect = {
-
-			declare_war_on = {
-				target = PER
-				type = puppet_wargoal_focus
-			}
-		}
-	}
-
-	EAI_propose_operation_countenance = {
-		allowed = {}
-
-	    visible = {
-
-			NOT = { has_global_flag = EAI_operation_countenance_proposed }
-
-			any_enemy_country = {
-	            is_faction_leader = yes
-	            is_major = yes
-	        }
-
-	        OR = {
-	            AND = {
-	                original_tag = ENG
-	                has_war_together_with = SOV
-	            }
-	            AND = {
-	                original_tag = SOV
-	                is_faction_leader = yes
-	                has_war_together_with = ENG
-	            }
-	        }
-
-	        PER = {
-				exists = yes
-	        }
-	    }
-
-	    available = {
-
-	    	threat > 0.9
-
-			ENG = { any_allied_country = { any_neighbor_country = { tag = PER } } }
-			SOV = { any_neighbor_country = { tag = PER } }
-
-			PER = {
-				NOT = { 
-	                EAI_is_not_independent = yes 
-	                is_in_faction = yes
-	                has_war = yes
-	            }
-			}
-
-			NOT = {
-				ENG = { PER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
-	            SOV = { PER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
-			}
-	    }
-
-	    cost = 50
-
-	    remove_effect = {
-
-			set_global_flag = EAI_operation_countenance_proposed
-
-			if = { limit = { original_tag = ENG }
-				SOV = { country_event = EAI_DM.1300 }
-			}
-			else = {
-				ENG = { country_event = EAI_DM.1300 }
-			}
-		}
-	
-		ai_will_do = {
-			base = 0
-
-			modifier = {
-				add = 10
-
-				is_historical_focus_on = yes
-				is_major = yes
-				date > 1941.4.1
-				has_army_manpower = { size > 1000000 }
-			}
-			modifier = { factor = 2 date > 1941.8.1 }
-			modifier = { factor = 2 date > 1942.1.1 }
-			modifier = { factor = 2 date > 1942.6.1 }
 		}
 	}
 }

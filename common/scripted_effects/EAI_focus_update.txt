@@ -1,0 +1,411 @@
+############################################################################################################
+#	Expert AI mod - effects
+############################################################################################################
+
+EAI_focus_update = {
+
+	EAI_focus_switch_infantry_design = yes
+
+	EAI_focus_switch_upgrade_to_40w_inf = yes
+
+	EAI_focus_switch_light_to_medium_armor = yes
+
+	EAI_focus_switch_build_strategic_bombers = yes
+
+	EAI_focus_switch_build_naval_bombers = yes
+
+	EAI_focus_switch_minors_fleet_composition_1 = yes
+
+	EAI_focus_switch_minors_fleet_composition_2 = yes
+
+	EAI_focus_switch_minors_fleet_composition_3 = yes
+
+	EAI_focus_switch_minors_fleet_composition_4 = yes
+
+	EAI_focus_switch_build_carriers = yes
+
+	EAI_focus_switch_large_fleet_focus = yes
+
+	EAI_focus_switch_build_minesweepers = yes
+}
+
+############################################################################################################
+
+EAI_focus_switch_infantry_design = {
+
+	if = {
+		limit = {
+			NOT = { EAI_major_country = yes }
+
+			NOT = { has_country_flag = EAI_upgrade_inf_design }
+			
+			### CONDITIONS
+
+			date > 1940.1.1
+			
+			stockpile_ratio = { 
+				archetype = infantry_equipment
+				ratio > 4
+			}
+			
+			has_army_experience > 50
+			
+			has_equipment = { infantry_equipment > 50000 }
+		}
+
+		set_country_flag = EAI_upgrade_inf_design
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: upgrade infantry" } 
+	}
+}
+
+EAI_focus_switch_upgrade_to_40w_inf = {
+
+	if = {
+		limit = {
+			has_global_flag = EAI_challenging_Mode
+
+			NOT = { has_country_flag = EAI_FOCUS/LAND/infantry_width_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			NOT = { has_country_flag = EAI_inf_40w_upgrade }
+			
+			### CONDITIONS
+
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH }
+				check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_26W_INF_WIDTH }
+			}
+			
+			has_army_experience > 15
+			
+			has_equipment = { infantry_equipment > 10000 }
+		}
+
+		set_country_flag = EAI_inf_40w_upgrade
+
+		set_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: upgrade to 40w infantry" } 
+	}
+}
+
+EAI_focus_switch_light_to_medium_armor = {
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_FOCUS/LAND/attachment_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
+			
+			### CONDITIONS
+
+			date > 1945.1.1
+			
+			num_of_military_factories > 50
+		}
+
+		set_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: light -> medium armor" } 
+	}
+}
+
+EAI_focus_switch_build_strategic_bombers = {
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_FOCUS/AI/strategic_bomber_OVERRIDE }
+
+			check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_OFF }
+			
+			### CONDITIONS
+			
+			num_of_military_factories > 200
+			
+			date > 1943.1.1
+			
+			NOT = { any_neighbor_country = { has_war_with = ROOT } }
+		}
+
+		set_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: build strat bombers" } 
+	}
+}
+
+EAI_focus_switch_build_naval_bombers = {
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_FOCUS/AI/naval_bomber_OVERRIDE }
+
+			check_variable = { EAI_FOCUS/AIR/naval_bomber = global.EAI_OFF }
+			
+			### CONDITIONS
+
+			enemies_naval_strength_ratio > 1 
+
+			num_of_military_factories > 50
+		}
+
+		set_variable = { EAI_FOCUS/AIR/naval_bomber = global.EAI_ON }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: build naval bombers" } 
+	}
+}
+
+EAI_focus_switch_minors_fleet_composition_1 = {
+
+	if = {
+		limit = {
+			NOT = { has_global_flag = EAI_challenging_Mode }
+		
+			is_ai = yes
+
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battleship_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battlecruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/heavy_cruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/destroyer_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/light_cruiser_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			NOT = { check_variable = { EAI_fleet_comp = 1 } }
+
+			### CONDITIONS
+
+			num_of_naval_factories > 25
+		}
+
+		set_variable = { EAI_fleet_comp = 1 }
+
+		###
+
+		set_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
+
+		###
+
+		random_list = {
+			1 = { set_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_A_BB_DESIGN } }
+			1 = { set_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_ON } }
+		}
+
+		set_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_ON }
+
+		set_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_C_DD_DESIGN }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: fleet composition 1" } 
+	}
+}
+
+EAI_focus_switch_minors_fleet_composition_2 = {
+
+	if = {
+		limit = {
+			NOT = { has_global_flag = EAI_challenging_Mode }
+		
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battleship_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battlecruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/heavy_cruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/destroyer_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/light_cruiser_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			NOT = { check_variable = { EAI_fleet_comp = 2 } }
+
+			### CONDITIONS
+
+			num_of_naval_factories > 10
+			NOT = { num_of_naval_factories > 25 }
+		}
+
+		set_variable = { EAI_fleet_comp = 2 }
+
+		###
+
+		set_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
+
+		###
+
+		set_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_ON }
+
+		set_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_ON }
+
+		set_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_C_DD_DESIGN }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: fleet composition 2" } 
+	}
+}
+
+EAI_focus_switch_minors_fleet_composition_3 = {
+
+	if = {
+		limit = {
+			NOT = { has_global_flag = EAI_challenging_Mode }
+
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battleship_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battlecruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/heavy_cruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/destroyer_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			NOT = { check_variable = { EAI_fleet_comp = 3 } }
+
+			### CONDITIONS
+
+			num_of_naval_factories > 3
+			NOT = { num_of_naval_factories > 10 }
+		}
+
+		set_variable = { EAI_fleet_comp = 3 }
+
+		###
+
+		set_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
+		set_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
+
+		###
+
+		set_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_C_DD_DESIGN }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: fleet composition 3" } 
+	}
+}
+
+EAI_focus_switch_minors_fleet_composition_4 = {
+
+	if = {
+		limit = {
+			has_global_flag = EAI_challenging_mode
+
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battleship_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/battlecruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/heavy_cruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/light_cruiser_OVERRIDE }
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/destroyer_OVERRIDE }
+
+			NOT = { EAI_major_country = yes }
+
+			### CONDITIONS
+
+			num_of_naval_factories > 3
+		}
+
+		set_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_C_DD_DESIGN }
+		set_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_ON }
+	}
+}
+
+EAI_focus_switch_build_carriers = {
+
+	if = {
+		limit = {
+			NOT = { has_global_flag = EAI_challenging_Mode }
+		
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/carrier_OVERRIDE }
+
+			check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF }
+
+			### CONDITIONS
+			
+			num_of_naval_factories > 50
+
+			amount_research_slots > 4
+
+			if = { limit = { original_tag = GER is_historical_focus_on = yes } NOT = { SOV = { EAI_is_threat = yes } } }
+		}
+
+		set_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_B_CV_DESIGN }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: carrier focus" } 
+	}
+}
+
+EAI_focus_switch_large_fleet_focus = {
+
+	if = {
+		limit = {
+			NOT = { has_global_flag = EAI_challenging_Mode }
+
+			NOT = { has_country_flag = EAI_country_focuses_edited_by_player }
+
+			### CONDITIONS
+
+			num_of_naval_factories > 40
+
+			OR = {
+				AND = {
+					check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF }
+					check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF }
+				}
+				AND = {
+					check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
+					check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
+					check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
+				}
+				AND = {
+					check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF }
+				}
+			}
+
+			if = { limit = { original_tag = GER is_historical_focus_on = yes } NOT = { SOV = { EAI_is_threat = yes } } }
+			if = { limit = { original_tag = SOV is_historical_focus_on = yes } NOT = { GER = { EAI_is_threat = yes } } }
+		}
+
+		if = {
+			limit = {
+				check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF }
+				check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF }
+			}
+
+			set_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_C_DD_DESIGN }
+		}
+
+		if = {
+			limit = {
+				check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
+				check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
+				check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
+			}
+
+			random_list = {
+				1 = { set_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_ON } }
+				1 = { set_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_ON } }
+			}
+		}
+
+		set_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_B_CV_DESIGN }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: large fleet focus" } 
+	}
+}
+
+EAI_focus_switch_build_minesweepers = {
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_FOCUS/NAVY/mine_sweeper_OVERRIDE }
+
+			### CONDITIONS
+
+			check_variable = { EAI_FOCUS/NAVY/mine_sweeper = global.EAI_OFF }
+
+			has_country_flag = EAI_enemy_mines_on_our_coasts
+		}
+
+		set_variable = { EAI_FOCUS/NAVY/mine_sweeper = global.EAI_ON }
+
+		if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMY-SWITCH: mine sweepers focus" } 
+	}
+}

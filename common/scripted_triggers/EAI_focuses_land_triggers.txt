@@ -164,10 +164,27 @@ EAI_infantry_design_C = {
 }
 
 # ARMOR FOCUS
+EAI_larm_army_focus = {
+	NOT = { # incompatible
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
+	}
+	OR = {
+		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
+		check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_LARM_FOCUS }
+
+		AND = {
+			OR = { EAI_Light_Armor_Focus_PRESET = yes has_global_flag = EAI_random_focuses }
+			NOT = { has_variable = EAI_FOCUS/LAND/armor_focus has_variable = EAI_FOCUS/LAND/armor_focus_OVERRIDE }
+		}
+	}
+}
 EAI_marm_army_focus = {
 	NOT = { # incompatible
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } 
-		check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
 	}
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
@@ -181,8 +198,9 @@ EAI_marm_army_focus = {
 }
 EAI_harm_army_focus = {
 	NOT = { # incompatible
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } 
-		check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
 	}
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
@@ -414,7 +432,6 @@ EAI_signal_tech_focus = {
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH }
 	}
-	NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } }
 }
 EAI_military_police_tech_focus = {
 	# OR = {
@@ -443,6 +460,7 @@ EAI_LARM_tech_focus = {
 	date > 1936.2.1
 
 	OR = {
+		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
 		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
 		
 		EAI_LSPART_tech_focus = yes
@@ -453,10 +471,14 @@ EAI_LARM_tech_focus = {
 		num_of_military_factories > 15
 	}
 }
+EAI_LTD_tech_focus = {
+	always = no
+}
 EAI_LSPART_tech_focus = {
 	date > 1936.2.1
 
 	OR = {
+		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
 		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
 		check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN }
 	}
@@ -633,6 +655,10 @@ EAI_artillery_tech_focus = {
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_B_INF_DESIGN }
 		check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_C_INF_DESIGN }
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+			check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN }
+		}
 		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE }
 
 		AND = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } num_of_military_factories > 100 }
@@ -706,26 +732,22 @@ EAI_aa_tech_focus = {
 	}
 }
 EAI_anti_air_design_focus = {
-	NOT = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } }
-	OR = {
-		AND = {
-			is_major = no
-			num_of_military_factories > 6
-			NOT = { EAI_FTR_tech_focus = yes }
-		}
-	}
+	always = yes
+	# NOT = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } }
+	# OR = {
+	# 	AND = {
+	# 		is_major = no
+	# 		num_of_military_factories > 6
+	# 		NOT = { EAI_FTR_tech_focus = yes }
+	# 	}
+	# }
 }
 EAI_cancel_anti_air_design_focus = {
-	has_country_flag = EAI_anti_air_design_focus
-	is_major = yes
-	has_deployed_air_force_size = { size > 2000 }
-	NOT = { has_country_flag = EAI_stop_air_production_min_duration }
-}
-
-EAI_land_doctrine_tech_focus = {
-	OR = {
-		EAI_Land_Doctrine_Research_Focus_PRESET = yes
-	}
+	always = no
+	# has_country_flag = EAI_anti_air_design_focus
+	# is_major = yes
+	# has_deployed_air_force_size = { size > 2000 }
+	# NOT = { has_country_flag = EAI_stop_air_production_min_duration }
 }
 
 ############################################
@@ -740,34 +762,28 @@ EAI_garrison_production = {
 	}
 }
 
+EAI_light_armor_production = {
+	has_country_flag = EAI_larm_template_upgrade
+
+	check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
+}
+
 EAI_medium_armor_production = {
 	has_country_flag = EAI_marm_template_upgrade NOT = { has_country_flag = EAI_mod_template_upgrade }
 
 	check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
-	
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } # delay production
-		num_of_military_factories > 75
-	}
 }
 
 EAI_heavy_armor_production = {
 	has_country_flag = EAI_harm_template_upgrade NOT = { has_country_flag = EAI_mod_template_upgrade }
 
 	check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
-	
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } # delay production
-		num_of_military_factories > 75
-	}
 }
 
 EAI_modern_armor_production = {
 	has_country_flag = EAI_mod_template_upgrade
 
 	OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
-	
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } # delay production
-		num_of_military_factories > 75
-	}
 }
 
 EAI_motorized_attachment_production = {

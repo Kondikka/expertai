@@ -6,7 +6,7 @@ political_actions = {
 		icon = generic_research
 
 		allowed = {
-			always = no
+			always = yes
 		}
 
 		available = {
@@ -96,7 +96,7 @@ political_actions = {
 		cost = 100
 
 		complete_effect = {
-
+			set_country_flag = { flag = EAI_improved_worker_conditions_taken value = 1 days = 540 }
 		}
 
 		ai_will_do = {
@@ -110,13 +110,6 @@ political_actions = {
 				
 					AND = { has_stability < 0.8 NOT = { has_available_idea_with_traits = { idea = popular_figurehead limit = 1 } } }
 				}
-			}
-			
-			modifier = { 
-				factor = 0  
-	
-				has_available_idea_with_traits = { idea = military_theorist limit = 1 } 
-				NOT = { has_idea_with_trait = military_theorist } 
 			}
 			
 			modifier = { 
@@ -296,11 +289,78 @@ economy_decisions = {
 				remove_ideas = FRA_protected_by_the_maginot_line
 			}
 		}
-	}		
+	}
+
+	restructure_supply_system = { #one time boost to get a few cheap supply hubs
+
+
+		visible = { 
+			OR = {
+				is_major = no
+				AND = {
+					is_faction_leader = yes
+					num_of_factories < 51 #would be a minor if it wasn't for faction leader status
+				}
+			}
+		}
+		fire_only_once = yes
+
+		days_remove = 120
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				num_of_factories < 30
+				factor = 0
+			}
+		}
+
+		modifier = {
+			production_speed_supply_node_factor = 3
+		}
+
+		complete_effect = {
+			set_variable = { node_goal = num_of_supply_nodes }
+			add_to_variable = { node_goal = 3 } #maximum 3 additional nodes
+		}
+
+		cancel_trigger = {
+			
+			 check_variable = { node_goal < num_of_supply_nodes } #if the number of supply nodes exceeds the old number by +3, immediately cancel
+		}
+	}
+	seize_some_trains_woo = { #repeating train seize
+
+		visible = { 
+			num_of_factories < 60
+		}
+		
+		available = {
+			has_equipment = { train_equipment < 101 }
+			has_tech = basic_train
+		}
+		
+		days_remove = 180
+
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 1
+				has_stability > 0.74
+			}
+		}
+
+		complete_effect = {
+			add_equipment_to_stockpile = {
+				type = train_equipment
+				amount = 15
+			}
+			add_stability = -0.05
+		}
+	}			
 }
 
 propaganda_efforts = {
-
 	war_propaganda = {
 
 		icon = generic_prepare_civil_war
@@ -527,11 +587,9 @@ propaganda_efforts = {
 		}
 
 		complete_effect = {
-			log = "[GetDateText]: [Root.GetName]: Decision war_propaganda_against_warmonger"
-			set_country_flag = war_propaganda_campaign_running
+			set_country_flag = { flag = war_propaganda_campaign_running value = 1 days = 90 } #TODO_Manu: This is a nasty fix so that the flag gets eventually removed if the target is annexed. days = days_remove
 		}
 		remove_effect = {
-			log = "[GetDateText]: [Root.GetName]: Decision remove war_propaganda_against_warmonger"
 			clr_country_flag = war_propaganda_campaign_running
 		}
 
@@ -546,8 +604,12 @@ propaganda_efforts = {
 						has_war_support < 0.5
 
 						OR = {
-							threat > 0.5
-							has_war = yes
+							any_enemy_country = {
+								ic_ratio = {
+									tag = ROOT
+									ratio > 0.5
+								}
+							}
 							has_country_flag = EAI_mobilize_army
 						}
 					}
@@ -1195,33 +1257,57 @@ operations = {
 				}
 			}
 		}
-		ai_will_do = { #EAI
-			base = 0
-
+		ai_will_do = {
+			factor = 1
 			modifier = {
-				add = 1000
-
-				alliance_naval_strength_ratio < 0.5
-
-				has_navy_size = { size < 25 }
-
-				original_tag = ITA
-
-				OR = {
-					surrender_progress > 0.2
-
+				factor = 0
+				NOT = {
 					any_enemy_country = {
 						OR = {
-							divisions_in_state = { state = 446 size > 3 } 
-							divisions_in_state = { state = 453 size > 3 }
+							controls_state = 452
+							controls_state = 447
+							controls_state = 456
+							controls_state = 457
+							controls_state = 454
+							controls_state = 455
+							OR = {
+								divisions_in_state = { state = 454 size > 2 }
+								divisions_in_state = { state = 447 size > 2 }
+								divisions_in_state = { state = 457 size > 2 }
+								divisions_in_state = { state = 456 size > 2 }
+							}
 						}
 					}
-
-					447 = { CONTROLLER = { has_war_with = ROOT } }
-					452 = { CONTROLLER = { has_war_with = ROOT } }
-					451 = { CONTROLLER = { has_war_with = ROOT } }
-					450 = { CONTROLLER = { has_war_with = ROOT } }
 				}
+			}
+			modifier = {
+				factor = 0 # Don't blow the canal when you've got troops needing supplies in the Horn of Africa, and no land route has been established there
+				any_allied_country = {
+					NOT = {
+						OR = {
+							has_full_control_of_state = 457
+							has_full_control_of_state = 456
+						}
+					}
+					NOT = { has_full_control_of_state = 551 }
+					OR = {
+						divisions_in_state = { state = 550 size > 0 }
+						divisions_in_state = { state = 268 size > 0 }
+						divisions_in_state = { state = 269 size > 0 }
+						divisions_in_state = { state = 559 size > 0 }
+					}
+				}
+			}
+			modifier = {
+				factor = 200 # Try to cut the enemy off from the mediterranean if you also occupy Gibraltar
+				OR = {
+					has_full_control_of_state = 118
+					any_allied_country = {
+						has_full_control_of_state = 118
+					}
+				}
+				has_war = yes
+				NOT = { tag = ENG }
 			}
 		}
 	}
@@ -1298,28 +1384,32 @@ operations = {
 				}
 			}
 		}
-		ai_will_do = { #EAI
-			base = 0
-			
+		ai_will_do = {
+			factor = 1
 			modifier = {
-				add = 1000
-
-				alliance_naval_strength_ratio < 0.5
-
-				OR = {
-					685 = { CONTROLLER = { has_war_with = ROOT } }
-					304 = { CONTROLLER = { has_war_with = ROOT } }
-
+				factor = 0 # Don't blow up the canal as USA. Ever.
+				tag = USA
+			}
+			modifier = {
+				factor = 0 # Don't blow up the canal if enemies have weak navies but you are a strong naval power
+				has_navy_size = {
+					size > 50
+				}
+				NOT = {
 					any_enemy_country = {
-						OR = {
-							divisions_in_state = { state = 685 size > 0 } 
-							divisions_in_state = { state = 304 size > 0 }
+						has_navy_size = {
+							size > 50
 						}
 					}
 				}
-
-				divisions_in_state = { state = 685 size < 1 } 
-				divisions_in_state = { state = 304 size < 1 }
+			}
+			modifier = {
+				factor = 200 # Always blow up the canal as JAP or GER when at war with USA (priority)
+				OR = {
+					is_in_faction_with = JAP
+					is_in_faction_with = GER
+				}
+				has_war_with = USA
 			}
 		}
 	}
@@ -1366,30 +1456,36 @@ special_projects = {
 		ai_will_do = {
 			factor = 1
 			modifier = {
-				factor = 0
+				factor = 0 # Don't bother if your navy is weak AND not ENG
 				has_navy_size = { size < 100 }
+				NOT = { tag = ENG }
 			}
 			modifier = {
-				factor = 200
+				factor = 200 # Prioritize if Italy is being invaded and you can't get to the battlefront (no control of Gibraltar strait)
 				NOT = {
 					OR = {
 						has_full_control_of_state = 118
-						any_other_country = {
-							is_in_faction_with = ROOT
+						any_allied_country = {
 							has_full_control_of_state = 118
 						}
 					}
 				}
-				OR = {
-					ITA = { surrender_progress < 0.1 }
-					NOT = { tag = ENG }
-				}
+				has_war_with = ITA
+				ITA = { surrender_progress > 0.1 }
 				has_full_control_of_state = 447
 				has_full_control_of_state = 454
 				has_full_control_of_state = 452
 				has_full_control_of_state = 456
 				has_full_control_of_state = 457
 				NOT = { has_country_flag = blew_up_suez }
+			}
+			modifier = {
+				factor = 200 # Prioritize if UK
+				tag = ENG
+			}
+			modifier = {
+				factor = 10 # Prioritize if not at war
+				has_war = no
 			}
 		}
 	}
@@ -1440,12 +1536,24 @@ special_projects = {
 		ai_will_do = {
 			factor = 1
 			modifier = {
-				factor = 0
-				has_navy_size = { size < 100 }
+				factor = 0 # Don't bother if your navy is weak AND not USA
+				has_navy_size = { size < 50 }
+				NOT = { tag = USA }
+				has_war = yes
 			}
 			modifier = {
-				factor = 0
-				has_country_flag = blew_up_panama
+				factor = 200 # Prioritize if you decisively beat USA's navy
+				has_war_with = USA
+				USA = { has_navy_size = { size < 50 } }
+				has_navy_size = { size > 100 }
+			}
+			modifier = {
+				factor = 200 # Prioritize if USA
+				tag = USA
+			}
+			modifier = {
+				factor = 10 # Prioritize if not at war
+				has_war = no
 			}
 		}
 	}
@@ -1602,12 +1710,12 @@ war_measures = {
             conscription = 0.03
             stability_factor = -0.05
         }
-        ai_will_do = {
+        ai_will_do = { #EAI
 			factor = 1000
 
 			modifier = {
 				factor = 0
-				has_manpower > 2000000
+				has_manpower > 3000000
 			}
 		}
 		complete_effect = {
@@ -1836,7 +1944,6 @@ economy_decisions = {
 			random_owned_state = {
 				limit = {
 					is_fully_controlled_by = ROOT
-					is_owned_by = ROOT
             		free_building_slots = {
 						building = industrial_complex
 						size > 1
@@ -1944,7 +2051,7 @@ economy_decisions = {
 							include_locked = yes
 						}
 						NOT = { has_state_flag = war_building_slot_flag }
-						infrastructure > 8
+						infrastructure > 4
 					}
 				}
 				random_owned_state = {
@@ -1956,7 +2063,7 @@ economy_decisions = {
 							include_locked = yes
 						}
 						NOT = { has_state_flag = war_building_slot_flag }
-						infrastructure > 8
+						infrastructure > 4
 					}
 					add_extra_state_shared_building_slots = 1
 					set_state_flag = war_building_slot_flag
@@ -1972,7 +2079,7 @@ economy_decisions = {
 							include_locked = yes
 						}
 						NOT = { has_state_flag = war_building_slot_flag }
-						infrastructure > 5
+						infrastructure > 2
 					}
 				}
 				random_owned_state = {
@@ -1984,7 +2091,7 @@ economy_decisions = {
 							include_locked = yes
 						}
 						NOT = { has_state_flag = war_building_slot_flag }
-						infrastructure > 5
+						infrastructure > 2
 					}
 					add_extra_state_shared_building_slots = 1
 					set_state_flag = war_building_slot_flag
@@ -2000,7 +2107,7 @@ economy_decisions = {
 							include_locked = yes
 						}
 						NOT = { has_state_flag = war_building_slot_flag }
-						infrastructure > 8
+						infrastructure > 4
 					}
 					add_extra_state_shared_building_slots = 1
 					set_state_flag = war_building_slot_flag

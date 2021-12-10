@@ -1,0 +1,193 @@
+############################################################################################################
+#	Expert AI mod - debug effects
+############################################################################################################
+
+EAI_set_logging_flags = {
+
+	set_country_flag = EAI_logging
+	set_country_flag = EAI_law_logging
+	set_country_flag = EAI_resources_logging
+	# set_country_flag = EAI_pathfind_logging
+	# set_country_flag = EAI_update_logging
+	set_country_flag = EAI_research_logging
+	set_country_flag = EAI_construction_logging
+	set_country_flag = EAI_pp_logging
+	# set_country_flag = EAI_construction_score_logging
+	set_country_flag = EAI_difficulty_logging
+	set_country_flag = EAI_military_focus_logging
+	set_country_flag = EAI_division_limit_logging
+	set_country_flag = EAI_leader_recruitment_logging
+	set_country_flag = EAI_lend_lease_logging
+	set_country_flag = EAI_naval_invasion_logging
+	set_country_flag = EAI_template_upgrade_logging
+	set_country_flag = EAI_template_design_logging
+	set_country_flag = EAI_variant_logging
+	set_country_flag = EAI_volunteer_logging
+	set_country_flag = EAI_diplomacy_event_logging
+	set_country_flag = EAI_war_justification_logging
+	set_country_flag = EAI_xp_logging
+}
+
+EAI_set_all_logging_flags = {
+
+	# set_country_flag = EAI_logging
+	# set_country_flag = EAI_law_logging
+	# set_country_flag = EAI_resources_logging
+	# set_country_flag = EAI_pathfind_logging
+	# set_country_flag = EAI_update_logging
+	# set_country_flag = EAI_research_logging
+	# set_country_flag = EAI_construction_logging
+	# set_country_flag = EAI_pp_logging
+	# set_country_flag = EAI_construction_score_logging
+	# set_country_flag = EAI_difficulty_logging
+	set_country_flag = EAI_military_focus_logging
+	# set_country_flag = EAI_division_limit_logging
+	# set_country_flag = EAI_leader_recruitment_logging
+	# set_country_flag = EAI_lend_lease_logging
+	# set_country_flag = EAI_naval_invasion_logging
+	# set_country_flag = EAI_template_upgrade_logging
+	# set_country_flag = EAI_template_design_logging
+	# set_country_flag = EAI_variant_logging
+	# set_country_flag = EAI_volunteer_logging
+	# set_country_flag = EAI_diplomacy_event_logging
+	# set_country_flag = EAI_war_justification_logging
+	# set_country_flag = EAI_xp_logging
+}
+
+###
+
+EAI_log = {
+
+	EAI_set_logging_flags = yes
+}
+
+EAI_log_all = {
+
+	every_country = {
+
+		EAI_set_all_logging_flags = yes
+	}
+}
+
+EAI_log_majors = {
+
+	every_country = { limit = { is_major = yes }
+
+		EAI_set_logging_flags = yes
+	}
+}
+
+EAI_debug_global = {
+
+	set_global_flag = EAI_debug_tracking
+}
+
+EAI_debug = {
+
+	set_country_flag = EAI_debug_tracking
+}
+
+############################################################################################################
+
+EAI_logging = {
+
+	if = { limit = { has_country_flag = EAI_research_logging }
+
+		EAI_LOGGING_track_techs_researched = yes
+	}
+}
+
+EAI_debug_tracking = {
+
+	if = { limit = { has_global_flag = EAI_debug_tracking }
+
+		EAI_DEBUG_check_for_empty_research_slots = yes
+		EAI_DEBUG_check_for_out_of_manpower = yes
+	}
+	else_if = { limit = { has_country_flag = EAI_debug_tracking }
+
+		EAI_DEBUG_check_for_empty_research_slots = yes
+		EAI_DEBUG_check_for_out_of_manpower = yes
+	}
+}
+
+###
+
+EAI_DEBUG_check_for_empty_research_slots = {
+
+	for_each_loop = { array = global.technology
+
+		if = { limit = { check_variable = { i > 0 } is_researching_technology = var:v }
+			
+			add_to_temp_variable = { debug_techs_being_researched = 1 }
+		}
+	}
+
+	if = { limit = { check_variable = { debug_techs_being_researched < amount_research_slots } }
+
+		add_to_variable = { EAI_DEBUG_empty_research_slots = 1 }
+	}
+	else = { clear_variable = EAI_DEBUG_empty_research_slots }
+
+	if = { limit = { check_variable = { EAI_DEBUG_empty_research_slots > 1 } }
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DEBUG: AI has unused research slots"
+	}
+}
+
+EAI_DEBUG_check_for_out_of_manpower = {
+
+	if = { 
+		limit = { 
+			has_army_manpower = { size > 100000 }
+			check_variable = { manpower_k < 10 }
+			check_variable = { global.EAI_days_elapsed > 120 }
+		}
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DEBUG: out of manpower"
+
+		if = { limit = { NOT = { check_variable = { conscription_ratio < 1 } } }
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DEBUG: not recruiting manpower"
+		}
+
+		if = { limit = { EAI_can_upgrade_manpower_law = yes  }
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DEBUG: conscription law upgrade permitted"
+		}
+	}
+}
+
+EAI_LOGGING_track_techs_researched = {
+
+	for_each_loop = { array = global.technology
+
+		if = { limit = { check_variable = { i > 0 } has_tech = var:v NOT = { is_in_array = { EAI_DEBUG_track_techs_researched = var:v } } }
+
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: researched [?v.GetTokenKey]"
+			
+			add_to_array = { EAI_DEBUG_track_techs_researched = var:v }
+		}
+	}
+}
+
+EAI_test_effect = {
+
+	log = "=============== test ==============="
+
+	# activate_decision = improved_worker_conditions
+
+	if = {
+		limit = {
+
+			tag = SPA
+		}
+
+		log = "yes"
+	}
+	else = {
+		log = "no"
+	}
+
+	log = "=============== end test ==============="
+}

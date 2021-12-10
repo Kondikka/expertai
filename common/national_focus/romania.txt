@@ -50,7 +50,7 @@
 #		completion_reward = {
 #
 #		}
-#	}
+#	} 
 
 	############################
 	##### CATEGORY HERE ! ######
@@ -112,10 +112,11 @@
 		}
 
 		available = {
-			NOT = { has_war_with = SOV }
-			SOV = {
+			NOT = { has_war_with = SOU }
+			SOU = {
 				exists = yes
 				is_puppet = no
+				has_civil_war = no
 			}
 		}
 
@@ -189,6 +190,7 @@
 				NOT = {
 					has_war_with = ROOT
 				}
+				has_civil_war = no 
 			}
 		}
 
@@ -259,9 +261,8 @@
 		}
 
 		available = {
-			SOV = { is_faction_leader = yes }
+			SOV_comintern_joinable = yes 
 			is_in_faction = no
-			NOT = { has_war_with = SOV }
 			is_subject = no
 			NOT = {
 				any_other_country = {
@@ -581,11 +582,7 @@
 		}
 
 		available = {
-			192 = {
-				is_owned_by = SOV
-				is_controlled_by = SOV
-			}
-			198 = {
+			834 = {
 				is_owned_by = SOV
 				is_controlled_by = SOV
 			}
@@ -604,7 +601,7 @@
 			create_wargoal = {
 				type = take_state_focus
 				target = SOV
-				generator = { 192 198 }
+				generator = { 834 }
 			}
 		}
 	}
@@ -1974,6 +1971,13 @@
 				popularity = 65
 			}
 			remove_ideas = neutrality_idea
+			hidden_effect = {
+				country_event = {
+					id = DOD_romania.163
+					days = 5
+					random_days = 10
+				}
+			}
 		}		
 	}
 
@@ -2613,21 +2617,26 @@
 		available_if_capitulated = no
 
 		completion_reward = {
-			create_country_leader = {
-				name = "Ion Antonescu"
-				desc = "POLITICS_ION_ANTONESCU_DESC"
-				picture = "Portrait_Romania_Ion_Antonescu.dds"
-				expire = "1965.1.1"
-				ideology = fascism_ideology
-				traits = {
-					#
+			
+			ROM_ion_antonescu = { #Making Antonescu into a Country leader and removing him from his other roles. 
+				add_country_leader_role = {
+					country_leader = {
+						expire = "1965.1.1"
+						ideology = fascism_ideology
+						traits = {
+							prince_of_terror
+						}
+					}
+					promote_leader = yes
 				}
+				remove_advisor_role = { slot = army_chief }
+				remove_unit_leader_role = yes
 			}
-
+		
 			set_party_name = { 
 			    ideology = fascism
-			    long_name = ROM_fascism_party2_long
-			    name = ROM_fascism_party2
+			    long_name = ROM_fascism_party_long
+			    name = ROM_fascism_party
 			}
 
 			if = {
@@ -2789,22 +2798,41 @@
 
 		completion_reward = {
 			unlock_decision_category_tooltip = ROM_change_sides
-			create_country_leader = {
-				name = "Michael I"
-				desc = "POLITICS_MICHAEL_I_DESC"
-				picture = GFX_Portrait_romania_michael_i				
-				expire = "1965.1.1"
-				ideology = liberalism
-				traits = {
+			if = {
+				limit = {
+					POL = {
+						has_country_leader = {
+							character = ROM_king_michael
+							ruling_only = yes
+						}
+					}
+				}
+				set_cosmetic_tag = ROM_polish_loyalists
+				set_politics = {
+					ruling_party = neutrality
+					elections_allowed = no
+				}
+				set_political_party = {
+					ideology = neutrality
+					popularity = 50
+				}
+				POL = {
+					set_autonomy = {
+						target = ROM
+						autonomy_state = autonomy_personal_union
+					}
 				}
 			}
-			set_politics = {
-				ruling_party = democratic
-				elections_allowed = yes
-			}
-			set_political_party = {
-				ideology = democratic
-				popularity = 50
+			else = {
+				set_politics = {
+					ruling_party = democratic
+					elections_allowed = yes
+				}
+				set_political_party = {
+					ideology = democratic
+					popularity = 50
+				}
+				promote_character = { character = ROM_king_michael ideology = liberalism }
 			}
 			if = {
 				limit = {
@@ -3157,9 +3185,9 @@
 		available_if_capitulated = yes
 		search_filters = { FOCUS_FILTER_RESEARCH }
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = ROM_air_defense
-				bonus = 1.0
+				cost_reduction = 0.25
 				uses = 2
 				category = cat_operational_integrity
 			}
@@ -3194,9 +3222,9 @@
 		available_if_capitulated = yes
 		search_filters = { FOCUS_FILTER_RESEARCH }
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = ROM_ground_support
-				bonus = 1.0
+				cost_reduction = 0.25
 				uses = 2
 				category = battlefield_support_tree
 			}
@@ -3380,9 +3408,9 @@
 		available_if_capitulated = yes
 		search_filters = { FOCUS_FILTER_RESEARCH }
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = ROM_air_superiority
-				bonus = 1.0
+				cost_reduction = 0.25
 				uses = 2
 				category = strategic_destruction_tree
 			}
@@ -4029,7 +4057,10 @@
 			hidden_effect = {
 				if = {
 					limit = {
-						has_tech = basic_medium_tank
+						OR = {
+							has_tech = basic_medium_tank
+							has_tech = basic_medium_tank_chassis
+						}
 						has_tech = tech_recon
 					}
 					division_template = {
@@ -4058,7 +4089,10 @@
 					else = {
 						if = {
 							limit = {
-								has_tech = basic_medium_tank
+								OR = {
+									has_tech = basic_medium_tank
+									has_tech = basic_medium_tank_chassis
+								}
 							}
 							division_template = {
 								name = "Armored Division"

@@ -4,105 +4,86 @@
 
 EAI_manage_xp = {
 
-	### land
+	################## 
+	###		Land
+	##################
 
-	if = { limit = { has_army_experience > 34 }
-	
-		while_loop_effect = { limit = { has_army_experience > 34 }
+	# AI's xp is kept below 60 to stop the AI from taking doctrines all the time (AI factors can't be used to block the AI from doctrines).
+	# When the AI should be allowed to take a doctrine, this script returns enough xp for it
 
-			add_to_variable = { EAI_army_xp = 5 }
-			army_experience = -5
+	if = { limit = { has_country_flag = EAI_land_doctrine_progress_limit }
+
+		### Store xp over 59
+
+		if = { limit = { NOT = { has_army_experience < 60 } check_variable = { EAI_army_xp < 500 } }
+
+			set_temp_variable = { minus_xp = army_experience }
+			subtract_from_temp_variable = { minus_xp = 59 }
+
+			add_to_variable = { EAI_army_xp = minus_xp }
+			clamp_variable = { var = EAI_army_xp min = 0 max = 500 }
+
+			multiply_temp_variable = { minus_xp = -1 }
+			army_experience = minus_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_army_xp = [?EAI_army_xp]" }
 		}
-		clamp_variable = { var = EAI_army_xp min = 0 max = 500 }
-	}
-	# keep 30 xp available to the AI for template changes
-	else_if = { limit = { has_army_experience < 30 check_variable = { EAI_army_xp > 4 } }
 
-		while_loop_effect = { limit = { has_army_experience < 30 check_variable = { EAI_army_xp > 4 } }
+		### Keep 49 xp available to the AI
 
-			subtract_from_variable = { EAI_army_xp = 5 }
-			army_experience = 5
+		else_if = { limit = { has_army_experience < 59 check_variable = { EAI_army_xp > 0 } }
+
+			set_temp_variable = { add_xp = 59 }
+			subtract_from_temp_variable = { add_xp = army_experience }
+			clamp_temp_variable = { var = add_xp min = 0 max = EAI_army_xp }
+
+			subtract_from_variable = { EAI_army_xp = add_xp }
+			army_experience = add_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp adding [?add_xp] EAI_army_xp = [?EAI_army_xp]" }
 		}
 	}
 
-	### air
-
-	if = { limit = { has_air_experience > 4 }
+	###
 	
-		while_loop_effect = { limit = { has_air_experience > 4 }
+	else_if = { limit = { has_army_experience < 150 check_variable = { EAI_army_xp > 0 } }
 
-			add_to_variable = { EAI_air_xp = 5 }
-			air_experience = -5
-		}
-		clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
+		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_army_xp]" }
+		
+		set_temp_variable = { return_xp = 150 }
+		subtract_from_temp_variable = { return_xp = army_experience }
+		clamp_temp_variable = { var = return_xp min = 0 max = EAI_army_xp }
+
+		army_experience = return_xp
+
+		subtract_from_variable = { EAI_army_xp = return_xp }
 	}
-}
 
-# since army/air xp is stored separately, doctrine boost has to be scripted
-EAI_doctrine_xp_boost = {
-	
-	# land
+	################## 
+	###		Air
+	##################
+
+	# Air variants take priority over doctrines
+
 	if = { 
-		limit = { 
-			NOT = { 
-				check_variable = { EAI_army_xp < 300 } 
-				check_variable = { EAI_land_doctrine_boosts > 5 }
-			} 
-			
-			NOT = {  
-				has_tech = modern_blitzkrieg is_researching_technology = modern_blitzkrieg
-				has_tech = werwolf_guerillas is_researching_technology = werwolf_guerillas
-
-				has_tech = shock_and_awe is_researching_technology = shock_and_awe
-				has_tech = air_land_battle is_researching_technology = air_land_battle
-
-				has_tech = infiltration_in_depth is_researching_technology = infiltration_in_depth
-				has_tech = c3i_theory is_researching_technology = c3i_theory
-
-				has_tech = guerilla_warfare is_researching_technology = guerilla_warfare
-				has_tech = continuous_offensive is_researching_technology = continuous_offensive
+		limit = {
+			OR = {
+				NOT = { EAI_fighter_developed = yes }
 			}
 		}
 
-		add_tech_bonus = {
-			name = EAI_land_doctrine_xp_boost
-			bonus = 1.0
-			uses = 1
-			category = land_doctrine
-		}
-		subtract_from_variable = { EAI_army_xp = 100 }
-		add_to_variable = { EAI_land_doctrine_boosts = 1 }
+		if = { limit = { has_air_experience > 4 check_variable = { EAI_air_xp < 500 } }
+	
+			add_to_variable = { EAI_air_xp = air_experience }
+			clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
 
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | XP: boosted land doctrine" } 
+			set_temp_variable = { minus_xp = air_experience }
+			multiply_temp_variable = { minus_xp = -1 }
+			air_experience = minus_xp
+		}
 	}
-
-	# air
-	if = {
-		limit = { 
-			NOT = { 
-				check_variable = { EAI_air_xp < 200 } 
-				check_variable = { EAI_air_doctrine_boosts > 7 }
-			} 
-			
-			NOT = {  
-				has_tech = mass_destruction is_researching_technology = mass_destruction
-				has_tech = offensive_formations is_researching_technology = offensive_formations
-
-				has_tech = forward_interception is_researching_technology = forward_interception
-
-				has_tech = high_level_bombing is_researching_technology = high_level_bombing
-			}
-		}
-
-		add_tech_bonus = {
-			name = EAI_air_doctrine_xp_boost
-			bonus = 1.0
-			uses = 1
-			category = air_doctrine
-		}
-		subtract_from_variable = { EAI_air_xp = 100 }
-		add_to_variable = { EAI_air_doctrine_boosts = 1 }
-
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | XP: boosted air doctrine" }  
+	else = {
+		air_experience = EAI_air_xp
+		set_variable = { EAI_air_xp = 0 }
 	}
 }

@@ -606,7 +606,7 @@ scripted_gui = {
 							limit = {
 								is_ai = yes
 
-								NOT = { has_country_flag = EAI_player_is_configuring_this_country has_country_flag = EAI_AI_is_configuring_this_country }
+								NOT = { has_country_flag = EAI_player_is_configuring_this_country }
 							}
 
 							EAI_apply_global_focuses = yes
@@ -633,8 +633,6 @@ scripted_gui = {
 				clr_country_flag = EAI_army_focuses_edited
 			
 				var:EAI_configuration_target = {
-					clr_country_flag = EAI_army_config_triggered
-					
 					EAI_clear_all_focuses = yes
 			
 					EAI_clear_all_OVERRIDE_focuses = yes
@@ -651,7 +649,7 @@ scripted_gui = {
 				# 				NOT = { has_country_flag = EAI_player_is_configuring_this_country has_country_flag = EAI_AI_is_configuring_this_country }
 				# 			}
 
-				# 			clr_country_flag = EAI_army_config_triggered
+				# 			clr_country_flag = EAI_military_focus_config_finished
 					
 				# 			EAI_clear_all_focuses = yes
 				
@@ -782,7 +780,7 @@ scripted_gui = {
 					var:EAI_configuration_target = {
 						EAI_clear_modified_focuses = yes
 		
-						clr_country_flag = EAI_army_config_triggered
+						EAI_FOCUS_CONFIG/set_focuses = yes
 
 						set_country_flag = EAI_country_focuses_edited_by_player
 					}
@@ -799,7 +797,7 @@ scripted_gui = {
 
 							EAI_clear_modified_focuses = yes
 		
-							clr_country_flag = EAI_army_config_triggered
+							EAI_FOCUS_CONFIG/set_focuses = yes
 
 							set_country_flag = EAI_country_focuses_edited_by_player
 						}
@@ -858,7 +856,7 @@ scripted_gui = {
 					var:EAI_configuration_target = {
 						EAI_clear_modified_focuses = yes
 		
-						clr_country_flag = EAI_army_config_triggered
+						EAI_FOCUS_CONFIG/set_focuses = yes
 					}
 				}
 				
@@ -873,7 +871,7 @@ scripted_gui = {
 
 					clr_country_flag = EAI_player_is_configuring_this_country_@ROOT
 					
-					country_event = EAI_CFG.0
+					EAI_FOCUS_CONFIG/set_focuses = yes
 				}
 
 				clear_variable = EAI_configuration_target
@@ -883,7 +881,7 @@ scripted_gui = {
 				EAI_refresh_gui = yes
 			}
 			EAI_config_ARMY_stockpile_click = {
-				if = { limit = { NOT { has_country_flag = EAI_config_STOCKPILE } }
+				if = { limit = { NOT = { has_country_flag = EAI_config_STOCKPILE } }
 				
 					var:EAI_configuration_target = {
 						ROOT = { EAI_set_stockpile_variables = yes }
@@ -1329,6 +1327,20 @@ scripted_gui = {
 				ROOT = { clear_variable = EAI_config_ARMY_show_category }
 
 				var:EAI_configuration_target = {
+					if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } } }
+						set_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_LARM_FOCUS }
+					}
+					else = { clear_variable = EAI_FOCUS/LAND/armor_focus_OVERRIDE }
+
+					set_country_flag = EAI_FOCUS/LAND/armor_focus_OVERRIDE
+				}
+
+				EAI_refresh_gui = yes
+			}
+			EAI_config_ARMY_L3b_click = {
+				ROOT = { clear_variable = EAI_config_ARMY_show_category }
+
+				var:EAI_configuration_target = {
 					if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } } }
 						set_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
 					}
@@ -1339,7 +1351,7 @@ scripted_gui = {
 
 				EAI_refresh_gui = yes
 			}
-			EAI_config_ARMY_L3b_click = {
+			EAI_config_ARMY_L3c_click = {
 				ROOT = { clear_variable = EAI_config_ARMY_show_category }
 
 				var:EAI_configuration_target = {
@@ -1353,7 +1365,7 @@ scripted_gui = {
 
 				EAI_refresh_gui = yes
 			}
-			EAI_config_ARMY_L3c_click = {
+			EAI_config_ARMY_L3d_click = {
 				ROOT = { clear_variable = EAI_config_ARMY_show_category }
 
 				var:EAI_configuration_target = {
@@ -1380,14 +1392,14 @@ scripted_gui = {
 					OR = { # block incompatible focus combinations
 						AND = {
 							NOT = {
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
 								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
 							}
 						}
 						AND = {
 							OR = {
 								check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MOT_ATTACHMENT }
-								check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
-								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
 							}
 						}
 					}
@@ -1399,20 +1411,39 @@ scripted_gui = {
 					OR = { # block incompatible focus combinations
 						AND = {
 							NOT = {
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
 								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
 							}
 						}
 						AND = {
 							OR = {
 								check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MOT_ATTACHMENT }
-								check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
-								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
 							}
 						}
 					}
 				}
 			}
 			EAI_config_ARMY_L3c_click_enabled = {
+				var:EAI_configuration_target = {
+
+					OR = { # block incompatible focus combinations
+						AND = {
+							NOT = {
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_LARM_ATTACHMENT }
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MARM_ATTACHMENT }
+								check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_HARM_ATTACHMENT }
+							}
+						}
+						AND = {
+							OR = {
+								check_variable = { EAI_FOCUS/LAND/attachment_OVERRIDE = global.EAI_MOT_ATTACHMENT }
+							}
+						}
+					}
+				}
+			}
+			EAI_config_ARMY_L3d_click_enabled = {
 	
 			}
 		}
@@ -1676,7 +1707,23 @@ scripted_gui = {
 
 			}
 			EAI_config_ARMY_L5b_click_enabled = {
+				var:EAI_configuration_target = {
 
+					OR = { # block incompatible focus combinations
+						AND = {
+							NOT = {
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_LARM_FOCUS }
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
+							}
+						}
+						AND = {
+							OR = {
+								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_AT_FOCUS }
+							}
+						}
+					}
+				}
 			}
 			EAI_config_ARMY_L5c_click_enabled = {
 				var:EAI_configuration_target = {
@@ -1684,12 +1731,13 @@ scripted_gui = {
 					OR = { # block incompatible focus combinations
 						AND = {
 							NOT = {
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_LARM_FOCUS }
 								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
 							}
 						}
 						AND = {
 							OR = {
-								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
 								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_AT_FOCUS }
 							}
 						}
@@ -1702,12 +1750,13 @@ scripted_gui = {
 					OR = { # block incompatible focus combinations
 						AND = {
 							NOT = {
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_LARM_FOCUS }
+								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
 								check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_HARM_FOCUS }
 							}
 						}
 						AND = {
 							OR = {
-								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_MARM_FOCUS }
 								check_variable = { EAI_FOCUS/LAND/armor_focus_OVERRIDE = global.EAI_AT_FOCUS }
 							}
 						}

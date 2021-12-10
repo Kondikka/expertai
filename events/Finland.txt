@@ -17,9 +17,10 @@ country_event = {
 		name = finland.1.a
 		trigger = { OR = { is_ai = no is_historical_focus_on = no is_in_faction = yes } } #EAI
 		ai_chance = { 
-		factor = 25
-		modifier = { # Don't accept if in a faction that can protect them
+			base = 25
+			modifier = { # Don't accept if in a faction that can protect them
 				factor = 0
+				NOT = { is_in_faction_with = FROM }
 				OR = {
 					any_other_country = {
 						is_major = yes
@@ -31,12 +32,12 @@ country_event = {
 					has_idea = anti_soviet_pact
 				}
 			}
-		modifier = { #EAI
-			factor = 0
-			is_historical_focus_on = yes
+			modifier = { #EAI
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
-		}
-		SOV = {
+		FROM = {
 			country_event = { days = 5 id = soviet.12 }
 			effect_tooltip = {
 				transfer_state = 146
@@ -45,8 +46,14 @@ country_event = {
 	}
 	option = { # Refuse
 		name = finland.1.b
-		ai_chance = { factor = 75 }
-		SOV = {
+		ai_chance = {
+			base = 75
+			modifier = {
+				factor = 0
+				is_in_faction_with = FROM
+			}
+		}
+		FROM = {
 			country_event = { days = 5 id = soviet.13 }
 			effect_tooltip = {
 				create_wargoal = {
@@ -399,24 +406,23 @@ country_event = {
 					not = { is_in_faction_with = SOV}
 				}
 			}
-			add_ai_strategy = {
-				type = alliance
-				id = "GER"			
-				value = 200
-			}
-			add_ai_strategy = {
-				type = befriend
-				id = "GER"			
-				value = 200
+			FIN = {
+				add_ai_strategy = {
+					type = befriend
+					id = "GER"			
+					value = 200
+				}
 			}
 			GER = {
 				add_ai_strategy = {
-					type = alliance
+					type = befriend #Previously "alliance" -> Don't want Finland in the Axis for now
 					id = "FIN"			
 					value = 200
 				}
 			}
 		}
+		add_political_power = 75 #Good Propaganda to win "fast"
+		SOV_paranoia_medium_decrease_effect = yes #Stalin likes this has been dealt with in a timely fashion
 	}
 
 	#Take it all
@@ -445,5 +451,21 @@ country_event = {
 
 	option = {
 		name = finland.9.a
+	}
+}
+
+# WINTER WAR STARTS! -> (NSB Barbarossa free patch)
+country_event = {
+	id = finland.10
+	title = finland.10.t
+	desc = finland.10.d
+	picture = GFX_report_event_finnish_soldiers_snow
+	
+	is_triggered_only = yes
+
+	option = {
+		name = finland.10.a
+
+		add_ideas = winter_war_ns
 	}
 }

@@ -12,60 +12,29 @@ EAI_prioritise_main_industry = {
 	}
 }
 
-EAI_prioritise_land_doctrine = {
-	if = { limit = { has_global_flag = EAI_limit_research } # with limited research, dont rush land doctrine
-		OR = {
-			EAI_major_country = yes
-			EAI_land_doctrine_tech_focus = yes
-			date > 1939.1.1
-		}
-	}
-
-	OR = {
-		EAI_land_doctrine_tech_focus = yes
-
-		has_war = yes
-
-		EAI_mobilize_army = yes
-
-		AND = {
-			NOT = { EAI_land_doctrine_tech_focus = yes }
-			date > 1937.6.1
-		}
-	}
-
-	NOT = { has_idea = FRA_victors_of_wwi } # FRA has a land doctrine debuff
-
-	if = { limit = { original_tag = USA } # lower prio for USA
-		OR = {
-			date > 1938.6.1
-			has_war = yes
-		}
-	}
-}
-
 EAI_prioritise_infantry_techs = {
 	OR = {
 		AND = { 
 			date > 1938.6.1 
 			NOT = {
-				is_researching_technology = gw_artillery
-				is_researching_technology = interwar_artillery
+				has_tech = gw_artillery is_researching_technology = gw_artillery
+				has_tech = interwar_artillery is_researching_technology = interwar_artillery
 				has_tech = artillery1 is_researching_technology = artillery1
 			}
 			NOT = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN } check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } } 
 		}
 
-		AND = { 
+		AND = {
 			date > 1938.6.1 
-			NOT = { 
-				is_researching_technology = infantry_weapons1
-				is_researching_technology = infantry_weapons2
+			NOT = {
+				has_tech = infantry_weapons1 is_researching_technology = infantry_weapons1
+				has_tech = infantry_weapons2 is_researching_technology = infantry_weapons2
 				has_tech = improved_infantry_weapons is_researching_technology = improved_infantry_weapons
 			} 
 		}
 		
 		if = { limit = { date > 1940.1.1 OR = { EAI_medium_armor_production = yes EAI_light_armor_attachment_production = yes EAI_motorized_attachment_production = yes } }
+		
 			NOT = { has_tech = mechanised_infantry is_researching_technology = mechanised_infantry }
 			
 			else = { always = no }
@@ -73,86 +42,36 @@ EAI_prioritise_infantry_techs = {
 	}
 }
 
-EAI_prioritise_air_doctrine = {
+EAI_prioritise_armor_chassis = {
+	has_dlc = "No Step Back"
+
 	OR = {
-		AND = {
-			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_SD_DOCTRINE }
+		if = { limit = { EAI_armor_tech_focus = yes }
 
-			NOT = {
-				is_researching_technology = air_superiority
-				is_researching_technology = infrastructure_destruction
-				is_researching_technology = naval_strike_tactics
-				is_researching_technology = dogfighting_experience
-				is_researching_technology = multialtitude_flying
-				is_researching_technology = logistical_bombing
-
-				AND = { has_tech = logistical_bombing }
+			OR = {
+				if = { limit = { EAI_MARM_tech_focus = yes }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = gwtank_chassis is_researching_technology = gwtank_chassis } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_medium_tank_chassis is_researching_technology = basic_medium_tank_chassis } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_medium_tank_chassis is_researching_technology = improved_medium_tank_chassis } }
+						AND = { date > 1943.1.1 NOT = { has_tech = advanced_medium_tank_chassis is_researching_technology = advanced_medium_tank_chassis } }
+						AND = { date > 1944.1.1 NOT = { has_tech = main_battle_tank_chassis is_researching_technology = main_battle_tank_chassis } }
+					}
+					else = { always = no }
+				}
+				if = { limit = { EAI_HARM_tech_focus = yes }
+					OR = {
+						AND = { date > 1936.1.1 NOT = { has_tech = gwtank_chassis is_researching_technology = gwtank_chassis } }
+						AND = { date > 1936.1.1 NOT = { has_tech = basic_heavy_tank_chassis is_researching_technology = basic_heavy_tank_chassis } }
+						AND = { date > 1940.1.1 NOT = { has_tech = improved_heavy_tank_chassis is_researching_technology = improved_heavy_tank_chassis } }
+						AND = { date > 1943.1.1 NOT = { has_tech = advanced_heavy_tank_chassis is_researching_technology = advanced_heavy_tank_chassis } }
+						AND = { date > 1944.1.1 NOT = { has_tech = main_battle_tank_chassis is_researching_technology = main_battle_tank_chassis } }
+					}
+					else = { always = no }
+				}
 			}
 		}
-
-		AND = {
-			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_BFS_DOCTRINE }
-
-			NOT = {
-				is_researching_technology = formation_flying
-				is_researching_technology = dive_bombing
-				is_researching_technology = direct_ground_support
-				is_researching_technology = formation_fighting
-				is_researching_technology = hunt_and_destroy
-				is_researching_technology = combat_unit_destruction
-				is_researching_technology = battlefield_support
-				is_researching_technology = ground_support_integration
-
-				AND = { has_tech = battlefield_support has_tech = ground_support_integration }
-			}
-		}
-
-		AND = {
-			check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_OI_DOCTRINE }
-
-			NOT = {
-				is_researching_technology = force_rotation
-				is_researching_technology = fighter_baiting
-				is_researching_technology = low_echelon_support
-				is_researching_technology = dispersed_fighting
-				is_researching_technology = operational_destruction
-				is_researching_technology = fighter_veteran_initiative
-
-				AND = { has_tech = fighter_veteran_initiative }
-			}
-		}
-	}
-}
-
-EAI_prioritise_naval_doctrine = {
-	OR = {
-		#AND = {
-		#	check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE }
-		#
-		#	NOT = {
-		#		is_researching_technology = fleet_in_being
-		#		is_researching_technology = battlefleet_concentration
-		#		is_researching_technology = subsidiary_carrier_role
-		#		is_researching_technology = hunter_killer_groups
-		#		is_researching_technology = floating_fortress
-		#
-		#		AND = { has_tech = floating_fortress }
-		#	}
-		#}
-
-		AND = {
-			check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE }
-
-			NOT = {
-				is_researching_technology = base_strike
-				is_researching_technology = carrier_primacy
-				is_researching_technology = carrier_task_forces
-				is_researching_technology = floating_airfield_bs
-				is_researching_technology = massed_strikes
-
-				AND = { has_tech = massed_strikes }
-			}
-		}
+		else = { always = no }
 	}
 }
 
@@ -267,6 +186,167 @@ EAI_prioritise_aircraft = {
 	}
 }
 
+### Land Doctrines
+
+EAI_land_doctrine_progress_limit = {
+
+	surrender_progress < 0.05
+	
+	OR = {
+		EAI_land_doctrine_cost_reduction_advisor_priority = yes
+
+		EAI_land_doctrine_cost_reduction_spirit_priority = yes
+	}
+
+	set_temp_variable = { total_xp = army_experience }
+	add_to_temp_variable = { total_xp = EAI_army_xp }
+	check_variable = { total_xp < 500 }
+}
+
+EAI_land_doctrine_priority = {
+
+	has_army_experience < 150
+}
+
+EAI_land_doctrine_mass_assault_priority = {
+
+	NOT = {
+		any_enemy_country = { OR = { is_major = yes strength_ratio = { tag = ROOT ratio > 1 } } }
+	}
+
+	AND = {
+		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+		NOT = { 
+			has_tech = vast_offensives 
+			has_tech = human_wave_offensive 
+		}
+	}
+}
+
+EAI_land_doctrine_cost_reduction_advisor_priority = {
+
+	OR = {
+
+		###
+
+		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MW_DOCTRINE }
+
+			OR = {
+				has_available_idea_with_traits = { idea = mobile_warfare_expert limit = 1 }
+				has_available_idea_with_traits = { idea = blitzkrieg_theorist limit = 1 }
+				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
+			}
+			NOT = {
+				has_idea_with_trait = mobile_warfare_expert
+				has_idea_with_trait = blitzkrieg_theorist
+				has_idea_with_trait = military_theorist
+			}
+		}
+
+		###
+
+		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_SF_DOCTRINE }
+
+			OR = {
+				has_available_idea_with_traits = { idea = superior_firepower_expert limit = 1 }
+				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
+			}
+			NOT = {
+				has_idea_with_trait = superior_firepower_expert
+				has_idea_with_trait = military_theorist
+			}
+		}
+
+		###
+
+		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_GB_DOCTRINE }
+
+			OR = {
+				has_available_idea_with_traits = { idea = grand_battle_plan_expert limit = 1 }
+				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
+			}
+			NOT = {
+				has_idea_with_trait = grand_battle_plan_expert
+				has_idea_with_trait = military_theorist
+			}
+		}
+
+		###
+
+		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MA_DOCTRINE }
+
+			OR = {
+				has_available_idea_with_traits = { idea = mass_assault_expert limit = 1 }
+				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
+			}
+			NOT = {
+				has_idea_with_trait = mass_assault_expert
+				has_idea_with_trait = military_theorist
+			}
+		}
+	}
+}
+
+EAI_land_doctrine_cost_reduction_spirit_priority = {
+
+	NOT = { has_idea = professional_officer_corps_spirit }
+}
+
+### Naval Doctrines
+
+EAI_naval_doctrine_progress_limit = {
+	
+	check_variable = { var = EAI_naval_doctrines_researched value = global.EAI_years_elapsed compare = greater_than_or_equals }
+
+	has_navy_experience < 500
+}
+
+### Air Doctrines
+
+EAI_air_doctrine_progress_limit = {
+	
+	OR = {
+
+		AND = {
+			set_temp_variable = { t1 = global.year }
+			subtract_from_temp_variable = { t1 = 1936 }
+			check_variable = { var = EAI_air_doctrines_researched value = t1 compare = greater_than_or_equals }
+
+			has_air_experience < 500
+		}
+
+		AND = {
+			NOT = { EAI_fighter_developed = yes }
+		}
+	}
+}
+
+EAI_air_doctrine_SD_priority = {
+
+	OR = {
+		NOT = { has_tech = logistical_bombing }
+		has_air_experience > 200
+	}
+}
+
+EAI_air_doctrine_BFS_priority = {
+
+	OR = {
+		NOT = { has_tech = ground_support_integration }
+		NOT = { has_tech = battlefield_support }
+		has_air_experience > 200
+	}
+}
+
+EAI_air_doctrine_OI_priority = {
+
+	OR = {
+		NOT = { has_tech = fighter_veteran_initiative }
+		NOT = { has_tech = cas_veteran_initiative }
+		has_air_experience > 200
+	}
+}
+
 ### special tech bonus checks
 
 EAI_armor_tech_bonus = {
@@ -345,7 +425,11 @@ EAI_use_tech_bonus_on_construction_tech = {
 		AND ={
 			tag = GER
 			has_completed_focus = GER_four_year_plan
-			NOT = { is_researching_technology = construction3 has_tech = construction3 }
+			NOT = { 
+				is_researching_technology = construction1 has_tech = construction1
+				is_researching_technology = construction2 has_tech = construction2
+				is_researching_technology = construction3 has_tech = construction3
+			}
 		}
 	}
 }

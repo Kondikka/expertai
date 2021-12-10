@@ -16,25 +16,6 @@
 #
 #################################################
 
-######## Land Doctrine Focus ########
-
-EAI_Land_Doctrine_Research_Focus_PRESET = { # high prio on this
-	OR = {
-		original_tag = JAP
-		original_tag = CHI
-
-		original_tag = SOV
-		original_tag = GER
-		original_tag = POL
-		original_tag = CZE
-
-		original_tag = SPR
-		original_tag = RAJ
-
-		original_tag = FIN
-	}
-}
-
 ######## Land Doctrine ########
 
 EAI_Mobile_Warfare_PRESET = {
@@ -42,15 +23,22 @@ EAI_Mobile_Warfare_PRESET = {
 
 		OR = {
 			original_tag = GER
-			original_tag = USA
-			original_tag = ENG
+
+			###
+
+			AND = { # Allowed if the country has a theorist for this doctrine
+				OR = {
+					has_available_idea_with_traits = { idea = mobile_warfare_expert }
+					has_available_idea_with_traits = { idea = blitzkrieg_theorist }
+				}
+			}
 		}
 	}
 
 	else_if = { limit = { has_global_flag = EAI_challenging_mode }
 
 		OR = {
-			always = no
+			original_tag = GER
 		}
 	}
 }
@@ -59,19 +47,23 @@ EAI_Superior_Firepower_PRESET = {
 	if = { limit = { NOT = { has_global_flag = EAI_challenging_mode } }
 
 		OR = {
-			original_tag = GER
 			original_tag = USA
-			original_tag = ENG
-			original_tag = ITA
-			original_tag = SOV
-			original_tag = JAP
+
+			###
+
+			AND = { # Allowed if the country has a theorist for this doctrine
+				OR = {
+					has_available_idea_with_traits = { idea = superior_firepower_expert }
+				}
+			}
 		}
 	}
 
 	else_if = { limit = { has_global_flag = EAI_challenging_mode }
 
 		OR = {
-			EAI_major_country = yes
+			original_tag = USA
+
 			NOT = { 
 				EAI_major_country = yes
 				original_tag = RAJ
@@ -90,20 +82,31 @@ EAI_Grand_Battleplan_PRESET = {
 			original_tag = ENG
 			original_tag = FRA
 			original_tag = ITA
-			original_tag = JAP
-			original_tag = SOV
 		}
 	}
 
 	else_if = { limit = { has_global_flag = EAI_challenging_mode }
 
 		OR = {
+			original_tag = ENG
+			original_tag = FRA
+			original_tag = ITA
+			original_tag = JAP
+
 			NOT = { 
 				EAI_major_country = yes
 				original_tag = RAJ
 				original_tag = CHI original_tag = SHX original_tag = GXC original_tag = YUN original_tag = PRC original_tag = XSM
 				original_tag = FIN
 				original_tag = MAN original_tag = MEN
+			}
+
+			###
+
+			AND = { # Allowed if the country has a theorist for this doctrine
+				OR = {
+					has_available_idea_with_traits = { idea = grand_battle_plan_expert }
+				}
 			}
 		}
 	}
@@ -113,16 +116,28 @@ EAI_Mass_Assault_PRESET = {
 	if = { limit = { NOT = { has_global_flag = EAI_challenging_mode } }
 
 		OR = {
+			original_tag = SOV
+
 			original_tag = RAJ
 			original_tag = CHI original_tag = SHX original_tag = GXC original_tag = YUN original_tag = PRC original_tag = XSM
 			original_tag = FIN
 			original_tag = MAN original_tag = MEN
+
+			###
+
+			AND = { # Allowed if the country has a theorist for this doctrine
+				OR = {
+					has_available_idea_with_traits = { idea = mass_assault_expert }
+				}
+			}
 		}
 	}
 
 	else_if = { limit = { has_global_flag = EAI_challenging_mode }
 
 		OR = {
+			original_tag = SOV
+
 			NOT = { EAI_major_country = yes }
 			original_tag = RAJ
 			# original_tag = CHI original_tag = SHX original_tag = GXC original_tag = YUN original_tag = PRC original_tag = XSM
@@ -157,13 +172,13 @@ EAI_Land_Doctrine_Left_Path_Focus_PRESET = {
 		#
 		#	}
 		#}
-		#AND = {
-		#	check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
-		#
-		#	OR = {
-		#
-		#	}
-		#}
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+		
+			OR = {
+				EAI_major_country = yes
+			}
+		}
 	}
 }
 
@@ -372,6 +387,22 @@ EAI_Infantry_Design_C_PRESET = { # 4/4 infantry
 }
 
 ######## Armor Focus ########
+
+EAI_Light_Armor_Focus_PRESET = { # Focus on light armor. Uses line AT in AT divisions
+	if = { limit = { NOT = { has_global_flag = EAI_challenging_mode } }
+
+		OR = {
+			always = no
+		}
+	}
+
+	else_if = { limit = { has_global_flag = EAI_challenging_mode }
+	
+		OR = {
+			always = no
+		}
+	}
+}
 
 EAI_Medium_Armor_Focus_PRESET = { # Focus on medium armor. Uses medium tank destroyers in AT divisions
 	if = { limit = { NOT = { has_global_flag = EAI_challenging_mode } }
@@ -700,17 +731,6 @@ EAI_No_Spec_Ops_Focus_PRESET = { # default
 #	Air
 #################################################
 
-######## Air Doctrine Focus ########
-
-EAI_Air_Doctrine_Research_Focus_PRESET = { # high prio on this
-	OR = {
-		original_tag = USA
-		original_tag = ENG
-		original_tag = GER
-		original_tag = SOV
-	}
-}
-
 ######## Air Doctrine ########
 
 EAI_Strategic_Destruction_PRESET = {
@@ -849,17 +869,6 @@ EAI_Naval_Bomber_Focus_0_PRESET = { # default
 #################################################
 #	Navy
 #################################################
-
-######## Naval Doctrine Focus ########
-
-EAI_Naval_Doctrine_Research_Focus_PRESET = { # high prio on this
-	OR = {
-		original_tag = USA
-		original_tag = ENG
-		original_tag = JAP
-		original_tag = ITA
-	}
-}
 
 ######## Naval Doctrine ########
 

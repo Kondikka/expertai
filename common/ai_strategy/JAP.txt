@@ -131,7 +131,13 @@ EAI_JAP_garrison_home = {
 	allowed = { tag = JAP }
 	enable = {
 		has_war = yes
-		alliance_naval_strength_ratio < 0.5
+		any_enemy_country = { 
+			is_major = yes
+			OR = {
+				is_ai = yes
+				has_navy_size = { size > 15 }
+			}
+		}
 	}
 	abort_when_not_enabled = yes
 
@@ -139,7 +145,7 @@ EAI_JAP_garrison_home = {
 
 	ai_strategy = {
 		type = put_unit_buffers
-		ratio = 0.25
+		ratio = 0.15
 		states = { 
 			533
 			282
@@ -150,6 +156,45 @@ EAI_JAP_garrison_home = {
 			529
 			530
 			528
+			645
+			526
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_JAP_last_stand = {
+	allowed = { tag = JAP }
+	enable = {
+		has_war = yes
+		check_variable = { EAI_japanese_home_states_controlled < 1.0 }
+	}
+	abort_when_not_enabled = yes
+
+	### japan
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = { is_core_of = FROM.FROM }
+		value = 100
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.35
+		states = { 
+			533
+			282
+			532
+			534
+			535
+			531
+			529
+			530
+			528
+			645
+			526
 		}
 		subtract_invasions_from_need = no
 		subtract_fronts_from_need = no
@@ -283,10 +328,10 @@ EAI_JAP_stalemate_vs_CHI = {
 		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
 
 		# Create some offensives every once in a while to make the front seem active
-		set_temp_variable = { day = global.EAI_day }
+		set_temp_variable = { day = global.EAI_days_elapsed }
 		modulo_temp_variable = { day = 30 }
 		OR = {
-			check_variable = { day < 28 }
+			check_variable = { day < 26 }
 			CHI = { surrender_progress > 0.6 }
 			check_variable = { EAI_fielded_eq_ratio < 0.9 }
 		}
@@ -338,11 +383,11 @@ EAI_CHI_stalemate_vs_JAP = {
 		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
 
 		# Create some offensives every once in a while to make the front seem active
-		set_temp_variable = { day = global.EAI_day }
+		set_temp_variable = { day = global.EAI_days_elapsed }
 		modulo_temp_variable = { day = 30 }
 		OR = {
-			check_variable = { day < 28 }
-			CHI = { surrender_progress < 0.5 }
+			check_variable = { day < 26 }
+			NOT = { CHI = { surrender_progress > 0.6 } }
 			check_variable = { EAI_fielded_eq_ratio < 0.9 }
 		}
 		

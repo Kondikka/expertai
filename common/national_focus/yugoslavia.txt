@@ -770,21 +770,21 @@
 					random_owned_controlled_state = {
 						limit = { PREV = { has_full_control_of_state = PREV } }
 						create_unit = {
-							division = "name = \"Bosnian Division\" division_template = \"Yugoslavian Division\" start_experience_factor = 0.9" 
+							division = "name = \"Bosnian Division\" division_template = \"Bosnian Division\" start_experience_factor = 0.9" 
 							owner = PREV
 						}
 					}
 					random_owned_controlled_state = {
 						limit = { PREV = { has_full_control_of_state = PREV } }
 						create_unit = {
-							division = "name = \"Bosnian Division\" division_template = \"Yugoslavian Division\" start_experience_factor = 0.9" 
+							division = "name = \"Bosnian Division\" division_template = \"Bosnian Division\" start_experience_factor = 0.9" 
 							owner = PREV
 						}
 					}
 					random_owned_controlled_state = {
 						limit = { PREV = { has_full_control_of_state = PREV } }
 						create_unit = {
-							division = "name = \"Bosnian Division\" division_template = \"Yugoslavian Division\" start_experience_factor = 0.9" 
+							division = "name = \"Bosnian Division\" division_template = \"Bosnian Division\" start_experience_factor = 0.9" 
 							owner = PREV
 						}
 					}
@@ -1788,6 +1788,13 @@
 
 		ai_will_do = {
 			factor = 40
+			modifier = { #If Bulgaria is really so much committed into getting Macedonian support, then we might just surrender Macedonia
+				factor = 5
+				controls_state = 106
+				106 = {
+					has_dynamic_modifier = { modifier = widespread_bulgarian_sentiment_01 }
+				}
+			}
 		}
 
 		available = {
@@ -1954,14 +1961,14 @@
 					}
 				}
 			}
-			create_country_leader = {
-				name = "Prince Paul"
-				desc = "POLITICS_PRINCE_PAUL_DESC"
-				picture = "Portrait_Yugoslavia_Prince_Paul.dds"
-				expire = "1965.1.1"
-				ideology = fascism_ideology
-				traits = {
-					#
+			YUG_prince_paul = {
+				add_country_leader_role = {
+					country_leader = {
+						expire = "1965.1.1"
+						ideology = fascism_ideology
+						traits = {}
+					}
+					promote_leader = yes
 				}
 			}
 		}
@@ -2298,7 +2305,7 @@
 
 		bypass = {
 			has_country_leader = {
-				name = "Peter II"
+				character = YUG_peter_ii
 				ruling_only = yes
 			}
 		}
@@ -2309,51 +2316,16 @@
 		search_filters = { FOCUS_FILTER_POLITICAL }
 		completion_reward = {
 			retire_country_leader = yes
+			YUG_peter_ii = {
+				promote_character = {ideology = despotism }
+				promote_character = {ideology = conservatism }
+			}
 			if = {
 				limit = {
-					date < 1941.09.06
+					date > 1941.09.06
 				}
-				create_country_leader = {
-					name = "Peter II"
-					desc = "POLITICS_PETER_II_DESC"
-					picture = "portrait_YUG_peter_II_young.dds"
-					expire = "1965.1.1"
-					ideology = despotism
-					traits = {
-						underage_monarch
-					}
-				}
-				create_country_leader = {
-					name = "Peter II"
-					desc = "POLITICS_PETER_II_DESC"
-					picture = "portrait_YUG_peter_II_young.dds"
-					expire = "1965.1.1"
-					ideology = conservatism
-					traits = {
-						underage_monarch
-					}
-				}
-			}
-			else = {
-				create_country_leader = {
-					name = "Peter II"
-					desc = "POLITICS_PETER_II_DESC"
-					picture = "Portrait_Yugoslavia_Peter_II.dds"
-					expire = "1965.1.1"
-					ideology = despotism
-					traits = {
-						legitimate_heir
-					}
-				}
-				create_country_leader = {
-					name = "Peter II"
-					desc = "POLITICS_PETER_II_DESC"
-					picture = "Portrait_Yugoslavia_Peter_II.dds"
-					expire = "1965.1.1"
-					ideology = conservatism
-					traits = {
-						legitimate_heir
-					}
+				YUG_peter_ii = {
+					swap_country_leader_traits = { remove = underage_monarch add = legitimate_heir }
 				}
 				hidden_effect = { set_country_flag = peter_is_of_age }
 			}
@@ -2378,7 +2350,7 @@
 			OR = {
 				AND = {
 					has_country_leader = {
-						name = "Peter II"
+						character = YUG_peter_ii
 						ruling_only = yes
 					}
 					NOT = { has_country_leader_with_trait = underage_monarch }
@@ -2386,7 +2358,7 @@
 				AND = {
 					NOT = { has_idea = king_peter_1 }
 					has_country_leader = {
-						name = "Prince Paul"
+						character = YUG_prince_paul
 						ruling_only = yes
 					}
 				}
@@ -2421,21 +2393,21 @@
 				if = {
 					limit = {
 						has_country_leader = {
-							name = "Prince Paul"
+							character = YUG_prince_paul
 							ruling_only = yes
 						}
 						NOT = { has_idea = king_peter_1 }
 						has_completed_focus = YUG_western_focus
 					}
-					create_country_leader = {
-						name = "Paul I"
-						desc = "POLITICS_PRINCE_PAUL_DESC"
-						picture = "Portrait_Yugoslavia_Prince_Paul.dds"
-						expire = "1965.1.1"
-						ideology = fascism_ideology
-						traits = {
-							collaborator_king
+					add_country_leader_role = {
+						character = YUG_prince_paul
+						country_leader = {
+							ideology = fascism_ideology
+							traits = {
+								collaborator_king
+							}
 						}
+						promote_leader = yes
 					}
 					set_party_name = { 
 						ideology = fascism
@@ -2480,7 +2452,7 @@
 
 		available = {
 			has_country_leader = {
-				name = "Peter II"
+				character = YUG_peter_ii
 				ruling_only = yes
 			}
 			NOT = { has_country_leader_with_trait = underage_monarch }
@@ -3109,8 +3081,10 @@
 					}
 					is_subject_of = ROOT
 				}
-				every_state = {
-					limit = { is_core_of = PREV }
+				every_owned_state = {
+					limit = {
+						is_core_of = PREV
+					}
 					add_core_of = PREV.PREV
 				}
 				PREV = {
@@ -3142,10 +3116,11 @@
 		}
 
 		available = {
-			SOV = {
+			SOU = {
 				NOT = { has_war_with = ROOT }
 				exists = yes
 				has_capitulated = no
+				has_government = communism
 			}
 		}
 
@@ -3338,22 +3313,16 @@
 
 		available = {
 			is_in_faction = no
-			OR = {
-				SOV = {
-					NOT = { has_war_with = ROOT }
-					exists = yes
-					has_capitulated = no
+			ANY_comintern_joinable = yes 
+			IF = {
+				limit = {
+					SOV = { has_government = communism }
 				}
-				any_other_country = {
-					is_major = yes
-					has_government = communism
-					is_faction_leader = yes
-				}
-			}
-			NOT = {
-				any_other_country = {
-					is_in_faction_with = SOV
-					has_war_with = YUG
+				NOT = {
+					any_other_country = {
+						is_in_faction_with = SOV
+						has_war_with = YUG
+					}
 				}
 			}
 		}
@@ -3508,6 +3477,7 @@
 
 		available = {
 			is_in_faction_with = SOV
+			SOV = { has_government = communism }
 		}
 
 		bypass = {
@@ -5066,9 +5036,9 @@
 
 
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = air_doc_bonus
-				bonus = 1.0
+				cost_reduction = 0.5
 				uses = 1
 				category = air_doctrine
 			}
@@ -6204,9 +6174,9 @@
 
 
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = YUG_army_maneuvers
-				bonus = 1.0
+				cost_reduction = 0.5
 				uses = 1
 				category = land_doctrine
 			}
@@ -6243,9 +6213,9 @@
 
 
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = YUG_supremacy_of_offense
-				bonus = 1.0
+				cost_reduction = 0.5
 				uses = 2
 				category = cat_mobile_warfare
 				category = cat_superior_firepower
@@ -6283,9 +6253,9 @@
 
 
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = YUG_supremacy_of_defense
-				bonus = 1.0
+				cost_reduction = 0.5
 				uses = 2
 				category = cat_grand_battle_plan
 				category = cat_mass_assault
@@ -6409,9 +6379,9 @@
 
 
 		completion_reward = {
-			add_tech_bonus = {
+			add_doctrine_cost_reduction = {
 				name = YUG_contest_the_adriatic
-				bonus = 1.0
+				cost_reduction = 0.5
 				uses = 2
 				category = naval_doctrine
 			}
