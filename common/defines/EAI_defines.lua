@@ -57,7 +57,7 @@ NDefines.NAI.RESEARCH_WITH_XP_AI_WEIGHT_MULT = 1.5 				-- AI will bump score of 
 -- DESIGNS
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_LAND = 25 --50	-- Army XP needed before attempting to create a variant of a type that uses the tank designer (the tank designer DLC feature must be active).
+NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_LAND = 50 --50	-- Army XP needed before attempting to create a variant of a type that uses the tank designer (the tank designer DLC feature must be active).
 NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_NAVY = 50 --50	-- Same as above but for the ship designer.
 
 -- Land/air handled by EAI
@@ -84,8 +84,8 @@ NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 1
 -- If a template may be reinforced with the archetype it's considered to be "demanded". If multiple conditions
 -- are met, e.g. it's both in the field and in training, the largest value is used.
 
-NDefines.NAI.LAND_DESIGN_DEMAND_FIELD_DIVISION = 20
-NDefines.NAI.LAND_DESIGN_DEMAND_TRAINING_DIVISION = 15
+NDefines.NAI.LAND_DESIGN_DEMAND_FIELD_DIVISION = 50
+NDefines.NAI.LAND_DESIGN_DEMAND_TRAINING_DIVISION = 50
 NDefines.NAI.LAND_DESIGN_DEMAND_GARRISON_DIVISION = 10
 NDefines.NAI.LAND_DESIGN_DEMAND_UNUSED_TEMPLATE = 10 --1
 NDefines.NAI.LAND_DESIGN_DEMAND_ABSENT = 10 --0
@@ -106,8 +106,8 @@ NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_DOCTRINE = 1     -- How quickly is desi
 --EAI: make sure land template desire is always at the top, if the doctrine desire is high but the mod blocks it, AI wont create templates
 NDefines.NAI.DESIRE_USE_XP_TO_UPDATE_LAND_TEMPLATE = 100.0 --2.0    -- How quickly is desire to update/create templates accumulated?
 
-NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 1.0  -- How quickly is desire to update/create land equipment variants accumulated?
-NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_NAVAL_EQUIPMENT = 1.0 -- How quickly is desire to update/create naval equipment variants accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 2.0  -- How quickly is desire to update/create land equipment variants accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_NAVAL_EQUIPMENT = 2.0 -- How quickly is desire to update/create naval equipment variants accumulated?
 NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_AIR_EQUIPMENT = 0.0   -- How quickly is desire to update/create air equipment variants accumulated?
 
 NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_ARMY_SPIRIT = 0.4    -- How quickly is desire to unlock army spirits accumulated?
