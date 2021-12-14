@@ -1108,7 +1108,7 @@ EAI_track_submarine_losses = {
 	set_variable = { EAI_previous_subs = num_ships_with_type@submarine }
 }
 
-# track the max armor value seen from other countries and the max piercing value of this country
+# Track armor and piercing seen in divisions of this and enemy countries
 EAI_armor_intel_check = {
 
 	if = {
@@ -1120,9 +1120,39 @@ EAI_armor_intel_check = {
 			}
 		}
 
-		### armor intel from other countries
+		#####################################
+		### 	Armor
+		#####################################
 
-		# enemies + neighbors
+		### This country
+
+		set_temp_variable = { armor_intel_value = EAI_max_armor }
+
+		while_loop_effect = { limit = { check_variable = { armor_intel_value < 200 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = {
+							NOT = { ROOT = { estimated_intel_max_armor = { tag = ROOT value > [x] } } }
+						}
+						x = "[?armor_intel_value|.0]"
+					}
+				}
+
+				if = { limit = { NOT = { check_variable = { EAI_max_armor = armor_intel_value } } }
+
+					if = { limit = { has_country_flag = EAI_armor_intel_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest armor of this country = [?armor_intel_value]" } 
+				}
+
+				set_variable = { EAI_max_armor = armor_intel_value }
+				set_temp_variable = { break = 1 }
+			}
+
+			add_to_temp_variable = { armor_intel_value = 2 }
+		}
+
+		### Enemies and neighbors
 
 		set_temp_variable = { armor_intel_value = EAI_max_armor_seen }
 
@@ -1146,7 +1176,7 @@ EAI_armor_intel_check = {
 
 				if = { limit = { NOT = { check_variable = { EAI_max_armor_seen = armor_intel_value } } }
 
-					if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest armor intel value = [?armor_intel_value]" } 
+					if = { limit = { has_country_flag = EAI_armor_intel_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest armor seen = [?armor_intel_value]" } 
 				}
 
 				set_variable = { EAI_max_armor_seen = armor_intel_value }
@@ -1156,7 +1186,7 @@ EAI_armor_intel_check = {
 			add_to_temp_variable = { armor_intel_value = 5 }
 		}
 
-		# enemies only
+		### Enemies
 
 		set_temp_variable = { armor_intel_value = EAI_max_armor_seen_enemies }
 
@@ -1176,7 +1206,7 @@ EAI_armor_intel_check = {
 
 				if = { limit = { NOT = { check_variable = { EAI_max_armor_seen_enemies = armor_intel_value } } }
 
-					if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new enemies highest armor intel value = [?armor_intel_value]" } 
+					if = { limit = { has_country_flag = EAI_armor_intel_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest enemy armor seen = [?armor_intel_value]" } 
 				}
 
 				set_variable = { EAI_max_armor_seen_enemies = armor_intel_value }
@@ -1186,7 +1216,11 @@ EAI_armor_intel_check = {
 			add_to_temp_variable = { armor_intel_value = 5 }
 		}
 
-		### armor piercing of this country
+		#####################################
+		### 	Piercing
+		#####################################
+
+		### This country
 
 		set_temp_variable = { piercing_value = EAI_max_piercing }
 
@@ -1202,11 +1236,46 @@ EAI_armor_intel_check = {
 					}
 				}
 
+				if = { limit = { NOT = { check_variable = { EAI_max_piercing = piercing_value } } }
+
+					if = { limit = { has_country_flag = EAI_armor_intel_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest piercing of this country = [?piercing_value]" } 
+				}
+
 				set_variable = { EAI_max_piercing = piercing_value }
 				set_temp_variable = { break = 1 }
 			}
 
 			add_to_temp_variable = { piercing_value = 2 }
+		}
+
+		### Enemies
+
+		set_temp_variable = { piercing_value = EAI_max_piercing_enemies }
+
+		while_loop_effect = { limit = { check_variable = { piercing_value < 200 } }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = {
+							NOT = {
+								any_enemy_country = { ROOT = { estimated_intel_max_piercing = { tag = PREV value > [x] } } }
+							}
+						}
+						x = "[?piercing_value|.0]"
+					}
+				}
+
+				if = { limit = { NOT = { check_variable = { EAI_max_piercing_seen_enemies = piercing_value } } }
+
+					if = { limit = { has_country_flag = EAI_armor_intel_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ARMOR INTEL: new highest piercing of enemies = [?piercing_value]" } 
+				}
+
+				set_variable = { EAI_max_piercing_seen_enemies = piercing_value }
+				set_temp_variable = { break = 1 }
+			}
+
+			add_to_temp_variable = { piercing_value = 5 }
 		}
 	}
 }
