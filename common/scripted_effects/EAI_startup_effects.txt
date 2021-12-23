@@ -4,9 +4,31 @@
 
 EAI_startup_effects = {
 
-	every_country = { limit = { is_ai = no }
+	# every_country = { limit = { is_ai = no }
 
-		EAI_check_game_version = yes
+	# 	EAI_check_game_version = yes
+	# }
+
+	###
+
+	random_country = { limit = { is_ai = no } 
+	
+		### Default historical startup settings
+
+		USA = { if = { limit = { is_ai = yes } add_ideas = EAI_neutrality_idea_USA } }
+			
+		set_global_flag = EAI_neutral_spr
+
+		set_global_flag = EAI_lend_lease
+
+		set_global_flag = EAI_challenging_mode
+		
+		set_variable = { global.EAI_eastern_front = 1 }
+
+		### Show EAI config
+
+		set_country_flag = EAI_config_STARTUP 
+		set_country_flag = EAI_show_country_config_decisions 
 	}
 
 	###
@@ -17,6 +39,10 @@ EAI_startup_effects = {
 
 	EAI_military_focus_types = yes
 
+	EAI_PC_set_global_variables = yes
+
+	country_event = EAI_C.10002 # EAI_set_resource_variables
+
 	###
 
 	EAI_create_north_african_states_array = yes
@@ -25,7 +51,6 @@ EAI_startup_effects = {
 
 	EAI_create_spanish_civil_war_states_array = yes
 
-	# chinese states array
 	every_state = {
 		limit = {
 			OR = {
@@ -40,51 +65,15 @@ EAI_startup_effects = {
 		add_to_array = { global.EAI_chinese_states = THIS.id }
 	}
 
-	###
-
-	EAI_PC_set_global_variables = yes
-
-	country_event = EAI_C.10002 # EAI_set_resource_variables
-
-	# radar script
+	### radar script
+	
 	every_state = { limit = { EAI_radar_location = yes }
 
 		set_state_flag = EAI_radar_site
 	}
 
-	### Causing issues with ahistorical outcomes for now
+	### Stop UK from taking all MAL divisions
 
-	if = {
-		limit = {
-			EST = { is_ai = yes }
-			LAT = { is_ai = yes }
-			LIT = { is_ai = yes }
-		}
-
-		EST = { load_focus_tree = generic_focus }
-		LAT = { load_focus_tree = generic_focus }
-		LIT = { load_focus_tree = generic_focus }
-	}
-
-	############################################################
-
-	random_country = { limit = { is_ai = no } 
-	
-		# apply default historical settings
-		country_event = EAI_DM.0
-
-		# EAI starup configuration
-		set_country_flag = EAI_config_STARTUP 
-		set_country_flag = EAI_show_country_config_decisions 
-	}
-
-	############################################################
-
-	# set default EAI settings
-	set_global_flag = EAI_lend_lease
-	set_global_flag = EAI_challenging_mode
-
-	# to stop UK from taking all MAL divisions
 	if = { limit = { ENG = { is_ai = yes } MAL = { is_ai = yes } }
 
 		ENG ={
@@ -93,5 +82,20 @@ EAI_startup_effects = {
 				autonomy_state = autonomy_puppet
 			}
 		}
+	}
+
+	### Causing issues with ahistorical outcomes for now
+
+	if = {
+		limit = {
+			is_historical_focus_on = yes
+			EST = { is_ai = yes }
+			LAT = { is_ai = yes }
+			LIT = { is_ai = yes }
+		}
+
+		EST = { load_focus_tree = generic_focus }
+		LAT = { load_focus_tree = generic_focus }
+		LIT = { load_focus_tree = generic_focus }
 	}
 }

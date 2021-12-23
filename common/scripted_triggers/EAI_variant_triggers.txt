@@ -2,6 +2,48 @@
 #	Expert AI mod - scripted variant AI triggers
 ######################################################
 
+EAI_armor_intel_tier_0 = { # < 60
+
+	check_variable = { EAI_max_armor_seen < 60 }
+}
+
+EAI_armor_intel_tier_1 = { # 60-69
+
+	NOT = { EAI_armor_intel_tier_0 = yes }
+
+	check_variable = { EAI_max_armor_seen < 70 }
+}
+
+EAI_armor_intel_tier_2 = { # > 69
+
+	NOT = {
+		EAI_armor_intel_tier_0 = yes
+		EAI_armor_intel_tier_1 = yes
+	}
+}
+
+###
+
+EAI_has_light_tank_TD_design = {
+
+	has_design_based_on = light_tank_destroyer_chassis
+}
+
+EAI_has_medium_tank_TD_design = {
+
+	has_design_based_on = medium_tank_destroyer_chassis
+}
+
+EAI_has_heavy_tank_TD_design = {
+
+	has_design_based_on = heavy_tank_destroyer_chassis
+}
+
+EAI_has_modern_tank_TD_design = {
+
+	has_design_based_on = modern_tank_destroyer_chassis
+}
+
 ###### Enable design if true
 
 ### Light armor
@@ -19,8 +61,8 @@ EAI_light_armor_aa_design_focus = {
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
 		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
-		check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
-		check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
+		AND = { check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN } has_country_flag = EAI_motorized_template_upgrade }
 	}
 }
 
@@ -38,7 +80,7 @@ EAI_light_armor_art_design_focus = {
 	OR = {
 		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
 		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
-		check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN }
+		AND = { check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_C_MOT_DESIGN } has_country_flag = EAI_motorized_template_upgrade }
 	}
 }
 
@@ -55,17 +97,18 @@ EAI_medium_armor_tank_design_focus = {
 EAI_medium_armor_aa_design_focus = {
 
 	OR = {
-		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
-		check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
 	}
 }
 
 EAI_medium_armor_td_design_focus = {
 
 	OR = {
-		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } NOT = { EAI_armor_intel_tier_0 = yes } }
+		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } NOT = { EAI_armor_intel_tier_0 = yes } }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
 	}
 }
 
@@ -73,7 +116,10 @@ EAI_medium_armor_art_design_focus = {
 
 	OR = {
 		AND = { 
-			OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT } }
+			OR = { 
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } 
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+			}
 
 			OR = {
 				check_variable = { EAI_FOCUS/LAND/medium_armor_design = global.EAI_B_MARM_DESIGN }
@@ -81,8 +127,8 @@ EAI_medium_armor_art_design_focus = {
 			}
 		}
 
-		check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN }
-		check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN }
+		AND = { check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN } has_country_flag = EAI_motorized_template_upgrade }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
 	}
 }
 
@@ -99,38 +145,34 @@ EAI_heavy_armor_tank_design_focus = {
 EAI_heavy_armor_aa_design_focus = {
 
 	OR = {
-		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
-		check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
+		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
 	}
 }
 
 EAI_heavy_armor_td_design_focus = {
 
 	OR = {
-		check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN }
-		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
+		AND = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } has_country_flag = EAI_anti_tank_template_upgrade }
+		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } NOT = { EAI_armor_intel_tier_0 = yes } }
+		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } NOT = { EAI_armor_intel_tier_0 = yes } }
 	}
 }
 
 EAI_heavy_armor_art_design_focus = {
 
 	OR = {
-		check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
-		check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
+		AND = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+		AND = { check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT } }
 	}
 }
 
 ###### Block design if true
 
-EAI_light_armor_design_priority = {
+EAI_light_armor_design_priority = { # Block all armor types
 
-	# Template creation has been enabled - it needs a buildable design
-	if = { limit = { has_country_flag = EAI_larm_template_upgrade }
-		
-		has_design_based_on = light_tank_chassis
-	}
+	has_army_experience < 300
 
 	# Basic techs should be avoided unless necessary
 	OR = {
@@ -140,17 +182,24 @@ EAI_light_armor_design_priority = {
 			}
 
 			has_war = no
+
+			has_design_based_on = light_tank_chassis
 		}
 	}
 }
 
-EAI_medium_armor_design_priority = {
+EAI_light_armor_tank_design_priority = { # Block all except tank
 
-	# Template creation has been enabled - it needs a buildable design
-	if = { limit = { has_country_flag = EAI_marm_template_upgrade }
-		
-		has_design_based_on = medium_tank_chassis
-	}
+	has_army_experience < 300
+
+	EAI_light_armor_tank_design_focus = yes
+
+	NOT = { has_design_based_on = light_tank_chassis }
+}
+
+EAI_medium_armor_design_priority = { # Block all armor types
+
+	has_army_experience < 300
 
 	# Basic techs should be avoided unless necessary
 	OR = {
@@ -160,17 +209,24 @@ EAI_medium_armor_design_priority = {
 			}
 
 			has_war = no
+
+			has_design_based_on = medium_tank_chassis
 		}
 	}
 }
 
-EAI_heavy_armor_design_priority = {
+EAI_medium_armor_tank_design_priority = { # Block all except tank
 
-	# Template creation has been enabled - it needs a buildable design
-	if = { limit = { has_country_flag = EAI_harm_template_upgrade }
-		
-		has_design_based_on = heavy_tank_chassis
-	}
+	has_army_experience < 300
+
+	EAI_medium_armor_tank_design_focus = yes
+
+	NOT = { has_design_based_on = medium_tank_chassis }
+}
+
+EAI_heavy_armor_design_priority = { # Block all armor types
+
+	has_army_experience < 300
 
 	# Basic techs should be avoided unless necessary
 	OR = {
@@ -180,8 +236,19 @@ EAI_heavy_armor_design_priority = {
 			}
 
 			has_war = no
+
+			has_design_based_on = heavy_tank_chassis
 		}
 	}
+}
+
+EAI_heavy_armor_tank_design_priority = { # Block all except tank
+
+	has_army_experience < 300
+
+	EAI_heavy_armor_tank_design_focus = yes
+
+	NOT = { has_design_based_on = heavy_tank_chassis }
 }
 
 ###
