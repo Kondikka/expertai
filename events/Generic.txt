@@ -1185,9 +1185,15 @@ country_event = {
 		random_other_country = {
 			limit = {
 				has_war_with = FROM
-				has_attache_from = ROOT
+				OR = { #EAI
+					has_attache_from = ROOT
+					is_in_array = { EAI_attache_senders = ROOT.id }
+				}
 			}
-			ROOT = { recall_attache = PREV }
+			ROOT = { #EAI
+				recall_attache = PREV
+				PREV = { EAI_recall_attache = yes }
+			}
 		}
 		FROM = {
 			country_event = { id = generic.15 days = 1 }
@@ -1211,6 +1217,11 @@ country_event = {
 			modifier = {
 				factor = 3
 				has_opinion = { target = FROM value < -50 }
+			}
+			modifier = { #EAI
+				factor = 0
+				is_historical_focus_on = yes
+				OR = { tag = USA tag = GER tag = ITA tag = SOV }
 			}
 		}
 		custom_effect_tooltip = attache_political_power_tt
