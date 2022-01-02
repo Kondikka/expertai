@@ -11,7 +11,13 @@ EAI_manage_xp = {
 	# AI's xp is kept below 60 to stop the AI from taking doctrines all the time (AI factors can't be used to block the AI from doctrines).
 	# When the AI should be allowed to take a doctrine, this script returns enough xp for it
 
-	if = { limit = { has_country_flag = EAI_land_doctrine_progress_limit }
+	if = { 
+		limit = { 
+			OR = { 
+				has_country_flag = EAI_land_doctrine_progress_limit 
+				has_country_flag = EAI_land_doctrine_switch_fix
+			} 
+		}
 
 		### Store xp over 59
 
@@ -29,7 +35,7 @@ EAI_manage_xp = {
 			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_army_xp = [?EAI_army_xp]" }
 		}
 
-		### Keep 49 xp available to the AI
+		### Keep 59 xp available to the AI
 
 		else_if = { limit = { has_army_experience < 59 check_variable = { EAI_army_xp > 0 } }
 
@@ -47,8 +53,6 @@ EAI_manage_xp = {
 	###
 	
 	else_if = { limit = { has_army_experience < 150 check_variable = { EAI_army_xp > 0 } }
-
-		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_army_xp]" }
 		
 		set_temp_variable = { return_xp = 150 }
 		subtract_from_temp_variable = { return_xp = army_experience }
@@ -57,6 +61,8 @@ EAI_manage_xp = {
 		army_experience = return_xp
 
 		subtract_from_variable = { EAI_army_xp = return_xp }
+
+		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?return_xp] EAI_army_xp = [?EAI_army_xp]" }
 	}
 
 	################## 
@@ -68,11 +74,12 @@ EAI_manage_xp = {
 	if = { 
 		limit = {
 			OR = {
-				NOT = { EAI_fighter_developed = yes }
+				has_country_flag = EAI_air_doctrine_progress_limit 
+				has_country_flag = EAI_air_doctrine_switch_fix
 			}
 		}
 
-		if = { limit = { has_air_experience > 4 check_variable = { EAI_air_xp < 500 } }
+		if = { limit = { NOT = { has_air_experience < 5 } check_variable = { EAI_air_xp < 500 } }
 	
 			add_to_variable = { EAI_air_xp = air_experience }
 			clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
@@ -80,10 +87,49 @@ EAI_manage_xp = {
 			set_temp_variable = { minus_xp = air_experience }
 			multiply_temp_variable = { minus_xp = -1 }
 			air_experience = minus_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_air_xp = [?EAI_air_xp]" }
 		}
 	}
-	else = {
+
+	else_if = { limit = { check_variable = { EAI_air_xp > 0 } }
+
+		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_air_xp] EAI_air_xp = [?EAI_air_xp]" }
+
 		air_experience = EAI_air_xp
 		set_variable = { EAI_air_xp = 0 }
+	}
+
+	################## 
+	###		Navy
+	##################
+
+	if = { 
+		limit = {
+			OR = {
+				has_country_flag = EAI_naval_doctrine_progress_limit 
+				has_country_flag = EAI_naval_doctrine_switch_fix
+			}
+		}
+
+		if = { limit = { NOT = { has_navy_experience < 5 } check_variable = { EAI_navy_xp < 500 } }
+	
+			add_to_variable = { EAI_navy_xp = navy_experience }
+			clamp_variable = { var = EAI_navy_xp min = 0 max = 500 }
+
+			set_temp_variable = { minus_xp = navy_experience }
+			multiply_temp_variable = { minus_xp = -1 }
+			navy_experience = minus_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_navy_xp = [?EAI_navy_xp]" }
+		}
+	}
+	
+	else_if = { limit = { check_variable = { EAI_navy_xp > 0 } }
+
+		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_navy_xp] EAI_navy_xp = [?EAI_navy_xp]" }
+
+		navy_experience = EAI_navy_xp
+		set_variable = { EAI_navy_xp = 0 }
 	}
 }
