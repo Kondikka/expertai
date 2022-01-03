@@ -37,9 +37,9 @@ EAI_manage_xp = {
 
 		### Keep 59 xp available to the AI
 
-		else_if = { limit = { has_army_experience < 59 check_variable = { EAI_army_xp > 0 } }
+		else_if = { limit = { has_army_experience < 60 check_variable = { EAI_army_xp > 0 } }
 
-			set_temp_variable = { add_xp = 59 }
+			set_temp_variable = { add_xp = 60 }
 			subtract_from_temp_variable = { add_xp = army_experience }
 			clamp_temp_variable = { var = add_xp min = 0 max = EAI_army_xp }
 
@@ -112,7 +112,7 @@ EAI_manage_xp = {
 			}
 		}
 
-		if = { limit = { NOT = { has_navy_experience < 5 } check_variable = { EAI_navy_xp < 500 } }
+		if = { limit = { NOT = { has_navy_experience < 60 } check_variable = { EAI_navy_xp < 500 } }
 	
 			add_to_variable = { EAI_navy_xp = navy_experience }
 			clamp_variable = { var = EAI_navy_xp min = 0 max = 500 }
@@ -122,6 +122,18 @@ EAI_manage_xp = {
 			navy_experience = minus_xp
 
 			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_navy_xp = [?EAI_navy_xp]" }
+		}
+
+		else_if = { limit = { has_navy_experience < 60 check_variable = { EAI_navy_xp > 0 } }
+
+			set_temp_variable = { add_xp = 60 }
+			subtract_from_temp_variable = { add_xp = navy_experience }
+			clamp_temp_variable = { var = add_xp min = 0 max = EAI_navy_xp }
+
+			subtract_from_variable = { EAI_navy_xp = add_xp }
+			army_experience = add_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp adding [?add_xp] EAI_navy_xp = [?EAI_navy_xp]" }
 		}
 	}
 	
