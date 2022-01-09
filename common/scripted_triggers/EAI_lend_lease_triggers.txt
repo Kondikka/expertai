@@ -18,6 +18,11 @@ EAI_lend_lease = {
 		OR = {
 			has_country_flag = EAI_supports_@PREV
 
+			AND = { # Lend lease to enable espionage operations
+				is_in_faction_with = ROOT
+				num_of_operatives > 1
+			}
+
 			AND = {
 				EAI_special_lend_lease_rules_SENDER = yes
 
@@ -321,8 +326,11 @@ EAI_lend_lease = {
 
 				if = { limit = { has_capitulated = yes }
 
-					has_army_manpower = { size > 100000 }
-					has_manpower > 100000
+					OR = {
+						has_army_manpower = { size > 100000 }
+						has_manpower > 100000
+						num_of_operatives > 1
+					}
 				}
 
 				### why should it NOT lend lease
@@ -523,20 +531,5 @@ EAI_special_lend_lease_rules_TARGET = {
 		}
 		
 		is_major = no
-	}
-
-	if = { 
-		limit = { 
-			THIS = { is_in_faction_with = ENG }
-			ROOT = { is_in_faction_with = ENG }
-		}
-		
-		OR = {
-			NOT = { any_enemy_country = { has_navy_size = { size > 40 unit = submarine } } }
-			AND = {
-				THIS = { tag = ENG }
-				ROOT = { tag = USA }
-			}
-		}
 	}
 }

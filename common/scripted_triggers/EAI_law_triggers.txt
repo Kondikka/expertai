@@ -103,25 +103,14 @@ EAI_can_upgrade_trade_law = {
 EAI_can_take_civilian_economy = {
 	########## AI LOGIC
 
-	always = no # dont take this ever
+	EAI_stability_event_trigger = yes
 
-	NOT = {
-		EAI_can_take_low_economic_mobilisation = yes
-		EAI_can_take_partial_economic_mobilisation = yes
-		EAI_can_take_war_economy = yes
-		EAI_can_take_tot_economic_mobilisation = yes
-	}
-
-	NOT = {
+	OR = {
 		has_idea = low_economic_mobilisation
 		has_idea = partial_economic_mobilisation
 		has_idea = war_economy
 		has_idea = tot_economic_mobilisation
 	}
-
-	NOT = { original_tag = USA }
-
-	EAI_store_pp_prio = yes
 
 	########## LAW REQUIREMENTS
 
@@ -146,7 +135,9 @@ EAI_can_take_low_economic_mobilisation = {
 		has_idea = tot_economic_mobilisation
 	}
 
-	# has_war_support > 0.25 # to avoid the AI having to demobilize
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	### this law is not worth taking in the later stages when either partial or war economy are likely to become available
 
@@ -159,6 +150,11 @@ EAI_can_take_low_economic_mobilisation = {
 	if = { limit = { tag = ENG }
 
 		date > 1941.1.1
+	}
+
+	if = { limit = { tag = SOV }
+
+		date > 1937.6.1 # Try to get war eco with an attache
 	}
 
 	########## LAW REQUIREMENTS
@@ -198,6 +194,10 @@ EAI_can_take_partial_economic_mobilisation = {
 		has_idea = war_economy
 		has_idea = tot_economic_mobilisation
 	}
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	has_war_support > 0.25 # to avoid the AI having to demobilize
 
@@ -250,6 +250,10 @@ EAI_can_take_war_economy = {
 	NOT = {
 		EAI_can_take_tot_economic_mobilisation = yes
 	}
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	OR = {
 		NOT = { has_idea = tot_economic_mobilisation }
@@ -375,6 +379,10 @@ EAI_can_take_tot_economic_mobilisation = {
 		has_idea = service_by_requirement
 	}
 
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
+
 	OR = {
 		AND = {
 			has_manpower > 150000
@@ -449,15 +457,30 @@ EAI_can_take_tot_economic_mobilisation = {
 EAI_can_take_volunteer_only = {
 	########## AI LOGIC
 
-	has_idea = disarmed_nation
+	OR = {
+		AND = {
+			has_idea = disarmed_nation
 
-	NOT = { original_tag = USA }
+			NOT = { original_tag = USA }
 
-	NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
+			NOT = { conscription_ratio < 0.99 } # wait for mobilization before upgrading again
 
-	has_manpower < 750000
+			has_manpower < 750000
 
-	EAI_store_pp_prio = yes
+			EAI_store_pp_prio = yes
+		}
+
+		AND = {
+			OR = {
+				has_idea = extensive_conscription
+				has_idea = service_by_requirement
+				has_idea = all_adults_serve
+				has_idea = scraping_the_barrel
+			}
+
+			EAI_stability_event_trigger = yes
+		}
+	}
 
 	########## LAW REQUIREMENTS
 
@@ -502,6 +525,10 @@ EAI_can_take_limited_conscription = {
 	}
 
 	EAI_store_pp_prio = yes
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	########## LAW REQUIREMENTS
 
@@ -577,6 +604,10 @@ EAI_can_take_extensive_conscription = {
 	}
 
 	EAI_store_pp_prio = yes
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	########## LAW REQUIREMENTS
 
@@ -663,6 +694,10 @@ EAI_can_take_service_by_requirement = {
 			NOT = { check_variable = { manpower_reserve > 0.4 } }
 		}
 	}
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	########## LAW REQUIREMENTS
 
@@ -754,6 +789,10 @@ EAI_can_take_all_adults_serve = {
 
 	amount_manpower_in_deployment_queue < 250000
 
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
+
 	########## LAW REQUIREMENTS
 
 	NOT = { has_idea = all_adults_serve }
@@ -843,6 +882,10 @@ EAI_can_take_scraping_the_barrel = {
 	}
 
 	amount_manpower_in_deployment_queue < 250000
+
+	### Avoid triggering draft events
+
+	NOT = { EAI_stability_event_trigger = yes }
 
 	########## LAW REQUIREMENTS
 
@@ -965,8 +1008,8 @@ EAI_can_take_free_trade = {
 		has_government = neutrality
 		has_government = democratic
 		NOT = { EAI_major_country = yes }
-		# AND = { tag = GER date < 1938.6.1 }
-		# AND = { tag = SOV date < 1940.6.1 }
+		AND = { tag = GER date < 1938.6.1 }
+		AND = { tag = SOV date < 1940.6.1 }
 	}
 
 	###
@@ -1032,23 +1075,24 @@ EAI_can_take_export_focus = {
 		check_variable = { var = EAI_average_resource_need value = 0.15 compare = greater_than_or_equals }
 	}
 
-	# when switching down, see if the AI cant fulfill needs by trading
+	# When switching down, consider whether it has a significant need or shortage and has a significant amount of needed resources
 	if = { limit = { OR = { has_idea = free_trade } }
 
 		OR = {
-			check_variable = { EAI_aluminium_resource_shortage = 3 }
-			check_variable = { EAI_rubber_resource_shortage = 3 }
-			check_variable = { EAI_tungsten_resource_shortage = 3 }
-			check_variable = { EAI_steel_resource_shortage = 3 }
-			check_variable = { EAI_chromium_resource_shortage = 3 }
+			AND = { check_variable = { EAI_aluminium_resource_shortage = 3 } check_variable = { resource_produced@aluminium > 75 } }
+			AND = { check_variable = { EAI_rubber_resource_shortage = 3 } check_variable = { resource_produced@rubber > 75 } }
+			AND = { check_variable = { EAI_tungsten_resource_shortage = 3 } check_variable = { resource_produced@tungsten > 75 } }
+			AND = { check_variable = { EAI_steel_resource_shortage = 3 } check_variable = { resource_produced@steel > 75 } }
+			AND = { check_variable = { EAI_chromium_resource_shortage = 3 } check_variable = { resource_produced@chromium > 75 } }
 
 			count_triggers = {
 				amount = 2
-				check_variable = { EAI_needs_aluminium = 3 }
-				check_variable = { EAI_needs_rubber = 3 }
-				check_variable = { EAI_needs_tungsten = 3 }
-				check_variable = { EAI_needs_steel = 3 }
-				check_variable = { EAI_needs_chromium = 3 }
+
+				AND = { check_variable = { EAI_needs_aluminium = 3 } check_variable = { resource_produced@aluminium > 75 } }
+				AND = { check_variable = { EAI_needs_rubber = 3 } check_variable = { resource_produced@rubber > 75 } }
+				AND = { check_variable = { EAI_needs_tungsten = 3 } check_variable = { resource_produced@tungsten > 75 } }
+				AND = { check_variable = { EAI_needs_steel = 3 } check_variable = { resource_produced@steel > 75 } }
+				AND = { check_variable = { EAI_needs_chromium = 3 } check_variable = { resource_produced@chromium > 75 } }
 			}
 		}
 	}
@@ -1082,17 +1126,25 @@ EAI_can_take_limited_exports = {
 
 	check_variable = { var = EAI_average_resource_need value = 0.60 compare = greater_than_or_equals }
 
-	# when switching down, see if the AI cant fulfill needs by trading
+	# When switching down, consider whether it has a significant need or shortage and has a significant amount of needed resources
 	if = { limit = { OR = { has_idea = free_trade has_idea = export_focus } }
 
-		count_triggers = {
-			amount = 2
-			
-			check_variable = { EAI_aluminium_resource_shortage = 3 }
-			check_variable = { EAI_rubber_resource_shortage = 3 }
-			check_variable = { EAI_tungsten_resource_shortage = 3 }
-			check_variable = { EAI_steel_resource_shortage = 3 }
-			check_variable = { EAI_chromium_resource_shortage = 3 }
+		OR = {
+			AND = { check_variable = { EAI_aluminium_resource_shortage = 3 } check_variable = { resource_produced@aluminium > 75 } }
+			AND = { check_variable = { EAI_rubber_resource_shortage = 3 } check_variable = { resource_produced@rubber > 75 } }
+			AND = { check_variable = { EAI_tungsten_resource_shortage = 3 } check_variable = { resource_produced@tungsten > 75 } }
+			AND = { check_variable = { EAI_steel_resource_shortage = 3 } check_variable = { resource_produced@steel > 75 } }
+			AND = { check_variable = { EAI_chromium_resource_shortage = 3 } check_variable = { resource_produced@chromium > 75 } }
+
+			count_triggers = {
+				amount = 2
+				
+				AND = { check_variable = { EAI_needs_aluminium = 3 } check_variable = { resource_produced@aluminium > 75 } }
+				AND = { check_variable = { EAI_needs_rubber = 3 } check_variable = { resource_produced@rubber > 75 } }
+				AND = { check_variable = { EAI_needs_tungsten = 3 } check_variable = { resource_produced@tungsten > 75 } }
+				AND = { check_variable = { EAI_needs_steel = 3 } check_variable = { resource_produced@steel > 75 } }
+				AND = { check_variable = { EAI_needs_chromium = 3 } check_variable = { resource_produced@chromium > 75 } }
+			}
 		}
 	}
 
@@ -1166,4 +1218,39 @@ EAI_can_take_closed_economy = {
 		}
 		NOT = { has_idea = CHI_nine_power_treaty }
 	}
+}
+
+### Stability event trigger
+
+EAI_stability_event_trigger = {
+
+	has_war = yes
+	has_civil_war = no
+	OR = {
+		has_stability < 0.5
+		has_war_support < 0.5
+	}
+	NOT = {
+		AND = {
+			is_major = yes
+			all_enemy_country = {
+				is_major = no
+			}
+		}
+	}
+	# NOT = { 
+	# 	has_country_flag = crisis_in_progress
+	# }
+	# NOT = { # Don't fire stability events if the country is not mobilising at all
+	# 	OR = {
+	# 		has_idea = disarmed_nation
+	# 		has_idea = volunteer_only
+	# 	}
+	# 	OR = {
+	# 		has_idea = undisturbed_isolation
+	# 		has_idea = isolation
+	# 		has_idea = civilian_economy
+	# 	}
+	# }
+	NOT = { has_completed_focus = SPR_all_must_bear_the_torch }
 }

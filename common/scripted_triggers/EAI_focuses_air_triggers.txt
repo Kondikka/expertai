@@ -99,6 +99,17 @@ EAI_no_ground_air_focus = {
 		}
 	}
 }
+EAI_both_ground_air_focus = {
+	OR = {
+		check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_BOTH_GROUND_AIR }
+		check_variable = { EAI_FOCUS/AIR/ground_bomber_OVERRIDE = global.EAI_BOTH_GROUND_AIR }
+
+		AND = {
+			OR = { EAI_Both_Ground_Air_Focus_PRESET = yes has_global_flag = EAI_random_focuses }
+			NOT = { has_variable = EAI_FOCUS/AIR/ground_bomber has_variable = EAI_FOCUS/AIR/ground_bomber_OVERRIDE }
+		}
+	}
+}
 
 # STR FOCUS
 EAI_STR_air_focus_1 = {
@@ -177,9 +188,15 @@ EAI_CAS_tech_focus = {
 
 	num_of_military_factories > 10
 	
-	check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_CAS_AIR }
+	EAI_CAS_military_focus = yes
 	
 	OR = { EAI_major_country = yes date > 1939.1.1 }
+}
+EAI_CAS_military_focus = {
+	OR = {
+		check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_CAS_AIR }
+		check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_BOTH_GROUND_AIR }
+	}
 }
 
 # tactical bomber
@@ -188,16 +205,22 @@ EAI_TAC_tech_focus = {
 
 	num_of_military_factories > 20
 	
-	check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_TAC_AIR }
+	EAI_TAC_military_focus = yes
 	
 	OR = { EAI_major_country = yes date > 1939.1.1 }
+}
+EAI_TAC_military_focus = {
+	OR = {
+		check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_TAC_AIR }
+		check_variable = { EAI_FOCUS/AIR/ground_bomber = global.EAI_BOTH_GROUND_AIR }
+	}
 }
 
 # naval bomber
 EAI_NAV_tech_focus = {
 	date > 1936.7.1
 
-	num_of_military_factories > 50
+	num_of_military_factories > 25
 
 	check_variable = { EAI_FOCUS/AIR/naval_bomber = global.EAI_ON }
 		
@@ -272,14 +295,18 @@ EAI_CV_aircraft_production = {
 
 # transport
 EAI_TRNS_aircraft_production = {
-	#num_of_military_factories > 25
 
-	#EAI_FTR_aircraft_production = yes
-	#
-	# OR = {
-	#	EAI_major_country = yes
-	#	num_of_factories > 100
-	#}
+	num_of_military_factories > 5
 
-	always = no
+	OR = {
+		EAI_FTR_aircraft_production = yes
+
+		check_variable = { num_equipment@transport_plane_equipment < 20 }
+	}
+	
+	OR = {
+		EAI_major_country = yes
+		num_of_factories > 100
+		check_variable = { num_equipment@transport_plane_equipment < 20 }
+	}
 }

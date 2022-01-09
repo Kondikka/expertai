@@ -49,59 +49,100 @@ operative_mission_build_intel_network_scorer = {
 		target_array = global.majors
 
 		score = {
-			base = 100
-			modifier = { #EAI
-				has_government = FROM
-				factor = 0.5
-			}
-			modifier = { #EAI
-				is_major = yes
-				factor = 1.5
-			}
-			modifier = { #EAI
-				is_neighbor_of = FROM
-				factor = 1.5
-			}
-			modifier = { #EAI
-				is_neighbor_of = FROM
-				is_major = yes
-				NOT = { has_government = FROM }
-				add = 5000
-			}
-			modifier = { #EAI
-				is_major = yes
-				NOT = { has_government = FROM }
-				set_temp_variable = { temp_score = num_of_military_factories }
-				divide_temp_variable = { temp_score = 200 }
-				add_to_temp_variable = { temp_score = 1.0 }
-				clamp_temp_variable = { var = temp_score max = 2 }
-				factor = temp_score
-			}
-			modifier = { #EAI
-				NOT = { has_captured_operative = FROM }
-				has_non_aggression_pact_with = FROM
-				strength_ratio = { tag = FROM ratio < 0.2 }
-				factor = 0
-			}
+			base = 0
+
 			modifier = {
-				has_capitulated = yes
-				factor = 0 
-			}
-			modifier = {
-				has_wargoal_against = FROM
-				add = 100
-			}
-			modifier = {
-				OR = {
-					has_war_with = FROM
-					FROM = {
+				set_temp_variable = { add_score = 100 }
+				
+				if = { 
+					limit = { 
+						has_government = FROM
+					}
+					
+					multiply_temp_variable = { add_score = 0.5 }
+				}
+				if = { 
+					limit = { 
+						is_major = yes
+					}
+					
+					multiply_temp_variable = { add_score = 1.5 }
+				}
+				if = { 
+					limit = { 
+						is_neighbor_of = FROM
+					}
+					
+					multiply_temp_variable = { add_score = 1.5 }
+				}
+				if = { 
+					limit = { 
+						is_neighbor_of = FROM
+						is_major = yes
+						NOT = { has_government = FROM }
+					}
+					
+					add_to_temp_variable = { add_score = 500 }
+				}
+				if = { 
+					limit = { 
+						is_major = yes
+						NOT = { has_government = FROM }
+						set_temp_variable = { temp_score = num_of_military_factories }
+						divide_temp_variable = { temp_score = 200 }
+						add_to_temp_variable = { temp_score = 1.0 }
+						clamp_temp_variable = { var = temp_score max = 2 }
+					}
+					
+					multiply_temp_variable = { add_score = temp_score }
+				}
+				if = { 
+					limit = { 
+						NOT = { has_captured_operative = FROM }
+						has_non_aggression_pact_with = FROM
+						strength_ratio = { tag = FROM ratio < 0.2 }
+					}
+					
+					multiply_temp_variable = { add_score = 0 }
+				}
+				if = { 
+					limit = { 
+						has_capitulated = yes
+					}
+					
+					multiply_temp_variable = { add_score = 0 }
+				}
+				if = { 
+					limit = { 
+						has_wargoal_against = FROM
+					}
+					
+					add_to_temp_variable = { add_score = 100 }
+				}
+				if = { 
+					limit = { 
 						OR = {
-							has_wargoal_against = PREV
-							is_justifying_wargoal_against = PREV
+							has_war_with = FROM
+							FROM = {
+								OR = {
+									has_wargoal_against = PREV
+									is_justifying_wargoal_against = PREV
+								}
+							}
 						}
 					}
+					
+					add_to_temp_variable = { add_score = 2000 }
 				}
-				add = 2000
+				if = {
+					limit = { 
+						FROM = { has_variable = EAI_operation_target }
+					}
+					
+					set_temp_variable = { add_score = 0 }
+				}
+
+				add = add_score 
 			}
 		}
 	}
@@ -122,51 +163,15 @@ operative_mission_counter_intelligence_scorer = {
 
 		score = {
 			base = 100
-			modifier = { #EAI
+			modifier = {
 				FROM = {
-					is_major = yes
-					check_variable = { operatives > 2 }
-				}
-				tag = FROM
-				add = 10000
-			}
-			modifier = { #EAI - free up operatives for collab op
-				FROM = {
-					has_variable = EAI_collaboration_target
-					network_strength = { 
-						target = var:EAI_collaboration_target
-						value > 50
-					}
-					NOT = {
-						is_running_operation = { 
-							target = var:EAI_collaboration_target 
-							operation = operation_collaboration_government
-						}
-					}
+					has_variable = EAI_operation_target
 				}
 				add = -50000
 			}
 			modifier = {
 				has_capitulated = yes
 				factor = 0
-			}
-			modifier = {
-				tag = FROM
-				factor = 1.5
-			}
-			modifier = {
-				set_temp_variable = {
-					army_weight = num_armies
-				}
-				divide_temp_variable = {
-					var = army_weight
-					value = 10
-				}
-				clamp_temp_variable = {
-					var = army_weight
-					max = 50
-				}
-				add = army_weight
 			}
 		}
 	}

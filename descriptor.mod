@@ -3,4 +3,4 @@ tags={
 	"Utilities"
 }
 name="Expert AI - Working Directory"
-supported_version="1.11.*"
+supported_version="1.11.4"

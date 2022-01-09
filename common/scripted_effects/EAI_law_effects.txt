@@ -124,6 +124,7 @@ EAI_law_upgrades = {
 }
 
 EAI_upgrade_economy_law = {
+	
     if = { 
 		limit = { 
 			EAI_can_upgrade_economy_law = yes 
@@ -233,6 +234,7 @@ EAI_upgrade_economy_law = {
 }
 
 EAI_upgrade_conscription_law = {
+
     if = { 
 		limit = { 
 			EAI_can_upgrade_manpower_law = yes 
@@ -265,49 +267,48 @@ EAI_upgrade_conscription_law = {
             
                 add_ideas = volunteer_only
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: volunteer_only (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: volunteer_only (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 
 			else_if = { limit = { EAI_can_take_limited_conscription = yes } 
                 
                 add_ideas = limited_conscription
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: limited_conscription (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: limited_conscription (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 
 			else_if = { limit = { EAI_can_take_extensive_conscription = yes } 
            
                 add_ideas = extensive_conscription
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: extensive_conscription (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: extensive_conscription (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 
 			else_if = { limit = { EAI_can_take_service_by_requirement = yes } 
             
                 add_ideas = service_by_requirement
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: service_by_requirement (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: service_by_requirement (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 
             else_if = { limit = { EAI_can_take_all_adults_serve = yes } 
             
                 add_ideas = all_adults_serve
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: all_adults_serve (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: all_adults_serve (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 
             else_if = { limit = { EAI_can_take_scraping_the_barrel = yes } 
             
                 add_ideas = scraping_the_barrel
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: scraping_the_barrel (script) current mp = [?manpower_k] current army = [?EAI_army_manpower]" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: scraping_the_barrel (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
             }
 		}
 	}
 }
 
 EAI_upgrade_trade_law = {
-	EAI_calculate_resource_need = yes
 	
     if = { 
 		limit = { 
@@ -358,99 +359,4 @@ EAI_upgrade_trade_law = {
 			set_country_flag = { flag = EAI_trade_law_recently_changed value = 1 days = 365 } # limits the AI from changing trade law due to minor fluctuations
 		}
 	}
-}
-
-# calculates the fraction of consumed resources : owned resources (only those with significant quantities) for trade law selection
-EAI_calculate_resource_need = {
-
-	set_variable = { EAI_average_resource_need = 0 }
-
-	### ALUMINIUM
-
-	if = { limit = { check_variable = { resource_produced@aluminium > 75 } }
-
-		set_temp_variable = { EAI_aluminium_needed = resource_consumed@aluminium }
-		if = { limit = { check_variable = { resource@aluminium < 0 } }
-
-			set_temp_variable = { aluminium_deficit = resource@aluminium }
-			multiply_temp_variable = { aluminium_deficit = -1 }
-			add_to_temp_variable = { EAI_aluminium_needed = aluminium_deficit }
-		}
-		divide_temp_variable = { EAI_aluminium_needed = resource_produced@aluminium }
-		clamp_temp_variable = { var = EAI_aluminium_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_aluminium_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
-
-	### RUBBER
-
-	if = { limit = { check_variable = { resource_produced@rubber > 75 } }
-
-		set_temp_variable = { EAI_rubber_needed = resource_consumed@rubber }
-		if = { limit = { check_variable = { resource@rubber < 0 } }
-
-			set_temp_variable = { rubber_deficit = resource@rubber }
-			multiply_temp_variable = { rubber_deficit = -1 }
-			add_to_temp_variable = { EAI_rubber_needed = rubber_deficit }
-		}
-		divide_temp_variable = { EAI_rubber_needed = resource_produced@rubber }
-		clamp_temp_variable = { var = EAI_rubber_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_rubber_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
-
-	### TUNGSTEN
-
-	if = { limit = { check_variable = { resource_produced@tungsten > 75 } }
-
-		set_temp_variable = { EAI_tungsten_needed = resource_consumed@tungsten }
-		if = { limit = { check_variable = { resource@tungsten < 0 } }
-
-			set_temp_variable = { tungsten_deficit = resource@tungsten }
-			multiply_temp_variable = { tungsten_deficit = -1 }
-			add_to_temp_variable = { EAI_tungsten_needed = tungsten_deficit }
-		}
-		divide_temp_variable = { EAI_tungsten_needed = resource_produced@tungsten }
-		clamp_temp_variable = { var = EAI_tungsten_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_tungsten_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
-
-	### STEEL
-
-	if = { limit = { check_variable = { resource_produced@steel > 75 } }
-
-		set_temp_variable = { EAI_steel_needed = resource_consumed@steel }
-		if = { limit = { check_variable = { resource@steel < 0 } }
-
-			set_temp_variable = { steel_deficit = resource@steel }
-			multiply_temp_variable = { steel_deficit = -1 }
-			add_to_temp_variable = { EAI_steel_needed = steel_deficit }
-		}
-		divide_temp_variable = { EAI_steel_needed = resource_produced@steel }
-		clamp_temp_variable = { var = EAI_steel_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_steel_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
-
-	### CHROMIUM
-
-	if = { limit = { check_variable = { resource_produced@chromium > 75 } }
-
-		set_temp_variable = { EAI_chromium_needed = resource_consumed@chromium }
-		if = { limit = { check_variable = { resource@chromium < 0 } }
-
-			set_temp_variable = { chromium_deficit = resource@chromium }
-			multiply_temp_variable = { chromium_deficit = -1 }
-			add_to_temp_variable = { EAI_chromium_needed = chromium_deficit }
-		}
-		divide_temp_variable = { EAI_chromium_needed = resource_produced@chromium }
-		clamp_temp_variable = { var = EAI_chromium_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_chromium_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-	}
-
-	###
-
-	divide_variable = { EAI_average_resource_need = EAI_resource_count }
 }

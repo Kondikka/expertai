@@ -1,0 +1,1648 @@
+##############################################
+### 	EAI operation scorers
+##############################################
+
+### Get token operations
+
+EAI_SCORER_operation_infiltrate_civilian = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_infiltrate_civilian_@PREV } }
+
+			modifier = { factor = 0 FROM = { has_country_flag = has_token_civilian_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				set_temp_variable = { research_factor = num_research_slots }
+				divide_temp_variable = { research_factor = 5 }
+
+				factor = research_factor
+			}
+
+			modifier = { 
+				factor = 1.25
+				
+				is_major = yes
+			}
+
+			modifier = {
+				set_temp_variable = { industry_factor = num_of_factories }
+				divide_temp_variable = { industry_factor = 500 }
+				clamp_temp_variable = { var = industry_factor max = 1 }
+
+				factor = industry_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_infiltrate_armed_forces_army = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_infiltrate_armed_forces_army_@PREV } }
+
+			modifier = { factor = 0 FROM = { has_country_flag = has_token_army_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				set_temp_variable = { research_factor = num_research_slots }
+				divide_temp_variable = { research_factor = 5 }
+
+				factor = research_factor
+			}
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				set_temp_variable = { division_factor = num_divisions }
+				divide_temp_variable = { division_factor = 250 }
+
+				factor = division_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_infiltrate_armed_forces_navy = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_infiltrate_armed_forces_navy_@PREV } }
+
+			modifier = { factor = 0 FROM = { has_country_flag = has_token_navy_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				set_temp_variable = { research_factor = num_research_slots }
+				divide_temp_variable = { research_factor = 5 }
+
+				factor = research_factor
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_owned_state = {
+						is_coastal = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				FROM = {
+					set_temp_variable = { ship_factor = num_ships }
+					divide_temp_variable = { ship_factor = 500 }
+				}
+
+				set_temp_variable = { target_ship_factor = num_ships }
+				divide_temp_variable = { target_ship_factor = 500 }
+
+				add_to_temp_variable = { ship_factor = target_ship_factor }
+				divide_temp_variable = { ship_factor = 2 }
+
+				factor = ship_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_infiltrate_armed_forces_airforce = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_infiltrate_armed_forces_airforce_@PREV } }
+
+			modifier = { factor = 0 FROM = { has_country_flag = has_token_airforce_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				set_temp_variable = { research_factor = num_research_slots }
+				divide_temp_variable = { research_factor = 5 }
+
+				factor = research_factor
+			}
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				FROM = {
+					set_temp_variable = { plane_factor = num_deployed_planes }
+					divide_temp_variable = { plane_factor = 5000 }
+				}
+
+				set_temp_variable = { target_plane_factor = num_deployed_planes }
+				divide_temp_variable = { target_plane_factor = 5000 }
+
+				add_to_temp_variable = { plane_factor = target_plane_factor }
+				divide_temp_variable = { plane_factor = 2 }
+
+				factor = plane_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_make_resistance_contacts = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_make_resistance_contacts_@PREV } }
+
+			modifier = { factor = 0 FROM = { has_country_flag = has_token_resistance_contacts_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_controlled_state = {
+						has_resistance = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0.01
+
+				NOT = { has_war_with = FROM }
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_occupied_country = {
+						has_war_together_with = FROM
+					}
+				}
+			}
+
+			modifier = {
+				factor = 10
+
+				FROM = { has_capitulated = yes }
+				is_in_array = { occupied_countries = FROM.id }
+			}
+
+			modifier = {
+				is_in_array = { occupied_countries = FROM.id }
+				FROM = { set_temp_variable = { surrender_factor = surrender_progress } }
+				add_to_temp_variable = { surrender_factor = 1 }
+
+				factor = surrender_factor
+			}
+
+			modifier = {
+				factor = 2
+				
+				has_war_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { size_factor = controlled_states }
+				divide_temp_variable = { size_factor = 100 }
+				clamp_temp_variable = { var = size_factor max = 1 }
+
+				factor = size_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}
+
+### Steal tech operations
+
+EAI_SCORER_operation_steal_tech_civilian = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_steal_tech_civilian_@PREV } }
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_civilian_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = { 
+				factor = 1.25
+				
+				is_major = yes
+			}
+
+			modifier = {
+				set_temp_variable = { industry_factor = num_of_factories }
+				divide_temp_variable = { industry_factor = 500 }
+				clamp_temp_variable = { var = industry_factor max = 1 }
+
+				factor = industry_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_steal_tech_army = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_steal_tech_army_@PREV } }
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_army_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				factor = 1.25
+				
+				has_war_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { division_factor = num_divisions }
+				divide_temp_variable = { division_factor = 250 }
+
+				factor = division_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_steal_tech_navy = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_steal_tech_navy_@PREV } }
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_navy_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_owned_state = {
+						is_coastal = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				factor = 1.25
+				
+				has_war_with = FROM
+			}
+
+			modifier = {
+				FROM = {
+					set_temp_variable = { ship_factor = num_ships }
+					divide_temp_variable = { ship_factor = 500 }
+				}
+
+				set_temp_variable = { target_ship_factor = num_ships }
+				divide_temp_variable = { target_ship_factor = 500 }
+
+				add_to_temp_variable = { ship_factor = target_ship_factor }
+				divide_temp_variable = { ship_factor = 2 }
+
+				factor = ship_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_steal_tech_airforce = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_steal_tech_airforce_@PREV } }
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_airforce_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 1.25
+
+				is_major = yes
+			}
+
+			modifier = {
+				factor = 1.25
+				
+				has_war_with = FROM
+			}
+
+			modifier = {
+				FROM = {
+					set_temp_variable = { plane_factor = num_deployed_planes }
+					divide_temp_variable = { plane_factor = 5000 }
+				}
+
+				set_temp_variable = { target_plane_factor = num_deployed_planes }
+				divide_temp_variable = { target_plane_factor = 5000 }
+
+				add_to_temp_variable = { plane_factor = target_plane_factor }
+				divide_temp_variable = { plane_factor = 2 }
+
+				factor = plane_factor
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+### Resistance operations
+
+EAI_SCORER_operation_boost_resistance = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { 
+				factor = 0
+
+				FROM = { 
+					OR = {
+						has_country_flag = is_running_operation_targeted_sabotage_industry_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_infrastructure_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_resources_@PREV
+						has_country_flag = is_running_operation_boost_resistance_@PREV
+					}
+				}
+			}
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_resistance_contacts_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_controlled_state = {
+						has_resistance = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_occupied_country = {
+						has_war_together_with = FROM
+					}
+				}
+			}
+
+			modifier = {
+				factor = 4
+
+				FROM = { has_capitulated = yes }
+				is_in_array = { occupied_countries = FROM.id }
+			}
+
+			modifier = {
+				is_in_array = { occupied_countries = FROM.id }
+				FROM = { set_temp_variable = { surrender_factor = surrender_progress } }
+				add_to_temp_variable = { surrender_factor = 1 }
+
+				factor = surrender_factor
+			}
+
+			modifier = {
+				factor = 2
+				
+				has_war_with = FROM
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_targeted_sabotage_industry = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 300
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { 
+				factor = 0
+
+				FROM = { 
+					OR = {
+						has_country_flag = is_running_operation_targeted_sabotage_industry_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_infrastructure_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_resources_@PREV
+						has_country_flag = is_running_operation_boost_resistance_@PREV
+					}
+				}
+			}
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_resistance_contacts_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				set_temp_variable = { industry_factor = num_of_factories }
+				divide_temp_variable = { industry_factor = 500 }
+				clamp_temp_variable = { var = industry_factor max = 1 }
+
+				factor = industry_factor
+			}
+
+			###
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_controlled_state = {
+						has_resistance = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					has_war_with = FROM
+					any_occupied_country = {
+						has_war_together_with = FROM
+					}
+				}
+			}
+
+			modifier = {
+				factor = 10
+
+				FROM = { has_capitulated = yes }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+
+				FROM = { surrender_progress > 0.01 }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+				
+				has_war_with = FROM
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_targeted_sabotage_infrastructure = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 200
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { 
+				factor = 0
+
+				FROM = { 
+					OR = {
+						has_country_flag = is_running_operation_targeted_sabotage_industry_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_infrastructure_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_resources_@PREV
+						has_country_flag = is_running_operation_boost_resistance_@PREV
+					}
+				}
+			}
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_resistance_contacts_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_controlled_state = {
+						has_resistance = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					has_war_with = FROM
+					any_occupied_country = {
+						has_war_together_with = FROM
+					}
+				}
+			}
+
+			modifier = {
+				factor = 10
+
+				FROM = { has_capitulated = yes }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+
+				FROM = { surrender_progress > 0.01 }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+				
+				has_war_with = FROM
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_targeted_sabotage_resources = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 2 }
+		}
+
+		score = {
+			base = 200
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { 
+				factor = 0
+
+				FROM = { 
+					OR = {
+						has_country_flag = is_running_operation_targeted_sabotage_industry_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_infrastructure_@PREV
+						has_country_flag = is_running_operation_targeted_sabotage_resources_@PREV
+						has_country_flag = is_running_operation_boost_resistance_@PREV
+					}
+				}
+			}
+
+			modifier = { factor = 0 NOT = { FROM = { has_country_flag = has_token_resistance_contacts_@PREV } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					any_controlled_state = {
+						has_resistance = yes
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					has_war_with = FROM
+					any_occupied_country = {
+						has_war_together_with = FROM
+					}
+				}
+			}
+
+			modifier = {
+				factor = 10
+
+				FROM = { has_capitulated = yes }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+
+				FROM = { surrender_progress > 0.01 }
+				any_occupied_country = {
+					tag = FROM
+				}
+			}
+
+			modifier = {
+				factor = 2
+				
+				has_war_with = FROM
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}
+
+### Misc
+
+EAI_SCORER_operation_capture_cipher = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_capture_cipher_@PREV } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+
+				NOT = {
+					FROM = {
+						has_tech = mechanical_computing
+						has_done_agency_upgrade = upgrade_form_department
+						NOT = {
+							decryption_progress = { 
+								target = PREV
+								value > 0.95
+							} 
+						}
+					}
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+				
+				FROM = { has_war = yes }
+				NOT = { has_war_with = FROM }
+			}
+
+			modifier = {
+				factor = 1.25
+				
+				has_war_with = FROM
+			}
+
+			modifier = {
+				factor = 2
+
+				has_war_with = FROM
+				is_neighbor_of = FROM
+			}
+
+			modifier = {
+				factor = 1.25
+
+				is_neighbor_of = FROM
+			}
+
+			modifier = {
+				factor = 4
+
+				NOT = { has_war_with = FROM }
+
+				OR = {
+					is_justifying_wargoal_against = FROM
+					has_wargoal_against = FROM
+					FROM = { is_justifying_wargoal_against = PREV }
+					FROM = { has_wargoal_against = PREV }
+				}
+			}
+
+			modifier = {
+				NOT = { has_war_with = FROM }
+				set_temp_variable = { threat_factor = global.threat }
+				multiply_temp_variable = { threat_factor = threat_factor }
+				multiply_temp_variable = { threat_factor = threat_factor }
+				
+				factor = threat_factor
+			}
+
+			modifier = {
+				FROM = { surrender_progress > 0.1}
+				any_occupied_country = {
+					tag = FROM
+				}
+				
+				factor = 1.1
+			}
+
+			modifier = {
+				has_war_with = FROM
+
+				if = { limit = { check_variable = { FROM.num_armies > 0 } }
+
+					set_temp_variable = { division_ratio = num_armies }
+					divide_temp_variable = { division_ratio = FROM.num_armies }
+
+					subtract_from_temp_variable = { division_ratio = 1 }
+					multiply_temp_variable = { division_ratio = 0.5 }
+					add_to_temp_variable = { division_ratio = 1 }
+				}
+				else = { set_temp_variable = { division_ratio = 0 } }
+
+				factor = division_ratio
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+
+			modifier = {
+				factor = 0.25
+
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+			}
+		}
+	}
+}
+
+EAI_SCORER_operation_collaboration_government = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		target_root_trigger = {
+			check_variable = { EAI_available_operatives > 1 }
+		}
+
+		score = {
+			base = 100
+
+			modifier = { factor = 0.01 has_country_flag = EAI_operation_timeout_@FROM }
+
+			modifier = { factor = 0 FROM = { has_country_flag = is_running_operation_collaboration_government_@PREV } }
+
+			modifier = { factor = 0 NOT = { check_variable = { FROM.has_collaboration@THIS < 0.1 } } }
+
+			modifier = { factor = 0 tag = FROM }
+
+			################################################
+			###		Operation specific AI logic
+			################################################
+
+			modifier = {
+				factor = 0
+				
+				NOT = { has_war_with = FROM }
+			}
+
+			modifier = {
+				OR = {
+					any_of_scopes = { array = owned_states
+						if = { limit = { is_controlled_by = FROM }
+							add_to_temp_variable = { target_states_controlled = 1 }
+						}
+						always = no
+					}
+					always = yes
+				}
+				divide_temp_variable = { target_states_controlled = num_owned_states }
+
+				factor = target_states_controlled
+			}
+
+			################################################
+			###		General AI logic
+			################################################
+
+			modifier = { # Already targeting this country and probably has built up a network
+				factor = 2
+
+				check_variable = { FROM.EAI_operation_target = THIS.id }
+			}
+
+			modifier = {
+				factor = 0.1
+
+				has_war_together_with = FROM
+			}
+
+			modifier = {
+				set_temp_variable = { temp = EAI_country_operative_captures_@FROM }
+				divide_temp_variable = { temp = 4 }
+				clamp_temp_variable = { var = temp min = 0 max = 1 }
+				set_temp_variable = { risk_factor = 1 }
+				subtract_from_temp_variable = { risk_factor = temp }
+
+				factor = risk_factor
+			}
+
+			modifier = {
+				factor = 0 
+
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+			}
+		}
+	}
+}

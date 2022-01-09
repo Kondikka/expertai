@@ -67,9 +67,13 @@ EAI_construction_monthly_update = {
 EAI_construction_bimonthly_update = {
 
 	EAI_construction_use_free_CIC =  yes
+
+	EAI_priority_construction_strategies = yes
 }
 
-### Common strategy
+###############################################################
+### Construction strategies
+###############################################################
 
 EAI_construction_strategy_COMMON = {
 
@@ -593,18 +597,18 @@ EAI_construction_strategy_GER = {
 			any_enemy_country = { has_deployed_air_force_size = { size > 200 type = strategic_bomber } }
 			is_major = yes
 		} 
+		
 		EAI_queue_AA = yes
 		EAI_queue_AA = yes
 	}
 	
 	if = { 
 		limit = { 
-			synthetic_refinery > 14
-			check_variable = { resource_consumed@rubber > 8 }
-			OR = { check_variable = { resource@rubber < 8 } check_variable = { resource_imported@rubber > 8 } }
+			check_variable = { EAI_needs_rubber = 3 }
 			has_tech = synth_oil_experiments 
 		}
-		EAI_queue_REF = yes
+
+		EAI_priority_queue_REF = yes
 	}
 	
 	if = { 
@@ -613,6 +617,7 @@ EAI_construction_strategy_GER = {
 			num_of_civilian_factories_available_for_projects < 100 
 			check_variable = { EAI_available_CIC_ratio < 0.25 } 
 		}
+
 		EAI_queue_CIC = yes
 	}
 
@@ -647,25 +652,13 @@ EAI_construction_strategy_GER = {
 			EAI_queue_MIC = yes
 			EAI_queue_MIC = yes
 			EAI_queue_MIC = yes
+
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
 			EAI_queue_MIC = yes
 
-			if = { 
-				limit = { 
-					synthetic_refinery < 15
-					set_temp_variable = { ref_limit = global.EAI_years_elapsed }
-					multiply_temp_variable = { ref_limit = 3 }
-					check_variable = { EAI_construction_REF_added < ref_limit }
-				}
-				EAI_queue_REF = yes
-				EAI_queue_REF = yes
-
-				else = {
-					EAI_queue_MIC = yes
-					EAI_queue_MIC = yes
-					EAI_queue_MIC = yes
-					EAI_queue_MIC = yes
-				}
-			}
+			EAI_queue_MIC = yes
 		}
 		else_if = { limit = {}
 			EAI_queue_INF_resource = yes
@@ -1103,17 +1096,25 @@ EAI_construction_strategy_SOV = {
 			EAI_queue_MIC = yes
 			
 			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
 		}
 		else_if = { limit = { num_of_military_factories < 500 }
 
 			EAI_queue_INF_resource = yes
 			EAI_queue_INF_resource = yes
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+			EAI_queue_CIC = yes
+			EAI_queue_CIC = yes
+			EAI_queue_CIC = yes
+			EAI_queue_CIC = yes
 
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
+			
+			EAI_queue_MIC = yes
+			EAI_queue_MIC = yes
 			EAI_queue_MIC = yes
 			EAI_queue_MIC = yes
 		}
@@ -1624,7 +1625,9 @@ EAI_construction_startup = {
 	EAI_clear_construction_scores = yes
 }
 
+###############################################################
 ### Misc strategies
+###############################################################
 
 EAI_construction_use_free_CIC = {
 
@@ -1910,5 +1913,354 @@ EAI_delete_excess_MIC = {
 		}
 
 		if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | deleting factories" } 
+	}
+}
+
+###############################################################
+### Priority construction strategies
+###############################################################
+
+EAI_priority_construction_strategies = {
+
+	if = { limit = { check_variable = { ROOT.EAI_PC_active_projects < 5 }  }
+	
+		if = { limit = { EAI_PC_can_afford_project = yes }
+
+			EAI_important_radar_constructions = yes
+
+			EAI_build_refineries = yes
+
+			EAI_resource_extraction = yes
+
+			EAI_convert_MIC_to_CIC_resource_shortage = yes
+		}
+
+		EAI_convert_MIC_to_CIC_industrial_expansion = yes
+	}
+}
+
+###
+
+EAI_build_refineries = {
+
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					check_variable = { EAI_rubber_resource_shortage = 3 }
+				}
+			}
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_build_refineries" }
+
+		EAI_priority_queue_REF = yes
+	}
+}
+
+EAI_important_radar_constructions = {
+
+	if = { 
+		limit = { 
+			check_variable = { ROOT.EAI_PC_active_projects < 5 } 
+			threat > 0.3
+			num_of_civilian_factories_available_for_projects > 15
+			any_of_scopes = { array = controlled_states EAI_radar_location_2 = yes EAI_available_RADAR = yes }
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_important_radar_constructions" }
+
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 4 }
+
+		random_scope_in_array = { array = controlled_states limit = { EAI_radar_location_2 = yes EAI_available_RADAR = yes EAI_PC_can_build_project = yes }
+
+			EAI_PC_start_project = yes
+		}
+	}
+}
+
+EAI_improve_north_africa_infrastructure = {
+
+	if = { 
+		limit = {
+			tag = ITA
+			date > 1937.6.1
+		}
+
+		set_temp_variable = { supply_line_start = 448.id } # tripoli
+		set_temp_variable = { supply_line_target = 446.id } # cairo
+		EAI_build_supply_line = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_improve_north_africa_infrastructure" }
+	}
+
+	if = { 
+		limit = {
+			tag = ENG
+			date > 1937.6.1
+		}
+
+		set_temp_variable = { supply_line_start = 446.id }
+		set_temp_variable = { supply_line_target = 448.id }
+		EAI_build_supply_line = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_improve_north_africa_infrastructure" }
+	}
+}
+
+EAI_resource_extraction = {
+	
+	if = {
+		limit = {
+			num_of_civilian_factories_available_for_projects > 30
+
+			# any state exists with significant resources and there is a need for it
+			any_of_scopes = { array = controlled_states
+
+				EAI_PC_can_build_project = yes
+
+				OR = {
+					AND = { has_resources_amount = { resource = oil amount > 50 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
+					AND = { has_resources_amount = { resource = aluminium amount > 50 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
+					AND = { has_resources_amount = { resource = rubber amount > 50 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
+					AND = { has_resources_amount = { resource = tungsten amount > 50 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
+					AND = { has_resources_amount = { resource = steel amount > 50 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
+					AND = { has_resources_amount = { resource = chromium amount > 50 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
+				}
+			}
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_resource_extraction" }
+
+		EAI_priority_queue_INF_resource = yes
+	}
+}
+
+EAI_convert_MIC_to_CIC_resource_shortage = {
+
+	### track steel shortage
+
+	if = {
+		limit = {
+			# there is a steel deficit
+			check_variable = { resource@steel < 0 }
+			
+			# total steel needed for production
+			set_temp_variable = { steel_needed = resource_consumed@steel }
+			multiply_temp_variable = { steel_needed = -1 }
+			add_to_temp_variable = { steel_needed = resource@steel }
+
+			# deficit is >25% of total need
+			set_temp_variable = { steel_deficit = resource@steel }
+			divide_temp_variable = { steel_deficit = steel_needed }
+			check_variable = { steel_deficit > 0.25 }
+		}
+
+		add_to_variable = { EAI_resource_shortage_months = 1 }
+	}
+	else = {
+		subtract_from_variable = { EAI_resource_shortage_months = 1 }
+	}
+
+	clamp_variable = { var = EAI_resource_shortage_months min = 0 max = 3 }
+
+	###
+
+	if = {
+		limit = {
+			check_variable = { ROOT.EAI_PC_active_projects < 5 }
+
+			NOT = { num_of_civilian_factories_available_for_projects < 5 }
+
+			# resource shortage
+			check_variable = { EAI_resource_shortage_months = 3 }
+
+			# over 50% of factories are mil
+			set_temp_variable = { mil_factories = num_of_military_factories }
+			divide_temp_variable = { mil_factories = num_of_factories }
+			check_variable = { mil_factories > 0.4 }
+
+			# no factory slots left
+			NOT = {
+				any_of_scopes = { array = controlled_states
+					EAI_available_SHARED = yes
+				}
+			}
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_convert_MIC_to_CIC_resource_shortage" }
+
+		EAI_priority_convert_MIC_to_CIC = yes
+	}
+}
+
+EAI_build_supply_line_GER_SOV = {
+
+	if = { 
+		limit = {
+			tag = GER
+			has_war_with = SOV
+			SOV = { has_capitulated = no }
+		}
+
+		set_temp_variable = { supply_line_start = GER.capital }
+		set_temp_variable = { supply_line_target = SOV.capital }
+		EAI_build_supply_line = yes
+	}
+
+	else_if = { 
+		limit = {
+			tag = SOV
+			has_war_with = GER
+			GER = { 
+				has_capitulated = no
+				surrender_progress > 0.1
+			}
+		}
+
+		set_temp_variable = { supply_line_start = SOV.capital }
+		set_temp_variable = { supply_line_target = GER.capital }
+		EAI_build_supply_line = yes
+	}
+}
+
+EAI_build_supply_line_JAP_RAJ = {
+
+	if = { 
+		limit = {
+			tag = JAP
+			has_war_with = RAJ
+		}
+
+		613 = { set_temp_variable = { supply_line_start = THIS.id } }
+		439 = { set_temp_variable = { supply_line_target = THIS.id } }
+		EAI_build_supply_line = yes
+	}
+}
+
+EAI_convert_MIC_to_CIC_industrial_expansion = {
+
+	if = { 
+		limit = { 
+			tag = SOV
+			has_idea = war_economy
+			num_of_military_factories > 30
+			date < 1937.1.1
+			has_war = no
+			num_of_civilian_factories_available_for_projects > 14
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_convert_MIC_to_CIC_industrial_expansion" }
+
+		set_temp_variable = { EAI_PC_ignore_factory_limit = 1 }
+		EAI_priority_convert_MIC_to_CIC = yes
+	}
+}
+
+EAI_build_supply_line = {
+
+	set_temp_variable = { pathfind_start = supply_line_start }
+	set_temp_variable = { pathfind_target = supply_line_target }
+	set_temp_variable = { pathfind_type = 1 }
+	EAI_PATHFIND/get_path = yes
+	
+	if = { limit = { check_variable = { pathfind_success = 1 } }
+
+		set_variable = { ROOT.EAI_PC_project_building_type^-1 = 1 }
+
+		### build a route to the front
+
+		set_temp_variable = { target_id = pathfind_path^0 }
+		for_each_loop = { array = pathfind_path
+
+			var:v = {
+
+				if = { limit = { EAI_PC_can_build_project = yes }
+
+					var:target_id = {
+
+						if = { limit = { check_variable = { PREV.building_level@infrastructure < THIS.building_level@infrastructure } }
+
+							set_temp_variable = { target_id = pathfind_path^i }
+						}
+					}
+
+					set_temp_variable = { building_path_to_front = 1 }
+				}
+			}
+		}
+
+		if = { limit = { check_variable = { building_path_to_front = 1 } }
+
+			var:target_id = { EAI_PC_start_project = yes }
+		}
+
+		### build along the front
+
+		if = { limit = { check_variable = { building_path_to_front = 0 } }
+
+			var:supply_line_target = {
+
+				CONTROLLER = {
+
+					set_temp_variable = { supply_line_target_controller = THIS.id }
+				}
+			}
+
+			set_temp_variable = { front_intersection = pathfind_path^num }
+			subtract_from_temp_variable = { front_intersection = 1 }
+			set_temp_variable = { front_intersection = pathfind_path^front_intersection }
+
+			add_to_temp_array = { front_states = front_intersection }
+			add_to_temp_array = { explore_states = front_intersection }
+
+			while_loop_effect = { limit = { check_variable = { explore_states^num > 0 } }
+
+				clear_temp_array = neighbor_states
+
+				for_each_scope_loop = { array = explore_states
+
+					# max infrastructure
+					if = { limit = { EAI_PC_can_build_project = yes }
+
+						EAI_PC_start_project = yes
+						
+						set_temp_variable = { break = 1 }
+					}
+
+					# check neighbors
+					else = {
+						every_neighbor_state = {
+							limit = { 
+								is_controlled_by = ROOT 
+
+								NOT = { is_in_array = { front_states = THIS.id } } 
+
+								any_neighbor_state = { 
+
+									CONTROLLER = {
+
+										NOT = { tag = ROOT }
+
+										OR = {
+											tag = var:supply_line_target_controller
+										}
+									}
+								}
+							}
+
+							add_to_temp_array = { front_states = THIS.id }
+							add_to_temp_array = { neighbor_states = THIS.id }
+						}
+					}
+				}
+
+				clear_temp_array = explore_states
+				for_each_loop = { array = neighbor_states break = break_2
+				
+					add_to_temp_array = { explore_states = v }
+				}
+			}
+		}
 	}
 }

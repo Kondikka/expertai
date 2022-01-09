@@ -1,0 +1,94 @@
+
+
+ai_generic_operation_target_scorer  = {
+	targets = {
+		target_array = potential_and_current_enemies
+		target_array = enemies_of_allies
+		target_array = neighbors
+		target_array = global.majors
+
+		score = {
+			base = 100
+
+			modifier = {
+				has_country_flag = EAI_operation_timeout_@FROM
+				factor = 0 
+			}
+
+			modifier = {
+				OR = {
+					exists = no
+					has_capitulated = yes
+					is_ally_with = FROM
+				}
+				factor = 0 
+			}
+
+			modifier = {
+				any_occupied_country = {
+					tag = FROM
+				}
+				factor = 4
+			}
+			
+			modifier = {
+				has_war_with = FROM
+				factor = 4
+			}
+
+			modifier = {
+				is_neighbor_of = FROM
+				factor = 1.1
+			}
+
+			modifier = {
+				has_war_with = FROM
+				is_neighbor_of = FROM
+				factor = 1.5
+			}
+			
+			modifier = {
+				OR = {
+					is_in_array = { FROM.potential_and_current_enemies = this }
+					is_in_array = { FROM.enemies_of_allies = this }
+				}
+				factor = 1.5
+			}
+			
+			modifier = {
+				is_major = yes
+				factor = 1.5
+			}
+
+			modifier = {
+				has_government = FROM
+				NOT = { has_war_with = FROM }
+				factor = 0.6
+			}
+
+			# larger countries are a bit more prio
+			modifier = {
+				set_temp_variable = { temp_score = num_armies }
+				divide_temp_variable = { temp_score = 250 }
+				add_to_temp_variable = { temp_score = 1.0 }
+				clamp_temp_variable = { var = temp_score max = 2 }
+				factor = temp_score
+			}
+			
+			# we got tokens to spend
+			modifier = {
+				FROM = {
+					OR = {
+						has_operation_token = { tag = PREV token = token_civilian }
+						has_operation_token = { tag = PREV token = token_army }
+						has_operation_token = { tag = PREV token = token_navy }
+						has_operation_token = { tag = PREV token = token_airforce }
+						has_operation_token = { tag = PREV token = token_resistance_contacts }
+					}
+				}
+				
+				factor = 2
+			}
+		}
+	}
+}

@@ -14,81 +14,6 @@
 #	EAI
 ########################
 
-EAI_espionage_kill_trotsky_build_network = {
-	allowed = { tag = SOV }
-	enable = {
-
-		### Requirements for operation
-
-		OR = { has_completed_focus = SOV_behead_the_snake focus_progress = { focus = SOV_behead_the_snake progress > 0 } }
-		NOT = { has_global_flag = flag_trotsky_dead }
-		NOT = { has_global_flag = flag_trotsky_has_returned_to_ussr_from_mexico }
-		NOT = { ROOT = { has_country_flag = SOV_trotskys_assassination_attempt_flag } } # This operation can only be done once
-		MEX = {
-			controls_state = 277
-		}
-		OR = {
-			has_global_flag = trotsky_exile_mexico
-			has_global_flag = flag_mexico_invited_trotsky_to_government
-		}
-
-		###
-
-		network_strength = { 
-			target = MEX
-			value < 25
-		}
-
-		NOT = { is_running_operation = { operation = murder_trotsky target = MEX } }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_mission
-		mission = build_intel_network
-		value = 50000
-		mission_target = MEX
-		num_operatives = 1
-	}
-}
-
-EAI_espionage_kill_trotsky_operation = {
-	allowed = { tag = SOV }
-	enable = {
-
-		### Requirements for operation
-
-		has_completed_focus = SOV_behead_the_snake
-		NOT = { has_global_flag = flag_trotsky_dead }
-		NOT = { has_global_flag = flag_trotsky_has_returned_to_ussr_from_mexico }
-		NOT = { ROOT = { has_country_flag = SOV_trotskys_assassination_attempt_flag } } # This operation can only be done once
-		MEX = {
-			controls_state = 277
-		}
-		OR = {
-			has_global_flag = trotsky_exile_mexico
-			has_global_flag = flag_mexico_invited_trotsky_to_government
-		}
-
-		###
-
-		NOT = {
-			network_strength = { 
-				target = MEX
-				value < 25
-			}
-		}
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = murder_trotsky
-		value = 50000
-		operation_target = MEX
-	}
-}
-
 EAI_wardec_FIN_on_historical_date = {
 	allowed = { original_tag = SOV }
 	enable = {
@@ -221,121 +146,30 @@ EAI_ignore_fin2 = {
 	}
 }
 
-EAI_SOV_ignore_claims = { # if these countries dont fold in the justification event, dont go to war
-	allowed = {
-		OR = {
-			tag = EST
-			tag = LAT
-			tag = LIT
-			tag = ROM
-		}
-	}
-	enable = {
-		is_historical_focus_on = yes
-		SOV = {
-			GER = { EAI_THIS_is_threat_to_PREV = yes }
-			OR = {
-				is_justifying_wargoal_against = ROOT
-				has_wargoal_against = ROOT
-			}
-		}
-	}
-
-	reversed = yes
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = ignore_claim id = "SOV" value = 1000 }
-	ai_strategy = { type = declare_war id = "SOV" value = -5000 }
-}
-
-EAI_conquer_est = {
+EAI_SOV_ignore_claims = {
 	allowed = { tag = SOV }
 	enable = {
-		date < 1941.1.1
-		date > 1940.1.1
-		NOT = { has_wargoal_against = EST }
-		NOT = { is_justifying_wargoal_against = EST }
-		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
-		country_exists = EST
-		NOT = { 13 = { is_controlled_by = SOV } }
-		has_war = no
 		is_historical_focus_on = yes
+		GER = { EAI_THIS_is_threat_to_PREV = yes }
 	}
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = antagonize id = "EST" value = 1000 }	
-	ai_strategy = { type = declare_war id = "EST" value = 5000 }
-	ai_strategy = { type = conquer id = "EST" value = 1000 }
-	ai_strategy = { type = ignore id = "EST" value = -1000 }	
-}
+	ai_strategy = { type = ignore_claim id = "EST" value = 5000 }
+	ai_strategy = { type = declare_war id = "EST" value = -5000 }
+	ai_strategy = { type = conquer id = "EST" value = -200 }
 
-EAI_conquer_lat = {
-	allowed = { tag = SOV }
-	enable = {
-		date < 1941.1.1
-		date > 1940.1.1
-		NOT = { has_wargoal_against = LAT }
-		NOT = { is_justifying_wargoal_against = LAT }
-		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
-		country_exists = LAT
-		NOT = { 12 = { is_controlled_by = SOV } }
-		has_war = no
-		is_historical_focus_on = yes
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = antagonize id = "LAT" value = 1000 }	
-	ai_strategy = { type = declare_war id = "LAT" value = 5000 }
-	ai_strategy = { type = conquer id = "LAT" value = 1000 }
-	ai_strategy = { type = ignore id = "LAT" value = -1000 }		
-}
+	ai_strategy = { type = ignore_claim id = "LAT" value = 5000 }
+	ai_strategy = { type = declare_war id = "LAT" value = -5000 }
+	ai_strategy = { type = conquer id = "LAT" value = -200 }
 
-EAI_conquer_lit = {
-	allowed = { tag = SOV }
-	enable = {
-		date < 1941.1.1
-		date > 1940.1.1
-		NOT = { has_wargoal_against = LIT }
-		NOT = { is_justifying_wargoal_against = LIT }
-		OR = { has_completed_focus = SOV_baltic_security has_global_flag = sov_yes_pact }
-		country_exists = LIT
-		NOT = { 189 = { is_controlled_by = SOV } }
-		has_war = no
-		is_historical_focus_on = yes
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = antagonize id = "LIT" value = 1000 }	
-	ai_strategy = { type = declare_war id = "LIT" value = 5000 }
-	ai_strategy = { type = conquer id = "LIT" value = 1000 }
-	ai_strategy = { type = ignore id = "LIT" value = -1000 }	
-}
+	ai_strategy = { type = ignore_claim id = "LIT" value = 5000 }
+	ai_strategy = { type = declare_war id = "LIT" value = -5000 }
+	ai_strategy = { type = conquer id = "LIT" value = -200 }
 
-EAI_conquer_rom = {
-	allowed = { tag = SOV }
-	enable = {
-		date < 1942.1.1
-		date > 1940.1.1
-		NOT = { has_wargoal_against = ROM }
-		NOT = { is_justifying_wargoal_against = ROM }
-		has_global_flag = sov_yes_pact
-		country_exists = ROM
-		NOT = { 78 = { is_controlled_by = SOV } }
-		has_war = no
-		is_historical_focus_on = yes
-		NOT = { has_wargoal_against = ROM }
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = antagonize id = "ROM" value = 1000 }	
-	ai_strategy = { type = declare_war id = "ROM" value = 5000 }
-	ai_strategy = { type = conquer id = "ROM" value = 1000 }
-	ai_strategy = { type = ignore id = "ROM" value = -1000 }	
+	ai_strategy = { type = ignore_claim id = "ROM" value = 5000 }
+	ai_strategy = { type = declare_war id = "ROM" value = -5000 }
+	ai_strategy = { type = conquer id = "ROM" value = -200 }
 }
 
 EAI_ignore_baltic = {
@@ -701,40 +535,40 @@ claims_on_poland = {
 	}	
 }
 
-claims_on_baltic = {
-	allowed = {
-		original_tag = SOV
-	}
-	enable = {
-		has_completed_focus = SOV_claims_in_baltic
-		OR = {
-			country_exists = LAT
-			country_exists = LIT
-		}
-	}
-	abort = {
-		NOT = {
-			country_exists = LAT
-			country_exists = LIT
-		}
-	}
+# claims_on_baltic = {
+# 	allowed = {
+# 		original_tag = SOV
+# 	}
+# 	enable = {
+# 		has_completed_focus = SOV_claims_in_baltic
+# 		OR = {
+# 			country_exists = LAT
+# 			country_exists = LIT
+# 		}
+# 	}
+# 	abort = {
+# 		NOT = {
+# 			country_exists = LAT
+# 			country_exists = LIT
+# 		}
+# 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "LAT"			
-		value = 200
-	}	
-	ai_strategy = {
-		type = antagonize
-		id = "LIT"			
-		value = 200
-	}
-	ai_strategy = {
-		type = antagonize
-		id = "EST"			
-		value = 200
-	}
-}
+# 	ai_strategy = {
+# 		type = antagonize
+# 		id = "LAT"			
+# 		value = 200
+# 	}	
+# 	ai_strategy = {
+# 		type = antagonize
+# 		id = "LIT"			
+# 		value = 200
+# 	}
+# 	ai_strategy = {
+# 		type = antagonize
+# 		id = "EST"			
+# 		value = 200
+# 	}
+# }
 
 claims_on_finland = {
 	allowed = {
@@ -786,26 +620,26 @@ claims_on_turkey = {
 	}	
 }
 
-claims_on_romania = {
-	allowed = {
-		original_tag = SOV
-	}
-	enable = {
-		has_completed_focus = SOV_claim_on_bessarabia
-		country_exists = ROM
-	}
-	abort = {
-		NOT = {
-			country_exists = ROM
-		}
-	}
+# claims_on_romania = {
+# 	allowed = {
+# 		original_tag = SOV
+# 	}
+# 	enable = {
+# 		has_completed_focus = SOV_claim_on_bessarabia
+# 		country_exists = ROM
+# 	}
+# 	abort = {
+# 		NOT = {
+# 			country_exists = ROM
+# 		}
+# 	}
 	
-	ai_strategy = {
-		type = antagonize
-		id = "ROM"			
-		value = 200
-	}	
-}
+# 	ai_strategy = {
+# 		type = antagonize
+# 		id = "ROM"			
+# 		value = 200
+# 	}	
+# }
 
 claims_on_sinkiang = {
 	allowed = {

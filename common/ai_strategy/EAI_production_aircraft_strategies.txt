@@ -33,6 +33,14 @@ EAI_default_aircraft_production_strategy = {
 	ai_strategy = { type = equipment_variant_production_factor id = suicide_craft_equipment      value = -1000 }
 
 	ai_strategy = { type = equipment_variant_production_factor id = scout_plane_equipment        value = -1000 }
+
+	###
+
+	ai_strategy = { type = build_airplane id = fighter value = 50000 }
+	ai_strategy = { type = build_airplane id = cas value = 50000 }
+	ai_strategy = { type = build_airplane id = tactical_bomber value = 50000 }
+	ai_strategy = { type = build_airplane id = strategic_bomber value = 50000 }
+	ai_strategy = { type = build_airplane id = naval_bomber value = 50000 }
 }
 
 EAI_stop_aircraft_production_strategy = {
@@ -86,7 +94,7 @@ EAI_HFTR_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_HFTR_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = heavy_fighter_equipment      value = 950 }
+	ai_strategy = { type = equipment_variant_production_factor id = heavy_fighter_equipment      value = 925 }
 }
 
 # close air support
@@ -94,7 +102,16 @@ EAI_CAS_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_CAS_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = CAS_equipment                value = 925 }
+	ai_strategy = { type = equipment_variant_production_factor id = CAS_equipment                value = 915 }
+}
+EAI_fix_CAS_aircraft_production_strategy = { # Fixes AI randomly deciding to produce this when it's not supposed to
+	enable = { NOT = { has_country_flag = EAI_CAS_aircraft_production_strategy } }
+	abort_when_not_enabled = yes
+
+	# This works by some miracle...
+	ai_strategy = { type = build_airplane id = cas value = 1 }
+	ai_strategy = { type = build_army id = cas value = -1 }
+	ai_strategy = { type = unit_ratio id = cas value = -10000 }
 }
 
 # tactical bomber
@@ -102,68 +119,60 @@ EAI_TAC_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_TAC_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = tac_bomber_equipment         value = 930 }
+	ai_strategy = { type = equipment_variant_production_factor id = tac_bomber_equipment         value = 925 }
 }
 EAI_JET_TAC_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_JET_TAC_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = jet_tac_bomber_equipment         value = 904 }
+	ai_strategy = { type = equipment_variant_production_factor id = jet_tac_bomber_equipment         value = 925 }
+}
+EAI_fix_TAC_aircraft_production_strategy = {
+	enable = { NOT = { has_country_flag = EAI_TAC_aircraft_production_strategy } }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_airplane id = tactical_bomber value = 1 }
+	ai_strategy = { type = build_army id = tactical_bomber value = -1 }
+	ai_strategy = { type = unit_ratio id = tactical_bomber value = -10000 }
 }
 
 # naval bomber
-EAI_NAV_aircraft_production_strategy = {
-	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy }
+EAI_NAV_aircraft_production_strategy_1 = {
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_1 }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = nav_bomber_equipment         value = 960 }
+	ai_strategy = { type = equipment_variant_production_factor id = nav_bomber_equipment         value = 901 }
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 1 }
 }
 EAI_NAV_aircraft_production_strategy_2 = {
-	enable = {
-		has_tech = naval_bomber1
-		
-		num_of_military_factories > 40
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_2 }
+	abort_when_not_enabled = yes
 
-		has_deployed_air_force_size = { size < 2000 type = naval_bomber }
-	}
-	abort = {
-		NOT = {
-			AND = {
-				has_tech = naval_bomber1
-		
-				num_of_military_factories > 40
-
-				has_deployed_air_force_size = { size < 2500 type = naval_bomber }
-			}
-		}
-	}
-
-	ai_strategy = { type = equipment_production_min_factories id = naval_bomber         value = 2 }
-	ai_strategy = { type = equipment_variant_production_factor id = nav_bomber_equipment         value = 2 }
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 1 }
 }
 EAI_NAV_aircraft_production_strategy_3 = {
-	enable = {
-		has_tech = naval_bomber1
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_3 }
+	abort_when_not_enabled = yes
 
-		has_deployed_air_force_size = { size < 2000 type = naval_bomber }
-		
-		num_of_military_factories > 50
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 2 }
+}
+EAI_NAV_aircraft_production_strategy_4 = {
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_4 }
+	abort_when_not_enabled = yes
 
-		alliance_naval_strength_ratio < 1
-	}
-	abort = {
-		NOT = {
-			AND = {
-				has_tech = naval_bomber1
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 2 }
+}
+EAI_NAV_aircraft_production_strategy_5 = {
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_5 }
+	abort_when_not_enabled = yes
 
-				has_deployed_air_force_size = { size < 2500 type = naval_bomber }
-		
-				num_of_military_factories > 50
-			}
-		}
-	}
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 2 }
+}
+EAI_NAV_aircraft_production_strategy_6 = {
+	enable = { has_country_flag = EAI_NAV_aircraft_production_strategy_6 }
+	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_production_min_factories id = naval_bomber         value = 2 }
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 2 }
 }
 
 # strategic bomber
@@ -171,13 +180,13 @@ EAI_STR_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_STR_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = strat_bomber_equipment       value = 975 }
+	ai_strategy = { type = equipment_variant_production_factor id = strat_bomber_equipment       value = 925 }
 }
 EAI_JET_STR_aircraft_production_strategy = {
 	enable = { has_country_flag = EAI_JET_STR_aircraft_production_strategy }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = jet_strat_bomber_equipment       value = 1000 }
+	ai_strategy = { type = equipment_variant_production_factor id = jet_strat_bomber_equipment       value = 925 }
 }
 
 # carrier fighter/naval bomber
@@ -190,9 +199,41 @@ EAI_CV_aircraft_production_strategy = {
 }
 
 # transport
-EAI_TRNS_aircraft_production_strategy = {
-	enable = { EAI_TRNS_aircraft_production = yes }
+EAI_TRNS_aircraft_production_strategy_1 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_1 }
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_variant_production_factor id = transport_plane_equipment    value = 901 }
+	ai_strategy = { type = equipment_variant_production_factor id = transport_plane_equipment    value = 1000 }
+	ai_strategy = { type = build_airplane id = air_transport value = 1 }
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 1 }
+}
+EAI_TRNS_aircraft_production_strategy_2 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_2 }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 1 }
+}
+EAI_TRNS_aircraft_production_strategy_3 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_3 }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 1 }
+}
+EAI_TRNS_aircraft_production_strategy_4 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_4 }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 2 }
+}
+EAI_TRNS_aircraft_production_strategy_5 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_5 }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 2 }
+}
+EAI_TRNS_aircraft_production_strategy_6 = {
+	enable = { has_country_flag = EAI_TRNS_aircraft_production_strategy_6 }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories id = air_transport value = 2 }
 }
