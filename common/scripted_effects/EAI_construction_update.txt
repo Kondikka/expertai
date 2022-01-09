@@ -77,93 +77,104 @@ EAI_construction_bimonthly_update = {
 
 EAI_construction_strategy_COMMON = {
 
-	# Air fields
-	if = {
-		limit = { 
-			has_deployed_air_force_size = { size > 1000 } 
-			num_of_civilian_factories_available_for_projects > 15 
-		}
-		
-		set_temp_variable = { temp = num_of_civilian_factories_available_for_projects }
-		while_loop_effect = { limit = { check_variable = { temp > 0 } }
-			EAI_queue_AIR = yes
-			subtract_from_temp_variable = { temp = 15 }
-		}
-	}
-
-	# Forts
-	if = { limit = { threat > 0.5 NOT = { any_of_scopes = { array = controlled_states EAI_available_SHARED = yes } } } 
-		random_list = {
-			1 = { EAI_queue_CFORT_BASES = yes }
-			1 = { EAI_queue_FORT_CITIES = yes }
-			1 = { EAI_queue_FORT_BORDER = yes }
-		}
-	}
-
-	# Silos
-	if = { limit = { check_variable = { EAI_max_fuel_consumption_estimate > 5000 } }
-
-		set_temp_variable = { EAI_num_silos_needed = num_of_military_factories }
-		subtract_from_temp_variable = { EAI_num_silos_needed = resource_produced@oil }
-		divide_temp_variable = { EAI_num_silos_needed = 6 }
-
-		if = {
-			limit = {
-				meta_trigger = {
-					text = { fuel_silo < [x] }
-					x = "[?EAI_num_silos_needed|.0]"
-				}
-			}
-
-			EAI_queue_SILO = yes
-		}
-	}
-
-	# Resources needed
 	if = {
 		limit = {
-			num_of_civilian_factories_available_for_projects > 15
+			date > 1937.1.1
+		}
 
-			any_of_scopes = { array = controlled_states
-
-				EAI_available_INF = yes
-
-				OR = {
-					AND = { has_resources_amount = { resource = oil amount > 50 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
-					AND = { has_resources_amount = { resource = aluminium amount > 50 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
-					AND = { has_resources_amount = { resource = rubber amount > 50 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
-					AND = { has_resources_amount = { resource = tungsten amount > 50 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
-					AND = { has_resources_amount = { resource = steel amount > 50 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
-					AND = { has_resources_amount = { resource = chromium amount > 50 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
-				}
+		# Air fields
+		if = {
+			limit = { 
+				has_deployed_air_force_size = { size > 1000 } 
+				num_of_civilian_factories_available_for_projects > 15 
 			}
+			
+			set_temp_variable = { temp = num_of_civilian_factories_available_for_projects }
+			while_loop_effect = { limit = { check_variable = { temp > 0 } }
+				EAI_queue_AIR = yes
+				subtract_from_temp_variable = { temp = 15 }
+			}
+		}
 
-			OR = { # Avoid using too much CIC on this
+		# Forts
+		if = { 
+			limit = { 
+				threat > 0.5 
+				NOT = { any_of_scopes = { array = controlled_states EAI_available_SHARED = yes } }
+			} 
+			
+			random_list = {
+				1 = { EAI_queue_CFORT_BASES = yes }
+				1 = { EAI_queue_FORT_CITIES = yes }
+				1 = { EAI_queue_FORT_BORDER = yes }
+			}
+		}
 
-				AND = {
-					NOT = { EAI_major_country = yes }
+		# Silos
+		if = { limit = { check_variable = { EAI_max_fuel_consumption_estimate > 5000 } }
+
+			set_temp_variable = { EAI_num_silos_needed = num_of_military_factories }
+			subtract_from_temp_variable = { EAI_num_silos_needed = resource_produced@oil }
+			divide_temp_variable = { EAI_num_silos_needed = 6 }
+
+			if = {
+				limit = {
+					meta_trigger = {
+						text = { fuel_silo < [x] }
+						x = "[?EAI_num_silos_needed|.0]"
+					}
 				}
 
-				AND = {
-					EAI_major_country = yes
-					
-					if = { limit = { OR = { has_idea = free_trade has_idea = export_focus } }
+				EAI_queue_SILO = yes
+			}
+		}
 
-						has_war = yes
+		# Resources needed
+		if = {
+			limit = {
+				num_of_civilian_factories_available_for_projects > 15
+
+				any_of_scopes = { array = controlled_states
+
+					EAI_available_INF = yes
+
+					OR = {
+						AND = { has_resources_amount = { resource = oil amount > 50 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
+						AND = { has_resources_amount = { resource = aluminium amount > 50 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
+						AND = { has_resources_amount = { resource = rubber amount > 50 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
+						AND = { has_resources_amount = { resource = tungsten amount > 50 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
+						AND = { has_resources_amount = { resource = steel amount > 50 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
+						AND = { has_resources_amount = { resource = chromium amount > 50 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
+					}
+				}
+
+				OR = { # Avoid using too much CIC on this
+
+					AND = {
+						NOT = { EAI_major_country = yes }
+					}
+
+					AND = {
+						EAI_major_country = yes
+						
+						if = { limit = { OR = { has_idea = free_trade has_idea = export_focus } }
+
+							has_war = yes
+						}
+					}
+				}
+
+				NOT = { 
+					has_idea = free_trade
+					AND = {
+						has_idea = export_focus
+						has_war = no
 					}
 				}
 			}
 
-			NOT = { 
-				has_idea = free_trade
-				AND = {
-					has_idea = export_focus
-					has_war = no
-				}
-			}
+			EAI_priority_queue_INF_resource = yes
 		}
-
-		EAI_priority_queue_INF_resource = yes
 	}
 
 	#########
@@ -1058,118 +1069,119 @@ EAI_construction_strategy_SOV = {
 
 	###
 	
-	if = { limit = { date > 1940.1.1 num_of_civilian_factories_available_for_projects < 100 check_variable = { EAI_available_CIC_ratio < 0.20 } }
+	# if = { limit = { date > 1940.1.1 num_of_civilian_factories_available_for_projects < 100 check_variable = { EAI_available_CIC_ratio < 0.20 } }
 	
-		EAI_queue_CIC = yes
-	}
+	# 	EAI_queue_CIC = yes
+	# }
 
 	###
 
-	if = {
-		limit = {
-			num_of_military_factories < 400
+	# if = {
+	# 	limit = {
+	# 		num_of_military_factories < 400
 
-			num_of_naval_factories < 50
-		}
+	# 		num_of_naval_factories < 50
+	# 	}
 
-		if = { limit = { has_war = no date < 1938.10.1 }
+	# 	if = { limit = { has_war = no date < 1938.10.1 }
 
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
 
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-		}
-		else_if = { limit = { num_of_military_factories < 300 }
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 	}
+	# 	else_if = { limit = { num_of_military_factories < 300 }
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
 			
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-		}
-		else_if = { limit = { num_of_military_factories < 500 }
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 	}
+	# 	else_if = { limit = { num_of_military_factories < 500 }
 
-			EAI_queue_INF_resource = yes
-			EAI_queue_INF_resource = yes
+	# 		EAI_queue_INF_resource = yes
+	# 		EAI_queue_INF_resource = yes
 
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
-			EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
+	# 		EAI_queue_CIC = yes
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
 			
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-		}
-		else_if = { limit = {}
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 	}
+	# 	else_if = { limit = {}
 
-			EAI_queue_INF_resource = yes
-			EAI_queue_INF_resource = yes
+	# 		EAI_queue_INF_resource = yes
+	# 		EAI_queue_INF_resource = yes
 
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
-			EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
+	# 		EAI_queue_MIC = yes
 
-			EAI_queue_NIC = yes
-			EAI_queue_NIC = yes
-		}
-	}
-	else_if = {
-		limit = {
-			num_of_naval_factories < 50
-		}
+	# 		EAI_queue_NIC = yes
+	# 		EAI_queue_NIC = yes
+	# 	}
+	# }
+	# else_if = {
+	# 	limit = {
+	# 		num_of_naval_factories < 50
+	# 	}
 
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
 
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
-		EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
+	# 	EAI_queue_NIC = yes
 
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-	}
-	else_if = {
-		limit = { }
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# }
+	# else_if = {
+	# 	limit = { }
 
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
 
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
 
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-		EAI_queue_INF_resource = yes
-	}
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# 	EAI_queue_INF_resource = yes
+	# }
 }
 
 EAI_construction_strategy_CHI = {
@@ -1600,25 +1612,25 @@ EAI_construction_startup = {
 	#	SOV
 	####################################################################################################################################################
 
-	else_if = { limit = { original_tag = SOV }
+	# else_if = { limit = { original_tag = SOV }
 
-		set_country_flag = { flag = EAI_construction_timer days = 240 value = 1 }
+	# 	set_country_flag = { flag = EAI_construction_timer days = 240 value = 1 }
 
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
 
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
 
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-		EAI_queue_CIC = yes
-	}
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# 	EAI_queue_CIC = yes
+	# }
 
 	####################################################################################################################################################
 

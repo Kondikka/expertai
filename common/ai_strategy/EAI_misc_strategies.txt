@@ -2,23 +2,83 @@
 #	Expert AI mod - generic
 ############################################################################################################
 
-### construction
+### Experimenting with building strategies
 
-EAI_default_construction = {
+EAI_construction_SOV_early_CIC = {
+	allowed = { original_tag = SOV }
 	enable = {
 		is_major = yes
-		num_of_military_factories < 400
+		date < 1939.1.1
+		has_war = no
+		num_of_civilian_factories < 120
+	}
+	abort_when_not_enabled = yes
+		
+	ai_strategy = { type = building_target id = industrial_complex value = 120 }
+}
+
+EAI_construction_SOV_build_MIC = {
+	allowed = { original_tag = SOV }
+	enable = {
+		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
+		
+		NOT = {
+			AND = {
+				is_major = yes
+				date < 1939.1.1
+				has_war = no
+				num_of_civilian_factories < 120
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+		
+	ai_strategy = { type = building_target id = arms_factory value = 400 }
+}
+
+EAI_construction_SOV_not_enough_CIC = {
+	allowed = { original_tag = SOV }
+	enable = {
+		check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 }
+		
+		NOT = {
+			AND = {
+				is_major = yes
+				date < 1939.1.1
+				has_war = no
+				num_of_civilian_factories < 120
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+		
+	ai_strategy = { type = added_military_to_civilian_factory_ratio value = -10000 }
+	ai_strategy = { type = dockyard_to_military_factory_ratio value = -10000 }
+}
+
+EAI_construction_SOV_NIC = {
+	allowed = { original_tag = SOV }
+	enable = {
+		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
+		NOT = { num_of_military_factories < 400 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = building_target id = dockyard value = 50 }
+}
+
+### construction
+
+EAI_construction_majors = {
+	enable = {
+		is_major = yes
+		date < 1939.1.1
+		has_war = no
 	}
 	abort_when_not_enabled = yes
 	
-	ai_strategy = {
-		type = added_military_to_civilian_factory_ratio
-		value = 100
-	}
-	ai_strategy = {
-		type = dockyard_to_military_factory_ratio
-		value = -1000
-	}
+	ai_strategy = { type = added_military_to_civilian_factory_ratio value = -10000 }
+	ai_strategy = { type = dockyard_to_military_factory_ratio value = -10000 }
 }
 
 EAI_construction_minors_MIC = {
