@@ -26,35 +26,40 @@
 
 EAI_construction_update = {
 
-	### approximate construction time
+	if = { limit = { NOT = { has_country_flag = EAI_construction_timer } check_variable = { global.EAI_days_elapsed > global.EAI_initialization_delay } }
 
-	set_temp_variable = { EAI_construction_time = 1 }
-	subtract_from_temp_variable = { EAI_construction_time = modifier@production_speed_arms_factory_factor }
-	multiply_temp_variable = { EAI_construction_time = 3800 }
-	divide_temp_variable = { EAI_construction_time = num_of_civilian_factories_available_for_projects }
-	clamp_temp_variable = { var = EAI_construction_time min = 75 max = 1000 }
-	meta_effect = {
-		text = { set_country_flag = { flag = EAI_construction_timer days = [x] value = 1 } }
-		x = "[?EAI_construction_time|.0]"
+		### approximate construction time
+
+		set_temp_variable = { EAI_construction_time = 1 }
+		subtract_from_temp_variable = { EAI_construction_time = modifier@production_speed_arms_factory_factor }
+		multiply_temp_variable = { EAI_construction_time = 3800 }
+		divide_temp_variable = { EAI_construction_time = num_of_civilian_factories_available_for_projects }
+		clamp_temp_variable = { var = EAI_construction_time min = 75 max = 1000 }
+		meta_effect = {
+			text = { set_country_flag = { flag = EAI_construction_timer days = [x] value = 1 } }
+			x = "[?EAI_construction_time|.0]"
+		}
+
+		if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: event delay: [?EAI_construction_time]" } 
+
+		####################################################################################################################################################
+
+		EAI_construction_strategy_COMMON = yes
+
+		if = { 		limit = { original_tag = ENG } EAI_construction_strategy_ENG = yes }
+		else_if = { limit = { original_tag = FRA } EAI_construction_strategy_FRA = yes }
+		else_if = { limit = { original_tag = USA } EAI_construction_strategy_USA = yes }
+		else_if = { limit = { original_tag = GER } EAI_construction_strategy_GER = yes }
+		else_if = { limit = { original_tag = ITA } EAI_construction_strategy_ITA = yes }
+		else_if = { limit = { original_tag = JAP } EAI_construction_strategy_JAP = yes }
+		else_if = { limit = { original_tag = SOV } EAI_construction_strategy_SOV = yes }
+		else_if = { limit = { original_tag = CHI } EAI_construction_strategy_CHI = yes }
+		else_if = { limit = { original_tag = SPR } EAI_construction_strategy_SPR = yes }
+
+		else = { EAI_construction_strategy_GENERIC = yes }
 	}
 
-	if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: event delay: [?EAI_construction_time]" } 
-
-	####################################################################################################################################################
-
-	EAI_construction_strategy_COMMON = yes
-
-	if = { 		limit = { original_tag = ENG } EAI_construction_strategy_ENG = yes }
-	else_if = { limit = { original_tag = FRA } EAI_construction_strategy_FRA = yes }
-	else_if = { limit = { original_tag = USA } EAI_construction_strategy_USA = yes }
-	else_if = { limit = { original_tag = GER } EAI_construction_strategy_GER = yes }
-	else_if = { limit = { original_tag = ITA } EAI_construction_strategy_ITA = yes }
-	else_if = { limit = { original_tag = JAP } EAI_construction_strategy_JAP = yes }
-	else_if = { limit = { original_tag = SOV } EAI_construction_strategy_SOV = yes }
-	else_if = { limit = { original_tag = CHI } EAI_construction_strategy_CHI = yes }
-	else_if = { limit = { original_tag = SPR } EAI_construction_strategy_SPR = yes }
-
-	else = { EAI_construction_strategy_GENERIC = yes }
+	EAI_conversion_strategies = yes
 }
 
 EAI_construction_monthly_update = {
@@ -1925,6 +1930,39 @@ EAI_delete_excess_MIC = {
 		}
 
 		if = { limit = { has_country_flag = EAI_construction_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | deleting factories" } 
+	}
+}
+
+EAI_conversion_strategies = {
+
+	if = { limit = { date > 1936.1.3 }
+
+		if = {
+			limit = {
+				tag = SOV
+				date < 1938.1.1
+				has_war = no
+				check_variable = { EAI_SOV_conversion_strategy < 10 }
+				num_of_civilian_factories_available_for_projects > 10
+				any_controlled_state = {
+					OR = { state = 219 state = 195 state = 217 }
+					EAI_PC_can_build_project = yes
+				}
+			}
+
+			add_to_variable = { EAI_SOV_conversion_strategy = 1 }
+
+			set_temp_variable = { EAI_PC_ignore_factory_limit = 1 }
+			
+			random_controlled_state = {
+				limit = {
+					OR = { state = 219 state = 195 state = 217 }
+					EAI_PC_can_build_project = yes
+				}
+
+				EAI_STATE_convert_MIC_to_CIC = yes
+			}
+		}
 	}
 }
 
