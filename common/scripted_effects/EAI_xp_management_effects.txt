@@ -145,3 +145,34 @@ EAI_manage_xp = {
 		set_variable = { EAI_navy_xp = 0 }
 	}
 }
+
+EAI_manage_command_power = { # For attaches
+
+	if = {
+		limit = {
+			OR = {
+				tag = SOV
+				tag = GER
+				tag = ENG
+				tag = ITA
+			}
+			date < 1937.1.1
+			NOT = { has_idea = EAI_attache_sent }
+		}
+
+		if = { limit = { check_variable = { EAI_stored_command_power < 50 } }
+
+			set_temp_variable = { add_cp = 50 }
+			subtract_from_temp_variable = { add_cp = EAI_stored_command_power }
+			clamp_temp_variable = { var = add_cp max = command_power }
+			add_to_variable = { EAI_stored_command_power = add_cp }
+			multiply_temp_variable = { add_cp = -1 }
+			add_command_power = add_cp
+		}
+	}
+	else_if = { limit = { check_variable = { EAI_stored_command_power > 0 } }
+
+		add_command_power = EAI_stored_command_power
+		set_variable = { EAI_stored_command_power = 0 }
+	}
+}
