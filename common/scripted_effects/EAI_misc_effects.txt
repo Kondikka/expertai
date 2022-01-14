@@ -424,6 +424,51 @@ EAI_defensive_front_strategy = {
 			clr_country_flag = EAI_defensive_front_strategy
 		}
 
+		### Out of manpower
+
+		if = { 
+			limit = {
+				set_temp_variable = { manpower_reserve = manpower_k }
+				multiply_temp_variable = { manpower_reserve = 0.1 }
+				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+				check_variable = { manpower_reserve < 0.05 } # Less than 5% mp in reserve
+				
+				OR = { # Can upgrade law or is currently conscripting
+					EAI_can_upgrade_manpower_law = yes
+					conscription_ratio < 1
+				}
+			}
+
+			if = { limit = { NOT = { has_country_flag = EAI_defensive_front_strategy } }
+
+				if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: stopping attacks due to low manpower" }
+			}
+
+			set_country_flag = EAI_defensive_front_strategy
+		}
+		else_if = {
+			limit = {
+				has_country_flag = EAI_defensive_front_strategy
+
+				set_temp_variable = { manpower_reserve = manpower_k }
+				multiply_temp_variable = { manpower_reserve = 0.1 }
+				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+				
+				OR = { # Cancel if:
+					check_variable = { manpower_reserve > 0.10 } # Over 10% mp in reserve
+					
+					NOT = { # Cant upgrade law and not conscripting more
+						EAI_can_upgrade_manpower_law = yes
+						conscription_ratio < 1
+					}
+				}
+			}
+
+			if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: CANCEL stopping attacks due to low manpower" }
+
+			clr_country_flag = EAI_defensive_front_strategy
+		}
+
 		### weak vs countries
 
 		every_enemy_country = {

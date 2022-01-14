@@ -130,6 +130,7 @@ EAI_update_espionage_strategy = {
 
 		clr_country_flag = EAI_create_new_operation
 		clr_country_flag = EAI_espionage_operation_underway
+		EAI_clear_special_operation_flags = yes
 
 		if = { limit = { check_variable = { EAI_available_operatives > 0 } }
 
@@ -171,6 +172,11 @@ EAI_clear_espionage_operation = {
 
 	clear_variable = EAI_operation_type
 	clear_variable = EAI_operation_target
+}
+
+EAI_clear_special_operation_flags = {
+
+	clr_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
 }
 
 EAI_create_espionage_operation = {
@@ -410,9 +416,10 @@ EAI_historical_operations_POL = {
 				date > 1942.1.1
 
 				OR = {
-					tag = POL
+					AND = { tag = POL GER = { is_ai = no } }
 					date > 1944.1.1
-					GER = { surrender_progress > 0.1 }
+					GER = { surrender_progress > 0.01 }
+					SOV = { surrender_progress > 0.35 }
 				}
 
 				# Timeout or already running the same operation here
@@ -432,6 +439,7 @@ EAI_historical_operations_POL = {
 			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
 
 			set_variable = { EAI_operation_target = 10.CONTROLLER }
+			set_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
 
 			# Required resistance contacts
 			if = { limit = { NOT = { has_operation_token = { tag = var:EAI_operation_target token = token_resistance_contacts } } }
@@ -456,7 +464,7 @@ EAI_historical_operations_POL = {
 			}
 
 			# Final op
-			else = {
+			else_if = { limit = { tag = POL }
 
 				set_variable = { EAI_operation_type = token:operation_warsaw_uprising }
 			}
