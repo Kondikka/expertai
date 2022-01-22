@@ -59,9 +59,15 @@ EAI_counterintelligence_mission = {
 		OR = {
 			NOT = { has_variable = EAI_operation_target }
 
-			check_variable = { EAI_available_operatives > 3 }
+			check_variable = { EAI_available_operatives > 2 }
 
 			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+				
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+
+			NOT = { network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type } }
 		}
 	}
 	abort_when_not_enabled = yes
@@ -90,13 +96,21 @@ EAI_counterintelligence_mission_2 = {
 	}
 }
 
-### Keep the network up while running an op in case AI wants another op here later
+### Keep the network up while running or preparing an op
 
 EAI_quiet_network_mission = {
 	enable = {
 		has_variable = EAI_operation_target
 		check_variable = { EAI_available_operatives > 0 }
-		is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		OR = {
+			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+				
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+
+			NOT = { network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type } }
+		}
 	}
 
 	abort_when_not_enabled = yes
@@ -108,28 +122,30 @@ EAI_quiet_network_mission = {
 		mission_target = var:EAI_operation_target
 		num_operatives = 1
 	}
+
+	ai_strategy = {
+		type = operative_mission
+		mission = build_intel_network
+		value = -10000
+		mission_target = var:EAI_operation_target
+		num_operatives = 1
+	}
 }
 
-### AI doesnt seem to want to run the op if it cant provide the exact amount of operatives in the strategy
+### Build intel network with up to 2 agents
 
-EAI_espionage_operation_1 = {
+EAI_espionage_build_network_1 = {
 	enable = {
 		has_variable = EAI_operation_target
 		check_variable = { EAI_available_operatives = 1 }
+		network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type }
+		NOT = {
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		}
 	}
 	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = var:EAI_operation_type
-		value = 500000
-		operation_target = var:EAI_operation_target
-	}
-
-	ai_strategy = {
-		type = operation_equipment_priority
-		value = 100
-	}
 
 	ai_strategy = {
 		type = operative_mission
@@ -140,24 +156,18 @@ EAI_espionage_operation_1 = {
 	}
 }
 
-EAI_espionage_operation_2 = {
+EAI_espionage_build_network_2 = {
 	enable = {
 		has_variable = EAI_operation_target
-		check_variable = { EAI_available_operatives = 2 }
+		check_variable = { EAI_available_operatives > 1 }
+		network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type }
+		NOT = {
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		}
 	}
 	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = var:EAI_operation_type
-		value = 500000
-		operation_target = var:EAI_operation_target
-	}
-
-	ai_strategy = {
-		type = operation_equipment_priority
-		value = 100
-	}
 
 	ai_strategy = {
 		type = operative_mission
@@ -168,99 +178,99 @@ EAI_espionage_operation_2 = {
 	}
 }
 
-EAI_espionage_operation_3 = {
+EAI_espionage_build_network_heavy_water_raid = {
 	enable = {
 		has_variable = EAI_operation_target
-		check_variable = { EAI_available_operatives > 2 }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = var:EAI_operation_type
-		value = 500000
-		operation_target = var:EAI_operation_target
-	}
-
-	ai_strategy = {
-		type = operation_equipment_priority
-		value = 100
-	}
-
-	ai_strategy = {
-		type = operative_mission
-		mission = build_intel_network
-		value = 10000
-		mission_target = var:EAI_operation_target
-		num_operatives = 3
-	}
-}
-
-### Operations that require special state targets
-
-EAI_espionage_operation_heavy_water_raid = {
-	enable = {
-		has_variable = EAI_operation_target
-		check_variable = { EAI_available_operatives = 2 }
 		check_variable = { EAI_operation_type = token:heavy_water_raid }
+		check_variable = { EAI_available_operatives > 1 }
+		network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type }
+		NOT = {
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		}
 	}
 	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = var:EAI_operation_type
-		value = 500000
-		operation_target = var:EAI_operation_target
-	}
-
-	ai_strategy = {
-		type = operation_equipment_priority
-		value = 100
-	}
 
 	ai_strategy = {
 		type = operative_mission
 		mission = build_intel_network
 		value = 10000
-		priority = 100
 		mission_target = var:EAI_operation_target
 		num_operatives = 2
+		priority = 100
 		state = 110
 	}
 }
 
-EAI_espionage_operation_warsaw_uprising = {
+EAI_espionage_build_network_warsaw_uprising = {
 	enable = {
 		has_variable = EAI_operation_target
-		check_variable = { EAI_available_operatives = 2 }
 		has_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
+		check_variable = { EAI_available_operatives > 1 }
+		network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type }
+		NOT = {
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		}
 	}
 	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = operative_operation
-		operation = var:EAI_operation_type
-		value = 500000
-		operation_target = var:EAI_operation_target
-	}
-
-	ai_strategy = {
-		type = operation_equipment_priority
-		value = 100
-	}
 
 	ai_strategy = {
 		type = operative_mission
 		mission = build_intel_network
 		value = 10000
-		priority = 100
 		mission_target = var:EAI_operation_target
 		num_operatives = 2
+		priority = 100
 		state = 10
 		state = 87
 		state = 98
 		state = 90
 		state = 92
-		state = 92
+	}
+}
+
+### Start operation
+
+EAI_prepare_espionage_operation = {
+	enable = {
+		has_variable = EAI_operation_target
+		OR = {
+			NOT = { network_strength = { target = var:EAI_operation_target value < global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type } }
+			is_preparing_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+			has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+		}
+		NOT = { is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type } }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = operative_operation
+		operation = var:EAI_operation_type
+		value = 500000
+		operation_target = var:EAI_operation_target
+	}
+
+	ai_strategy = {
+		type = operation_equipment_priority
+		value = 500
+	}
+}
+
+EAI_run_espionage_operation = {
+	enable = {
+		has_variable = EAI_operation_target
+		NOT = { has_country_flag = EAI_operation_completed }
+		has_finished_collecting_for_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = operative_operation
+		operation = var:EAI_operation_type
+		value = 500000
+		operation_target = var:EAI_operation_target
 	}
 }

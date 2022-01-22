@@ -4,7 +4,13 @@
 
 @NUM_OPERATION_STRATEGIES = 4
 @NUM_HISTORICAL_OPERATION_STRATEGIES = 5
-@OPERATION_COMMIT_DAYS = 120
+@OPERATION_COMMIT_ADDED_DAYS_BASE = 20
+@OPERATION_COMMIT_ADDED_DAYS_FACTOR = 1.1
+@OPERATION_FAILED_TO_START_TIMEOUT_DAYS = 120
+@OPERATION_OPERATIVES_CAPTURED_TIMEOUT_DAYS = 60
+@RANDOM_OPERATION_FREQUENCY_INDUSTRY_DIVISOR = 50 # Weight = 100 * (RANDOM_OPERATION_FREQUENCY_MULT - (num_of_civilian_factories_available_for_projects / RANDOM_OPERATION_FREQUENCY_INDUSTRY_DIVISOR)^4 * RANDOM_OPERATION_FREQUENCY_MULT)
+@RANDOM_OPERATION_FREQUENCY_MULT = 1
+@RANDOM_OPERATION_FREQUENCY_WORLD_THREAT_MULT = 0.1 # 0 threat = 10% more likely to not start operation
 
 EAI_espionage_operation_types = {
 
@@ -54,6 +60,50 @@ EAI_espionage_operation_types = {
 	set_variable = { global.EAI_MIN_OPERATIVES^token:nuclear_espionage                              = 1 }
 
 	set_variable = { global.EAI_MIN_OPERATIVES^token:operation_warsaw_uprising                      = 2 }
+
+	###
+
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_rescue_operative                     = 30 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_infiltrate_civilian                  = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_fake_intel                           = 40 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_capture_cipher                       = 40 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_infiltrate_armed_forces_army         = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_infiltrate_armed_forces_navy         = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_infiltrate_armed_forces_airforce     = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_coup_government                      = 70 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_boost_resistance                     = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_make_resistance_contacts             = 40 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_collaboration_government             = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_coordinated_strike                   = 70 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_steal_tech_civilian                  = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_targeted_sabotage_industry           = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_targeted_sabotage_infrastructure     = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_targeted_sabotage_resources          = 35 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_steal_tech_army                      = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_steal_tech_navy                      = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_steal_tech_airforce                  = 50 }
+
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_instigate_workers_revolution_britain       = 25 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_instigate_workers_revolution_italy         = 25 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_instigate_workers_revolution_spain         = 25 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_instigate_workers_revolution_germany       = 25 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_north_africa                       = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_syria                              = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_indochina                          = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_central_africa                     = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_west_africa                        = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:FRA_coup_in_madagascar                         = 50 }
+
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:heavy_water_raid                               = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:bruneval_raid                                  = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:capture_tito                                   = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:rescue_mussolini                               = 35 }
+
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:raid_trotskys_villa                            = 50 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:murder_trotsky                                 = 25 }
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:nuclear_espionage                              = 75 }
+
+	set_variable = { global.EAI_OPERATION_NETWORK_REQUIREMENT^token:operation_warsaw_uprising                      = 50 }
 }
 
 EAI_update_espionage_strategy = {
@@ -77,7 +127,23 @@ EAI_update_espionage_strategy = {
 		limit = {
 			is_running_operation = { target = var:EAI_operation_target operation = var:EAI_operation_type }
 
-			check_variable = { EAI_available_operatives > 2 } # Only if it has 3 extra agents, otherwise it will keep doing 2 agent operations
+			OR = {
+				check_variable = { EAI_available_operatives > 2 } # Only if it has 3 extra agents, otherwise it will keep doing 2 agent operations
+
+				any_operative_leader = { # Operatives need rescuing
+					is_operative_captured = yes 
+
+					var:operative_captor = {
+
+						# Timeout or already running the same operation here
+						NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
+						NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_rescue_operative } } }
+
+						# Can perform operations against this country
+						num_of_controlled_states > 0
+					}
+				} 
+			}
 		}
 
 		set_country_flag = EAI_create_new_operation
@@ -99,9 +165,9 @@ EAI_update_espionage_strategy = {
 		}
 
 		set_country_flag = EAI_create_new_operation
-		if = { limit = { var:EAI_operation_target = { check_variable = { EAI_country_operative_captures_@ROOT > 1 } } }
+		if = { limit = { var:EAI_operation_target = { check_variable = { EAI_espionage_operation_risk_@ROOT > 1 } } }
 			
-			var:EAI_operation_target = { set_country_flag = { flag = EAI_operation_timeout_@ROOT value = 1 days = 60 } }
+			var:EAI_operation_target = { set_country_flag = { flag = EAI_operation_timeout_@ROOT value = 1 days = @OPERATION_OPERATIVES_CAPTURED_TIMEOUT_DAYS } }
 		}
 
 		if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: not enough available operatives - [?EAI_operation_type.GetTokenKey] = [?EAI_operation_target.GetName]" }
@@ -119,7 +185,7 @@ EAI_update_espionage_strategy = {
 		}
 
 		set_country_flag = EAI_create_new_operation
-		var:EAI_operation_target = { set_country_flag = { flag = EAI_operation_timeout_@ROOT value = 1 days = 120 } }
+		var:EAI_operation_target = { set_country_flag = { flag = EAI_operation_timeout_@ROOT value = 1 days = @OPERATION_FAILED_TO_START_TIMEOUT_DAYS } }
 
 		if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: was not able to start operation - [?EAI_operation_type.GetTokenKey] = [?EAI_operation_target.GetName]" }
 	}
@@ -137,9 +203,11 @@ EAI_update_espionage_strategy = {
 			EAI_create_espionage_operation = yes
 		}
 
-		if = { limit = { has_country_flag = EAI_espionage_operation_underway }
+		if = { limit = { check_variable = { started_operation = 1 } }
 
-			if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: started operation - [?EAI_operation_type.GetTokenKey] = [?EAI_operation_target.GetTag]" }
+			EAI_set_operation_commit_days = yes
+
+			if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: started operation - [?EAI_operation_type.GetTokenKey] = [?EAI_operation_target.GetTag], committed [?commit_days] days" }
 		}
 		else = { EAI_clear_espionage_operation = yes }
 	}
@@ -159,6 +227,14 @@ EAI_available_operatives = {
 					AND = {
 						check_variable = { operation_country = 0 }
 						NOT = { check_variable = { operation_type = 0 } }
+					}
+				}
+
+				NOT = { # Not in hiding or wounded
+					AND = {
+						check_variable = { operation_country = 0 }
+						check_variable = { operation_state = 0 }
+						check_variable = { operation_type = 0 }
 					}
 				}
 			}
@@ -181,7 +257,7 @@ EAI_clear_special_operation_flags = {
 
 EAI_create_espionage_operation = {
 
-	for_each_loop = { array = global.EAI_operations index = operation_prio break = found_operation
+	for_each_loop = { array = global.EAI_operations index = operation_prio break = started_operation
 
 		### Operation strategy priorities
 
@@ -192,10 +268,28 @@ EAI_create_espionage_operation = {
 		else_if = { limit = { check_variable = { operation_prio = 2 } } EAI_set_collaboration_target = yes }
 
 		else_if = { limit = { check_variable = { operation_prio = 3 } } EAI_random_operation_selector = yes }
+	}
+}
 
-		###
+EAI_set_operation_commit_days = {
 
-		if = { limit = { has_country_flag = EAI_espionage_operation_underway } set_temp_variable = { found_operation = 1 } }
+	if = { 		limit = { check_variable = { EAI_available_operatives = 1 } } set_temp_variable = { intel_gain = 0.4 } }
+	else_if = { limit = { check_variable = { EAI_available_operatives = 2 } } set_temp_variable = { intel_gain = 0.6 } }
+	else_if = { limit = { check_variable = { EAI_available_operatives > 2 } } set_temp_variable = { intel_gain = 0.7 } }
+
+	###
+
+	set_temp_variable = { commit_days = global.EAI_OPERATION_NETWORK_REQUIREMENT^EAI_operation_type }
+	divide_temp_variable = { commit_days = intel_gain }
+	add_to_temp_variable = { commit_days = @OPERATION_COMMIT_ADDED_DAYS_BASE }
+	multiply_temp_variable = { commit_days = @OPERATION_COMMIT_ADDED_DAYS_FACTOR }
+	round_temp_variable = commit_days
+
+	###
+
+	meta_effect = {
+		text = { set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = [x] } }
+		x = "[?commit_days]"
 	}
 }
 
@@ -219,7 +313,7 @@ EAI_historical_operations = {
 
 		###
 
-		if = { limit = { has_country_flag = EAI_espionage_operation_underway } set_temp_variable = { found_historical_operation = 1 } }
+		if = { limit = { check_variable = { started_operation = 1 } } set_temp_variable = { found_historical_operation = 1 } }
 	}
 }
 
@@ -243,10 +337,13 @@ EAI_historical_operations_FRA = {
 					# Timeout or already running the same operation here
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = FRA_coup_in_madagascar } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:FRA_coup_in_madagascar }
 			set_variable = { EAI_operation_target = 543.CONTROLLER }
@@ -272,10 +369,13 @@ EAI_historical_operations_FRA = {
 					# Timeout or already running the same operation here
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = FRA_coup_in_north_africa } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:FRA_coup_in_north_africa }
 			set_variable = { EAI_operation_target = 461.CONTROLLER }
@@ -297,6 +397,9 @@ EAI_historical_operations_GER = {
 				ITA = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = rescue_mussolini } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 
 				# Operation requirements
@@ -314,7 +417,7 @@ EAI_historical_operations_GER = {
 				# }
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:rescue_mussolini }
 			set_variable = { EAI_operation_target = ITA.id }
@@ -349,6 +452,9 @@ EAI_historical_operations_SOV = {
 							# Timeout or already running the same operation here
 							NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 							NOT = { ROOT = { is_running_operation = { target = PREV operation = murder_trotsky } } }
+
+							# Can perform operations against this country
+							num_of_controlled_states > 0
 						}
 						AND = {
 							controls_state = 110 #OSTLANDET (Oslo) -> Trotsky not accepted in Mexico (or Soviets being super fast to kill him, which should be impossible btw)
@@ -360,13 +466,16 @@ EAI_historical_operations_SOV = {
 							# Timeout or already running the same operation here
 							NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 							NOT = { ROOT = { is_running_operation = { target = PREV operation = murder_trotsky } } }
+							
+							# Can perform operations against this country
+						num_of_controlled_states > 0
 						}
 					}
 					set_temp_variable = { operation_target = THIS.id }
 				}
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:murder_trotsky }
 			set_variable = { EAI_operation_target = operation_target }
@@ -387,11 +496,14 @@ EAI_historical_operations_SOV = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = nuclear_espionage } } }
 
+					# Can perform operations against this country
+					num_of_controlled_states > 0
+
 					set_temp_variable = { operation_target = THIS.id }
 				}
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:nuclear_espionage }
 			set_variable = { EAI_operation_target = operation_target }
@@ -425,9 +537,10 @@ EAI_historical_operations_POL = {
 				# Timeout or already running the same operation here
 				GER = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
-					NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_make_resistance_contacts } } }
-					NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_boost_resistance } } }
-					NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_warsaw_uprising } } }
+					NOT = { ROOT = { has_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 
 				# Operation requirements
@@ -436,14 +549,14 @@ EAI_historical_operations_POL = {
 				var:10.CONTROLLER = { has_war_with = POL }
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
-
-			set_variable = { EAI_operation_target = 10.CONTROLLER }
-			set_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
-
 			# Required resistance contacts
 			if = { limit = { NOT = { has_operation_token = { tag = var:EAI_operation_target token = token_resistance_contacts } } }
 
+				set_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
+
+				set_temp_variable = { started_operation = 1 } 
+
+				set_variable = { EAI_operation_target = 10.CONTROLLER }
 				set_variable = { EAI_operation_type = token:operation_make_resistance_contacts }
 			}
 
@@ -460,16 +573,26 @@ EAI_historical_operations_POL = {
 					}
 				}
 
+				set_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
+
+				set_temp_variable = { started_operation = 1 } 
+
+				set_variable = { EAI_operation_target = 10.CONTROLLER }
 				set_variable = { EAI_operation_type = token:operation_boost_resistance }
 			}
 
 			# Final op
 			else_if = { limit = { tag = POL }
 
+				set_country_flag = EAI_operation_warsaw_uprising_OPERATION_ACTIVE
+
+				set_temp_variable = { started_operation = 1 } 
+
+				set_variable = { EAI_operation_target = 10.CONTROLLER }
 				set_variable = { EAI_operation_type = token:operation_warsaw_uprising }
 			}
 
-			if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: operation_warsaw_uprising" }
+			if = { limit = { check_variable = { started_operation = 1 } has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: operation_warsaw_uprising" }
 		}
 	}
 }
@@ -493,6 +616,9 @@ EAI_historical_operations_ALLIES = {
 				GER = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = bruneval_raid } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 
 				# Operation requirements
@@ -591,7 +717,7 @@ EAI_historical_operations_ALLIES = {
 				# }
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:bruneval_raid }
 			set_variable = { EAI_operation_target = GER.id }
@@ -606,6 +732,9 @@ EAI_historical_operations_ALLIES = {
 				GER = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = heavy_water_raid } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 
 				# Operation requirements
@@ -623,7 +752,7 @@ EAI_historical_operations_ALLIES = {
 				# }
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:heavy_water_raid }
 			set_variable = { EAI_operation_target = GER.id }
@@ -645,13 +774,16 @@ EAI_set_rescue_operative_target = {
 					# Timeout or already running the same operation here
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_rescue_operative } } }
+
+					# Can perform operations against this country
+					num_of_controlled_states > 0
 				}
 
 				set_temp_variable = { rescue_op = operative_captor }
 			} 
 		}
 
-		set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+		set_temp_variable = { started_operation = 1 } 
 
 		set_variable = { EAI_operation_type = token:operation_rescue_operative }
 		set_variable = { EAI_operation_target = rescue_op }
@@ -697,11 +829,14 @@ EAI_set_collaboration_target = {
 					NOT = { has_country_flag = EAI_operation_timeout_@ROOT }
 					NOT = { ROOT = { is_running_operation = { target = PREV operation = operation_collaboration_government } } }
 
+					# Can perform operations against this country
+					num_of_controlled_states > 0
+
 					set_temp_variable = { op_target = THIS.id }
 				}
 			}
 
-			set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+			set_temp_variable = { started_operation = 1 } 
 
 			set_variable = { EAI_operation_type = token:operation_collaboration_government }
 			set_variable = { EAI_operation_target = op_target }
@@ -869,7 +1004,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_infiltrate_civilian_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_infiltrate_civilian }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_infiltrate_armed_forces_army_SCORES^0 = {
@@ -890,7 +1025,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_infiltrate_armed_forces_army_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_infiltrate_armed_forces_army }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_infiltrate_armed_forces_navy_SCORES^0 = {
@@ -911,7 +1046,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_infiltrate_armed_forces_navy_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_infiltrate_armed_forces_navy }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_infiltrate_armed_forces_airforce_SCORES^0 = {
@@ -932,7 +1067,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_infiltrate_armed_forces_airforce_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_infiltrate_armed_forces_airforce }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_make_resistance_contacts_SCORES^0 = {
@@ -941,7 +1076,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_make_resistance_contacts_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_make_resistance_contacts }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_steal_tech_civilian_SCORES^0 = {
@@ -962,7 +1097,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_steal_tech_civilian_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_steal_tech_civilian }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_steal_tech_army_SCORES^0 = {
@@ -983,7 +1118,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_steal_tech_army_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_steal_tech_army }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_steal_tech_navy_SCORES^0 = {
@@ -1004,7 +1139,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_steal_tech_navy_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_steal_tech_navy }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_steal_tech_airforce_SCORES^0 = {
@@ -1025,7 +1160,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_steal_tech_airforce_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_steal_tech_airforce }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_boost_resistance_SCORES^0 = {
@@ -1034,7 +1169,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_boost_resistance_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_boost_resistance }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_targeted_sabotage_industry_SCORES^0 = {
@@ -1043,7 +1178,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_targeted_sabotage_industry_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_targeted_sabotage_industry }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_targeted_sabotage_infrastructure_SCORES^0 = {
@@ -1052,7 +1187,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_targeted_sabotage_infrastructure_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_targeted_sabotage_infrastructure }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_targeted_sabotage_resources_SCORES^0 = {
@@ -1061,7 +1196,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_targeted_sabotage_resources_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_targeted_sabotage_resources }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_capture_cipher_SCORES^0 = {
@@ -1076,7 +1211,7 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_capture_cipher_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_capture_cipher }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
 			}
 
 			var:EAI_SCORER_operation_collaboration_government_SCORES^0 = {
@@ -1094,7 +1229,61 @@ EAI_random_operation_selector = {
 
 				set_variable = { EAI_operation_target = EAI_SCORER_operation_collaboration_government_TARGETS^0 }
 				set_variable = { EAI_operation_type = token:operation_collaboration_government }
-				set_country_flag = { flag = EAI_espionage_operation_underway value = 1 days = @OPERATION_COMMIT_DAYS }
+				set_temp_variable = { started_operation = 1 } 
+			}
+
+			100 = { # Do nothing
+
+				modifier = { # Do use tokens tho
+					factor = 0.1
+
+					OR = {
+						check_variable = { EAI_SCORER_operation_steal_tech_civilian_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_steal_tech_army_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_steal_tech_navy_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_steal_tech_airforce_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_boost_resistance_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_targeted_sabotage_industry_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_targeted_sabotage_infrastructure_SCORES^0 > 50 }
+						check_variable = { EAI_SCORER_operation_targeted_sabotage_resources_SCORES^0 > 50 }
+					}
+				}
+
+				modifier = { # Industry size affects operation frequency
+
+					set_temp_variable = { temp = num_of_civilian_factories_available_for_projects }
+					divide_temp_variable = { temp = @RANDOM_OPERATION_FREQUENCY_INDUSTRY_DIVISOR }
+					multiply_temp_variable = { temp = temp }
+					multiply_temp_variable = { temp = temp }
+					clamp_temp_variable = { var = temp min = 0 max = 0.75 }
+					multiply_temp_variable = { temp = @RANDOM_OPERATION_FREQUENCY_MULT }
+
+					set_temp_variable = { industry_factor = @RANDOM_OPERATION_FREQUENCY_MULT }
+					subtract_from_temp_variable = { industry_factor = temp }
+
+					factor = industry_factor
+				}
+
+				modifier = { # Global threat has a minor effect on frequency
+
+					set_temp_variable = { threat_factor = 1 }
+					subtract_from_temp_variable = { threat_factor = global.threat }
+					multiply_temp_variable = { threat_factor = @RANDOM_OPERATION_FREQUENCY_WORLD_THREAT_MULT }
+					add_to_temp_variable = { threat_factor = 1 }
+
+					factor = threat_factor
+				}
+
+				modifier = { # Does not have 3 operatives needed for better operations
+
+					num_of_operatives < 3
+
+					is_major = no
+
+					factor = 3
+				}
+
+				if = { limit = { has_country_flag = EAI_espionage_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | ESPIONAGE: skipped starting operation" }
 			}
 		}
 	}

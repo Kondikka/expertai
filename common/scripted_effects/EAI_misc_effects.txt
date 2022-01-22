@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 4.64
+@EAI_VERSION = 4.646
 
 EAI_set_version = {
 
@@ -22,6 +22,7 @@ EAI_save_compatibility = {
 		### Save compatibility effects
 
 		EAI_espionage_operation_types = yes
+		EAI_advisor_types = yes
 	}
 }
 
@@ -36,6 +37,82 @@ EAI_check_game_version = { # Show warning to players
 	# }
 }
 
+### Advisors
+
+EAI_advisor_types = {
+
+	set_variable = { global.EAI_silent_workhorse_TYPE = 1 }
+
+	set_variable = { global.EAI_captain_of_industry_TYPE = 2 }
+
+	set_variable = { global.EAI_war_industrialist_TYPE = 3 }
+
+	set_variable = { global.EAI_head_of_intelligence_TYPE = 4 }
+
+	set_variable = { global.EAI_popular_queen_TYPE = 5 }
+	set_variable = { global.EAI_popular_figurehead_TYPE = 6 }
+	set_variable = { global.EAI_marxist_fundementalist_TYPE = 7 }
+	set_variable = { global.EAI_autocratic_archbishop_TYPE = 8 }
+}
+
+EAI_advisor_strategies = {
+
+	if = { limit = { NOT = { EAI_major_country = yes } }
+
+		clear_variable = EAI_get_advisor
+
+		# silent_workhorse
+		if = {
+			limit = {
+				has_available_idea_with_traits = { idea = silent_workhorse limit = 1 }
+				NOT = { has_idea_with_trait = silent_workhorse }
+			}
+
+			set_variable = { EAI_get_advisor = global.EAI_silent_workhorse_TYPE }
+		}
+
+		# captain_of_industry
+		else_if = {
+			limit = {
+				has_available_idea_with_traits = { idea = captain_of_industry limit = 1 }
+				NOT = { has_idea_with_trait = captain_of_industry }
+			}
+
+			set_variable = { EAI_get_advisor = global.EAI_captain_of_industry_TYPE }
+		}
+
+		# head_of_intelligence
+		else_if = {
+			limit = {
+				has_available_idea_with_traits = { idea = head_of_intelligence limit = 1 }
+				NOT = { has_idea_with_trait = head_of_intelligence }
+			}
+
+			set_variable = { EAI_get_advisor = global.EAI_head_of_intelligence_TYPE }
+		}
+
+		# war_industrialist
+		else_if = {
+			limit = {
+				has_available_idea_with_traits = { idea = war_industrialist limit = 1 }
+				NOT = { has_idea_with_trait = war_industrialist }
+			}
+
+			set_variable = { EAI_get_advisor = global.EAI_war_industrialist_TYPE }
+		}
+
+		# popular_figurehead
+		else_if = {
+			limit = {
+				has_available_idea_with_traits = { idea = popular_figurehead limit = 1 }
+				NOT = { has_idea_with_trait = popular_figurehead }
+			}
+
+			set_variable = { EAI_get_advisor = global.EAI_popular_figurehead_TYPE }
+		}
+	}
+}
+
 ###
 
 EAI_build_armies_fix = {
@@ -47,7 +124,7 @@ EAI_build_armies_fix = {
 			
 			# Build amount
 			set_temp_variable = { build_manpower = EAI_division_cap }
-			clamp_temp_variable = { var = build_manpower min = 0 max = 250 }
+			clamp_temp_variable = { var = build_manpower min = 0 max = 350 }
 			check_variable = { EAI_army_manpower < build_manpower }
 
 			# Has enough equipment

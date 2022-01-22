@@ -367,28 +367,37 @@ on_actions = {
 			# ROOT   the country the operative was performing its mission in
 			# FROM   the country the operative is operating for
 
-			add_to_variable = { ROOT.EAI_country_operative_captures_@FROM = 1 }
+			add_to_variable = { ROOT.EAI_espionage_operation_risk_@FROM = 1 }
+		}
+	}
+	on_operative_death = {
+		effect = {
+			# SCOPE  the operative
+			# ROOT   the killer country (optional)
+			# FROM   the country the operative is operating for
+
+			add_to_variable = { ROOT.EAI_espionage_operation_risk_@FROM = 1 }
 		}
 	}
 	on_bi_yearly_pulse = {
 		effect = {
 
-			if = { limit = { check_variable = { EAI_yearly_check = 2 } }
+			if = { limit = { check_variable = { EAI_espionage_risk_decay = 2 } }
 
 				every_other_country = {
 					limit = {
-						ROOT = { has_variable = EAI_country_operative_captures_@PREV }
+						check_variable = { ROOT.EAI_espionage_operation_risk_@THIS > 0 }
 					}
 
-					subtract_from_variable = { ROOT.EAI_country_operative_captures_@THIS = 1 }
-					clamp_variable = { var = ROOT.EAI_country_operative_captures_@THIS min = 0 }
+					subtract_from_variable = { ROOT.EAI_espionage_operation_risk_@THIS = 1 }
+					clamp_variable = { var = ROOT.EAI_espionage_operation_risk_@THIS min = 0 }
 				}
 
-				clear_variable = EAI_yearly_check
+				clear_variable = EAI_espionage_risk_decay
 			}
 			else = {
 
-				add_to_variable = { EAI_yearly_check = 1 }
+				add_to_variable = { EAI_espionage_risk_decay = 1 }
 			}
 		}
 	}
