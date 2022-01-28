@@ -7852,9 +7852,14 @@ focus_tree = {
 					}
 				}
 				CZE = {
-					every_unit_leader = {
+					every_character = {
 						limit = {
-							has_unit_leader_flag = POL_monarchy_sympathies_flag
+							OR = {
+								is_corps_commander = yes 
+								is_navy_leader = yes
+								is_field_marshal = yes
+							}
+							has_unit_leader_flag = POL_monarchy_sympathies_flag	
 						}
 						set_nationality = POL
 					}
@@ -8493,7 +8498,7 @@ focus_tree = {
 				create_country_leader = {
 					name = "Michał II"
 					desc = "POLITICS_MICHAEL_I_DESC"
-					picture = "gfx/leaders/ROM/Portrait_romania_michael_i.dds"			
+					picture = GFX_portrait_Michał_II
 					expire = "1965.1.1"
 					ideology = despotism
 					traits = {
@@ -9799,6 +9804,23 @@ focus_tree = {
 						is_ai = yes
 					}
 				}
+				random_other_country = {
+					limit = {
+						is_puppet_of = ROOT 
+						original_tag = LIT 
+					}
+					every_character = {
+						limit = {
+							OR = {
+								is_corps_commander = yes 
+								is_navy_leader = yes
+								is_field_marshal = yes
+							}
+							has_unit_leader_flag = POL_monarchy_sympathies_flag
+						}
+						set_nationality = ROOT 
+					}					
+				}
 				annex_country = {
 					target = LIT
 					transfer_troops = yes
@@ -10504,7 +10526,8 @@ focus_tree = {
 								is_corps_commander = yes 
 								is_navy_leader = yes
 								is_field_marshal = yes
-							}							
+							}
+							has_unit_leader_flag = POL_monarchy_sympathies_flag							
 						}
 						set_nationality = ROOT 
 					}
@@ -11579,6 +11602,19 @@ focus_tree = {
 		available = {
 			NOT = { has_completed_focus = POL_support_global_falangism }
 			is_subject_of = GER
+		}
+
+		bypass = {
+			is_subject_of = GER  
+			if = {
+				limit = {
+					has_dlc = "Death or Dishonor"
+				}
+				compare_autonomy_state > autonomy_reichsprotectorate
+			}
+			else = {
+				compare_autonomy_state > autonomy_integrated_puppet
+			}
 		}
 
 		x = 0
@@ -14204,13 +14240,54 @@ focus_tree = {
 		available = {
 			has_intelligence_agency = yes
 			surrender_progress > 0.6
-
 		}
-		allow_branch = { has_dlc = "La Resistance" }
+		allow_branch = {
+			has_dlc = "La Resistance"
+			has_dlc = "Man the Guns"
+		}
 
 		x = 3
 		y = 1
 		relative_position_id = POL_prepare_for_the_inevitable
+		cost = 10
+
+		ai_will_do = {
+			factor = 10
+		}
+		available_if_capitulated = yes
+		search_filters = {  }
+		completion_reward = {
+			add_ideas = { POL_expand_intelligence_idea }
+			custom_effect_tooltip = available_political_advisor
+			show_ideas_tooltip = POL_marian_rejewski
+			create_operative_leader = {
+				bypass_recruitment = yes
+				name = "Witold Pilecki"
+				GFX = "GFX_operative_portrait_POL_witold_pilecki"
+				traits = {
+					operative_escape_artist operative_infiltrator operative_commando
+				}
+				nationalities = { POL GER }
+			}
+		}
+	}
+
+	focus = {
+		id = POL_expand_polish_intelligence_no_mtg
+		icon = GFX_focus_POL_expand_polish_intelligence
+		available = {
+			has_intelligence_agency = yes
+			surrender_progress > 0.6
+		}
+		allow_branch = {
+			has_dlc = "La Resistance"
+			NOT = { has_dlc = "Man the Guns" }
+		}
+
+		x = -2
+		y = 0
+		relative_position_id = POL_prepare_for_the_inevitable
+
 		cost = 10
 
 		ai_will_do = {
@@ -14269,6 +14346,42 @@ focus_tree = {
 			}
 		}
 	}
+	
+	focus = {
+		id = POL_niech_zyje_opor_no_mtg
+		icon = GFX_focus_POL_resistance
+		prerequisite = { focus = POL_expand_polish_intelligence_no_mtg }
+		available = {
+			has_intelligence_agency = yes
+			has_capitulated = yes
+		}
+
+		x = -1
+		y = 2
+		relative_position_id = POL_expand_polish_intelligence_no_mtg
+		cost = 10
+
+		ai_will_do = {
+			factor = 10
+		}
+		available_if_capitulated = yes
+		search_filters = {  }
+		completion_reward = {
+			gain_random_agency_upgrade = yes
+			custom_effect_tooltip = unlock_warsaw_uprising_tt
+			hidden_effect = {
+				every_enemy_country = { #Alert Germany/Sov that the Warsaw Uprising may happen
+					limit = {
+						core_resistance = {
+							occupied_country_tag = POL
+							value > 0
+						}
+					}
+					country_event = poland.26
+				}
+			}
+		}
+	}
 
 	focus = {
 		id = POL_the_long_push_home
@@ -14283,7 +14396,7 @@ focus_tree = {
 						has_war_with = SOV
 					}
 					is_in_faction = yes
-					surrender_progress < 0.6
+					surrender_progress > 0.6
 				}
 			}
 		}
@@ -14291,6 +14404,41 @@ focus_tree = {
 		x = 0
 		y = 1
 		relative_position_id = POL_expand_polish_intelligence
+		cost = 10
+
+		ai_will_do = {
+			factor = 10
+		}
+		available_if_capitulated = yes
+		completion_reward = {
+			add_timed_idea = {
+				idea = POL_push_home_idea
+				days = 365
+			}
+		}
+	}
+
+	focus = {
+		id = POL_the_long_push_home_no_mtg
+		icon = GFX_focus_spr_the_anti_fascist_workers_revolution
+		prerequisite = { focus = POL_expand_polish_intelligence_no_mtg }
+		available = {
+			OR = {
+				has_capitulated = yes
+				AND = {
+					OR = {
+						has_war_with = GER
+						has_war_with = SOV
+					}
+					is_in_faction = yes
+					surrender_progress > 0.6
+				}
+			}
+		}
+
+		x = 0
+		y = 1
+		relative_position_id = POL_expand_polish_intelligence_no_mtg
 		cost = 10
 
 		ai_will_do = {
@@ -14334,6 +14482,34 @@ focus_tree = {
 	}
 
 	focus = {
+		id = POL_the_bombe_no_mtg
+		icon = GFX_goal_generic_radar
+		prerequisite = { focus = POL_expand_polish_intelligence_no_mtg }
+		available = {
+		}
+
+		x = 4
+		y = 1
+		relative_position_id = POL_expand_polish_intelligence_no_mtg
+		cost = 10
+
+		ai_will_do = {
+			factor = 1
+		}
+
+		available_if_capitulated = yes
+		search_filters = { FOCUS_FILTER_RESEARCH }
+		completion_reward = {
+			add_tech_bonus = {
+				name = POL_the_bombe
+				bonus = 1.0
+				uses = 1
+				category = computing_tech
+			}
+		}
+	}
+
+	focus = {
 		id = POL_the_cyclometer
 		icon = GFX_goal_generic_production2
 		prerequisite = { focus = POL_expand_polish_intelligence }
@@ -14343,6 +14519,46 @@ focus_tree = {
 		x = 2
 		y = 1
 		relative_position_id = POL_expand_polish_intelligence
+		cost = 10
+
+		ai_will_do = {
+			factor = 1
+		}
+
+		available_if_capitulated = yes
+		search_filters = { FOCUS_FILTER_RESEARCH }
+		completion_reward = {
+			if = {
+				limit = {
+					NOT = { has_dlc = "La Resistance" }
+				}
+				add_tech_bonus = {
+					name = POL_the_cyclometer
+					bonus = 1.0
+					uses = 1
+					category = encryption_tech
+					category = decryption_tech
+				}
+			}
+			else = {
+				hidden_effect = {
+					set_technology = { lar_decryption_bonus_tech = 1 }
+				}
+				custom_effect_tooltip = lar_decryption_bonus_tt
+			}
+		}
+	}
+
+	focus = {
+		id = POL_the_cyclometer_no_mtg
+		icon = GFX_goal_generic_production2
+		prerequisite = { focus = POL_expand_polish_intelligence_no_mtg }
+		available = {
+		}
+
+		x = 2
+		y = 1
+		relative_position_id = POL_expand_polish_intelligence_no_mtg
 		cost = 10
 
 		ai_will_do = {
@@ -15077,4 +15293,4 @@ focus_tree = {
 		}
 	}
 
-}		
+}

@@ -274,8 +274,7 @@ EAI_create_espionage_operation = {
 EAI_set_operation_commit_days = {
 
 	if = { 		limit = { check_variable = { EAI_available_operatives = 1 } } set_temp_variable = { intel_gain = 0.4 } }
-	else_if = { limit = { check_variable = { EAI_available_operatives = 2 } } set_temp_variable = { intel_gain = 0.6 } }
-	else_if = { limit = { check_variable = { EAI_available_operatives > 2 } } set_temp_variable = { intel_gain = 0.7 } }
+	else_if = { limit = { check_variable = { EAI_available_operatives > 1 } } set_temp_variable = { intel_gain = 0.6 } }
 
 	###
 
@@ -532,6 +531,19 @@ EAI_historical_operations_POL = {
 					date > 1944.1.1
 					GER = { surrender_progress > 0.01 }
 					SOV = { surrender_progress > 0.35 }
+				}
+
+				OR = {
+					NOT = {
+						var:10.CONTROLLER = { # Warsaw controller
+							core_resistance = {
+								occupied_country_tag = POL
+								value > 50
+							}
+						}
+					}
+
+					tag = POL
 				}
 
 				# Timeout or already running the same operation here
@@ -855,7 +867,7 @@ EAI_collaboration_strategy_GER = {
 
 EAI_collaboration_strategy_JAP = {
 
-	if = { limit = { date > 1939.1.1 }
+	if = { limit = { date > 1939.1.1 NOT = { has_war_with = CHI } }
 
 		add_to_temp_array = { collab_targets = PHI.id }
 		add_to_temp_array = { collab_targets = INS.id }
@@ -1279,6 +1291,8 @@ EAI_random_operation_selector = {
 					num_of_operatives < 3
 
 					is_major = no
+
+					has_war = no
 
 					factor = 3
 				}
