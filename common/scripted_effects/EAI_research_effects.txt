@@ -162,3 +162,129 @@ EAI_check_for_empty_research_slots = {
 	}
 	else = { clr_country_flag = EAI_unused_research_slots }
 }
+
+############################################################################################################
+
+### Priority research - unused
+
+EAI_priority_research = {
+
+	clear_array = EAI_RESEARCH_get_technology
+
+	# fighter2
+	if = {
+		limit = {
+			set_temp_variable = { get_tech = token:fighter2 }
+
+			NOT = { has_tech = var:get_tech is_researching_technology = var:get_tech }
+
+			###
+
+			EAI_FTR_tech_focus = yes
+
+			date > 1939.1.1
+		}
+
+		add_to_array = { EAI_RESEARCH_get_technology = get_tech }
+	}
+
+	# radio
+	if = {
+		limit = {
+			set_temp_variable = { get_tech = token:radio }
+
+			NOT = { has_tech = var:get_tech is_researching_technology = var:get_tech }
+
+			###
+
+			has_war = yes
+		}
+
+		add_to_array = { EAI_RESEARCH_get_technology = get_tech }
+	}
+}
+
+############################################################################################################
+
+### Research factors
+
+EAI_research_factors = {
+
+	EAI_RESEARCH_armor_research_factor = yes
+	EAI_RESEARCH_naval_research_factor = yes
+}
+
+EAI_RESEARCH_armor_research_factor = {
+
+	@ARMOR_INDUSTRY_DIVISOR = 100
+	@ARMOR_INDUSTRY_WEIGHT = 0.7
+	
+	@ARMOR_RESEARCH_SLOT_DIVISOR = 5
+	@ARMOR_RESEARCH_SLOT_WEIGHT = 0.3
+
+	set_temp_variable = { research_factor = 0 }
+
+	###
+
+	set_temp_variable = { industry_factor = num_of_military_factories }
+	divide_temp_variable = { industry_factor = @ARMOR_INDUSTRY_DIVISOR }
+	clamp_temp_variable = { var = industry_factor max = 1 }
+	multiply_temp_variable = { industry_factor = @ARMOR_INDUSTRY_WEIGHT }
+	add_to_temp_variable = { research_factor = industry_factor }
+
+	###
+
+	set_temp_variable = { research_slot_factor = num_research_slots }
+	divide_temp_variable = { research_slot_factor = @ARMOR_RESEARCH_SLOT_DIVISOR }
+	clamp_temp_variable = { var = research_slot_factor max = 1 }
+	multiply_temp_variable = { research_slot_factor = @ARMOR_RESEARCH_SLOT_WEIGHT }
+	add_to_temp_variable = { research_factor = research_slot_factor }
+	
+	###
+
+	clamp_temp_variable = { var = research_factor min = 0.01 max = 1 }
+	set_variable = { EAI_RESEARCH_armor_research_factor = research_factor }
+}
+
+EAI_RESEARCH_naval_research_factor = {
+
+	@NAVAL_INDUSTRY_DIVISOR = 50
+	@NAVAL_INDUSTRY_WEIGHT = 0.6
+	
+	@NAVAL_SHIP_DIVISOR = 100
+	@NAVAL_SHIP_WEIGHT = 0.2
+
+	@NAVAL_RESEARCH_SLOT_DIVISOR = 5
+	@NAVAL_RESEARCH_SLOT_WEIGHT = 0.2
+
+	set_temp_variable = { research_factor = 0 }
+
+	###
+
+	set_temp_variable = { dockyard_factor = num_of_naval_factories }
+	divide_temp_variable = { dockyard_factor = @NAVAL_INDUSTRY_DIVISOR }
+	clamp_temp_variable = { var = dockyard_factor max = 1 }
+	multiply_temp_variable = { dockyard_factor = @NAVAL_INDUSTRY_WEIGHT }
+	add_to_temp_variable = { research_factor = dockyard_factor }
+
+	###
+
+	set_temp_variable = { ship_factor = num_ships }
+	divide_temp_variable = { ship_factor = @NAVAL_SHIP_DIVISOR }
+	clamp_temp_variable = { var = ship_factor max = 1 }
+	multiply_temp_variable = { ship_factor = @NAVAL_SHIP_WEIGHT }
+	add_to_temp_variable = { research_factor = ship_factor }
+
+	###
+
+	set_temp_variable = { research_slot_factor = num_research_slots }
+	divide_temp_variable = { research_slot_factor = @NAVAL_RESEARCH_SLOT_DIVISOR }
+	clamp_temp_variable = { var = research_slot_factor max = 1 }
+	multiply_temp_variable = { research_slot_factor = @NAVAL_RESEARCH_SLOT_WEIGHT }
+	add_to_temp_variable = { research_factor = research_slot_factor }
+	
+	###
+
+	clamp_temp_variable = { var = research_factor min = 0.01 max = 1 }
+	set_variable = { EAI_RESEARCH_naval_research_factor = research_factor }
+}
