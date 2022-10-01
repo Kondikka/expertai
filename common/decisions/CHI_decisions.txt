@@ -338,7 +338,6 @@ war_measures = {
 
 CHI_industrial_evacuations = {
 
-
 	CHI_industrial_evacuations_from_gansu = { #283 #gansu
 		icon = generic_scorched_earth
 		available = {
@@ -5796,10 +5795,10 @@ CHI_communist_infiltration = {
 			has_equipment = { infantry_equipment > 999 }
 		}
 		highlight_states = {
- highlight_state_targets = {
-			state = 744
-		} 
-}
+		 	highlight_state_targets = {
+				state = 744
+			} 
+		}
 		
 		visible = {
 			744 = {
@@ -5859,10 +5858,10 @@ CHI_communist_infiltration = {
 			has_equipment = { infantry_equipment > 999 }
 		}
 		highlight_states = {
- highlight_state_targets = {
-			state = 746
-		} 
-}
+		 	highlight_state_targets = {
+				state = 746
+			} 
+		}
 		
 		visible = {
 			746 = {
@@ -5921,8 +5920,11 @@ CHI_communist_infiltration = {
 foreign_support = {
 	CHI_flying_tigers = {
 		icon = generic_air
+		allowed = {
+			original_tag = USA
+		}
 		available = {
-			has_equipment = { fighter_equipment > 149 }
+			has_equipment = { small_plane_airframe > 99 }
 		}
 		visible = {
 			has_country_flag = CHI_flying_tigers
@@ -5940,11 +5942,35 @@ foreign_support = {
 				}
 				custom_effect_tooltip = flying_tigers_tt
 				hidden_effect = {
-					USA = {
-						send_equipment = {
-							target = PREV
-							type = fighter_equipment
-							amount = 150
+					if = {
+						limit = {
+							NOT = { has_dlc = "By Blood Alone" }
+						}
+						add_equipment_to_stockpile = {
+							producer = USA
+							type = fighter_equipment_1
+							amount = 100
+						}
+					}
+					else = {
+						USA = {
+							create_equipment_variant = {
+								name = "P-40" #
+								type = small_plane_airframe_2
+								modules = {
+									fixed_main_weapon_slot = heavy_mg_4x
+									fixed_auxiliary_weapon_slot_1 = heavy_mg_2x
+									fixed_auxiliary_weapon_slot_2 = bomb_locks
+									engine_type_slot = engine_3_1x
+									special_type_slot_1 = drop_tanks
+								}
+							}
+						}
+						add_equipment_to_stockpile = {
+							producer = USA
+							type = small_plane_airframe_2
+							amount = 100
+							variant_name = "P-40"
 						}
 					}
 				}
@@ -5952,15 +5978,18 @@ foreign_support = {
 			add_war_support = 0.05
 		}
 		modifier = {
-			air_volunteer_cap = 100
+			air_volunteer_cap = 1
 		}
 	}
 
 	CHI_soviet_volunteer_group = {
 		icon = generic_air
+		allowed = {
+			original_tag = SOV
+		}
 		available = {
-			has_equipment = { fighter_equipment > 99 }
-			has_equipment = { tac_bomber_equipment > 49 }
+			has_equipment = { small_plane_airframe > 99 }
+			has_equipment = { medium_plane_airframe > 49 }
 		}
 		visible = {
 			has_country_flag = CHI_soviet_volunteer_group
@@ -5978,26 +6007,43 @@ foreign_support = {
 				}
 				custom_effect_tooltip = soviet_volunteers_tt
 				hidden_effect = {
-					SOV = {
-						send_equipment = {
-							target = PREV
-							type = fighter_equipment
+					if = {
+						limit = {
+							NOT = {
+								has_dlc = "By Blood Alone"
+							}
+						}
+						add_equipment_to_stockpile = {
+							producer = SOV
+							type = fighter_equipment_1
 							amount = 100
 						}
-					}
-					SOV = {
-						send_equipment = {
-							target = PREV
-							type = tac_bomber_equipment
+						add_equipment_to_stockpile = {
+							producer = SOV
+							type = tac_bomber_equipment_1
 							amount = 50
+						}	
+					}
+					else = {
+						add_equipment_to_stockpile = {
+							producer = SOV
+							type = small_plane_airframe_1
+							amount = 100
+							variant_name = "I-16"
 						}
+						add_equipment_to_stockpile = {
+							producer = SOV
+							type = medium_plane_airframe_0
+							amount = 50
+							variant_name = "DB-3"
+						}	
 					}
 				}
 			}
 			add_war_support = 0.05	
 		}
 		modifier = {
-			air_volunteer_cap = 100
+			air_volunteer_cap = 1
 		}
 	}
 
@@ -6678,4 +6724,87 @@ prestigious_projects = {
 		
 		}
 	}
+}
+
+CHI_occupation_actions = { 
+
+
+	CHI_breach_the_yellow_river = { 
+		icon = GFX_decision_hol_inundate_water_lines
+		
+		available = {
+			controls_state = 607
+			has_war_with = JAP
+			OR = {
+				NOT = { controls_state = 608 }
+				NOT = { controls_state = 614 }
+				NOT = { controls_state = 597 }
+				NOT = { controls_state = 598 }
+				NOT = { controls_state = 606 }
+			}
+		}
+		highlight_states = {
+			highlight_state_targets = {
+				state = 607
+			} 
+		}
+		
+		visible = {
+			controls_state = 607
+			is_literally_china = yes
+			NOT = { has_global_flag = chi_yellow_river_blown } #So warlords don't do this too
+		}
+		
+		fire_only_once = yes
+		
+		cost = 20
+
+		ai_will_do = {
+			base = 0
+			#Pretty damn important
+			modifier = {
+				add = 25
+				NOT = { controls_state = 608 }
+			}
+			modifier = {
+				add = 25
+				NOT = { controls_state = 614 }
+			}
+			modifier = {
+				add = 25
+				NOT = { controls_state = 597 }
+			}
+			modifier = {
+				add = 25
+				NOT = { controls_state = 598 }
+			}
+			modifier = {
+				add = 25
+				NOT = { controls_state = 606 }
+			}
+		}
+		
+		complete_effect = {
+			add_war_support = -0.05
+			every_owned_state = {
+				limit = {
+					OR = {
+						state = 606
+						state = 607
+						state = 598
+						state = 597
+					}
+				}
+				add_dynamic_modifier = {
+					modifier = yellow_river_blown
+					days = 730 
+				}
+			}
+			hidden_effect = { 
+				news_event = { id = news.409 } 
+				set_global_flag = chi_yellow_river_blown
+			}
+		}
+	}
+	
 }

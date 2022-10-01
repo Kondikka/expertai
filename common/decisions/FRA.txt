@@ -140,7 +140,7 @@ FRA_vichy_france = {
 		available = {
 			has_government = fascism
 			NOT = {
-				GER = { divisions_in_state = { state = 21 size > 0 } }
+				GER = { divisions_in_state = { state = 851 size > 0 } } #BBA: Replaced state 21 (Provence - Bouches-du-Rhone) by stat 851 (Provence - Var), where Toulon is
 			}
 			has_country_flag = {
 				flag = case_anton
@@ -335,6 +335,7 @@ category_test_decisions = {
 						OR = {
 							state = 735
 							state = 21
+							state = 851
 							state = 32
 							state = 20
 							state = 26
@@ -398,6 +399,8 @@ category_test_decisions = {
 						air_ratio = 1.0
 					}
 				}
+				event_target:france_vichy = {set_country_flag  = vichy_france}
+				
 				change_tag_from = FRA
 			}
 		}
@@ -569,7 +572,7 @@ FRA_weapons_purchases_category = {
 			factor = 1
 			modifier = {
 				has_equipment = {
-					fighter_equipment < 1
+					small_plane_airframe < 1
 				}
 				factor = 5
 			}
@@ -586,9 +589,23 @@ FRA_weapons_purchases_category = {
 			}
 		}
 		remove_effect = {
-			add_equipment_to_stockpile = {
-				type = fighter_equipment
-				amount = 50
+			if = {
+				limit = {
+					NOT = { has_dlc = "By Blood Alone" }
+				}
+				add_equipment_to_stockpile = {
+					type = fighter_equipment_1
+					amount = 50
+					producer = USA
+				}
+			}
+			else = {
+				add_equipment_to_stockpile = {
+					type = small_plane_airframe_1
+					amount = 50
+					producer = USA
+					variant_name = "P-36A"
+				}	
 			}
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -5 }
@@ -609,7 +626,7 @@ FRA_weapons_purchases_category = {
 			factor = 1
 			modifier = {
 				has_equipment = {
-					tac_bomber_equipment < 1
+					medium_plane_airframe < 1
 				}
 				factor = 5
 			}
@@ -627,9 +644,23 @@ FRA_weapons_purchases_category = {
 			}
 		}
 		remove_effect = {
-			add_equipment_to_stockpile = {
-				type = tac_bomber_equipment
-				amount = 25
+			if = {
+				limit = {
+					NOT = { has_dlc = "By Blood Alone" }
+				}
+				add_equipment_to_stockpile = {
+					type = tac_bomber_equipment_1
+					amount = 25
+					producer = USA
+				}
+			}
+			else = {
+				add_equipment_to_stockpile = {
+					type = medium_plane_airframe_1
+					amount = 25
+					producer = USA
+					variant_name = "B-18"
+				}
 			}
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -5 }
@@ -1297,6 +1328,7 @@ economy_decisions = {
 						state = 32
 						state = 20
 						state = 21
+						state = 851
 					}
 					is_fully_controlled_by = ROOT 
 					free_building_slots = {
@@ -1894,7 +1926,7 @@ FRA_intervention_in_overseas_territories = {
 		}
 		fire_only_once = yes
 		cost = 25
-		ai_will_do = {
+		ai_will_do = { #EAI
 			factor = 0
 		}
 	}

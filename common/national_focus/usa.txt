@@ -1016,35 +1016,44 @@ focus_tree = {
 			OR = {
 				ENG = {
 					exists = yes
-					not = { has_war_with = ROOT }
-					not = { is_in_faction_with = ROOT }
-					not = { has_completed_focus = ENG_decolonization }
+					NOT = { has_war_with = ROOT }
+					NOT = { is_in_faction_with = ROOT }
+					NOT = { has_completed_focus = ENG_decolonization }
 				}
 				ITA = {
 					exists = yes
-					not = { has_war_with = ROOT }
-					not = { is_in_faction_with = ROOT }
+					NOT = { has_war_with = ROOT }
+					NOT = { is_in_faction_with = ROOT }
+					if = {
+						limit = {
+							has_dlc = "By Blood Alone"
+						}
+						NOT = {
+							has_completed_focus = ITA_abolish_the_colonies
+							has_completed_focus = ITA_new_colonial_policies
+						}
+					}
 					any_state = {
 						is_controlled_by = ITA
-						not = { is_core_of = ITA }
+						NOT = { is_core_of = ITA }
 					}
 				}
 				FRA = {
 					exists = yes
-					not = { has_war_with = ROOT }
-					not = { is_in_faction_with = ROOT }
+					NOT = { has_war_with = ROOT }
+					NOT = { is_in_faction_with = ROOT }
 					any_state = {
 						is_controlled_by = FRA
-						not = { is_core_of = FRA }
+						NOT = { is_core_of = FRA }
 					}
 				}
 				GER = {
 					exists = yes
-					not = { has_war_with = ROOT }
-					not = { is_in_faction_with = ROOT }
+					NOT = { has_war_with = ROOT }
+					NOT = { is_in_faction_with = ROOT }
 					any_state = {
 						is_controlled_by = GER
-						not = { is_core_of = GER }
+						NOT = { is_core_of = GER }
 					}
 				}
 			}
@@ -1063,9 +1072,9 @@ focus_tree = {
 				limit = {
 					ENG = {
 						exists = yes
-						not = { has_war_with = ROOT }
-						not = { is_in_faction_with = ROOT }
-						not = { has_completed_focus = ENG_decolonization }
+						NOT = { has_war_with = ROOT }
+						NOT = { is_in_faction_with = ROOT }
+						NOT = { has_completed_focus = ENG_decolonization }
 					}
 				}
 				every_country = {
@@ -1088,11 +1097,18 @@ focus_tree = {
 				limit = {
 					ITA = {
 						exists = yes
-						not = { has_war_with = ROOT }
-						not = { is_in_faction_with = ROOT }
+						NOT = { has_war_with = ROOT }
+						NOT = { is_in_faction_with = ROOT }
 						any_state = {
 							is_controlled_by = ITA
-							not = { is_core_of = ITA }
+							NOT = { is_core_of = ITA }
+						}
+						OR = {
+							NOT = { has_dlc = "By Blood Alone" }
+							NOT = {
+								has_completed_focus = ITA_abolish_the_colonies
+								has_completed_focus = ITA_new_colonial_policies
+							}
 						}
 					}
 				}
@@ -1116,11 +1132,11 @@ focus_tree = {
 				limit = {
 					FRA = {
 						exists = yes
-						not = { has_war_with = ROOT }
-						not = { is_in_faction_with = ROOT }
+						NOT = { has_war_with = ROOT }
+						NOT = { is_in_faction_with = ROOT }
 						any_state = {
 							is_controlled_by = FRA
-							not = { is_core_of = FRA }
+							NOT = { is_core_of = FRA }
 						}
 					}
 				}
@@ -1144,11 +1160,11 @@ focus_tree = {
 				limit = {
 					GER = {
 						exists = yes
-						not = { has_war_with = ROOT }
-						not = { is_in_faction_with = ROOT }
+						NOT = { has_war_with = ROOT }
+						NOT = { is_in_faction_with = ROOT }
 						any_state = {
 							is_controlled_by = GER
-							not = { is_core_of = GER }
+							NOT = { is_core_of = GER }
 						}
 					}
 				}
@@ -2167,10 +2183,10 @@ focus_tree = {
 				}
 			}
 			every_state = {
-				limit = { has_state_flag = USA_military_construction_3Inf }
+				limit = { has_state_flag = USA_military_construction_2Inf }
 				add_building_construction = {
 					type = infrastructure
-					level = 3
+					level = 2
 					instant_build = yes
 				}
 			}
@@ -2191,6 +2207,13 @@ focus_tree = {
 						region = 118
 						region = 119
 						region = 120
+						region = 199
+						region = 219
+						region = 218
+						region = 211
+						region = 214
+						region = 198
+						region = 197
 					}
 				}
 				add_extra_state_shared_building_slots = 5
@@ -2203,163 +2226,209 @@ focus_tree = {
 			}
 			if = {
 				limit = {
-					371 = {
-						OR = {
-							NOT = { is_owned_and_controlled_by = USA }
-							AND = {
-								is_owned_and_controlled_by = USA
-								free_building_slots = {
-									building = infrastructure
-									size < 3
-								}
+					any_owned_state = {
+						AND = {
+							is_controlled_by = USA
+							is_core_of = USA
+							free_building_slots = {
+								building = infrastructure
+								size > 1
 							}
 						}
 					}
 				}
 				random_owned_controlled_state = {
 					limit = { 
+						is_core_of = USA
 						free_building_slots = {
 							building = infrastructure
-							size > 2
-						}
-						OR = {
-							region = 117
-							region = 118
-							region = 119
-							region = 120
+							size > 1
 						}
 					}
 					add_building_construction = {
 						type = infrastructure
-						level = 3
+						level = 2
 						instant_build = yes
 					}
-					set_state_flag = USA_military_construction_3Inf
-				}
-			}
-			371 = {
-				if = {
-					limit = { 
-						is_owned_and_controlled_by = USA
-						free_building_slots = {
-							building = infrastructure
-							size > 2
-						}
-					}
-					add_building_construction = {
-						type = infrastructure
-						level = 3
-						instant_build = yes
-					}
-					set_state_flag = USA_military_construction_3Inf
+					set_state_flag = USA_military_construction_2Inf
 				}
 			}
 			if = {
 				limit = {
-					375 = {
-						OR = {
-							NOT = { is_owned_and_controlled_by = USA }
-							AND = {
-								is_owned_and_controlled_by = USA
-								free_building_slots = {
-									building = infrastructure
-									size < 3
-								}
-							}
+			 		any_owned_state = { 
+						is_controlled_by = USA
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
 						}
 					}
 				}
 				random_owned_controlled_state = {
+					prioritize = { 371 }
 					limit = { 
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
 						free_building_slots = {
 							building = infrastructure
-							size > 2
-						}
-						OR = {
-							region = 117
-							region = 118
-							region = 119
-							region = 120
+							size > 1
 						}
 					}
 					add_building_construction = {
 						type = infrastructure
-						level = 3
+						level = 2
 						instant_build = yes
 					}
-					set_state_flag = USA_military_construction_3Inf
+					set_state_flag = USA_military_construction_2Inf
 				}
 			}
-			375 = {
-				if = {
-					limit = { 
-						is_owned_and_controlled_by = USA
-						free_building_slots = {
-							building = infrastructure
-							size > 2
-						}
-					}
-					add_building_construction = {
-						type = infrastructure
-						level = 3
-						instant_build = yes
-					}
-					set_state_flag = USA_military_construction_3Inf
-				}
-			}			
+			
 			if = {
 				limit = {
-					378 = {
-						OR = {
-							NOT = { is_owned_and_controlled_by = USA }
-							AND = {
-								is_owned_and_controlled_by = USA
-								free_building_slots = {
-									building = infrastructure
-									size < 3
-								}
+					any_owned_state = { #doing this in sequence so that one single state having open infra slots doesn't cascade through everything. There is probably a smarter way of doing this but it is late and my brain no worky
+						AND = {
+							is_controlled_by = USA
+							is_core_of = USA
+							NOT = {
+								has_state_flag = USA_military_construction_2Inf
+							}
+							free_building_slots = {
+								building = infrastructure
+								size > 1
 							}
 						}
 					}
 				}
 				random_owned_controlled_state = {
 					limit = { 
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
 						free_building_slots = {
 							building = infrastructure
-							size > 2
-						}
-						OR = {
-							region = 117
-							region = 118
-							region = 119
-							region = 120
+							size > 1
 						}
 					}
 					add_building_construction = {
 						type = infrastructure
-						level = 3
+						level = 2
 						instant_build = yes
 					}
-					set_state_flag = USA_military_construction_3Inf
+					set_state_flag = USA_military_construction_2Inf
 				}
 			}
-			378 = {
-				if = {
-					limit = { 
-						is_owned_and_controlled_by = USA
+			if = {
+				limit = { 
+					any_owned_state = {
+						is_controlled_by = USA
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
 						free_building_slots = {
 							building = infrastructure
-							size > 2
+							size > 1
+						}
+					}
+				}
+				random_owned_controlled_state = {
+					prioritize = { 375 }
+					limit = { 
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
 						}
 					}
 					add_building_construction = {
 						type = infrastructure
-						level = 3
+						level = 2
 						instant_build = yes
 					}
-					set_state_flag = USA_military_construction_3Inf
+					set_state_flag = USA_military_construction_2Inf
 				}
-			}			
+			}
+						
+			if = {
+				limit = {
+					any_owned_state = {
+						AND = {
+							is_controlled_by = USA
+							is_core_of = USA
+							NOT = {
+								has_state_flag = USA_military_construction_2Inf
+							}
+							free_building_slots = {
+								building = infrastructure
+								size > 1
+							}
+						}
+					}
+				}
+				random_owned_controlled_state = {
+					limit = { 
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+					set_state_flag = USA_military_construction_2Inf
+				}
+			}
+			
+			if = {
+				limit = { 
+					any_owned_state = {
+						is_controlled_by = USA
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
+				random_owned_controlled_state = {
+					prioritize = { 378 }
+					limit = { 
+						is_core_of = USA
+						NOT = {
+							has_state_flag = USA_military_construction_2Inf
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+					set_state_flag = USA_military_construction_2Inf
+				}
+			}
+						
 		}
 	}
 
@@ -3374,6 +3443,7 @@ focus_tree = {
 			any_other_country = {
 				owns_state = 473
 				owns_state = 471
+				owns_state = 864
 			}
 		}
 		
@@ -3388,6 +3458,14 @@ focus_tree = {
 					}
 				}
 				471 = {
+					OR = {
+						is_controlled_by = ROOT 
+						is_owned_by = ROOT
+						OWNER = { has_war_with = ROOT }
+						OWNER = { is_subject_of = ROOT } 
+					}
+				}
+				864 = {
 					OR = {
 						is_controlled_by = ROOT 
 						is_owned_by = ROOT
@@ -5571,9 +5649,7 @@ focus_tree = {
 				name = USA_escort_fighters
 				bonus = 3.0
 				uses = 1
-				technology = heavy_fighter1
-				technology = heavy_fighter2
-				technology = heavy_fighter3
+				category = cat_heavy_fighter
 			}
 		}
 	}

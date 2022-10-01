@@ -2,6 +2,23 @@
 #	Expert AI mod - focus config effects
 ############################################################################################################
 
+# AI country's initial military focus setup
+
+# Related files:
+#	common\scripted_effects\EAI_military_focus_config_effects.txt
+#	common\scripted_effects\EAI_focus_effects.txt
+#	common\scripted_effects\EAI_focus_update.txt
+#	common\scripted_triggers\EAI_focuses_air_triggers.txt
+#	common\scripted_triggers\EAI_ai_presets.txt
+#	common\scripted_guis\EAI_army_config_scripted_gui.txt
+#	common\scripted_localisation\EAI_army_config_scripted_loc.txt
+#	common\ai_equipment
+#	common\ai_templates
+#	common\ai_strategy
+#	common\technologies
+#	interface\EAI_army_config.gui
+#	localisation\EAI_l_english.yml
+
 EAI_military_focus_types = {
 
 	set_variable = { global.EAI_OFF				= 1 }
@@ -96,9 +113,17 @@ EAI_military_focus_types = {
 	set_variable = { global.EAI_TAC_AIR			= 2 }
 	set_variable = { global.EAI_BOTH_GROUND_AIR = 4 }
 
+	# EAI_FOCUS/AIR/fighter
+	set_variable = { global.EAI_FTR_A		= 2 }	# Normal
+	set_variable = { global.EAI_FTR_B		= 3 }	# Paper plane
+
 	# EAI_FOCUS/AIR/heavy_fighter
+	set_variable = { global.EAI_HFTR_A		= 2 }	# Normal
+	set_variable = { global.EAI_HFTR_B		= 3 }	# Paper plane
+
 	# EAI_FOCUS/AIR/strategic_bomber
 	# EAI_FOCUS/AIR/naval_bomber
+	# EAI_FOCUS/AIR/maritime_patrol
 
 	###################################################
 	### 	NAVY
@@ -175,13 +200,14 @@ EAI_FOCUS_CONFIG/LAND/set_focuses = {
 
 EAI_FOCUS_CONFIG/AIR/set_focuses = {
 
+	EAI_FOCUS_CONFIG/AIR/fighter = yes
 	EAI_FOCUS_CONFIG/AIR/heavy_fighter = yes
 
 	EAI_FOCUS_CONFIG/AIR/ground_bomber = yes
-
 	EAI_FOCUS_CONFIG/AIR/strategic_bomber = yes
 
 	EAI_FOCUS_CONFIG/AIR/naval_bomber = yes
+	EAI_FOCUS_CONFIG/AIR/maritime_patrol = yes
 	
 	EAI_FOCUS_CONFIG/AIR/air_doctrine = yes
 }
@@ -195,9 +221,7 @@ EAI_FOCUS_CONFIG/NAVY/set_focuses = {
 	EAI_FOCUS_CONFIG/NAVY/ASW_light_cruiser = yes
 
 	EAI_FOCUS_CONFIG/NAVY/heavy_cruiser = yes
-
 	EAI_FOCUS_CONFIG/NAVY/battlecruiser = yes
-
 	EAI_FOCUS_CONFIG/NAVY/battleship = yes
 
 	EAI_FOCUS_CONFIG/NAVY/carrier = yes
@@ -1852,14 +1876,112 @@ EAI_FOCUS_CONFIG/LAND/antitank_design = {
 ### 	AIR
 ####################################################
 
-### Misc
+### Fighter
+
+EAI_FOCUS_CONFIG/AIR/fighter = {
+
+	random_list = {
+
+		##########################################
+		###		EAI_FTR_A
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						OR = {
+							EAI_ftr_air_focus_1 = yes
+
+							NOT = {
+								EAI_ftr_air_focus_2 = yes
+								EAI_ftr_air_focus_1 = yes
+								EAI_ftr_air_focus_0 = yes
+							}
+						}
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+			
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/fighter = global.EAI_FTR_A" }
+
+			set_variable = { EAI_FOCUS/AIR/fighter = global.EAI_FTR_A }
+		}
+
+		##########################################
+		###		EAI_FTR_B
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						EAI_ftr_air_focus_2 = yes
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+			
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/fighter = global.EAI_FTR_B" }
+
+			set_variable = { EAI_FOCUS/AIR/fighter = global.EAI_FTR_B }
+		}
+
+		##########################################
+		###		EAI_OFF
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						EAI_ftr_air_focus_0 = yes
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+			
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/fighter = global.EAI_OFF" }
+
+			set_variable = { EAI_FOCUS/AIR/fighter = global.EAI_OFF }
+		}
+	}
+}
 
 EAI_FOCUS_CONFIG/AIR/heavy_fighter = {
 
 	random_list = {
 
 		##########################################
-		###		EAI_ON
+		###		EAI_HFTR_A
 		##########################################
 
 		1 = {
@@ -1881,9 +2003,37 @@ EAI_FOCUS_CONFIG/AIR/heavy_fighter = {
 			
 			###### Effect
 			
-			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/heavy_fighter = global.EAI_ON" }
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_A" }
 
-			set_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_ON }
+			set_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_A }
+		}
+
+		##########################################
+		###		EAI_HFTR_B
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						EAI_hftr_air_focus_2 = yes
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+			
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_B" }
+
+			set_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_B }
 		}
 
 		##########################################
@@ -1899,8 +2049,13 @@ EAI_FOCUS_CONFIG/AIR/heavy_fighter = {
 					AND = {
 
 						OR = {
-							EAI_hftr_air_focus_0 = yes
-							NOT = { EAI_hftr_air_focus_1 = yes EAI_hftr_air_focus_0 = yes }
+							EAI_Hftr_air_focus_1 = yes
+
+							NOT = {
+								EAI_hftr_air_focus_2 = yes
+								EAI_hftr_air_focus_1 = yes
+								EAI_hftr_air_focus_0 = yes
+							}
 						}
 					}
 				}
@@ -1918,6 +2073,8 @@ EAI_FOCUS_CONFIG/AIR/heavy_fighter = {
 		}
 	}
 }
+
+### Bomber
 
 EAI_FOCUS_CONFIG/AIR/ground_bomber = {
 
@@ -2120,6 +2277,8 @@ EAI_FOCUS_CONFIG/AIR/strategic_bomber = {
 	}
 }
 
+### Naval Bomber
+
 EAI_FOCUS_CONFIG/AIR/naval_bomber = {
 
 	random_list = {
@@ -2185,6 +2344,73 @@ EAI_FOCUS_CONFIG/AIR/naval_bomber = {
 			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/naval_bomber = global.EAI_OFF" }
 
 			set_variable = { EAI_FOCUS/AIR/naval_bomber = global.EAI_OFF }
+		}
+	}
+}
+
+EAI_FOCUS_CONFIG/AIR/maritime_patrol = {
+
+	random_list = {
+
+		##########################################
+		###		EAI_ON
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						EAI_MARITIME_air_focus_1 = yes
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+
+			modifier = { factor = 2 is_major = yes } 
+
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/maritime_patrol = global.EAI_ON" }
+
+			set_variable = { EAI_FOCUS/AIR/maritime_patrol = global.EAI_ON }
+		}
+
+		##########################################
+		###		EAI_OFF
+		##########################################
+
+		1 = {
+
+			###### Trigger
+
+			modifier = { factor = 0
+				NOT = {
+					AND = {
+
+						OR = {
+							EAI_MARITIME_air_focus_0 = yes
+							NOT = { EAI_MARITIME_air_focus_1 = yes EAI_MARITIME_air_focus_0 = yes }
+						}
+					}
+				}
+			}
+
+			###### AI chance
+
+			modifier = { factor = 1 } 
+
+			###### Effect
+			
+			if = { limit = { has_country_flag = EAI_military_focus_logging } log = "[GetDate] | AI | [Root.GetName] | FOCUS CONFIG: EAI_FOCUS/AIR/maritime_patrol = global.EAI_OFF" }
+
+			set_variable = { EAI_FOCUS/AIR/maritime_patrol = global.EAI_OFF }
 		}
 	}
 }

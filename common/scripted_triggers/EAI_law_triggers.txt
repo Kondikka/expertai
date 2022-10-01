@@ -27,10 +27,6 @@ EAI_store_pp_prio = {
 			has_available_idea_with_traits = { idea = silent_workhorse limit = 1 }
 			NOT = { has_idea_with_trait = silent_workhorse }
 		}
-
-		AND = {
-			EAI_can_take_women_in_the_workforce = yes
-		}
 	}
 
 	### Law cost reduction
@@ -304,7 +300,7 @@ EAI_can_take_war_economy = {
 
 		AND = { # completely out of manpower
 			has_idea = tot_economic_mobilisation
-			NOT = { has_decision = women_in_the_workforce }
+			NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 
 			has_manpower < 10000
 			NOT = { conscription_ratio < 0.99 }
@@ -312,7 +308,7 @@ EAI_can_take_war_economy = {
 
 		AND = { # downgrade when low on manpower
 			has_idea = tot_economic_mobilisation
-			NOT = { has_decision = women_in_the_workforce }
+			NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 
 			NOT = { has_manpower > 100000 }
 
@@ -326,7 +322,7 @@ EAI_can_take_war_economy = {
 
 			NOT = { # take women in workforce first
 				AND = {
-					NOT = { has_decision = women_in_the_workforce }
+					NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 					has_war = yes
             		OR = {
             		    AND = {
@@ -421,6 +417,7 @@ EAI_can_take_war_economy = {
 	}	
 }
 EAI_can_take_tot_economic_mobilisation = {
+
 	########## AI LOGIC
 
 	has_stability > 0.5
@@ -435,13 +432,25 @@ EAI_can_take_tot_economic_mobilisation = {
 
 	NOT = { EAI_stability_event_trigger = yes }
 
+	### 
+
+	AND = {
+		set_temp_variable = { manpower_reserve = manpower_k }
+		multiply_temp_variable = { manpower_reserve = 0.1 }
+		divide_temp_variable = { manpower_reserve = EAI_army_manpower }
+		check_variable = { manpower_reserve > 0.4 }
+	}
+
+	###
+
 	OR = {
 		AND = {
 			has_manpower > 150000
 
 			# needs to be able to take women in workforce decision to counteract the manpower reduction
-			NOT = { has_decision = women_in_the_workforce }
-			OR = { # decision requirements
+			NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
+
+			OR = { # decision requirements women_in_the_workforce
    			    AND = { 
    			        has_government = democratic
    			        has_war_support > 0.79
@@ -464,8 +473,9 @@ EAI_can_take_tot_economic_mobilisation = {
    			    }
    			}
 		}
+		
 		AND = {
-			NOT = { has_decision = women_in_the_workforce }
+			NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 			has_manpower > 1000000
 		}
 	}
@@ -678,6 +688,12 @@ EAI_can_take_extensive_conscription = {
 		AND = {
 			original_tag = SOV
 			has_manpower < 1500000
+		}
+
+		AND = {
+			original_tag = JAP
+			has_manpower < 2000000
+			date < 1941.1.1
 		}
 	}
 
@@ -1027,9 +1043,10 @@ EAI_can_take_scraping_the_barrel = {
 
 EAI_can_take_women_in_the_workforce = {
 
-	if = { limit = { has_idea = tot_economic_mobilisation NOT = { has_decision = women_in_the_workforce } }
+	if = { limit = { has_idea = tot_economic_mobilisation NOT = { has_country_flag = EAI_women_in_the_workforce_taken } }
 
 		# requirements for this decision
+		NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 		has_war = yes
 		has_idea = tot_economic_mobilisation
 		OR = {

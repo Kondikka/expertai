@@ -37,6 +37,29 @@ EAI_check_game_version = { # Show warning to players
 	# }
 }
 
+###
+
+EAI_track_calendar_month = {
+
+	if = { limit = { NOT = { has_global_flag = EAI_track_calendar_month_update } }
+
+		if = { limit = { check_variable = { global.EAI_calendar_month = 0 } } 			set_variable = { global.EAI_calendar_month = 1 } 	set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #JAN
+
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 1 } } 		set_variable = { global.EAI_calendar_month = 2 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 28 } } #FEB
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 2 } } 		set_variable = { global.EAI_calendar_month = 3 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #MAR
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 3 } } 		set_variable = { global.EAI_calendar_month = 4 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 30 } } #MAY
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 4 } } 		set_variable = { global.EAI_calendar_month = 5 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #APR
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 5 } } 		set_variable = { global.EAI_calendar_month = 6 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 30 } } #JUN
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 6 } } 		set_variable = { global.EAI_calendar_month = 7 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #JUL
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 7 } } 		set_variable = { global.EAI_calendar_month = 8 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #AUG
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 8 } } 		set_variable = { global.EAI_calendar_month = 9 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 30 } } #SEP
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 9 } } 		set_variable = { global.EAI_calendar_month = 10 }	set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #OCT
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 10 } } 	set_variable = { global.EAI_calendar_month = 11 }	set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 30 } } #NOV
+		else_if = { limit = { check_variable = { global.EAI_calendar_month = 11 } } 	set_variable = { global.EAI_calendar_month = 12 }	set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #DEC
+		else = { 																		set_variable = { global.EAI_calendar_month = 1 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #JAN
+	}
+}
+
 ### Advisors
 
 EAI_advisor_types = {
@@ -254,40 +277,7 @@ EAI_create_japanese_home_states_array = {
 	}
 }
 
-EAI_train_navy = { # simulate naval training for xp (AI doesn't exercise during war which causes serious issues for some like JAP later vs USA) - keep this for now
-
-	@TRAINING_AVG_FUEL_CONSUMED_PER_SHIP = 32
-	@TRAINING_AVG_XP_GAINED_PER_SHIP = 0.004
-
-	if = {
-		limit = {
-			check_variable = { num_ships > 0 }
-
-			has_navy_experience < 100
-
-			fuel_ratio > 0.8
-
-			has_war = yes
-
-			enemies_naval_strength_ratio < 0.2 # enemy navies are very weak
-			
-			NOT = {
-				any_enemy_country = {
-					has_navy_size = { size > 10 }
-				}
-			}
-		}
-
-		set_temp_variable = { fuel_consumed = @TRAINING_AVG_FUEL_CONSUMED_PER_SHIP }
-		multiply_temp_variable = { fuel_consumed = num_ships }
-		multiply_temp_variable = { fuel_consumed = -1 }
-		add_fuel = fuel_consumed
-
-		set_temp_variable = { xp_gained = @TRAINING_AVG_XP_GAINED_PER_SHIP }
-		multiply_temp_variable = { xp_gained = num_ships }
-		navy_experience = xp_gained
-	}
-}
+###
 
 EAI_num_fighters_deployed = { # num_deployed_planes_with_type@fighter does not work
 
@@ -346,320 +336,14 @@ EAI_num_fighters_deployed = { # num_deployed_planes_with_type@fighter does not w
     set_variable = { num_fighters_deployed = guess }
 }
 
-EAI_calc_air_force_sizes = {
-
-	### allied air size
-		
-	set_temp_variable = { friendly_air_force_size = num_fighters_deployed }
-	add_to_temp_variable = { friendly_air_force_size = num_equipment@fighter_equipment }
-
-	for_each_scope_loop = { array = allies
-
-		add_to_temp_variable = { friendly_air_force_size = num_fighters_deployed }
-		add_to_temp_variable = { friendly_air_force_size = num_equipment@fighter_equipment }
-	}
-
-	### enemies air size
-
-	every_enemy_country = {
-
-		set_temp_variable = { air_force_size_@THIS = num_fighters_deployed }
-
-		if = { limit = { is_in_faction = yes NOT = { is_faction_leader = yes } }
-
-			var:faction_leader = {
-
-				add_to_temp_variable = { faction_air_force_size_@THIS = air_force_size_@PREV }
-			}
-		}
-		else_if = { limit = { is_faction_leader = yes }
-
-			add_to_temp_variable = { faction_air_force_size_@THIS = air_force_size_@THIS }
-			add_to_temp_array = { enemy_air_force_sizes = THIS.id }
-		}
-		else = { add_to_temp_array = { enemy_air_force_sizes = THIS.id } }
-	}
-}
-
-EAI_stop_air_production_strategy = {
-
-	if = { 
-		limit = { 
-			has_war = yes 
-			has_capitulated = no
-		}
-
-		### abandon air production if overwhelmed by enemy air
-
-		if = { 
-			limit = { 
-				has_war = yes
-				NOT = { has_country_flag = EAI_stop_air_production }
-				surrender_progress > 0.1 
-				has_deployed_air_force_size = { size < 1000 type = fighter } 
-			}
-
-			EAI_calc_air_force_sizes =  yes
-
-			### compare
-
-			for_each_scope_loop = { array = enemy_air_force_sizes
-
-				if = { 
-					limit = { 
-
-						if = { limit = { is_faction_leader = yes }
-
-							set_temp_variable = { air_difference = faction_air_force_size_@THIS }
-							subtract_from_temp_variable = { air_difference = friendly_air_force_size }
-
-							set_temp_variable = { air_ratio = friendly_air_force_size }
-							clamp_temp_variable = { var = faction_air_force_size_@THIS min = 1 }
-							divide_temp_variable = { air_ratio = faction_air_force_size_@THIS }
-						}
-
-						else = {
-
-							set_temp_variable = { air_difference = air_force_size_@THIS }
-							subtract_from_temp_variable = { air_difference = friendly_air_force_size }
-
-							set_temp_variable = { air_ratio = friendly_air_force_size }
-							clamp_temp_variable = { var = air_force_size_@THIS min = 1 }
-							divide_temp_variable = { air_ratio = air_force_size_@THIS }
-						}
-
-						check_variable = { air_difference > 800 }
-						check_variable = { air_ratio < 0.25 }
-					}
-
-					ROOT = { 
-						set_country_flag = EAI_stop_air_production
-						set_country_flag = { flag = EAI_stop_air_production_min_duration value = 1 days = 365 }
-						set_country_flag = EAI_anti_air_design_focus
-						clear_variable = EAI_no_surrender_progression_months
-
-						if = { limit = { has_country_flag = EAI_military_strategy_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AIR PRODUCTION: stopping air production" }
-					}
-				}
-			}
-		}
-
-		### resume air production conditions
-
-		else_if = { 
-			limit = { 
-				has_country_flag = EAI_stop_air_production 
-				NOT = { has_country_flag = EAI_stop_air_production_min_duration }
-			}
-
-			# track how long it has had no surrender progress (track change instead?)
-			if = { limit = { NOT = { surrender_progress > 0.05 } }
-
-				add_to_variable = { EAI_no_surrender_progression_months = 1 }
-			}
-			else = { clear_variable = EAI_no_surrender_progression_months }
-
-			# is not losing anymore or has an airforce
-			if = { 
-				limit = { 
-					OR = {
-						check_variable = { EAI_no_surrender_progression_months > 5 }
-						has_deployed_air_force_size = { size > 800 type = fighter } 
-					}
-				}
-
-				clr_country_flag = EAI_stop_air_production
-				if = { limit = { has_country_flag = EAI_military_strategy_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AIR PRODUCTION: restarting air production" }
-			}
-
-			# none of its enemies have a significant air force remaining
-			else = {
-				
-				EAI_calc_air_force_sizes =  yes
-
-				### compare
-
-				for_each_scope_loop = { array = enemy_air_force_sizes
-
-					if = { 
-						limit = {
-							is_faction_leader = yes
-							check_variable = { faction_air_force_size_@THIS > 800 }
-						}
-
-						set_temp_variable = { break = 1 }
-					}
-
-					else_if = {
-						limit = {
-							check_variable = { air_force_size_@THIS > 200 }
-						}
-
-						set_temp_variable = { break = 1 }
-					}
-				}
-
-				if = { limit = { check_variable = { break = 0 } }
-
-					clr_country_flag = EAI_stop_air_production
-					if = { limit = { has_country_flag = EAI_military_strategy_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AIR PRODUCTION: restarting air production" }
-				}
-			}
-		}
-	}
-	else = { clr_country_flag = EAI_stop_air_production }
-}
-
-EAI_enable_garrison_state_strategies = {
-
-	if = {
-		limit = {
-			if = { limit = { has_war = yes }
-				alliance_naval_strength_ratio < 3
-			}
-			else = { has_war = no }
-
-			### exceptions
-
-			# JAP needs troops vs CHi
-			if = { limit = { tag = JAP }
-
-				OR = {
-					date > 1940.1.1
-					alliance_naval_strength_ratio < 3
-				}
-			}
-		}
-		
-		set_country_flag = EAI_enable_garrison_state_strategies
-	}
-	else = { clr_country_flag = EAI_enable_garrison_state_strategies }
-}
-
-EAI_defensive_front_strategy = {
-
-	if = { limit = { has_war = yes }
-
-		### critically low on equipment
-
-		if = { 
-			limit = { 
-				NOT = { has_country_flag = EAI_defensive_front_strategy_equipment }
-				check_variable = { EAI_fielded_eq_ratio < 0.6 }
-			}
-
-			if = { limit = { NOT = { has_country_flag = EAI_defensive_front_strategy } }
-
-				if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: stopping attacks due to low equipment" }
-			}
-
-			set_country_flag = EAI_defensive_front_strategy
-			set_country_flag = EAI_defensive_front_strategy_equipment
-		}
-		else_if = {
-			limit = {
-				has_country_flag = EAI_defensive_front_strategy_equipment
-				check_variable = { EAI_fielded_eq_ratio > 0.9 }
-			}
-
-			if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: CANCEL stopping attacks due to low equipment" }
-
-			clr_country_flag = EAI_defensive_front_strategy
-			clr_country_flag = EAI_defensive_front_strategy_equipment
-		}
-
-		### Out of manpower
-
-		if = { 
-			limit = {
-				NOT = { has_country_flag = EAI_defensive_front_strategy_manpower }
-
-				set_temp_variable = { manpower_reserve = manpower_k }
-				multiply_temp_variable = { manpower_reserve = 0.1 }
-				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
-				check_variable = { manpower_reserve < 0.05 } # Less than 5% mp in reserve
-				
-				OR = { # Can upgrade law or is currently conscripting
-					EAI_can_upgrade_manpower_law = yes
-					conscription_ratio < 1
-				}
-			}
-
-			if = { limit = { NOT = { has_country_flag = EAI_defensive_front_strategy } }
-
-				if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: stopping attacks due to low manpower" }
-			}
-
-			set_country_flag = EAI_defensive_front_strategy
-			set_country_flag = EAI_defensive_front_strategy_manpower
-		}
-		else_if = {
-			limit = {
-				has_country_flag = EAI_defensive_front_strategy_manpower
-
-				set_temp_variable = { manpower_reserve = manpower_k }
-				multiply_temp_variable = { manpower_reserve = 0.1 }
-				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
-				
-				OR = { # Cancel if:
-					check_variable = { manpower_reserve > 0.10 } # Over 10% mp in reserve
-					
-					NOT = { # Cant upgrade law and not conscripting more
-						EAI_can_upgrade_manpower_law = yes
-						conscription_ratio < 1
-					}
-				}
-			}
-
-			if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: CANCEL stopping attacks due to low manpower" }
-
-			clr_country_flag = EAI_defensive_front_strategy
-			clr_country_flag = EAI_defensive_front_strategy_manpower
-		}
-
-		### weak vs countries
-
-		every_enemy_country = {
-
-			if = {
-				limit = {
-					ROOT = { 
-						NOT = { is_in_array = { EAI_defensive_front_strategy_at = PREV.id } }
-
-						alliance_strength_ratio < 0.5
-						strength_ratio = { tag = PREV ratio < 0.25 }
-					}
-				}
-
-				if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: stopping attacks vs [This.GetTag] (weak)" }
-
-				ROOT = { add_to_array = { EAI_defensive_front_strategy_at = PREV.id } }
-			}
-			else_if = {
-				limit = {
-					ROOT = {
-						is_in_array = { EAI_defensive_front_strategy_at = PREV.id }
-					
-						NOT = {
-							alliance_strength_ratio < 0.5
-							strength_ratio = { tag = PREV ratio < 0.25 }
-						}
-					}
-				}
-
-				if = { limit = { has_country_flag = EAI_front_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FRONT: CANCEL stopping attacks vs [This.GetTag] (weak)" }
-
-				ROOT = { remove_from_array = { EAI_defensive_front_strategy_at = PREV.id } }
-			}
-		}
-	}
-}
+###
 
 EAI_calculate_fielded_eq_ratio = {
 
 	set_temp_variable = { equipment_count = 0 }
+	set_temp_variable = { tot_fielded_eq_ratio = 0 }
 
-	### only count equipment that has a major impact in combat
+	### Good enough indicator of the enemy eq. strength
 
 	set_temp_variable = { fielded_eq_ratio = num_equipment_in_armies_k@infantry_equipment }
 	divide_temp_variable = { fielded_eq_ratio = num_target_equipment_in_armies_k@infantry_equipment }
@@ -988,22 +672,6 @@ EAI_clear_stockpile_variables = {
 
 	clear_variable = EAI_stockpile_fuel
 	clear_variable = EAI_str_ratio_fuel
-}
-
-# submarines lost during 20 days
-EAI_track_submarine_losses = {
-
-	subtract_from_variable = { EAI_previous_subs = num_ships_with_type@submarine }
-
-	if = { limit = { check_variable = { EAI_previous_subs > 0 } }
-
-		divide_variable = { EAI_previous_subs = num_ships_with_type@submarine }
-		if = { limit = { check_variable = { EAI_previous_subs > 0.05 } } # lost more than 5%
-			set_country_flag = { flag = EAI_halt_sub_missions value = 1 days = 14 }
-		}
-	}
-
-	set_variable = { EAI_previous_subs = num_ships_with_type@submarine }
 }
 
 ### Track armor and piercing seen in divisions of this and enemy countries

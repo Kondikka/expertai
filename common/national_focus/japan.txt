@@ -547,6 +547,12 @@
 				type = puppet_wargoal_focus
 				expire = 0
 			}
+			hidden_effect = {
+				set_country_flag = {
+					flag = JAP_dont_surrender_instantly_lock
+					days = 720
+				}
+			}
 		}
 	}
 
@@ -1384,33 +1390,84 @@
 
 		cost = 10
 
-		historical_ai = { #EAI
-			date > 1941.7.22
+		historical_ai = { #EAI war focus
 
-			surrender_progress < 0.2
+			### General situation
 
-			OR = {
-				has_army_manpower = { size > 1000000 }
-				AND = {
-					check_variable = { global.EAI_sino_japanese_war = 2 }
-					has_army_manpower = { size > 800000 }
+			NOT = { EAI_is_not_independent = yes }
+
+			surrender_progress < 0.1
+
+			NOT = {
+				any_home_area_neighbor_country = {
+					has_war_with = ROOT
 				}
 			}
 
-			OR = {
-				CHI = { has_capitulated = yes }
-				CHI = { exists = no }
-				CHI = { is_subject_of = ROOT }
-				CHI = { has_government = fascism }
-				CHI = { surrender_progress > 0.4 }
-				NOT = { has_war_with = CHI }
-				date > 1942.2.1
-                check_variable = { global.EAI_sino_japanese_war = 2 }
-			}
+			### Army size and timing
 
 			OR = {
-				enemies_strength_ratio < 2
-				check_variable = { global.EAI_sino_japanese_war = 2 }
+				AND = {
+					date > 1941.6.1
+					has_army_manpower = { size > 1200000 }
+				}
+
+				AND = { # Historical timing
+					date > 1941.9.1
+					has_army_manpower = { size > 800000 }
+				}
+
+				AND = {
+					date > 1941.9.1
+					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
+					has_army_manpower = { size > 600000 }
+				}
+			}
+
+			### State of war with China
+
+			OR = {
+				NOT = { CHI = { EAI_THIS_is_threat_to_PREV = yes } }
+
+				NOT = { has_war_with = CHI }
+
+				AND = { # Historical timing
+					date > 1941.9.1
+					CHI = { surrender_progress > 0.4 }
+				}
+
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
+			}
+
+			### State of France and Siam
+
+			OR = {
+				date > 1941.9.1 # Historical timing
+				
+				# FRA and SIA are out of the way
+				AND = {
+					OR = { 
+						FRA = { NOT = { EAI_is_threat = yes } }
+						GER = { is_in_faction_with = FRA }
+					}
+				
+					OR = { 
+						SIA = { NOT = { EAI_is_threat = yes } }
+						CHI = { surrender_progress > 0.9 }
+					}
+				}
+			}
+
+			### No strong enemies
+
+			OR = {
+				NOT = {
+					any_enemy_country = {
+						strength_ratio = { tag = ROOT ratio > 2 }
+					}
+				}
+
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
 			}
 		}
 
@@ -1486,37 +1543,89 @@
 
 		cost = 10
 		
-		historical_ai = { #EAI
-			date > 1941.1.1
+		historical_ai = { #EAI war focus
+
+			### Date
+
+			check_variable = { global.EAI_sino_japanese_war = 2 }
+
+			date > 1941.6.1
+
+			if = { limit = { check_variable = { global.EAI_sino_japanese_war = 2 } }
+
+				date > 1941.9.1 # Historical timing
+			}
+
+			### General situation
 
 			NOT = { EAI_is_not_independent = yes }
 
-			surrender_progress < 0.2
-			
+			surrender_progress < 0.1
+
+			NOT = {
+				any_home_area_neighbor_country = {
+					has_war_with = ROOT
+				}
+			}
+
+			### State of military
+
 			OR = {
-				has_army_manpower = { size > 1000000 }
 				AND = {
-					check_variable = { global.EAI_sino_japanese_war = 2 }
-					has_army_manpower = { size > 800000 }
+					date > 1941.6.1
+					check_variable = { EAI_fielded_eq_ratio > 0.9 }
+				}
+
+				AND = {
+					date > 1941.9.1
+					check_variable = { EAI_fielded_eq_ratio > 0.8 }
+				}
+
+				AND = {
+					date > 1942.1.1
+					check_variable = { EAI_fielded_eq_ratio > 0.7 }
 				}
 			}
 
 			OR = {
-				CHI = { has_capitulated = yes }
-				CHI = { exists = no }
-				CHI = { is_subject_of = ROOT }
-				CHI = { has_government = fascism }
 				AND = {
+					date > 1941.6.1
+					has_army_manpower = { size > 1200000 }
+				}
+
+				AND = { # Historical timing
+					date > 1941.9.1
+					has_army_manpower = { size > 800000 }
+				}
+
+				AND = {
+					date > 1941.9.1
+					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
+					has_army_manpower = { size > 600000 }
+				}
+			}
+
+			### State of war with China
+
+			OR = {
+				NOT = { CHI = { EAI_THIS_is_threat_to_PREV = yes } }
+
+				NOT = { has_war_with = CHI }
+
+				AND = { # Historical timing
 					date > 1941.9.1
 					CHI = { surrender_progress > 0.4 }
 				}
-				NOT = { has_war_with = CHI }
-				check_variable = { global.EAI_sino_japanese_war = 2 }
+
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
 			}
 
+			### State of France and Siam
+
 			OR = {
-				date > 1941.9.1
+				date > 1941.9.1 # Historical timing
 				
+				# FRA and SIA are out of the way
 				AND = {
 					OR = { 
 						FRA = { NOT = { EAI_is_threat = yes } }
@@ -1529,15 +1638,17 @@
 					}
 				}
 			}
-			
+
+			### No strong enemies
+
 			OR = {
 				NOT = {
-					any_neighbor_country = {
-						has_war_with = ROOT
+					any_enemy_country = {
 						strength_ratio = { tag = ROOT ratio > 2 }
 					}
 				}
-				check_variable = { global.EAI_sino_japanese_war = 2 }
+
+				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate setting
 			}
 		}
 
@@ -2225,7 +2336,7 @@
 		}
 
 		bypass = {
-
+			has_idea = tot_economic_mobilisation
 		}
 
 		cancel_if_invalid = yes
@@ -2467,6 +2578,7 @@
 		search_filters = { FOCUS_FILTER_MANPOWER }
 		completion_reward = {
 			add_ideas = spiritual_mobilization_idea
+			custom_effect_tooltip = peace_conference_spiritual_mob_modifier_japan
 		}
 	}
 
@@ -2553,8 +2665,17 @@
 		available_if_capitulated = no
 
 		completion_reward = {
-			custom_effect_tooltip = JAP_strengthen_the_divine_wind_effect
-			hidden_effect = { set_technology = { suicide_craft = 1 } }
+			if = {
+				limit = {
+					NOT = { has_dlc = "By Blood Alone" }
+				}
+				custom_effect_tooltip = JAP_strengthen_the_divine_wind_effect
+				hidden_effect = { set_technology = { suicide_craft = 1 } }
+			}
+			else = {
+				custom_effect_tooltip = JAP_strengthen_the_divine_wind_effect_bba
+				hidden_effect = { set_technology = { suicide_charge = 1 popup = no} }
+			}
 		}
 	}
 
@@ -5062,7 +5183,30 @@
 		search_filters = { FOCUS_FILTER_RESEARCH }
 		completion_reward = {
 			custom_effect_tooltip = JAP_the_zero_tt
-			hidden_effect = { set_technology = { cv_fighter2 = 1 } }
+			hidden_effect = { 
+				if = {
+					limit = {
+						NOT = {
+							has_dlc = "By Blood Alone"
+						}
+					}
+					set_technology = { cv_fighter2 = 1 } 
+				}
+				else = {
+					create_equipment_variant = {
+						name = "A6M Zero-Sen"
+						type = cv_small_plane_airframe_2
+						modules = {
+							fixed_main_weapon_slot = light_mg_2x
+							fixed_auxiliary_weapon_slot_1 = aircraft_cannon_1_2x
+							engine_type_slot = engine_3_1x
+							special_type_slot_1 = drop_tanks
+							special_type_slot_2 = fuel_tanks_small
+						}
+						icon = "GFX_JAP_cv_fighter2_medium"
+					}
+				}
+			}
 		}
 	}
 

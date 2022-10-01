@@ -79,19 +79,37 @@ EAI_manage_xp = {
 			}
 		}
 
-		if = { limit = { NOT = { has_air_experience < 5 } check_variable = { EAI_air_xp < 500 } }
-	
-			add_to_variable = { EAI_air_xp = air_experience }
-			clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
+		### Store xp over 60
+
+		if = { limit = { check_variable = { var = air_experience value = 60 compare = greater_than } check_variable = { EAI_air_xp < 500 } }
 
 			set_temp_variable = { minus_xp = air_experience }
+			subtract_from_temp_variable = { minus_xp = 60 }
+
+			add_to_variable = { EAI_air_xp = minus_xp }
+			clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
+
 			multiply_temp_variable = { minus_xp = -1 }
 			air_experience = minus_xp
 
 			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_air_xp = [?EAI_air_xp]" }
 		}
-	}
 
+		### Keep 60 xp available to the AI
+
+		else_if = { limit = { check_variable = { var = air_experience value = 60 compare = less_than } check_variable = { EAI_air_xp > 0 } }
+
+			set_temp_variable = { add_xp = 60 }
+			subtract_from_temp_variable = { add_xp = air_experience }
+			clamp_temp_variable = { var = add_xp min = 0 max = EAI_air_xp }
+
+			subtract_from_variable = { EAI_air_xp = add_xp }
+			air_experience = add_xp
+
+			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp adding [?add_xp] EAI_air_xp = [?EAI_air_xp]" }
+		}
+	}
+	
 	else_if = { limit = { check_variable = { EAI_air_xp > 0 } }
 
 		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_air_xp] EAI_air_xp = [?EAI_air_xp]" }
@@ -99,6 +117,35 @@ EAI_manage_xp = {
 		air_experience = EAI_air_xp
 		set_variable = { EAI_air_xp = 0 }
 	}
+
+	# if = { 
+	# 	limit = {
+	# 		OR = {
+	# 			has_country_flag = EAI_air_doctrine_progress_limit 
+	# 			has_country_flag = EAI_fix_air_doctrine_switch
+	# 		}
+	# 	}
+
+	# 	if = { limit = { NOT = { has_air_experience < 5 } check_variable = { EAI_air_xp < 500 } }
+	
+	# 		add_to_variable = { EAI_air_xp = air_experience }
+	# 		clamp_variable = { var = EAI_air_xp min = 0 max = 500 }
+
+	# 		set_temp_variable = { minus_xp = air_experience }
+	# 		multiply_temp_variable = { minus_xp = -1 }
+	# 		air_experience = minus_xp
+
+	# 		if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_air_xp = [?EAI_air_xp]" }
+	# 	}
+	# }
+
+	# else_if = { limit = { check_variable = { EAI_air_xp > 0 } }
+
+	# 	if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp returning [?EAI_air_xp] EAI_air_xp = [?EAI_air_xp]" }
+
+	# 	air_experience = EAI_air_xp
+	# 	set_variable = { EAI_air_xp = 0 }
+	# }
 
 	################## 
 	###		Navy
@@ -112,17 +159,23 @@ EAI_manage_xp = {
 			}
 		}
 
+		### Store xp over 60
+
 		if = { limit = { check_variable = { var = navy_experience value = 60 compare = greater_than } check_variable = { EAI_navy_xp < 500 } }
-	
-			add_to_variable = { EAI_navy_xp = navy_experience }
-			clamp_variable = { var = EAI_navy_xp min = 0 max = 500 }
 
 			set_temp_variable = { minus_xp = navy_experience }
+			subtract_from_temp_variable = { minus_xp = 60 }
+
+			add_to_variable = { EAI_navy_xp = minus_xp }
+			clamp_variable = { var = EAI_navy_xp min = 0 max = 500 }
+
 			multiply_temp_variable = { minus_xp = -1 }
 			navy_experience = minus_xp
 
 			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp storing [?minus_xp] EAI_navy_xp = [?EAI_navy_xp]" }
 		}
+
+		### Keep 60 xp available to the AI
 
 		else_if = { limit = { check_variable = { var = navy_experience value = 60 compare = less_than } check_variable = { EAI_navy_xp > 0 } }
 
@@ -131,7 +184,7 @@ EAI_manage_xp = {
 			clamp_temp_variable = { var = add_xp min = 0 max = EAI_navy_xp }
 
 			subtract_from_variable = { EAI_navy_xp = add_xp }
-			army_experience = add_xp
+			navy_experience = add_xp
 
 			if = { limit = { has_country_flag = EAI_xp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_manage_xp adding [?add_xp] EAI_navy_xp = [?EAI_navy_xp]" }
 		}

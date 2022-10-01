@@ -2,183 +2,6 @@
 #	Expert AI mod - generic
 ############################################################################################################
 
-### Experimenting with building strategies
-
-EAI_construction_SOV_early_CIC = {
-	allowed = { original_tag = SOV }
-	enable = {
-		is_major = yes
-		date < 1939.1.1
-		has_war = no
-		num_of_civilian_factories < 120
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = building_target id = industrial_complex value = 120 }
-}
-
-EAI_construction_SOV_build_MIC = {
-	allowed = { original_tag = SOV }
-	enable = {
-		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
-		
-		NOT = {
-			AND = {
-				is_major = yes
-				date < 1939.1.1
-				has_war = no
-				num_of_civilian_factories < 120
-			}
-		}
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = building_target id = arms_factory value = 400 }
-}
-
-EAI_construction_SOV_not_enough_CIC = {
-	allowed = { original_tag = SOV }
-	enable = {
-		check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 }
-		
-		NOT = {
-			AND = {
-				is_major = yes
-				date < 1939.1.1
-				has_war = no
-				num_of_civilian_factories < 120
-			}
-		}
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = added_military_to_civilian_factory_ratio value = -10000 }
-	ai_strategy = { type = dockyard_to_military_factory_ratio value = -10000 }
-}
-
-EAI_construction_SOV_NIC = {
-	allowed = { original_tag = SOV }
-	enable = {
-		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
-		NOT = { num_of_military_factories < 400 }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = building_target id = dockyard value = 50 }
-}
-
-###
-
-EAI_construction_GER_early_CIC = {
-	allowed = { original_tag = GER }
-	enable = {
-		is_major = yes
-		date < 1938.6.1
-		has_war = no
-		num_of_civilian_factories < 90
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = building_target id = industrial_complex value = 90 }
-}
-
-EAI_construction_GER_build_MIC = {
-	allowed = { original_tag = GER }
-	enable = {
-		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
-		
-		NOT = {
-			AND = {
-				is_major = yes
-				date < 1938.6.1
-				has_war = no
-				num_of_civilian_factories < 90
-			}
-		}
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = building_target id = arms_factory value = 400 }
-}
-
-EAI_construction_GER_not_enough_CIC = {
-	allowed = { original_tag = GER }
-	enable = {
-		check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 }
-		
-		NOT = {
-			AND = {
-				is_major = yes
-				date < 1938.6.1
-				has_war = no
-				num_of_civilian_factories < 90
-			}
-		}
-	}
-	abort_when_not_enabled = yes
-		
-	ai_strategy = { type = added_military_to_civilian_factory_ratio value = -10000 }
-	ai_strategy = { type = dockyard_to_military_factory_ratio value = -10000 }
-}
-
-EAI_construction_GER_NIC = {
-	allowed = { original_tag = GER }
-	enable = {
-		NOT = { check_variable = { EAI_CIC_to_total_factories_ratio < 0.25 } }
-		NOT = { num_of_military_factories < 400 }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = building_target id = dockyard value = 50 }
-}
-
-### construction
-
-EAI_construction_majors = {
-	enable = {
-		is_major = yes
-		date < 1939.1.1
-		has_war = no
-	}
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = added_military_to_civilian_factory_ratio value = -10000 }
-	ai_strategy = { type = dockyard_to_military_factory_ratio value = -10000 }
-}
-
-EAI_construction_minors_MIC = {
-	enable = {
-		is_major = no
-		check_variable = { EAI_available_CIC_ratio > 0.25 }
-	}
-	abort_when_not_enabled = yes
-	
-	ai_strategy = {
-		type = added_military_to_civilian_factory_ratio
-		value = 1000
-	}
-	ai_strategy = {
-		type = dockyard_to_military_factory_ratio
-		value = -1000
-	}
-}
-EAI_construction_minors_CIC = {
-	enable = {
-		is_major = no
-		NOT = { check_variable = { EAI_available_CIC_ratio > 0.25 } }
-	}
-	abort_when_not_enabled = yes
-	
-	ai_strategy = {
-		type = added_military_to_civilian_factory_ratio
-		value = -1000
-	}
-	ai_strategy = {
-		type = dockyard_to_military_factory_ratio
-		value = -1000
-	}
-}
-
 ### PP priorities
 
 EAI_default_pp_spend_amount = {
@@ -246,7 +69,7 @@ EAI_PP_relation_prio = {
 
 ###
 
-EAI_variant_creation = { # Mod manages land variant creation without NSB
+EAI_tank_variant_creation = { # Mod manages land variant creation without NSB
 	enable = {
 		NOT = { has_dlc = "No Step Back" }
 	}
@@ -255,6 +78,20 @@ EAI_variant_creation = { # Mod manages land variant creation without NSB
 
 	ai_strategy = {
 		type = land_xp_spend_priority
+		id = upgrade_xp_cutoff
+		value = 999
+	}
+}
+
+EAI_air_variant_creation = { # Mod manages air variant creation without BBA
+	enable = {
+		NOT = { has_dlc = "By Blood Alone" }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = air_xp_spend_priority
 		id = upgrade_xp_cutoff
 		value = 999
 	}
