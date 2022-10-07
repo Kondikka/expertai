@@ -14,43 +14,56 @@
 #	EAI
 ########################
 
-EAI_CW_ignore_FRA = {
+EAI_CW_avoid_BALKANS_during_blitz = {
 	allowed = {
 		OR = {
 			tag = ENG
-			tag = CAN
-			tag = AST
-			tag = RAJ
-			tag = SAF
-			tag = NZL
+			is_subject_of = ENG
 		}
 	}
 	enable = {
-		is_historical_focus_on = yes
+		OR = {
+			has_global_flag = EAI_GER_yugoslavia_blitz
+			has_global_flag = EAI_ITA_greece_blitz
+		}
+	}
 
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 24
+		strategic_region = 27
+		strategic_region = 26
+		strategic_region = 25
+		value = -99
+	}
+}
+
+EAI_CW_avoid_FRA_during_blitz = {
+	allowed = {
+		OR = {
+			tag = ENG
+			is_subject_of = ENG
+		}
+	}
+	enable = {
+		has_global_flag = EAI_GER_france_blitz
 		GER = { is_ai = yes }
-
-		OR = { tag = ENG is_subject_of = ENG }
-
-		GER = { has_country_flag = EAI_norway_invasion }
-						
-		has_war_with = GER
-		
-		is_in_faction_with = FRA
-		
-		FRA = { has_capitulated = no }
+		ITA = { is_ai = yes }
 	}
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = dont_defend_ally_borders id = "FRA" value = 500 }
-	ai_strategy = { type = dont_defend_ally_borders id = "BEL" value = 500 }
-	ai_strategy = { type = dont_defend_ally_borders id = "HOL" value = 500 }
-	ai_strategy = { type = dont_defend_ally_borders id = "LUX" value = 500 }
-	ai_strategy = { # norway
+	ai_strategy = {
 		type = front_unit_request
-		area = scandinavia
-		value = -200
+		strategic_region = 5
+		strategic_region = 19
+		strategic_region = 20
+		strategic_region = 208
+		strategic_region = 7
+		strategic_region = 21
+		value = -90
 	}
 }
 
@@ -86,20 +99,38 @@ EAI_CW_defend_FRA = {
 	ai_strategy = { type = force_defend_ally_borders id = "LUX" value = 500 }
 }
 
-EAI_CW_ignore_DEN = {
+EAI_CW_avoid_DEN_during_blitz = {
+	allowed = {
+		OR = {
+			tag = ENG
+			tag = FRA
+			is_subject_of = ENG
+		}
+	}
 	enable = {
-		OR = { original_tag = ENG is_subject_of = ENG }
-
-		date < 1941.1.1
-		
-		has_war_with = GER
-		
-		is_in_faction_with = FRA
+		has_global_flag = EAI_norway_invasion_rush
 	}
 	
 	abort_when_not_enabled = yes
 	
 	ai_strategy = { type = dont_defend_ally_borders id = "DEN" value = 500 }
+}
+
+EAI_CW_avoid_NOR_during_blitz = {
+	allowed = {
+		OR = {
+			tag = ENG
+			tag = FRA
+			is_subject_of = ENG
+		}
+	}
+	enable = {
+		has_global_flag = EAI_norway_invasion
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "NOR" value = 500 }
 }
 
 EAI_ENG_ignore_RAJ = {
@@ -233,21 +264,20 @@ EAI_ENG_garrison = {
 EAI_ENG_garrison_home = {
 	allowed = { tag = ENG }
 	enable = {
-		always = yes
+		has_capitulated = no
 	}
 	abort_when_not_enabled = yes
 
 	### england
 
-	ai_strategy = { type = strategic_air_importance id = 18 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 1 value = 50000 }
+	ai_strategy = { type = strategic_air_importance id = 18 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 1 value = 100000 }
 
 	ai_strategy = {
 		type = put_unit_buffers
 		ratio = 0.50
 		states = { 
 			127
-			126
 			125
 			123
 			338
@@ -255,6 +285,17 @@ EAI_ENG_garrison_home = {
 			129
 			130
 			132 
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.10
+		order_id = 9
+		states = { 
+			126
 		}
 		subtract_invasions_from_need = no
 		subtract_fronts_from_need = no

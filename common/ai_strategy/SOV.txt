@@ -38,8 +38,27 @@ EAI_SOV_take_finland = {
 		}
 		FIN = { is_in_faction = no }
 		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
 	}
-	abort_when_not_enabled = yes
+	abort = {
+		NOT = {
+			AND = {
+				OR = {
+					has_war_with = FIN
+					AND = {
+						focus_progress = { focus = SOV_secure_leningrad progress > 0 }
+						NOT = { has_completed_focus = SOV_secure_leningrad }
+					}
+					has_country_flag = EAI_SOV_take_finland
+				}
+				FIN = { is_in_faction = no }
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
+	
+
 	ai_strategy = {
 		type = front_control
 		country_trigger = {
@@ -419,7 +438,12 @@ EAI_SOV_defensive_vs_GER_careful = {
 		has_war_with = GER
 		has_defensive_war = yes
 		surrender_progress > 0
-		check_variable = { EAI_fielded_eq_ratio < 0.9 }
+
+		OR = {
+			check_variable = { EAI_fielded_eq_ratio < 0.9 }
+			EAI_reserve_manpower_less_than_20p = yes
+		}
+		
 		NOT = { GER = { surrender_progress > 0.2 } }
 
 		if = { # only when losing badly vs AI ger
@@ -482,7 +506,7 @@ EAI_SOV_offensive_vs_GER_critical_shortage_pause = { # Prio 10
 
 		OR = {
 			check_variable = { EAI_fielded_eq_ratio < 0.6 }
-			has_manpower < 50000
+			EAI_reserve_manpower_less_than_5p = yes
 		}
 	}
 	abort = {
@@ -494,7 +518,7 @@ EAI_SOV_offensive_vs_GER_critical_shortage_pause = { # Prio 10
 
 				OR = {
 					check_variable = { EAI_fielded_eq_ratio < 0.7 }
-					has_manpower < 100000
+					EAI_reserve_manpower_less_than_10p = yes
 				}
 			}
 		}
@@ -516,7 +540,10 @@ EAI_SOV_offensive_vs_GER_shortage_limit_offensive = { # Prio 6
 
 		is_in_faction_with = SOV
 
-		check_variable = { EAI_fielded_eq_ratio < 0.7 }
+		OR = {
+			check_variable = { EAI_fielded_eq_ratio < 0.7 }
+			EAI_reserve_manpower_less_than_10p = yes
+		}
 	}
 	abort = {
 		NOT = { 
@@ -525,7 +552,10 @@ EAI_SOV_offensive_vs_GER_shortage_limit_offensive = { # Prio 6
 
 				is_in_faction_with = SOV
 
-				check_variable = { EAI_fielded_eq_ratio < 0.8 }
+				OR = {
+					check_variable = { EAI_fielded_eq_ratio < 0.8 }
+					EAI_reserve_manpower_less_than_15p = yes
+				}
 			}
 		}
 	} 	
@@ -668,7 +698,7 @@ EAI_SOV_offensive_vs_GER_is_weak = { # Prio 8
 	}
 }
 
-### Air assignments
+### Assignments
 
 EAI_SOV_offensive_assignments = {
 	enable = {
@@ -689,7 +719,7 @@ EAI_SOV_offensive_assignments = {
 	ai_strategy = {
 		type = front_armor_score
 		id = "GER"
-		value = 1000
+		value = 50000
 	}
 }
 

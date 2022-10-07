@@ -3,6 +3,8 @@
 ############################################################################################################
 
 EAI_check_division_limits = {
+
+	set_temp_variable = { division_production_was_adjusted = 0 } # Limits that adjust role_ratio need this fix
 	
 	EAI_calculate_division_cap = yes
 
@@ -11,12 +13,19 @@ EAI_check_division_limits = {
 	if = { limit = { EAI_infantry_division_limit = yes } 
 
 		if = { limit = { NOT = { has_country_flag = EAI_infantry_division_limit } } 
+
+			set_temp_variable = { division_production_was_adjusted = 1 }
 		
 			set_country_flag = EAI_infantry_division_limit 
 			if = { limit = { has_country_flag = EAI_division_limit_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: infantry, [?EAI_division_cap]0000" }  
 		}
 	}
-	else = { clr_country_flag = EAI_infantry_division_limit }
+	else_if = { limit = { has_country_flag = EAI_infantry_division_limit }
+
+		set_temp_variable = { division_production_was_adjusted = 1 }
+		
+		clr_country_flag = EAI_infantry_division_limit
+	}
 
 	# anti tank
 
@@ -101,6 +110,10 @@ EAI_check_division_limits = {
 		}
 	}
 	else = { clr_country_flag = EAI_motorized_division_limit }
+
+	###
+
+	EAI_division_production_strategy_fix = yes
 }
 
 # division cap calculation

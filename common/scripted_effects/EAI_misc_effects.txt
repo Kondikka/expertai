@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 4.646
+@EAI_VERSION = 4.702
 
 EAI_set_version = {
 
@@ -21,8 +21,7 @@ EAI_save_compatibility = {
 
 		### Save compatibility effects
 
-		EAI_espionage_operation_types = yes
-		EAI_advisor_types = yes
+		EAI_create_operation_torch_states_array = yes
 	}
 }
 
@@ -217,6 +216,37 @@ EAI_refresh_gui = {
 
 ###
 
+EAI_create_state_arrays = {
+
+	EAI_create_operation_torch_states_array = yes
+
+	EAI_create_japanese_home_states_array = yes
+
+	EAI_create_spanish_civil_war_states_array = yes
+
+	EAI_create_north_african_states_array = yes
+}
+
+EAI_create_operation_torch_states_array = {
+
+	clear_array = global.EAI_operation_torch_states_array
+
+	every_state = {
+		limit = {
+			OR = {
+				region = 182
+				region = 126
+				region = 225
+			}
+			NOT = {
+				state = 699
+			}
+		}
+
+		add_to_array = { global.EAI_operation_torch_states_array = THIS.id }
+	}
+}
+
 EAI_create_spanish_civil_war_states_array = {
 
 	clear_array = global.EAI_spanish_civil_war_states_array
@@ -379,6 +409,27 @@ EAI_calculate_reserve_eq_ratio = {
 	set_variable = { EAI_reserve_eq_ratio = reserve_eq_ratio }
 
 	if = { limit = { has_country_flag = EAI_equipment_logging} log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EQUIPMENT: EAI_reserve_eq_ratio = [?EAI_reserve_eq_ratio|%0]" }
+}
+
+EAI_calculate_reserve_mp_ratio = {
+
+	set_temp_variable = { reserve_mp_ratio = manpower_k }
+	divide_temp_variable = { reserve_mp_ratio = 10 }
+
+	if = { limit = { check_variable = { EAI_army_manpower > 0 } }
+
+		divide_temp_variable = { reserve_mp_ratio = EAI_army_manpower }
+	}
+	else = {
+
+		set_temp_variable = { reserve_mp_ratio = 1 }
+	}
+
+	###
+
+	set_variable = { EAI_reserve_mp_ratio = reserve_mp_ratio }
+
+	if = { limit = { has_country_flag = EAI_equipment_logging} log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EQUIPMENT: EAI_reserve_mp_ratio = [?EAI_reserve_mp_ratio|%0]" }
 }
 
 # command power cost when changing an ally's military focuses
@@ -889,21 +940,39 @@ EAI_mobile_warfare_doctrine_tech_switch_to_manpower_branch = {
 
 	if = {
 		limit = {
-			has_idea = service_by_requirement
-			has_manpower < 500000
-			has_tech = modern_blitzkrieg
 			NOT = { has_country_flag = EAI_MW_switched_to_manpower_branch }
+
+			OR = {
+				has_idea = service_by_requirement
+				has_idea = all_adults_serve
+				has_idea = scraping_the_barrel
+			}
+
+			has_tech = kampfgruppe
+
+			has_army_experience > 100
+
+			# Manpower level
+			OR = {
+				check_variable = { EAI_reserve_mp_ratio < 0.30 }
+				has_manpower < 50000
+			}
+
+			# Not currently conscripting more manpower
 			NOT = { conscription_ratio < 0.99 }
 		}
 
 		set_country_flag = EAI_MW_switched_to_manpower_branch
 
+		army_experience = -100
+
 		set_technology = { firebrigades = 0 }
 		set_technology = { backhand_blow = 0 }
 		set_technology = { modern_blitzkrieg = 0 }
-		set_variable = { EAI_land_doctrine_level = 7 }
 
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch" } 
+		set_technology = { volkssturm = 1 }
+
+		if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch" } 
 	}
 }
 

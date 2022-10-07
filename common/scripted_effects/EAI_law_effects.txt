@@ -25,6 +25,8 @@ EAI_store_PP = {
 	if = { limit = { check_variable = { EAI_man_law_cost > EAI_max_stored_pp } } set_variable = { EAI_max_stored_pp = EAI_man_law_cost } }
 	if = { limit = { check_variable = { EAI_tra_law_cost > EAI_max_stored_pp } } set_variable = { EAI_max_stored_pp = EAI_tra_law_cost } }
 
+	clamp_variable = { var = EAI_max_stored_pp min = 100 } # For decisions
+
 	### Special modifier
 
 	if = { limit = { tag = GER }
@@ -149,7 +151,10 @@ EAI_law_upgrades = {
 
 		EAI_upgrade_economy_law = yes
 		EAI_upgrade_conscription_law = yes
-		EAI_upgrade_trade_law = yes
+		if = { limit = { NOT = { has_country_flag = EAI_trade_law_recently_changed } }
+
+			EAI_upgrade_trade_law = yes
+		}
 	}
 }
 
@@ -386,7 +391,7 @@ EAI_upgrade_trade_law = {
 				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE LAW: limited_exports (need: [?EAI_average_resource_need]) (script)" } 
             }
 
-			set_country_flag = { flag = EAI_trade_law_recently_changed value = 1 days = 365 } # limits the AI from changing trade law due to minor fluctuations
+			set_country_flag = { flag = EAI_trade_law_recently_changed value = 1 days = 90 } # limits the AI from changing trade law due to minor fluctuations
 		}
 	}
 }

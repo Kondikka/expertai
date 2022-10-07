@@ -52,11 +52,11 @@ EAI_naval_invade = {
 	OR = {
 		has_war_with = ROOT
 		
-		is_justifying_wargoal_against = ROOT
-		ROOT = { is_justifying_wargoal_against = PREV }
+		# is_justifying_wargoal_against = ROOT
+		# ROOT = { is_justifying_wargoal_against = PREV }
 		
-		has_wargoal_against = ROOT
-		ROOT = { has_wargoal_against = PREV }
+		# has_wargoal_against = ROOT
+		# ROOT = { has_wargoal_against = PREV }
 
 		EAI_historical_invasion = yes
 	}
@@ -146,7 +146,7 @@ EAI_invasion_restriction = {
 		AND = { # uninvadeable countries
 			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
-			THIS = { OR = { original_tag = FRA original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN } is_in_faction_with = GER } 
+			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN } is_in_faction_with = GER } 
 		}
 		
 		AND = { # JAP
@@ -182,6 +182,20 @@ EAI_invasion_restriction = {
 					is_major = yes
 					is_subject_of = ENG
 				}
+			}
+		}
+
+		AND = { # USA invasions vs JAP
+			ROOT = { 
+				tag = USA
+				
+				has_war_with = JAP
+				JAP = { has_capitulated = no }
+			}
+			
+			THIS = { 
+				NOT = { tag = JAP }
+				is_in_faction_with = JAP
 			}
 		}
 	}
@@ -260,6 +274,42 @@ EAI_historical_invasion = {
 				original_tag = PHI
 				has_capitulated = no
 			} 
+		}
+
+		# Operation torch
+		AND = { 
+			ROOT = {  
+				has_war_with = GER
+				OR = { 
+					is_in_faction_with = USA 
+					is_in_faction_with = ENG 
+				} 
+				check_variable = { EAI_army_manpower > 60 }
+			} 
+			
+			THIS = { 
+				tag = VIC
+				any_of_scopes = { array = global.EAI_operation_torch_states_array
+
+					is_controlled_by = VIC
+					is_coastal = yes
+				}
+				GER = { EAI_PREV_on_same_side_with_THIS = yes } 
+				OR = {
+					has_army_manpower = { size < 1000000 }
+					date > 1941.1.1
+				}
+				if = { limit = { is_historical_focus_on = yes } 
+				
+					OR = {
+						date > 1942.1.1
+						GER = { surrender_progress > 0.2 }
+						SOV = { surrender_progress > 0.2 }
+					}
+				}
+			} 
+			
+			GER = { has_war_with = SOV }
 		}
 		
 		# ALLIES invasion in axis

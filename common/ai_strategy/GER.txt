@@ -17,6 +17,163 @@
 #	EAI
 ########################
 
+############ Weserubung
+
+EAI_GER_blitz_denmark = {
+	allowed = {
+		tag = GER
+	}
+	enable = {
+		OR = {
+			has_country_flag = EAI_norway_invasion_rush
+			AND = { focus_progress = { focus = GER_weserubung progress > 0 } NOT = { has_completed_focus = GER_weserubung } }
+		}
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
+	}
+	
+	abort = {
+		NOT = {
+			AND = {
+				OR = {
+					has_country_flag = EAI_norway_invasion_rush
+					AND = { focus_progress = { focus = GER_weserubung progress > 0 } NOT = { has_completed_focus = GER_weserubung } }
+				}
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		strategic_region = 6
+		ordertype = front
+		execution_type = rush
+	}
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 6
+		value = 50
+	}
+
+	ai_strategy = { type = strategic_air_importance id = 6 value = 50000 }
+	ai_strategy = { type = front_armor_score id = "DEN" value = 50000 }
+}
+
+EAI_GER_blitz_norway = {
+	allowed = {
+		tag = GER
+	}
+	enable = {
+		has_country_flag = EAI_norway_invasion
+		any_state = {
+			region = 11
+			GER = { divisions_in_state = { state = PREV size > 0 } }
+		}
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
+	}
+	
+	abort = {
+		NOT = {
+			AND = {
+				has_country_flag = EAI_norway_invasion
+				any_state = {
+					region = 11
+					GER = { divisions_in_state = { state = PREV size > 0 } }
+				}
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		tag = NOR
+		ordertype = front
+		execution_type = rush
+		execute_order = yes
+	}
+
+	ai_strategy = { type = strategic_air_importance id = 11 value = 50000 }
+	# Dont send armor
+	ai_strategy = { type = front_armor_score id = "NOR" value = -50000 }
+}
+
+############ Invasion of balkans
+
+EAI_GER_blitz_BALKANS_assignments = {
+	enable = {
+		is_in_faction_with = GER
+		OR = {
+			has_global_flag = EAI_GER_yugoslavia_blitz
+			GER = { focus_progress = { focus = GER_demand_slovenia progress > 0 } NOT = { has_completed_focus = GER_demand_slovenia } }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				region = 24
+				region = 27
+				region = 26
+				region = 25
+			}
+		}
+		value = 50
+	}
+
+	ai_strategy = { type = strategic_air_importance id = 24 value = 50000 }
+	ai_strategy = { type = strategic_air_importance id = 25 value = 50000 }
+	ai_strategy = { type = front_armor_score id = "YUG" value = 50000 }
+	ai_strategy = { type = front_armor_score id = "GRE" value = 50000 }
+}
+
+EAI_GER_blitz_BALKANS_push = {
+	enable = {
+		is_in_faction_with = GER
+		has_global_flag = EAI_GER_yugoslavia_blitz
+		has_war_with = YUG
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
+	}
+
+	abort = {
+		NOT = {
+			AND = {
+				is_in_faction_with = GER
+				has_global_flag = EAI_GER_yugoslavia_blitz
+				has_war_with = YUG
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		priority = 9
+		state_trigger = {
+			OR = {
+				region = 24
+				region = 27
+				region = 26
+				region = 25
+			}
+		}
+		ratio > 0.50
+		execution_type = rush_weak
+		execute_order = yes
+	}
+}
+
+############
+
 EAI_GER_avoid_southern_africa = { # AI GER gains any states in Africa = disaster
 	allowed = { tag = GER }
 	enable = {
@@ -85,7 +242,7 @@ EAI_axis_prep_for_barbarossa = {
 	ai_strategy = {
 		type = front_armor_score
 		id = "SOV"
-		value = 1000
+		value = 50000
 	}
 }
 
@@ -100,10 +257,22 @@ EAI_GER_offensive_vs_SOV_initial_push = { # Prio 9
 		is_in_faction_with = GER
 
 		check_variable = { EAI_fielded_eq_ratio > 0.85 }
-
-		has_manpower > 250000
+		EAI_reserve_manpower_more_than_25p = yes
 	}
-	abort_when_not_enabled = yes
+	abort = {
+		NOT = {
+			AND = {
+				has_country_flag = EAI_barbarossa_blitz
+
+				has_war_with = SOV
+
+				is_in_faction_with = GER
+
+				check_variable = { EAI_fielded_eq_ratio > 0.75 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
 
 	ai_strategy = {
 		type = front_control
@@ -125,7 +294,7 @@ EAI_GER_offensive_vs_SOV_critical_shortage_pause = { # Prio 10
 
 		OR = {
 			check_variable = { EAI_fielded_eq_ratio < 0.6 }
-			has_manpower < 50000
+			EAI_reserve_manpower_less_than_5p = yes
 		}
 	}
 	abort = {
@@ -137,7 +306,7 @@ EAI_GER_offensive_vs_SOV_critical_shortage_pause = { # Prio 10
 
 				OR = {
 					check_variable = { EAI_fielded_eq_ratio < 0.7 }
-					has_manpower < 100000
+					EAI_reserve_manpower_less_than_10p = yes
 				}
 			}
 		}
@@ -159,7 +328,10 @@ EAI_GER_offensive_vs_SOV_shortage_limit_offensive = { # Prio 6
 
 		is_in_faction_with = GER
 
-		check_variable = { EAI_fielded_eq_ratio < 0.7 }
+		OR = {
+			check_variable = { EAI_fielded_eq_ratio < 0.7 }
+			EAI_reserve_manpower_less_than_10p = yes
+		}
 	}
 	abort = {
 		NOT = { 
@@ -168,7 +340,10 @@ EAI_GER_offensive_vs_SOV_shortage_limit_offensive = { # Prio 6
 
 				is_in_faction_with = GER
 
-				check_variable = { EAI_fielded_eq_ratio < 0.8 }
+				OR = {
+					check_variable = { EAI_fielded_eq_ratio < 0.8 }
+					EAI_reserve_manpower_less_than_15p = yes
+				}
 			}
 		}
 	} 	
@@ -556,20 +731,30 @@ EAI_GER_prep_for_maginot = {
 EAI_GER_push_benelux = {
 	allowed = { tag = GER }
 	enable = {
-		is_historical_focus_on = yes
+		has_country_flag = EAI_GER_benelux_rush
 		
-		focus_progress = { focus = GER_around_maginot progress > 0 }
+		OR = {
+			focus_progress = { focus = GER_around_maginot progress > 0 }
+			has_completed_focus = GER_around_maginot
+		}
 
 		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
 		
 		date < 1941.1.1
 	}
 	abort = {
 		NOT = {
 			AND = {
-				focus_progress = { focus = GER_around_maginot progress > 0 }
+				has_country_flag = EAI_GER_benelux_rush
 
-				check_variable = { EAI_fielded_eq_ratio > 0.6 }
+				OR = {
+					focus_progress = { focus = GER_around_maginot progress > 0 }
+					has_completed_focus = GER_around_maginot
+				}
+
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
 				
 				date < 1941.1.1
 			}
@@ -588,23 +773,22 @@ EAI_GER_push_benelux = {
 			}
 		}
 		ratio > 0.5
-		execution_type = balanced
+		execution_type = rush
+		# execute_order = yes
 	}
 }
 
 EAI_GER_rush_benelux = {
 	allowed = { tag = GER }
 	enable = {
-		is_historical_focus_on = yes
-
-		has_country_flag = EAI_GER_benelux_rush
+		has_country_flag = { flag = EAI_GER_benelux_rush value = 1 days < 30 }
 		
 		date < 1941.1.1
 	}
 	abort = {
 		NOT = {
 			AND = {
-				has_country_flag = EAI_GER_benelux_rush
+				has_country_flag = { flag = EAI_GER_benelux_rush value = 1 days < 30 }
 		
 				date < 1941.1.1
 			}
@@ -624,7 +808,7 @@ EAI_GER_rush_benelux = {
 			}
 		}
 		ratio > 0.5
-		execution_type = rush_weak
+		execution_type = rush
 		execute_order = yes
 	}
 }
@@ -651,6 +835,29 @@ EAI_GER_hold_maginot = {
 }
 
 ############
+
+EAI_GER_garrison_home = {
+	allowed = { tag = GER }
+	enable = {
+		has_capitulated = no
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 7 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 6 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 8 value = 100000 }
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.05
+		order_id = 9
+		states = { 
+			64
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
 
 EAI_GER_ignore_ITA = {
 	allowed = { tag = GER }
@@ -922,67 +1129,6 @@ EAI_GER_garrison_atlantic_wall = {
 	}
 }
 
-EAI_rush_denmark = {
-	allowed = {
-		tag = GER
-	}
-	enable = {
-		OR = {
-			has_country_flag = EAI_norway_invasion_rush
-			AND = {
-				focus_progress = { focus = GER_weserubung progress > 0 }
-				NOT = { has_completed_focus = GER_weserubung }
-			}
-		}
-		check_variable = { EAI_fielded_eq_ratio > 0.8 }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = front_control
-		tag = DEN
-		ordertype = front
-		execution_type = rush
-		manual_attack = yes
-	}
-	ai_strategy = {
-		type = front_control
-		tag = DEN
-		ordertype = front
-		execution_type = rush
-		manual_attack = yes
-	}
-	ai_strategy = {
-		type = front_unit_request
-		tag = DEN
-		value = 50
-	}
-	ai_strategy = {
-		type = conquer
-		id = "DEN"
-		value = 100
-	}
-}
-
-EAI_rush_norway = {
-	allowed = {
-		tag = GER
-	}
-	enable = {
-		check_variable = { EAI_naval_invasion_target = NOR.id }
-		check_variable = { EAI_fielded_eq_ratio > 0.8 }
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = front_control
-		tag = NOR
-		ordertype = front
-		execution_type = rush
-		manual_attack = yes
-	}
-}
-
 EAI_wardec_BEL = {
 	allowed = { tag = GER }
 	enable = {
@@ -1038,9 +1184,19 @@ EAI_rush_poland = {
 	enable = {
 		has_war_with = POL
 		has_country_flag = EAI_pause_national_focuses # timed flag set when ger wardecs pol
-		check_variable = { EAI_fielded_eq_ratio > 0.7 }
+		check_variable = { EAI_fielded_eq_ratio > 0.8 }
+		EAI_reserve_manpower_more_than_25p = yes
 	}
-	abort_when_not_enabled = yes
+	abort = {
+		NOT = {
+			AND = {
+				has_war_with = POL
+				has_country_flag = EAI_pause_national_focuses # timed flag set when ger wardecs pol
+				check_variable = { EAI_fielded_eq_ratio > 0.7 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
 
 	ai_strategy = {
 		type = front_control

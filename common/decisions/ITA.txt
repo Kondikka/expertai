@@ -612,7 +612,10 @@ ITA_missiolinis = {
 				tooltip = ITA_pacify_ethiopia_goal_tt
 				all_of_scopes = {
 					array = ITA_initial_ethiopian_states
-					compliance > 60 #WARNING THIS VALUE NEEDS TO MATCH THE ONE IN EVENT TRIGGER
+					OR = {
+						compliance > 60 #WARNING THIS VALUE NEEDS TO MATCH THE ONE IN EVENT TRIGGER
+						controller = { is_subject_of = ROOT }
+					}
 				}
 			}
 		}
@@ -684,7 +687,10 @@ ITA_missiolinis = {
 				tooltip = ITA_pacify_ethiopia_goal_tt
 				all_of_scopes = {
 					array = ITA_initial_ethiopian_states
-					compliance > 60 #WARNING THIS VALUE NEEDS TO MATCH THE ONE IN EVENT TRIGGER
+					OR = {
+						compliance > 60 #WARNING THIS VALUE NEEDS TO MATCH THE ONE IN EVENT TRIGGER
+						controller = { is_subject_of = ROOT }
+					}
 				}
 			}
 		}
@@ -712,7 +718,7 @@ ITA_missiolinis = {
 				limit = {
 					all_of_scopes = {
 						array = ITA_initial_ethiopian_states
-						compliance > 70
+						compliance > 60
 					}
 				}
 				log = "Success"
@@ -5265,6 +5271,8 @@ ITA_naval_cooperation_programs_dec_cat = {
 			base = 0.7
 		}
 
+		fire_only_once = yes
+
 		available = {
 			has_navy_size = {
 				size > 4
@@ -5319,6 +5327,8 @@ ITA_naval_cooperation_programs_dec_cat = {
 		ai_will_do = {
 			base = 1
 		}
+
+		fire_only_once = yes
 
 		available = {
 			has_navy_size = {
@@ -5850,6 +5860,11 @@ ITA_diplomacy_balkan_decision_category = {
 
 		target_trigger = {
 			ITA_basic_ultimatum_triggers = yes
+			FROM = {
+				NOT = {
+					is_subject_of = ITA
+				}
+			}
 		}
 
 		target_root_trigger = {
@@ -5869,6 +5884,7 @@ ITA_diplomacy_balkan_decision_category = {
 		}
 
 		visible = {
+
 		}
 
 		cost = ITA_send_ultimatum_to_country_cost
@@ -6445,46 +6461,47 @@ ITA_diplomacy_balkan_decision_category = {
 			original_tag = ITA
 		}
 
-		available = {
-			any_country = {
-				OR = {
-					is_in_faction_with = ITA
-					is_subject_of = ITA
+		target_trigger = {
+			FROM = {
+				NOT = {
+					has_war_with = ROOT
 				}
-				controls_state = 103
-			}
-			NOT = {
-				103 = {
-					is_controlled_by = ITA
+				OR = {
+					controls_state = 852
+					controls_state = 103
+					controls_state = 163
+				}
+				NOT = {
+					has_country_flag = ITA_refused_dalmatian_demands
+					has_country_flag = ITA_sent_dalmatian_demands
 				}
 			}
 		}
 
-		visible = {
+		available = {
+		}
+
+		target_root_trigger = {
 			ITA = {
 				OR = {
 					has_government = neutrality
 					has_government = fascism
 				}
 			}
-			NOT = {
-				has_country_flag = ITA_demanded_dalmatia
-			}
 		}
 
 		cost = 75
 
 		complete_effect = {
-			random_country = {
-				limit = { controls_state = 103 }
+			FROM = {
 				country_event = {
 				    id = BBA_italy_interaction_events.8
 				    days = 2
 				    random = 3
 				}
-			}
-			hidden_effect = {
-				set_country_flag = ITA_demanded_dalmatia
+				hidden_effect = {
+					set_country_flag = ITA_sent_dalmatian_demands
+				}
 			}
 		}
 	}
@@ -6734,6 +6751,7 @@ ITA_diplomacy_balkan_decision_category = {
 				controls_state = 164
 			}
 			GRE = {
+				is_subject = no
 				has_civil_war = no
 				NOT = {
 					has_government = communism
@@ -6742,6 +6760,10 @@ ITA_diplomacy_balkan_decision_category = {
 		}
 
 		visible = {
+			GRE = {
+				exists = yes
+				NOT = { is_in_faction_with = ROOT }
+			}
 			ITA = {
 				OR = {
 					has_government = neutrality
@@ -6761,6 +6783,7 @@ ITA_diplomacy_balkan_decision_category = {
 			random_country = {
 				limit = {
 					original_tag = GRE
+					is_subject = no
 					has_civil_war = no
 					NOT = {
 						has_government = communism
@@ -6804,6 +6827,7 @@ ITA_diplomacy_balkan_decision_category = {
 				controls_state = 164
 			}
 			TUR = {
+				is_subject = no
 				has_civil_war = no
 				NOT = {
 					has_government = communism
@@ -6812,6 +6836,10 @@ ITA_diplomacy_balkan_decision_category = {
 		}
 
 		visible = {
+			TUR = {
+				exists = yes
+				NOT = { is_in_faction_with = ROOT }
+			}
 			ITA = {
 				OR = {
 					has_government = neutrality
@@ -6831,6 +6859,7 @@ ITA_diplomacy_balkan_decision_category = {
 			random_country = {
 				limit = {
 					original_tag = TUR
+					is_subject = no
 					has_civil_war = no
 					NOT = {
 						has_government = communism
@@ -7255,7 +7284,14 @@ ITA_italian_mafia_dec_cat = {
 		}
 
 		complete_effect = {
-
+			hidden_effect = {
+				add_equipment_to_stockpile = { 
+					type = infantry_equipment
+					amount = -500
+				}
+				add_manpower = -1000
+				add_command_power = -25
+			}
 		}
 
 		remove_effect = {
@@ -7321,6 +7357,10 @@ operations = {
 		fire_only_once = yes
 
 		complete_effect = {
+			hidden_effect = {
+				add_command_power = -25
+			}
+
 			if = {
 				limit = {
 					any_enemy_country = {

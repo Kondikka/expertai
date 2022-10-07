@@ -87,9 +87,9 @@ EAI_allies_avoid_GER = {
 
 		NOT = { GER = { has_capitulated = yes } }
 
-		alliance_naval_strength_ratio < 8
+		alliance_naval_strength_ratio < 4
 
-		NOT = { GER = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+		NOT = { check_variable = { EAI_naval_invasion_target = GER.id } }
 
 		NOT = { # unblock if holding these states
 			19 = { CONTROLLER = { has_war_with = GER } }
@@ -450,90 +450,6 @@ EAI_GER_naval_missions_early_war = {
 ############################################################################ 
 #	scripted invasion AI
 ############################################################################
-
-### special cases
-
-# JAP
-
-EAI_pacific_war_JAP = {
-	allowed = { tag = JAP }
-	enable = {
-		OR = { has_war_with = PHI focus_progress = { focus = JAP_secure_the_philippines progress > 0 } }
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "PHI" value = 4000 }
-}
-
-EAI_pacific_war_JAP_2 = {
-	allowed = { tag = JAP }
-	enable = {
-		has_war_with = MAL
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "MAL" value = 4000 }
-}
-
-EAI_pacific_war_JAP_3 = {
-	allowed = { tag = JAP }
-	enable = {
-		has_war_with = INS
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "INS" value = 4000 }
-}
-
-EAI_pacific_war_JAP_4 = {
-	allowed = { tag = JAP }
-	enable = {
-		has_war_with = USA
-		
-		if = { limit = { has_war_with = INS } INS = { has_capitulated = yes } }
-		if = { limit = { has_war_with = MAL } MAL = { has_capitulated = yes } }
-		if = { limit = { has_war_with = PHI } PHI = { has_capitulated = yes } }
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "USA" value = 4000 }
-}
-
-EAI_pacific_war_JAP_5 = {
-	allowed = { tag = JAP }
-	enable = {
-		has_war_with = USA
-
-		if = { limit = { has_war_with = PHI } PHI = { has_capitulated = yes } }
-
-		OR = {
-			638 = { CONTROLLER = { original_tag = USA } }
-			650 = { CONTROLLER = { original_tag = USA } }
-			632 = { CONTROLLER = { original_tag = USA } }
-		}
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "USA" value = 4000 }
-}
-
-EAI_pacific_war_USA = {
-	allowed = { tag = USA }
-	enable = {
-		has_war_with = JAP
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = invade id = "JAP" value = 4000 }
-}
-
-###
 
 EAI_disable_invasions = {
 	enable = { always = yes }
@@ -896,4 +812,126 @@ EAI_naval_invasion = {
 	enable = { always = yes }
 
 	ai_strategy = { type = invade id = "N00" value = 7000 }
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { FROM.FROM = { set_temp_variable = { invasion_target = N00 } } is_controlled_by = var:invasion_target }
+		value = 1
+	}
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = {
+			NOT = { 
+				FROM = { FROM.FROM = { check_variable = { ai_strategy_invade@PREV > 1000 } } }
+				is_controlled_by = var:FROM.FROM.EAI_naval_invasion_target
+			}
+		}
+		value = -2000
+	}
+}
+
+### special cases
+
+EAI_invasion_normandy = {
+	enable = {
+		OR = {
+			is_in_faction_with = ENG
+			is_in_faction_with = USA
+		}
+		check_variable = { EAI_naval_invasion_target = GER.id }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_208 value = 2000 }
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_19 value = 2000 }
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			OR = {
+				region = 208
+				region = 19
+			}
+		}
+		value = 5
+	}
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			NOT = {
+				region = 208
+				region = 19
+			}
+			NOT = { FROM = { FROM.FROM = { check_variable = { ai_strategy_invade@PREV > 1000 } } } }
+		}
+		value = -2000
+	}
+}
+
+EAI_operation_torch = {
+	enable = {
+		OR = {
+			is_in_faction_with = ENG
+			is_in_faction_with = USA
+		}
+		OR = {
+			AND = {
+				check_variable = { EAI_naval_invasion_target = ITA.id }
+				any_of_scopes = { array = global.EAI_operation_torch_states_array
+
+					is_controlled_by = ITA
+					is_coastal = yes
+				}
+			}
+			AND = {
+				check_variable = { EAI_naval_invasion_target = VIC.id }
+				any_of_scopes = { array = global.EAI_operation_torch_states_array
+
+					is_controlled_by = VIC
+					is_coastal = yes
+				}
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_182 value = 2000 }
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_126 value = 2000 }
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			is_in_array = { global.EAI_operation_torch_states_array = THIS.id }
+		}
+		value = 5
+	}
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			NOT = { is_in_array = { global.EAI_operation_torch_states_array = THIS.id } }
+			NOT = { FROM = { FROM.FROM = { check_variable = { ai_strategy_invade@PREV > 1000 } } } }
+		}
+		value = -2000
+	}
+}
+
+EAI_pacific_war_USA = {
+	allowed = { tag = USA }
+	enable = {
+		has_war_with = JAP
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = invade id = "JAP" value = 4000 }
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { is_controlled_by = JAP }
+		value = 1
+	}
 }

@@ -319,10 +319,7 @@ EAI_defensive_front_strategy = {
 			limit = {
 				NOT = { has_country_flag = EAI_defensive_front_strategy_manpower }
 
-				set_temp_variable = { manpower_reserve = manpower_k }
-				multiply_temp_variable = { manpower_reserve = 0.1 }
-				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
-				check_variable = { manpower_reserve < 0.05 } # Less than 5% mp in reserve
+				EAI_reserve_manpower_less_than_5p = yes
 				
 				OR = { # Can upgrade law or is currently conscripting
 					EAI_can_upgrade_manpower_law = yes
@@ -342,12 +339,8 @@ EAI_defensive_front_strategy = {
 			limit = {
 				has_country_flag = EAI_defensive_front_strategy_manpower
 
-				set_temp_variable = { manpower_reserve = manpower_k }
-				multiply_temp_variable = { manpower_reserve = 0.1 }
-				divide_temp_variable = { manpower_reserve = EAI_army_manpower }
-				
 				OR = { # Cancel if:
-					check_variable = { manpower_reserve > 0.10 } # Over 10% mp in reserve
+					EAI_reserve_manpower_more_than_10p = yes
 					
 					NOT = { # Cant upgrade law and not conscripting more
 						EAI_can_upgrade_manpower_law = yes
@@ -500,12 +493,15 @@ EAI_GER_offensive_vs_SOV_is_weak = {
 			is_in_faction_with = GER
 
 			check_variable = { EAI_fielded_eq_ratio > 0.7 }
+			EAI_reserve_manpower_more_than_25p = yes
 
 			SOV = {
 				OR = {
 					surrender_progress > 0.8
-					check_variable = { EAI_fielded_eq_ratio < 0.6 }
 					strength_ratio = { tag = PREV ratio < 0.5 } 
+
+					check_variable = { EAI_fielded_eq_ratio < 0.6 }
+					EAI_reserve_manpower_less_than_5p = yes
 				}
 			}
 		}
@@ -529,8 +525,10 @@ EAI_GER_offensive_vs_SOV_is_weak = {
 					SOV = {
 						OR = {
 							surrender_progress > 0.8
-							check_variable = { EAI_fielded_eq_ratio < 0.6 }
 							strength_ratio = { tag = GER ratio < 0.5 } 
+
+							check_variable = { EAI_fielded_eq_ratio < 0.6 }
+							EAI_reserve_manpower_less_than_10p = yes
 						}
 					}
 				}
@@ -560,8 +558,10 @@ EAI_SOV_offensive_vs_GER_is_weak = {
 			GER = {
 				OR = {
 					surrender_progress > 0.8
-					check_variable = { EAI_fielded_eq_ratio < 0.6 }
 					strength_ratio = { tag = SOV ratio < 0.5 } 
+
+					check_variable = { EAI_fielded_eq_ratio < 0.6 }
+					EAI_reserve_manpower_less_than_5p = yes
 				}
 			}
 		}
@@ -585,8 +585,10 @@ EAI_SOV_offensive_vs_GER_is_weak = {
 					GER = {
 						OR = {
 							surrender_progress > 0.8
+							strength_ratio = { tag = SOV ratio < 0.5 }
+
 							check_variable = { EAI_fielded_eq_ratio < 0.6 }
-							strength_ratio = { tag = SOV ratio < 0.5 } 
+							EAI_reserve_manpower_less_than_10p = yes 
 						}
 					}
 				}
