@@ -285,6 +285,9 @@ NDefines.NAI.COMMAND_POWER_BEFORE_SPEND_ON_TRAITS = 65.0
 -- LAND AI
 --------------------------------------------------------------------------------------------------------------
 
+NDefines.NAI.MIN_AI_UNITS_PER_TILE_FOR_STANDARD_COHESION = 2.0	-- How many units should we have for each tile along a front in order to switch to standard cohesion (less moving around)
+NDefines.NAI.MIN_FRONT_SIZE_TO_CONSIDER_STANDARD_COHESION = 2000	-- How long should fronts be before we consider switching to standard cohesion (under this, standard cohesion fronts will switch back to relaxed)
+
 NDefines.NAI.ASSIGN_TANKS_TO_WAR_FRONT = 8.0 --4.0
 NDefines.NAI.ASSIGN_TANKS_TO_NON_WAR_FRONT = 0.2 --0.4
 
@@ -583,3 +586,10 @@ NDefines.NAI.LAND_DEFENSE_NAVAL_FACTORY_IMPORTANCE = 60 -- 30			-- Strategic imp
 -- NDefines.NAI.LAND_DEFENSE_AA_IMPORTANCE_FACTOR = 1.0			-- Factor of AA influence on strategic importance ( 0.0 - 1.0 )
 -- NDefines.NAI.LAND_DEFENSE_INFRA_IMPORTANCE_FACTOR = 0.5			-- Factor of infrastructure influence on strategic importance ( 0.0 - 1.0 )
 -- NDefines.NAI.LAND_DEFENSE_IMPORTANCE_SCALE = 3.0				-- Lend defence total importance scale (every land defence score get's multiplied by it)
+
+NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 200				-- Amount of planes requested per enemy civ factory
+NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 205				-- Amount of planes requested per enemy military factory
+NDefines.NAI.STR_BOMB_PLANES_PER_NAV_FACTORY = 105				-- Amount of planes requested per enemy naval factory
+NDefines.NAI.STR_BOMB_PLANES_PER_SUPPLY_HUB = 30                 -- Amount of planes requested per enemy supply node
+NDefines.NAI.STR_BOMB_MIN_EXCORT_PLANES = 200					-- Min amount of planes requested to excort operations
+	
