@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 4.702
+@EAI_VERSION = 4.705
 
 EAI_set_version = {
 
@@ -21,7 +21,21 @@ EAI_save_compatibility = {
 
 		### Save compatibility effects
 
-		EAI_create_operation_torch_states_array = yes
+		every_country = {
+			limit = {
+				check_variable = { EAI_FOCUS/AIR/fighter = global.EAI_FTR_B }
+			}
+
+			set_variable = { EAI_FOCUS/AIR/fighter = global.EAI_FTR_A }
+		}
+
+		every_country = {
+			limit = {
+				check_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_B }
+			}
+
+			set_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_HFTR_A }
+		}
 	}
 }
 
@@ -131,6 +145,176 @@ EAI_advisor_strategies = {
 			}
 
 			set_variable = { EAI_get_advisor = global.EAI_popular_figurehead_TYPE }
+		}
+	}
+}
+
+###
+
+# Transitions between fighter variants based on resources
+EAI_fighter_variant_selection = {
+
+	set_temp_variable = { rubber_excess = 0 }
+	set_temp_variable = { aluminium_shortage = 0 }
+
+	### Normal variant
+
+	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } }
+
+		# Has aluminium shortage
+		if = {
+			limit = {
+				check_variable = { EAI_aluminium_resource_shortage > 2 }
+			}
+
+			set_temp_variable = { aluminium_shortage = 1 }
+		}
+
+		# Can afford the estimated extra rubber consumption
+		if = {
+			limit = {
+				check_variable = { resource@rubber > 0 }
+				set_temp_variable = { rubber_needed = resource_consumed@rubber }
+				multiply_temp_variable = { rubber_needed = 2 }
+				check_variable = { resource@rubber > rubber_needed }
+			}
+
+			set_temp_variable = { rubber_excess = 1 }
+		}
+	}
+
+	### More rubber variant
+
+	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } }
+
+		# Has aluminium shortage
+		if = {
+			limit = {
+				check_variable = { EAI_aluminium_resource_shortage > 2 }
+			}
+
+			set_temp_variable = { aluminium_shortage = 1 }
+		}
+
+		# Doesn't have rubber shortage
+		if = {
+			limit = {
+				NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
+			}
+
+			set_temp_variable = { rubber_excess = 1 }
+		}
+	}
+
+	### Less aluminium variant
+
+	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } }
+
+		# Can afford the estimated extra aluminium consumption
+		if = {
+			limit = {
+				NOT = {
+					AND = {
+						check_variable = { resource@aluminium > 0 }
+						set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
+						multiply_temp_variable = { aluminium_needed = 3 }
+						check_variable = { resource@aluminium > aluminium_needed }
+					}
+				}
+			}
+
+			set_temp_variable = { aluminium_shortage = 1 }
+		}
+
+		# Can afford the estimated extra rubber consumption
+		if = {
+			limit = {
+				check_variable = { resource@rubber > 0 }
+				set_temp_variable = { rubber_needed = resource_consumed@rubber }
+				multiply_temp_variable = { rubber_needed = 2 }
+				check_variable = { resource@rubber > rubber_needed }
+			}
+
+			set_temp_variable = { rubber_excess = 1 }
+		}
+	}
+
+	### More rubber + less aluminium variant
+
+	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } }
+
+		# Doesn't have rubber shortage
+		if = {
+			limit = {
+				NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
+			}
+
+			set_temp_variable = { rubber_excess = 1 }
+		}
+
+		# Can afford the estimated extra aluminium consumption
+		if = {
+			limit = {
+				NOT = {
+					AND = {
+						check_variable = { resource@aluminium > 0 }
+						set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
+						multiply_temp_variable = { aluminium_needed = 3 }
+						check_variable = { resource@aluminium > aluminium_needed }
+					}
+				}
+			}
+
+			set_temp_variable = { aluminium_shortage = 1 }
+		}
+	}
+
+	###### 
+
+	if = { limit = { NOT = { has_country_flag = EAI_fighter_variant_selection_timeout } }
+
+		if = { limit = { check_variable = { aluminium_shortage = 1 } check_variable = { rubber_excess = 1 } }
+
+			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } } } 
+				
+				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D }
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber + less aluminium"
+			}
+		}
+
+		else_if = { limit = { check_variable = { aluminium_shortage = 1 } }
+
+			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } } } 
+				
+				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C }
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Less aluminium"
+			}
+		}
+
+		else_if = { limit = { check_variable = { rubber_excess = 1 } }
+
+			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } } } 
+				
+				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B }
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber"
+			}
+		}
+
+		else = {
+
+			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } } } 
+				
+				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A }
+
+				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Normal type"
+			}
 		}
 	}
 }
