@@ -571,21 +571,45 @@ NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = 500 --
 
 NDefines.NAI.PRODUCTION_CARRIER_PLANE_BUFFER_RATIO = 0.75 --1.5				-- in additiona to total deck size of carriers, we want at list this ratio to buffer it
 -- -- NDefines.NAI.PRODUCTION_CARRIER_PLANE_PRODUCTION_BOOST_TO_BUFFER = 4.0  -- production of carrier planes will go up by this ratio if we lack buffers
-
 NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 1
 
--- -- NDefines.NAI.AIR_WING_REINFORCEMENT_LIMIT = 400
-                           -- [0.3]  -- Effect of distance applied to the score calculations
-NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 1                              -- [4]    -- Amount of days between air ai updates priorities for air wings ( from 1 to N )
+-- NDefines.NAI.DAYS_BETWEEN_AIR_PRIORITIES_UPDATE = 1                              -- [4]    -- Amount of days between air ai updates priorities for air wings ( from 1 to N )
+-- NDefines.NAI.AIR_SCORE_DISTANCE_IMPACT = 0.3					-- Effect of distance applied to the score calculations
+
+-------------------------
+-- Land combat
+-------------------------
+
+-- NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 0.40		-- Strategic importance of air superiority ( amount of enemy planes in area )
+-- NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 20			-- Strategic importance of our armies
+NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 1000		-- Strategic importance of our armies in the combats
+-- NDefines.NAI.LAND_COMBAT_FRIEND_ARMIES_AIR_IMPORTANCE = 10		-- Strategic importance of friendly armies
+-- NDefines.NAI.LAND_COMBAT_FRIEND_COMBATS_AIR_IMPORTANCE = 8		-- Strategic importance of friendly armies in the combat
+-- NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 12		-- Strategic importance of our armies
+-- NDefines.NAI.LAND_COMBAT_ENEMY_LAND_FORTS_AIR_IMPORTANCE = 5	-- Strategic importance of enemy land forts in the region
+-- NDefines.NAI.LAND_COMBAT_ENEMY_COASTAL_FORTS_AIR_IMPORTANCE = 3	-- Strategic importance of enemy coastal fronts in the region
+-- NDefines.NAI.LAND_COMBAT_IMPORTANCE_SCALE = 5.0					-- Lend combat total importance scale (every land combat score get's multiplied by it)
+
+-------------------------
+-- Defense
+-------------------------
+
+NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 1				-- Amount of air superiority planes requested per enemy plane
+NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 1		-- Amount of air interceptor planes requested per enemy bomber
+-- NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.1				-- Amount of air interceptor planes requested per enemy plane (non bomber)
 
 -- NDefines.NAI.LAND_DEFENSE_AIR_SUPERIORITY_IMPORTANCE = 1.0		-- Strategic importance of air superiority ( amount of enemy planes in area )
-NDefines.NAI.LAND_DEFENSE_CIVIL_FACTORY_IMPORTANCE = 100 -- 50			-- Strategic importance of civil factories
-NDefines.NAI.LAND_DEFENSE_MILITARY_FACTORY_IMPORTANCE = 140 -- 70		-- Strategic importance of military factories
-NDefines.NAI.LAND_DEFENSE_NAVAL_FACTORY_IMPORTANCE = 60 -- 30			-- Strategic importance of naval factories
+NDefines.NAI.LAND_DEFENSE_CIVIL_FACTORY_IMPORTANCE = 800 -- 50			-- Strategic importance of civil factories
+NDefines.NAI.LAND_DEFENSE_MILITARY_FACTORY_IMPORTANCE = 880 -- 70		-- Strategic importance of military factories
+NDefines.NAI.LAND_DEFENSE_NAVAL_FACTORY_IMPORTANCE = 420 -- 30			-- Strategic importance of naval factories
 -- NDefines.NAI.LAND_DEFENSE_SUPPLY_HUB_IMPORTANCE = 4             -- Strategic importance of supply hubs
 -- NDefines.NAI.LAND_DEFENSE_AA_IMPORTANCE_FACTOR = 1.0			-- Factor of AA influence on strategic importance ( 0.0 - 1.0 )
 -- NDefines.NAI.LAND_DEFENSE_INFRA_IMPORTANCE_FACTOR = 0.5			-- Factor of infrastructure influence on strategic importance ( 0.0 - 1.0 )
 -- NDefines.NAI.LAND_DEFENSE_IMPORTANCE_SCALE = 3.0				-- Lend defence total importance scale (every land defence score get's multiplied by it)
+
+-------------------------
+-- Str bombing
+-------------------------
 
 NDefines.NAI.STR_BOMB_PLANES_PER_CIV_FACTORY = 200				-- Amount of planes requested per enemy civ factory
 NDefines.NAI.STR_BOMB_PLANES_PER_MIL_FACTORY = 205				-- Amount of planes requested per enemy military factory
@@ -593,3 +617,33 @@ NDefines.NAI.STR_BOMB_PLANES_PER_NAV_FACTORY = 105				-- Amount of planes reques
 NDefines.NAI.STR_BOMB_PLANES_PER_SUPPLY_HUB = 30                 -- Amount of planes requested per enemy supply node
 NDefines.NAI.STR_BOMB_MIN_EXCORT_PLANES = 200					-- Min amount of planes requested to excort operations
 	
+-------------------------
+-- Naval air
+-------------------------
+
+-- NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 1.0						-- Amounts of air superiority planes requested per enemy plane
+-- NDefines.NAI.NAVAL_STRIKE_PLANES_PER_ARMY = 0					-- Amount of planes requested per enemy army
+NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 40					-- Amount of bombers requested per enemy ship
+-- NDefines.NAI.PORT_STRIKE_PLANES_PER_SHIP = 10					-- Amount of bombers request per enemy ship in the port
+-- NDefines.NAI.NAVAL_MIN_EXCORT_PLANES = 100 --0						-- Min amount of planes requested to excort operations
+
+-- NDefines.NAI.NAVAL_AIR_SUPERIORITY_IMPORTANCE = 0.10			-- Strategic importance of air superiority ( amount of enemy planes in area )
+NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 10000 --2.0					-- Naval ship air importance
+-- NDefines.NAI.NAVAL_SHIP_IN_PORT_AIR_IMPORTANCE = 6.0			-- Naval ship in the port air importance
+-- NDefines.NAI.NAVAL_COMBAT_AIR_IMPORTANCE = 8.0					-- Naval combat air importance
+-- NDefines.NAI.NAVAL_TRANSFER_AIR_IMPORTANCE = 0.0				-- Naval transfer air importance
+-- NDefines.NAI.NAVAL_COMBAT_TRANSFER_AIR_IMPORTANCE = 50.0		-- Naval combat involving enemy land units
+NDefines.NAI.NAVAL_IMPORTANCE_SCALE = 2 --0.65						-- Naval total importance scale (every naval score get's multiplied by it)
+-- NDefines.NAI.NAVAL_COMBAT_OUR_NAVY_MULT_ON_IMPORTANCE = 0.35	-- Naval region importance are scaled by our ships as well
+-- NDefines.NAI.NAVAL_COMBAT_ALLY_NAVY_MULT_ON_IMPORTANCE = 0.15	-- Naval region importance are scaled by our ships as well
+-- NDefines.NAI.NAVAL_COMBAT_MIN_OUR_NAVY_MULT_ON_IMPORTANCE = 0.5 -- Min scale factor for naval region importance from our ships
+-- NDefines.NAI.NAVAL_COMBAT_MAX_OUR_NAVY_MULT_ON_IMPORTANCE = 1.0 -- Max scale factor for naval region importance from our ships
+
+NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_PATROLLING = 20 --10.0		-- Amount of naval patrol planes per ship on a patrol mission
+NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_RAIDING = 40 --10.0		-- Amount of naval patrol planes per ship on a convoy raid mission
+NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_ESCORTING = 20 --10.0		-- Amount of naval patrol planes per ship on a convoy escort mission
+
+-- NDefines.NAI.ENEMY_PASSING_THROUGH_PLANES_PER_BOMBER_NAVAL_REGION = 0.15		-- Amount of planes we assign to intercept enemies en-route to a location over a sea region
+-- NDefines.NAI.ENEMY_PASSING_THROUGH_PLANES_PER_FIGHTER_NAVAL_REGION = 0.15		-- Amount of planes we assign to intercept enemies en-route to a location over a sea region
+-- NDefines.NAI.ENEMY_PASSING_THROUGH_PLANES_PER_SUPPORT_NAVAL_REGION = 0.15		-- Amount of planes we assign to intercept enemies en-route to a location over a sea region
+-- NDefines.NAI.NAVAL_DEFENSE_INTERCEPTION_IMPORTANCE_FACTOR = 30	-- Factor on added planes passing through region to strategic importance
