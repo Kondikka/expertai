@@ -8703,6 +8703,10 @@ focus_tree = {
 		relative_position_id = ITA_triumph_in_africa_bba
 		cost = 5
 		available = {
+			OR = {
+				has_government = fascism
+				has_government = neutrality
+			}
 			has_full_control_of_state = 835
 			has_full_control_of_state = 836
 			has_full_control_of_state = 837
@@ -10580,6 +10584,12 @@ focus_tree = {
 			}		
 		}
 
+		bypass = {
+			NOT = {
+				has_character = ITA_benito_mussolini
+			}
+		}
+
 		search_filters = {FOCUS_FILTER_BALANCE_OF_POWER}
 
 		completion_reward = {
@@ -10609,6 +10619,11 @@ focus_tree = {
 		available = {
 			has_character = ITA_italo_balbo
 			has_government = fascism
+			GER = {
+				NOT = {
+					has_completed_focus = GER_assassinate_mussolini
+				}
+			}
 		}
 
 		search_filters = {FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH FOCUS_FILTER_STABILITY FOCUS_FILTER_WAR_SUPPORT FOCUS_FILTER_BALANCE_OF_POWER}
@@ -10662,6 +10677,11 @@ focus_tree = {
 		available = {
 			has_character = ITA_dino_grandi
 			has_government = fascism
+			GER = {
+				NOT = {
+					has_completed_focus = GER_assassinate_mussolini
+				}
+			}
 		}
 		
 		search_filters = {FOCUS_FILTER_POLITICAL FOCUS_FILTER_WAR_SUPPORT FOCUS_FILTER_STABILITY FOCUS_FILTER_BALANCE_OF_POWER}
@@ -13823,20 +13843,40 @@ focus_tree = {
 			custom_effect_tooltip = ITA_all_roads_lead_to_rome_re_tt
 			add_to_variable = { ITA_re_supply_node_range = 0.1 }
 
-			every_neighbor_country = { #TODO_Manu: Better solution cause this does not match the countries which states are above (due to islands)
+			custom_effect_tooltip = ITA_all_roads_lead_to_rome_wargoals_tt
+			if = {
 				limit = {
-					capital_scope = { is_on_continent = europe }
-					NOT = {
-						is_in_faction_with = ROOT
-						has_guaranteed = ROOT
-						is_guaranteed_by = ROOT
-						has_non_aggression_pact_with = ROOT
+					any_other_country = {
+						capital_scope = { is_on_continent = europe }
+						NOT = {
+							is_in_faction_with = ROOT
+							has_guaranteed = ROOT
+							is_guaranteed_by = ROOT
+							has_non_aggression_pact_with = ROOT
+							has_war_with = ROOT
+						}
 					}
 				}
-				ROOT = {
-					create_wargoal = {
-						type = annex_everything
-						target = PREV
+				custom_effect_tooltip = generic_current_effects
+				custom_effect_tooltip = generic_ROOT_gains_wargoal_tt
+				every_neighbor_country = {
+					limit = {
+						capital_scope = { is_on_continent = europe }
+						NOT = {
+							is_in_faction_with = ROOT
+							has_guaranteed = ROOT
+							is_guaranteed_by = ROOT
+							has_non_aggression_pact_with = ROOT
+							has_war_with = ROOT
+						}
+					}
+					hidden_effect = {
+						ROOT = {
+							create_wargoal = {
+								type = annex_everything
+								target = PREV
+							}
+						}
 					}
 				}
 			}
@@ -15150,10 +15190,50 @@ focus_tree = {
 			}
 		}
 
+		bypass = {
+			OR = {
+				ENG = {
+					OR = {
+						country_exists = no
+						is_subject = yes
+					}
+				}
+				FRA = {
+					OR = {
+						country_exists = no
+						is_subject = yes
+					}
+				}
+				AND = {
+					custom_trigger_tooltip = {
+						tooltip = ITA_ENG_must_control_necessary_states_tt
+						ENG = {
+							NOT = {
+								controls_state = 269 
+								controls_state = 903
+								controls_state = 906
+								controls_state = 116 
+							}
+						}
+					}
+					custom_trigger_tooltip = {
+						tooltip = ITA_FRA_must_control_necessary_states_tt
+						FRA = {
+							NOT = {
+								controls_state = 268
+								controls_state = 458
+								controls_state = 665
+							}
+						}
+					}
+				}
+			}
+		}
+
 		search_filters = {FOCUS_FILTER_ANNEXATION}
 
 		completion_reward = {
-			if = {
+			if = { #Send this event if ETH is hosted by ENG and ITA is at war with ETH
 				limit = { #UK or an ally is hosting exiled Ethiopia
 					ITA_hosting_exiled_ethiopia = yes
 					ROOT = {
@@ -15164,9 +15244,81 @@ focus_tree = {
 					country_event = { id = BBA_italy_interaction_events.50 hours = 1 }
 				}
 			}
-			else = {
+			else_if = { #Send this event if ITA isn't at war with ETH or ETH isn't hosted by ENG
+				limit = {
+					ENG = {
+						controls_state = 269
+						controls_state = 903	
+					}
+				}
 				ENG = {
 					country_event = { id = BBA_italy_interaction_events.31 hours = 1 }
+				}
+			}
+			else_if = { #If Britain didn't have the necessary state(s), send this event
+				limit = {
+					FRA = {
+						controls_state = 268
+					}
+				}
+				FRA = {
+					country_event = {
+					    id = BBA_italy_interaction_events.32
+					    days = 3
+					    random = 6
+					}
+				}
+			}
+			else_if = { #If France didn't have the necessary state(s), send this event
+				limit = {
+					ENG = {
+						controls_state = 906
+					}
+				}
+				ENG = {
+					country_event = {
+					    id = BBA_italy_interaction_events.33
+					    days = 3
+					    random = 6
+					}
+				}
+			}
+			else_if = { #If Britain didn't have the necessary state(s), send this event
+				limit = {
+					FRA = {
+						controls_state = 458
+						controls_state = 665
+					}
+				}
+				FRA = {
+					country_event = {
+					    id = BBA_italy_interaction_events.34
+					    days = 3
+					    random = 6
+					}
+				}
+			}
+			else_if = { #If France didn't have the necessary state(s), send this event
+				limit = {
+					ENG = {
+						controls_state = 116
+					}
+				}
+				ENG = {
+					country_event = {
+					    id = BBA_italy_interaction_events.35
+					    days = 3
+					    random = 6
+					}
+				}
+			}
+			else = { #If Britain didn't have the necessary state(s), send this event
+				FRA = {
+					country_event = { #Balkan claims event
+					    id = BBA_italy_interaction_events.36
+					    days = 3
+					    random = 6
+					}
 				}
 			}
 		}
@@ -17987,7 +18139,7 @@ focus_tree = {
 			add_to_variable = { ITA_re_modifier_army_sub_unit_militia_defence_factor = 0.05 }
 			add_to_variable = { ITA_re_modifier_army_sub_unit_militia_max_org_factor = 0.05 }
 			add_to_variable = { ITA_re_modifier_army_sub_unit_blackshirt_assault_battalion_defence_factor = 0.05 }
-			add_to_variable = { ITA_re_modifier_army_sub_unit_blackshirt_assault_battalion_max_org_factor = 0.05 }
+			add_to_variable = { ITA_re_modifier_army_sub_unit_blackshirt_assault_battalion_attack_factor = 0.05 }
 			#Custom tooltip based on Assault Battalions focus
 			if = {
 				limit = {
@@ -21344,7 +21496,58 @@ focus_tree = {
 							is_on_continent = africa
 						}
 					}
-					ROOT = { release_puppet_on_controlled = PREV }
+					if = { #Give a potential player the option to get puppeted
+						limit = { 
+							is_ai = no
+							is_government_in_exile = yes
+							exists = yes 
+						}
+						country_event = { id = BBA_italy_interaction_events.71 hours = 1 }
+						if = {
+							limit = {
+								is_ai = no
+							}
+							ROOT = { 
+								country_event = { id = BBA_italy_interaction_events.70 hours = 1 }
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							exists = yes
+						}
+						create_dynamic_country = {
+							original_tag = THIS
+							set_variable = { ITA.create_puppet = THIS }
+							ROOT = {
+								every_controlled_state = {
+									limit = {
+										is_core_of = PREV.PREV
+										is_fully_controlled_by = ROOT
+									}
+									var:ITA.create_puppet = {
+										transfer_state = PREV
+									}
+								}
+							}
+							set_popularities = {
+								democratic = ITA.party_popularity_100@democratic
+								neutrality = ITA.party_popularity_100@neutrality
+								fascism = ITA.party_popularity_100@fascism
+								communism = ITA.party_popularity_100@communism
+							}
+							set_politics = {
+								ruling_party = ROOT
+							}
+						}
+						ROOT = {
+							puppet = ITA.create_puppet
+						}
+						clear_variable = ITA.create_puppet
+					}
+					else = {
+						ROOT = { release_puppet_on_controlled = PREV }
+					}
 					hidden_effect = {
 						add_to_temp_variable = { ROOT.ITA_pp_from_releasing_colonies = 15 }
 					}

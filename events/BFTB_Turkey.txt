@@ -2047,11 +2047,35 @@ country_event = {
 	
 	option = {
 		name = bftb_turkey.44.a #strategically sound!
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_opinion = {
+					target = FROM
+					value > 75
+				}
+				factor = 2
+			}
+			modifier = {
+				has_opinion = {
+					target = FROM
+					value < -25
+				}
+				factor = 0.2
+			}
+		}
 		effect_tooltip = {
-			TUR = {
-				transfer_state = 455
-				transfer_state = 454
-				transfer_state = 453
+			IF = {
+				limit = { 455 = { is_owned_by = ROOT } }
+				TUR = { transfer_state = 455 }
+			}
+			IF = {
+				limit = { 454 = { is_owned_by = ROOT } }
+				TUR = { transfer_state = 454 }
+			}
+			IF = {
+				limit = { 453 = { is_owned_by = ROOT } }
+				TUR = { transfer_state = 453 }
 			}
 		}
 		hidden_effect = {
@@ -2063,6 +2087,15 @@ country_event = {
 
 	option = {
 		name = bftb_turkey.44.b #the Ottoman Empire collapsed for a reason
+		ai_chance = {
+			base = 5
+			modifier = { # More sceptical if already promised to Ethiopia
+				454 = {
+					is_in_array = { ETH.ETH_promised_states_array = THIS }
+				}
+				factor = 4
+			}
+		}
 		TUR = {
 			country_event = { id = bftb_turkey.46 hours = 8 }
 		}
@@ -2080,9 +2113,24 @@ country_event = {
 	
 	option = {
 		name = bftb_turkey.45.a #we will not let them down
-		transfer_state = 455
-		transfer_state = 454
-		transfer_state = 453
+		IF = {
+			limit = {
+				455 = { is_owned_by = FROM }
+			}
+			transfer_state = 455
+		}
+		IF = {
+			limit = {
+				454 = { is_owned_by = FROM }
+			}
+			transfer_state = 454
+		}
+		IF = {
+			limit = {
+				453 = { is_owned_by = FROM }
+			}
+			transfer_state = 453
+		}
 		custom_effect_tooltip = TUR_unlock_camelry_effect_tt
 		hidden_effect = { set_technology = { camelry = 1 } } 
 	}
@@ -5351,6 +5399,12 @@ country_event = {
 			modifier = { #EAI
 				is_historical_focus_on = yes
 				add = 10000
+			}
+		}
+		hidden_effect = {
+			remove_country_leader_role = {
+				character = TUR_ismet_inonu
+				ideology = despotism
 			}
 		}
 		add_country_leader_role = {
