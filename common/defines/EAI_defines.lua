@@ -539,8 +539,10 @@ NDefines.NAI.MAX_INVASION_SIZE = 18 --24									-- max invasion group size
 -- convoy escorts
 -------------------------
 
--- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200
-NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2
+-- NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = 25					-- Threat value per convoy sunk in a region. Decays over time.
+-- NDefines.NAI.REGION_THREAT_LEVEL_TO_AVOID_REGION = 25 * 10		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
+NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 200		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
+NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 2				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
 
 -- NDefines.NAI.CONVOY_ESCORT_SCORE_FROM_CONVOYS = 15 -- score for each convoy you have in area
 NDefines.NAI.CONVOY_ESCORT_MUL_FROM_NO_CONVOYS = 0 -- score multiplier when no convoys are around
