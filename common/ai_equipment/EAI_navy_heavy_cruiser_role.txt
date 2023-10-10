@@ -6,7 +6,7 @@ EAI_heavy_cruiser_early = {
 	category = naval
 	roles = { naval_cruiser_heavy }
 	priority = {
-		base = 1
+		base = 0
 	}
 
 	EARLY_CRUISER_1 = { # to make task force reinforcement work
@@ -48,204 +48,297 @@ EAI_heavy_cruiser_early = {
 EAI_heavy_cruiser = {
 	category = naval
 	roles = { naval_cruiser_heavy }
-	priority = {
-		base = 100
-		modifier = { factor = 0 check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } }
+	priority = { # Priority of design among all roles (1-10)
+		base = 0
+		modifier = { add = 5 check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_ON } }
 	}
 
-	BASIC_HEAVY_CRUISER_1 = {
+	##############################################################################
+	### 	BASIC
+	##############################################################################
+
+	BASIC_HEAVY_CRUISER = {
 		role_icon_index = 1
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = basic_ship_hull_cruiser }
-			modifier = { add = -900 OR = { has_tech = improved_ship_hull_cruiser has_tech = decimetric_radar } }
+			base = 0
+			modifier = { 
+				add = 10000
+
+				### Requirements
+				has_tech = basic_ship_hull_cruiser
+				has_tech = basic_battery
+				has_tech = basic_medium_battery
+
+				has_tech = interwar_antiair
+				has_tech = basic_fire_control_system
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_2
-			match_value = 2000
+			match_value = 1
 
 			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = empty
+				
+				# ELECTRONICS
+				fixed_ship_fire_control_system_slot = { module = ship_fire_control_system_1 }
+				fixed_ship_radar_slot = { module = empty }
+
+				# ENGINE
 				fixed_ship_engine_slot = { module = cruiser_ship_engine_2 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_medium_battery_1
+
+				# ANTI-AIR
+				fixed_ship_anti_air_slot = { module = ship_anti_air_2 }
+
+				# ARMOR
+				fixed_ship_armor_slot = empty
+
+				# MAIN
+				fixed_ship_secondaries_slot = { module = ship_secondaries_2 upgrade = current }
+				fixed_ship_battery_slot = { module = ship_medium_battery_1 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				mid_1_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				mid_2_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				rear_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
 			}
-		}
-
-		requirements = {
-			module > ship_medium_battery_1
-		}
-	}
-	BASIC_HEAVY_CRUISER_2 = {
-		role_icon_index = 1
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = basic_ship_hull_cruiser has_tech = decimetric_radar }
-			modifier = { add = -900 has_tech = improved_ship_hull_cruiser }
-		}
-
-		target_variant = {
-			type = ship_hull_cruiser_2
-			match_value = 2000
-
-			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = { any_of = { ship_radar_4 ship_radar_3 ship_radar_2 ship_radar_1 } }
-				fixed_ship_engine_slot = { module = cruiser_ship_engine_2 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_medium_battery_1
-			}
-		}
-
-		requirements = {
-			module > ship_medium_battery_1
-			module = ship_radar
 		}
 	}
 
-	IMPROVED_HEAVY_CRUISER_1 = {
+	##############################################################################
+	### 	IMPROVED
+	##############################################################################
+
+	IMPROVED_HEAVY_CRUISER = {
 		role_icon_index = 1
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = improved_ship_hull_cruiser }
-			modifier = { add = -900 OR = { has_tech = advanced_ship_hull_cruiser has_tech = decimetric_radar } }
+			base = 0
+			modifier = { 
+				add = 20000
+
+				### Requirements
+				has_tech = improved_ship_hull_cruiser
+				has_tech = basic_battery
+				has_tech = basic_medium_battery
+
+				has_tech = interwar_antiair
+				has_tech = improved_fire_control_system
+
+				### Block after unlocking the next version
+				NOT = {
+					AND = {
+						has_tech = improved_decimetric_radar
+					}
+				}
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_3
-			match_value = 4000
+			match_value = 1
 
 			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = empty
+
+				# ELECTRONICS
+				fixed_ship_fire_control_system_slot = { module = ship_fire_control_system_2 }
+				fixed_ship_radar_slot = { module = empty }
+
+				# ENGINE
 				fixed_ship_engine_slot = { module = cruiser_ship_engine_3 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_light_medium_battery_1
-				rear_2_custom_slot > ship_medium_battery_1
+
+				# ANTI-AIR
+				fixed_ship_anti_air_slot = { module = ship_anti_air_2 }
+
+				# ARMOR
+				fixed_ship_armor_slot = empty
+
+				# MAIN
+				fixed_ship_secondaries_slot = { module = ship_secondaries_2 upgrade = current }
+				fixed_ship_battery_slot = { module = ship_medium_battery_1 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				mid_1_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				mid_2_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				rear_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				rear_2_custom_slot = { module = ship_medium_battery_1 upgrade = current }
 			}
 		}
-
-		requirements = {
-			module > ship_medium_battery_1
-		}
 	}
-	IMPROVED_HEAVY_CRUISER_2 = {
+
+	IMPROVED_HEAVY_CRUISER_UPDATE = {
 		role_icon_index = 1
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = improved_ship_hull_cruiser has_tech = decimetric_radar }
-			modifier = { add = -900 has_tech = advanced_ship_hull_cruiser }
+			base = 0
+			modifier = { 
+				add = 20000
+
+				### Requirements
+				has_tech = improved_ship_hull_cruiser
+				has_tech = basic_battery
+				has_tech = basic_medium_battery
+
+				has_tech = interwar_antiair
+				has_tech = improved_fire_control_system
+
+				### Added
+				has_tech = improved_decimetric_radar
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_3
-			match_value = 4000
+			match_value = 1.1
 
 			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = { any_of = { ship_radar_4 ship_radar_3 ship_radar_2 ship_radar_1 } }
+
+				# ELECTRONICS
+				fixed_ship_fire_control_system_slot = { module = ship_fire_control_system_2 }
+				fixed_ship_radar_slot = { module = ship_radar_2 }
+
+				# ENGINE
 				fixed_ship_engine_slot = { module = cruiser_ship_engine_3 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_light_medium_battery_1
-				rear_2_custom_slot > ship_medium_battery_1
-			}
-		}
 
-		requirements = {
-			module > ship_medium_battery_1
-			module = ship_radar
+				# ANTI-AIR
+				fixed_ship_anti_air_slot = { module = ship_anti_air_2 }
+
+				# ARMOR
+				fixed_ship_armor_slot = empty
+
+				# MAIN
+				fixed_ship_secondaries_slot = { module = ship_secondaries_2 upgrade = current }
+				fixed_ship_battery_slot = { module = ship_medium_battery_1 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				mid_1_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				mid_2_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				rear_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				rear_2_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+			}
 		}
 	}
 
-	ADVANCED_HEAVY_CRUISER_1 = {
+	##############################################################################
+	### 	ADVANCED
+	##############################################################################
+
+	ADVANCED_HEAVY_CRUISER = {
 		role_icon_index = 1
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = advanced_ship_hull_cruiser }
-			modifier = { add = -900 has_tech = decimetric_radar }
+			base = 0
+			modifier = { 
+				add = 40000
 
+				### Requirements
+				has_tech = advanced_ship_hull_cruiser
+				has_tech = basic_battery
+				has_tech = basic_medium_battery
+
+				has_tech = antiair2
+				has_tech = advanced_fire_control_system
+				has_tech = improved_decimetric_radar
+
+				### Block after unlocking the next version
+				NOT = {
+					AND = {
+						has_tech = advanced_dp_light_battery
+
+						has_tech = antiair5
+						has_tech = advanced_centimetric_radar
+					}
+				}
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_4
-			match_value = 6000
+			match_value = 1
 
 			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = empty
+
+				# ELECTRONICS
+				fixed_ship_fire_control_system_slot = { module = ship_fire_control_system_3 }
+				fixed_ship_radar_slot = { module = ship_radar_2 }
+
+				# ENGINE
 				fixed_ship_engine_slot = { module = cruiser_ship_engine_4 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_light_medium_battery_1
-				rear_2_custom_slot > ship_medium_battery_1
+
+				# ANTI-AIR
+				fixed_ship_anti_air_slot = { module = ship_anti_air_3 }
+
+				# ARMOR
+				fixed_ship_armor_slot = empty
+
+				# MAIN
+				fixed_ship_secondaries_slot = { module = ship_secondaries_2 upgrade = current }
+				fixed_ship_battery_slot = { module = ship_medium_battery_1 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				mid_1_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				mid_2_custom_slot = { module = ship_secondaries_2 upgrade = current }
+				rear_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				rear_2_custom_slot = { module = ship_medium_battery_1 upgrade = current }
 			}
 		}
-
-		requirements = {
-			module > ship_medium_battery_1
-		}
 	}
-	ADVANCED_HEAVY_CRUISER_2 = {
+
+	ADVANCED_HEAVY_CRUISER_UPDATE = {
 		role_icon_index = 1
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = advanced_ship_hull_cruiser has_tech = decimetric_radar }
+			base = 0
+			modifier = { 
+				add = 40000
+
+				### Requirements
+				has_tech = advanced_ship_hull_cruiser
+				has_tech = basic_battery
+				has_tech = basic_medium_battery
+
+				has_tech = antiair2
+				has_tech = advanced_fire_control_system
+				has_tech = improved_decimetric_radar
+
+				### Added
+				has_tech = advanced_dp_light_battery
+
+				has_tech = antiair5
+				has_tech = advanced_centimetric_radar
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_4
-			match_value = 6000
+			match_value = 1.1
 
 			modules = {
-				fixed_ship_battery_slot > ship_medium_battery_1
-				fixed_ship_anti_air_slot = ship_anti_air
-				fixed_ship_fire_control_system_slot = { any_of = { ship_fire_control_system_3 ship_fire_control_system_2 ship_fire_control_system_1 ship_fire_control_system_0 } }
-				fixed_ship_radar_slot = { any_of = { ship_radar_4 ship_radar_3 ship_radar_2 ship_radar_1 } }
-				fixed_ship_engine_slot = { module = cruiser_ship_engine_4 upgrade = current }
-				fixed_ship_secondaries_slot = ship_dp_secondaries
-				fixed_ship_armor_slot = { any_of = { ship_armor_cruiser_4 ship_armor_cruiser_3 ship_armor_cruiser_2 ship_armor_cruiser_1 } }
-				front_1_custom_slot > ship_medium_battery_1
-				mid_1_custom_slot > ship_light_medium_battery_1
-				mid_2_custom_slot > ship_light_medium_battery_1
-				rear_1_custom_slot > ship_light_medium_battery_1
-				rear_2_custom_slot > ship_medium_battery_1
-			}
-		}
 
-		requirements = {
-			module > ship_medium_battery_1
-			module = ship_radar
+				# ELECTRONICS
+				fixed_ship_fire_control_system_slot = { module = ship_fire_control_system_3 }
+				fixed_ship_radar_slot = { module = ship_radar_4 }
+
+				# ENGINE
+				fixed_ship_engine_slot = { module = cruiser_ship_engine_4 upgrade = current }
+
+				# ANTI-AIR
+				fixed_ship_anti_air_slot = { module = ship_anti_air_4 }
+
+				# ARMOR
+				fixed_ship_armor_slot = empty
+
+				# MAIN
+				fixed_ship_secondaries_slot = { module = dp_ship_secondaries_4 upgrade = current }
+				fixed_ship_battery_slot = { module = ship_medium_battery_1 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				mid_1_custom_slot = { module = dp_ship_secondaries_4 upgrade = current }
+				mid_2_custom_slot = { module = dp_ship_secondaries_4 upgrade = current }
+				rear_1_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+				rear_2_custom_slot = { module = ship_medium_battery_1 upgrade = current }
+			}
 		}
 	}
 }

@@ -86,7 +86,7 @@ political_actions = {
 
 		modifier = {
 			stability_weekly = 0.005
-			consumer_goods_factor = 0.05
+			consumer_goods_factor = 0.10
 			industrial_capacity_factory = -0.1
 		}
 
@@ -96,32 +96,74 @@ political_actions = {
 		cost = 100
 
 		complete_effect = {
-			set_country_flag = { flag = EAI_improved_worker_conditions_taken value = 1 days = 540 }
+			set_country_flag = { flag = EAI_improved_worker_conditions_taken value = 1 days = 540 } #EAI
 		}
 
 		ai_will_do = {
 			base = 0
+
+			### EAI STABILITY MODIFIER
+
+			modifier = { #EAI
+				add = 10000
+				
+				EAI_needs_stability = yes
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_stability = yes }
+
+				has_stability > 0.80
+			}
+
+			###########################
 			
 			modifier = { #EAI
-				add = 1000
+				add = 100
 				
-				OR = {
-					has_stability < 0.7
+				has_stability < 0.7
+			}
+
+			modifier = { #EAI
+				factor = 0
 				
-					AND = { has_stability < 0.8 NOT = { has_available_idea_with_traits = { idea = popular_figurehead limit = 1 } } }
-				}
+				tag = FRA
+				has_political_power < 200
+				has_stability > 0.5
 			}
 			
-			modifier = { 
+			modifier = { #EAI
 				factor = 0  
 				
 				has_available_idea_with_traits = { idea = silent_workhorse limit = 1 } 
 				NOT = { has_idea_with_trait = silent_workhorse } 
 			}
+
+			modifier = {
+				factor = 0
+
+				tag = SOV
+				date < 1941.1.1
+				has_political_power < 300
+			}
 			modifier = {
 				factor = 0
 				original_tag = SPR
 				NOT = { has_global_flag = spanish_civil_war }
+			}
+			modifier = {
+				factor = 0 
+				tag = ICE
+				has_completed_focus = ICE_not_our_king
+				NOT = { has_completed_focus = ICE_break_with_the_crown }
+			}
+
+			modifier = {
+				add = 1000
+				has_stability < 0.76
+				original_tag = SWE
+				has_idea = SWE_hungershield
 			}
 		}
 	}
@@ -270,6 +312,10 @@ economy_decisions = {
 			modifier = {
 				add = 1
 				has_stability > 0.74
+				NOT = {
+					original_tag = SWE
+					has_idea = SWE_hungershield
+				}
 			}
 		}
 
@@ -343,60 +389,36 @@ propaganda_efforts = {
 
 		ai_will_do = {
 			base = 0
-			modifier = { #EAI
-				add = 1000
 
+			modifier = {
+				add = 201
+				has_war_support < 0.6
+
+				#EAI
 				OR = {
-					# has low war support
-					AND = {
-						has_war_support < 0.5
-
-						OR = {
-							has_idea = war_economy
-							threat > 0.5
-							has_war = yes
-							has_country_flag = EAI_mobilize_army
-						}
-					}
-
-					# taking tot_economic_mobilisation is possible 
-					AND = {
-						NOT = { has_idea = tot_economic_mobilisation }
-						any_enemy_country = {
-							ic_ratio = {
-								tag = ROOT
-								ratio > 0.5
-							}
-						}
-					}
-
-					# doesnt have women_in_the_workforce but has tot_economic_mobilisation
-					AND = {
-						has_idea = tot_economic_mobilisation
-						NOT = { has_decision = women_in_the_workforce }
-					}
+					has_war = yes
+					check_variable = { has_war_support < global.threat }
+					has_political_power > 300
 				}
-
-				# war support needed for total mobilization and women_in_the_workforce
-				NOT = {
-            	    AND = {
-            	        has_government = democratic
-            	        has_war_support > 0.79
-            	    }
-            	    AND = {
-            	        has_government = communism
-            	        has_war_support > 0.79
-            	    }
-            	    AND = {
-            	        has_government = fascism
-            	        has_war_support > 0.89
-            	    }
-            	    AND = {
-            	        has_government = neutrality
-            	        has_war_support > 0.84
-            	    }
-            	}
 			}
+			
+			### EAI WARSUPPORT MODIFIER
+
+			modifier = { #EAI
+				add = 5000
+				
+				EAI_needs_war_support = yes
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
 		}
 	}
 	
@@ -437,6 +459,26 @@ propaganda_efforts = {
 
 		ai_will_do = {
 			base = 0
+
+			### EAI WARSUPPORT MODIFIER
+
+			modifier = { #EAI
+				add = 5000
+				
+				EAI_needs_war_support = yes
+				has_casualties_war_support < -0.10
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
+
 			modifier = {
 				add = 10 #AI should probably just choose this one for general purposes.
 				has_war = yes
@@ -507,6 +549,26 @@ propaganda_efforts = {
 
 		ai_will_do = {
 			base = 0
+			
+			### EAI WARSUPPORT MODIFIER
+
+			modifier = { #EAI
+				add = 5000
+				
+				EAI_needs_war_support = yes
+				has_convoys_war_support < -0.10
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
+
 			modifier = {
 				add = 201 #ie; consider prio idea
 				has_war = yes
@@ -562,35 +624,26 @@ propaganda_efforts = {
 
 		ai_will_do = {
 			base = 0
-			modifier = { #EAI
-				add = 50000
+			
+			### EAI WARSUPPORT MODIFIER
 
-				# Not enough for women in the workforce
-				has_war = yes
-				has_idea = tot_economic_mobilisation
-				NOT = {
-					AND = {
-						has_government = democratic
-						has_war_support > 0.79
-					}
-					AND = {
-						has_government = communism
-						has_war_support > 0.79
-					}
-					AND = {
-						has_government = fascism
-						OR = {
-							has_war_support > 0.89
-							surrender_progress > 0
-						}
-					}
-					AND = {
-						has_government = neutrality
-						has_war_support > 0.84
-						has_stability > 0.7
-					}
-				}
+			modifier = { #EAI
+				add = 5000
+				
+				EAI_needs_war_support = yes
+				has_bombing_war_support < -0.10
 			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
+
 			modifier = {
 				add = 10 #AI should probably just choose this one for general purposes.
 				has_war = yes
@@ -665,7 +718,36 @@ propaganda_efforts = {
 			modifier = {
 				add = 201
 				has_war_support < 0.6
+
+				#EAI
+				OR = {
+					has_war = yes
+					check_variable = { has_war_support < global.threat }
+					has_political_power > 300
+				}
 			}
+			
+			### EAI WARSUPPORT MODIFIER
+
+			modifier = { #EAI
+				EAI_needs_war_support = yes
+
+				# between war_propaganda_radio_industry and war_propaganda_film_industry, take the one that makes sense for the amount needed
+				if = { limit = { check_variable = { missing_ws_ > 0.05 } } set_temp_variable = { tmp_factor = 7500 } }
+				else = { set_temp_variable = { tmp_factor = 10000 } }
+
+				add = tmp_factor
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
 		}
 	}
 	
@@ -729,7 +811,36 @@ propaganda_efforts = {
 			modifier = {
 				add = 201
 				has_war_support < 0.6
+
+				#EAI
+				OR = {
+					has_war = yes
+					check_variable = { has_war_support < global.threat }
+					has_political_power > 300
+				}
 			}
+
+			### EAI WARSUPPORT MODIFIER
+
+			modifier = { #EAI
+				EAI_needs_war_support = yes
+
+				if = { limit = { check_variable = { missing_ws > 0.05 } } set_temp_variable = { tmp_factor = 10000 } }
+				else_if = { limit = { check_variable = { missing_ws < 0.10 } } set_temp_variable = { tmp_factor = 7500 } }
+				else = { set_temp_variable = { tmp_factor = 10000 } }
+
+				add = tmp_factor
+			}
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_needs_war_support = yes }
+
+				has_political_power < 300
+				has_war_support > 0.4
+			}
+
+			###########################
 		}
 	}
 	
@@ -1659,7 +1770,8 @@ war_measures = {
 
 		visible = {
 			has_defensive_war = yes
-			has_offensive_war = no			
+			has_offensive_war = no
+			num_of_controlled_states > 0			
 		}
 
 		fire_only_once = no
@@ -1672,8 +1784,14 @@ war_measures = {
 			replace_civ_with_arms_factories = yes
 			add_war_support = -0.05
 		}
-		ai_will_do = {
-			factor = 0
+		ai_will_do = { #EAI
+			base = 0
+
+			modifier = {
+				add = 1000
+
+				num_of_military_factories < 10
+			}
 		}
 	}
 
@@ -1798,7 +1916,7 @@ war_measures = {
             conscription = 0.03
             stability_factor = -0.05
         }
-        ai_will_do = { #EAI
+        ai_will_do = { #EAI - managed by scripts
 			factor = 0
 		}
 		complete_effect = {
@@ -1864,7 +1982,7 @@ war_measures = {
 		cost = GER_war_bonds_var?50
 
 		modifier = {
-			consumer_goods_factor = -0.05
+			consumer_goods_factor = -0.20
 		}
 
 		ai_will_do = { #EAI
@@ -1933,6 +2051,44 @@ war_measures = {
 			}
 		}
     }
+	
+	diversify_special_forces = {
+
+		icon = GFX_decision_generic_military
+
+		available = {
+			date > 1940.1.1
+		}
+
+		visible = {
+			has_dlc = "Arms Against Tyranny"
+			NOT = {
+				OR = {
+					tag = ENG #has a focus
+					tag = USA #has a focus
+					tag = SOV #has a focus
+					tag = JAP #has a focus
+				}
+			} 
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			add_potential_special_forces_tree = yes
+		}
+		ai_will_do = {
+			factor = 201
+
+			modifier = { #EAI
+				factor = 0
+				NOT = { EAI_get_special_forces_tree = yes }
+			}
+		}
+	}
+	
 }
 
 foreign_politics = {
@@ -2060,9 +2216,9 @@ economy_decisions = {
 			base = 0 
 			
 			modifier = {
-				add = 1000
+				add = 10000
 				
-				NOT = { any_state = { is_controlled_by = ROOT free_building_slots = { building = dummy size > 0 include_locked = no } } }
+				NOT = { any_state = { EAI_has_free_shared_slot = yes } }
 			}
 			
 			modifier = {
@@ -2226,10 +2382,9 @@ economy_decisions = {
 			base = 0 
 			
 			modifier = {
-				add = 1000
+				add = 10000
 				
-				has_political_power > 170
-				NOT = { any_state = { is_controlled_by = ROOT free_building_slots = { building = dummy size > 0 include_locked = no } } }
+				NOT = { any_state = { EAI_has_free_shared_slot = yes } }
 			}
 			
 			modifier = {
@@ -3417,6 +3572,362 @@ foreign_support = {
 				}
 				country_event = { id = wtt_hanoi_route.2 }
 				custom_effect_tooltip = close_hanoi_route_explanation # Prints the contents of the CHI_hanoi_route_current_level variable
+			}
+		}
+	}
+}
+
+generic_purchase_old_ships_category = {
+	purchase_ships_eng = {
+		cost = 50
+		icon = GFX_decision_generic_naval
+		fire_only_once = no
+		visible = {
+			has_country_flag = generic_purchase_old_ships_flag
+			ENG = { 
+				NOT = { 
+					has_country_flag = sold_ships_to_us@ROOT
+					has_country_flag = negotiating_ship_purchase_flag@ROOT 
+				}
+			}
+			NOT = { has_war_with = ENG}
+		}
+		available = {
+			NOT = {
+				ENG = {
+					OR = {
+						has_civil_war = yes
+						has_capitulated = yes
+						has_opinion = {
+							target = FROM
+							value < 30
+						}
+					}					
+				}
+			}
+			
+		}
+		days_remove = 14
+		remove_effect = {
+			ENG = {
+				country_event = {
+					id = generic_purchase_ships_events.01
+					hours = 1
+				}
+				set_country_flag = negotiating_ship_purchase_flag@ROOT
+			}			
+		}
+	}
+	purchase_ships_sov = {
+		cost = 50
+		icon = GFX_decision_generic_naval
+		fire_only_once = no
+		visible = {
+			has_country_flag = generic_purchase_old_ships_flag
+			SOV = { 
+					has_country_flag = sold_ships_to_us@ROOT
+					has_country_flag = negotiating_ship_purchase_flag@ROOT 
+			}
+
+			NOT = { has_war_with = SOV}
+		}
+		available = {
+			NOT = {
+				SOV = {
+					OR = {
+						has_civil_war = yes
+						has_capitulated = yes
+						has_opinion = {
+							target = FROM
+							value < 30
+						}
+					}					
+				}
+			}
+			
+		}
+		days_remove = 14
+		remove_effect = {
+			SOV = {
+				country_event = {
+					id = generic_purchase_ships_events.01
+					hours = 1
+				}
+				set_country_flag = negotiating_ship_purchase_flag@ROOT
+			}
+		}
+	}
+	purchase_ships_ger = {
+		cost = 50
+		icon = GFX_decision_generic_naval
+		fire_only_once = no
+		visible = {
+			has_country_flag = generic_purchase_old_ships_flag
+			GER = { 
+				NOT = { 
+					has_country_flag = sold_ships_to_us@ROOT
+					has_country_flag = negotiating_ship_purchase_flag@ROOT
+				}
+
+			}
+			NOT = { has_war_with = GER}
+		}
+		available = {
+			NOT = {
+				GER = {
+					OR = {
+						has_civil_war = yes
+						has_capitulated = yes
+						has_opinion = {
+							target = FROM
+							value < 30
+						}
+					}					
+				}
+			}
+			
+		}
+		days_remove = 14
+		remove_effect = {
+			GER = {
+				country_event = {
+					id = generic_purchase_ships_events.01
+					hours = 1
+				}
+				set_country_flag = negotiating_ship_purchase_flag@ROOT
+			}
+		}
+	}
+	purchase_ships_usa = {
+		cost = 50
+		icon = GFX_decision_generic_naval
+		fire_only_once = no
+		visible = {
+			has_country_flag = generic_purchase_old_ships_flag
+			USA = { 
+				NOT = { 
+					has_country_flag = sold_ships_to_us@ROOT
+					has_country_flag = negotiating_ship_purchase_flag@ROOT  
+				}
+			}
+			NOT = { has_war_with = USA}
+		}
+		available = {
+			NOT = {
+				USA = {
+					OR = {
+						has_civil_war = yes
+						has_capitulated = yes
+						has_opinion = {
+							target = FROM
+							value < 30
+						}
+					}					
+				}
+			}
+			
+		}
+		days_remove = 14
+		remove_effect = {
+			USA = {
+				country_event = {
+					id = generic_purchase_ships_events.01
+					hours = 1
+				}
+				set_country_flag = negotiating_ship_purchase_flag@ROOT
+			}
+		}
+	}
+}
+
+generic_refit_civilian_ships_category = {
+	refit_to_destroyer = {
+		cost = 15
+		icon = GFX_decision_generic_merge_plant_ship
+		fire_only_once = no
+		visible = {
+			has_country_flag = refit_convoy_ships_flag
+		}
+		available = {	
+			has_equipment = {
+   				convoy > 9
+	  		}	
+	  		if = {
+				limit = {
+					has_dlc = "Man the Guns"
+				}
+				has_tech = early_ship_hull_light
+			}
+			else = {
+				has_tech = early_destroyer
+			}
+		}
+		days_remove = 50
+
+		complete_effect = {
+			add_equipment_to_stockpile = { 
+				type = convoy_1
+				amount = -10 
+
+			}
+		}
+		remove_effect = {
+			if = {
+				limit = {
+					has_dlc = "Man the Guns"
+				}
+				if = {
+					limit = {
+						NOT = {	has_country_flag = refit_to_destroyer_flag } #FIN gets flag along with Ship variants via the focus that unlocks these decisions
+					}			
+					set_country_flag = refit_to_destroyer_flag
+	
+					create_equipment_variant = {	
+						name = "Refitted Destroyer Class" 		
+						type = ship_hull_light_1
+						name_group = "DEN_DD_HISTORICAL" #Note: Doesn't matter if ROOT is not DEN, the effect will grab the appropriate country-specific name list anyways
+						parent_version = 0
+						modules = {
+							fixed_ship_battery_slot = ship_light_battery_1
+							fixed_ship_anti_air_slot = ship_anti_air_1
+							fixed_ship_fire_control_system_slot = ship_fire_control_system_0
+							fixed_ship_radar_slot = empty
+							fixed_ship_engine_slot = light_ship_engine_1
+							fixed_ship_torpedo_slot = ship_torpedo_1
+							mid_1_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						obsolete = yes
+					}
+				}
+				create_ship = {
+					type = ship_hull_light_1
+					equipment_variant = "Refitted Destroyer Class"
+					creator = ROOT
+					name = "Coastguard"
+				}
+			}
+			#NO MTG
+			else = {
+				if = {
+					limit = {
+						NOT = {	has_country_flag = refit_to_destroyer_flag }
+					}			
+					set_country_flag = refit_to_destroyer_flag
+
+					create_equipment_variant = {
+						name = "Refitted Destroyer Class"
+						type = destroyer_1
+						upgrades = {
+							ship_torpedo_upgrade = 0
+							destroyer_engine_upgrade = 0
+							ship_ASW_upgrade = 0
+							ship_anti_air_upgrade = 0
+						}
+						obsolete = yes
+					}
+				}
+				create_ship = {
+					type = destroyer_1
+					equipment_variant = "Refitted Destroyer Class"
+					creator = ROOT
+					name = "Coastguard"
+				}		
+			}
+		}
+	}
+	refit_to_cruiser = {
+		cost = 30
+		icon = GFX_decision_generic_merge_plant_ship
+		fire_only_once = no
+		visible = {
+			has_country_flag = refit_convoy_ships_flag
+		}
+		available = {	
+			has_equipment = {
+   				convoy > 19
+	  		}
+	  		if = {
+				limit = {
+					has_dlc = "Man the Guns"
+				}
+				has_tech = early_ship_hull_cruiser
+			}
+			else = {
+				has_tech = early_light_cruiser
+			}
+		}
+		days_remove = 100
+
+		complete_effect = {
+			add_equipment_to_stockpile = { 
+				type = convoy_1
+				amount = -25 
+			}
+		}
+		remove_effect = {
+			if = {
+				limit = {
+					has_dlc = "Man the Guns"
+				}
+				if = {
+					limit = {
+						NOT = {	has_country_flag = refit_to_cruiser_flag } #FIN gets flag along with Ship variants via the focus that unlocks these decisions
+					}			
+					set_country_flag = refit_to_cruiser_flag
+	
+					create_equipment_variant = {
+						name = "Refitted Cruiser Class"				
+						type = ship_hull_cruiser_1
+						name_group = DEN_CL_HISTORICAL #Note: Doesn't matter if ROOT is not DEN, the effect will grab the appropriate country-specific name list anyways
+						parent_version = 0
+						modules = {
+							fixed_ship_battery_slot = ship_light_medium_battery_1
+							fixed_ship_anti_air_slot = ship_anti_air_1
+							fixed_ship_fire_control_system_slot = ship_fire_control_system_0
+							fixed_ship_radar_slot = empty
+							fixed_ship_engine_slot = cruiser_ship_engine_1
+							fixed_ship_armor_slot = ship_armor_cruiser_1
+							fixed_ship_secondaries_slot = dp_ship_secondaries_1
+							mid_1_custom_slot = empty
+							mid_2_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						obsolete = yes
+					}
+				}
+				create_ship = {
+					type = ship_hull_cruiser_1
+					equipment_variant = "Refitted Cruiser Class"
+					creator = ROOT
+					name = "Protector"
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						NOT = {	has_country_flag = refit_to_cruiser_flag }
+					}			
+					set_country_flag = refit_to_cruiser_flag
+
+					create_equipment_variant = {
+						name = "Refitted Cruiser Class"
+						type = light_cruiser_1
+						upgrades = {
+							ship_reliability_upgrade = 0
+							ship_engine_upgrade = 0
+							ship_gun_upgrade = 0
+							ship_anti_air_upgrade = 0
+						}
+						obsolete = yes
+					}
+				}
+				create_ship = {
+					type = light_cruiser_1
+					equipment_variant = "Refitted Cruiser Class"
+					creator = ROOT
+					name = "Protector"
+				}	
 			}
 		}
 	}

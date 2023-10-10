@@ -1,0 +1,133 @@
+############################################################################################################
+#	Expert AI mod - scripted law AI effects
+############################################################################################################
+
+# PP saved in a separate variable that the mod can use to do things or simply to stop AI from using it until the script returns the PP
+EAI_PP_store = {
+
+	### find the highest law cost and store enough pp for it
+
+	set_variable = { EAI_PP_max_stored_pp = 1 }
+
+	set_temp_variable = { EAI_eco_law_cost = modifier@economy_cost_factor }
+	add_to_temp_variable = { EAI_eco_law_cost = 1 }
+	multiply_temp_variable = { EAI_eco_law_cost = 150 }
+
+	set_temp_variable = { EAI_man_law_cost = modifier@mobilization_laws_cost_factor }
+	add_to_temp_variable = { EAI_man_law_cost = 1 }
+	multiply_temp_variable = { EAI_man_law_cost = 150 }
+
+	set_temp_variable = { EAI_tra_law_cost = modifier@trade_laws_cost_factor }
+	add_to_temp_variable = { EAI_tra_law_cost = 1 }
+	multiply_temp_variable = { EAI_tra_law_cost = 150 }
+
+	if = { limit = { check_variable = { EAI_eco_law_cost > EAI_PP_max_stored_pp } } set_variable = { EAI_PP_max_stored_pp = EAI_eco_law_cost } }
+	if = { limit = { check_variable = { EAI_man_law_cost > EAI_PP_max_stored_pp } } set_variable = { EAI_PP_max_stored_pp = EAI_man_law_cost } }
+	if = { limit = { check_variable = { EAI_tra_law_cost > EAI_PP_max_stored_pp } } set_variable = { EAI_PP_max_stored_pp = EAI_tra_law_cost } }
+
+	clamp_variable = { var = EAI_PP_max_stored_pp min = 100 } # For decisions
+
+	### Special modifier
+
+	if = { limit = { NOT = { EAI_PP_store_pp_prio = yes } }
+
+		set_variable = { EAI_PP_max_stored_pp = 30 }
+	}
+
+	if = { limit = { tag = GER }
+
+		set_variable = { EAI_PP_max_stored_pp = 150 }
+	}
+
+	if = { 
+		limit = { 
+			tag = SOV 
+			date < 1939.1.1
+			has_war = no
+		}
+
+		set_variable = { EAI_PP_max_stored_pp = 300 }
+	}
+
+	if = { limit = { check_variable = { EAI_PP_needs_pp > 0 } }
+
+		clamp_variable = { var = EAI_PP_max_stored_pp min = EAI_PP_needs_pp }
+	}
+
+	###
+
+    if = {
+		limit = {
+			has_political_power > 30
+			check_variable = { EAI_PP_stored_pp < EAI_PP_max_stored_pp }
+
+			OR = { 
+				check_variable = { EAI_PP_needs_pp > 0 }
+
+				AND = {
+					### Stockpiling PP this early if it is not needed is unnecessary
+
+					if = { limit = { date < 1939.1.1 has_war = no NOT = { EAI_PP_store_pp_prio = yes } }
+
+						OR = {
+							check_variable = { EAI_PP_stored_pp < 50 }
+							EAI_LAW_upgrade_economy_law = yes
+							EAI_LAW_upgrade_manpower_law = yes
+							EAI_LAW_upgrade_trade_law = yes
+							EAI_PP_store_pp_strategies = yes
+						}
+					}
+				}
+			}
+		}
+
+		set_temp_variable = { add_pp = EAI_PP_max_stored_pp }
+		subtract_from_temp_variable = { add_pp = EAI_PP_stored_pp }
+		set_temp_variable = { add_pp_max = political_power }
+		subtract_from_temp_variable = { add_pp_max = 5 }
+		clamp_temp_variable = { var = add_pp min = 0 max = add_pp_max }
+
+		if = { limit = { has_country_flag = EAI_pp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: PP = [?political_power], storing = [?add_pp], EAI_PP_stored_pp = [?EAI_PP_stored_pp], EAI_PP_max_stored_pp = [?EAI_PP_max_stored_pp]" } 
+		add_to_variable = { EAI_PP_stored_pp = add_pp }
+		multiply_temp_variable = { add_pp = -1 }
+		add_political_power = add_pp
+	}
+	else_if = { limit = { check_variable = { EAI_PP_stored_pp > EAI_PP_max_stored_pp } }
+
+		set_temp_variable = { return_pp = EAI_PP_stored_pp }
+		subtract_from_temp_variable = { return_pp = EAI_PP_max_stored_pp }
+		subtract_from_variable = { EAI_PP_stored_pp = return_pp }
+		add_political_power = return_pp
+	}
+
+	set_variable = { EAI_PP_needs_pp = 0 }
+}
+
+EAI_PP_return_stored = {
+
+	if = { limit = { has_country_flag = EAI_pp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: returning [?EAI_PP_stored_pp], PP = [?political_power]" } 
+
+	add_political_power = EAI_PP_stored_pp
+	set_variable = { EAI_PP_stored_pp = 0 }
+}
+
+EAI_PP_give_pp_amount = { 
+
+	set_temp_variable = { add_pp = _pp_amount }
+	subtract_from_temp_variable = { add_pp = political_power }
+	clamp_temp_variable = { var = add_pp min = 0 max = EAI_PP_stored_pp }
+	add_political_power = add_pp
+	if = { limit = { has_country_flag = EAI_pp_logging check_variable = { add_pp > 0 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: giving AI [?add_pp]/[?_pp_amount], EAI_PP_stored_pp = [?EAI_PP_stored_pp]" }
+	subtract_from_variable = { EAI_PP_stored_pp = add_pp }
+}
+
+EAI_PP_pay_pp_cost = {
+
+	EAI_PP_return_stored = yes
+	if = { limit = { check_variable = { _pp_cost > 0 } }
+		multiply_temp_variable = { _pp_cost = -1 }
+	}
+	if = { limit = { has_country_flag = EAI_pp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_PP_pay_pp_cost: _pp_cost=[?_pp_cost]" } 
+	add_political_power = _pp_cost
+	EAI_PP_store = yes
+}

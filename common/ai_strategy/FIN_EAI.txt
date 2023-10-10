@@ -1,0 +1,199 @@
+#########################################################
+#	Production Strategies
+#########################################################
+
+EAI_FIN_build_army = {
+	allowed = { tag = FIN }
+	enable = {
+		SOV = { is_ai = no }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = infantry value = 100 }
+	ai_strategy = { type = force_build_armies value = 100 }
+}
+
+#########################################################
+#	Diplomacy Strategies
+#########################################################
+
+EAI_FIN_dont_join_JAP = {
+	allowed = { tag = FIN }
+	enable = {
+		is_historical_focus_on = yes
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = JAP target = join_faction value = -5000 }
+	ai_strategy = { type = diplo_action_acceptance id = JAP target = offer_join_faction value = -5000 }
+}
+
+#########################################################
+#	Unit Strategies
+#########################################################
+
+EAI_FIN_winter_war_defense_in_depth = {
+	allowed = { tag = FIN }
+	enable = {
+
+		# Too much for the AI
+		SOV = { is_ai = no }
+
+		OR = {
+			has_war_with = SOV
+			SOV = { has_wargoal_against = FIN }
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = {
+					has_war_with = SOV
+					SOV = { has_wargoal_against = FIN }
+				}
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.30
+		states = { 
+			928
+			930
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = front_control
+		tag = SOV
+		execution_type = careful
+	}
+}
+
+EAI_FIN_protect_helsinki = {
+	allowed = { tag = FIN }
+	enable = {
+
+		# Too much for the AI
+		SOV = { is_ai = no }
+
+		###
+
+		any_state = {
+			OR = {
+				state = 111
+				state = 926
+			}
+			OR = {
+				AND = {
+					set_temp_variable = { tmp_protect_state = THIS.id }
+					ROOT = {
+						any_enemy_country = {
+							divisions_in_state = { state = var:tmp_protect_state size > 0 }
+						}
+					}
+				}
+				AND = {
+					any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+				}
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.5
+		states = { 
+			111
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = front_control
+		state_trigger = {
+			OR = {
+				state = 111
+				state = 926
+			}
+		}
+		ordertype = front
+		execution_type = rush
+		ratio > 0.2
+	}
+}
+
+EAI_FIN_continuation_war_preparation = {
+	allowed = { tag = FIN }
+	enable = {
+		is_historical_focus_on = yes
+
+		has_completed_focus = FIN_cooperation_with_germany
+		GER = { focus_progress = { focus = GER_ussr_war_goal progress > 0 } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = prepare_for_war id = "SOV" value = 200 }
+}
+
+EAI_FIN_continuation_war_hold_vs_SOV = {
+	allowed = { tag = FIN }
+	enable = {
+		is_historical_focus_on = yes
+
+		has_completed_focus = FIN_cooperation_with_germany
+		GER = { 
+			OR = {
+				AND = {
+					focus_progress = { focus = GER_ussr_war_goal progress > 0 } 
+					NOT = { has_completed_focus = GER_ussr_war_goal }
+				}
+				has_country_flag = EAI_barbarossa_blitz
+			}
+		}
+
+		has_army_manpower = { size < 300000 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		tag = SOV
+		ordertype = front
+		execution_type = rush_weak
+		ratio > 0.2
+	}
+}
+
+EAI_FIN_guard_coasts = {
+	allowed = { tag = FIN }
+	enable = {
+		is_historical_focus_on = yes
+
+		has_war_with = SOV
+
+		surrender_progress < 0.1
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.5
+		states = { 
+			111
+			926
+			149
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}

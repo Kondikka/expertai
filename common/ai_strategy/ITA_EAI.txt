@@ -1,0 +1,576 @@
+# befriend
+# conquer
+# antagonize
+# build_ship
+# build_army
+# unit_ratio
+# build_building
+# research_tech
+# garrison
+# protect
+# influence
+
+#########################################################
+#	Production Strategies
+#########################################################
+
+EAI_ITA_air_production = {
+	allowed = { tag = ITA }
+	enable = { always = yes }
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = air_factory_balance value = 50 }
+}
+
+EAI_ITA_naval_bombers = {
+	allowed = { tag = ITA }
+	enable = { 
+		EAI_NAV_equipment_production = yes
+		num_of_military_factories > 25
+	}
+	abort = {
+		NOT = {
+			AND = {
+				EAI_NAV_equipment_production = yes
+				num_of_military_factories > 25
+			}
+		}	
+	}
+
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 3 }
+}
+
+EAI_ITA_naval_bombers_2 = {
+	allowed = { tag = ITA }
+	enable = { 
+		EAI_NAV_equipment_production = yes
+		has_deployed_air_force_size = { size < 400 type = naval_bomber }
+		num_of_military_factories > 45
+	}
+	abort = {
+		NOT = {
+			AND = {
+				EAI_NAV_equipment_production = yes
+				has_deployed_air_force_size = { size < 600 type = naval_bomber }
+				num_of_military_factories > 45
+			}
+		}	
+	}
+
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 10 }
+}
+
+#########################################################
+#	Diplomacy Strategies
+#########################################################
+
+EAI_ITA_no_docking_rights_for_ITA_outside_europe = {
+	enable = { 
+		NOT = {
+			capital_scope = { is_on_continent = europe }
+			has_war_together_with = ITA
+			is_in_faction_with = ITA
+			any_neighbor_country = { is_in_faction_with = ITA }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = ITA target = docking_rights value = -200 }
+	ai_strategy = { type = diplo_action_acceptance id = ITA target = docking_rights value = -200 }
+}
+
+EAI_GER_want_to_invade_FRA_without_ITA = {
+	allowed = {
+		OR = {
+			original_tag = GER
+			original_tag = ITA
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+
+		ITA = { is_in_faction_with = GER }
+
+		date > 1939.1.1
+		date < 1941.1.1
+
+		NOT = {
+			# Fallback
+			date > 1940.6.1
+
+			# Check progress vs France
+			OR = {
+
+				# Breakthrough in France
+				FRA = { surrender_progress > 0.50 }
+				FRA = { has_country_flag = EAI_MILITARY_trend_losing_war }
+				FRA = { has_capitulated = yes }
+
+				# Breakthrough in Benelux
+				BEL = { has_capitulated = yes }
+				HOL = { has_capitulated = yes }
+
+				# Enemies in FRA northern provinces except Maginot
+				FRA = { 
+					any_of_scopes = { array = owned_states 
+						region = 19
+						NOT = { state = 28 }
+						NOT = { is_fully_controlled_by = FRA }
+					}
+				}
+
+				# Axis puts more pressure on when the player is on the other side
+				GER = { 
+					any_enemy_country = { is_major = yes is_ai = no }
+					OR = { 
+						has_war_with = BEL 
+						has_war_with = HOL 
+					}
+				} 
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = dont_join_wars_with
+		id = ITA
+		target_country = FRA
+		value = 500
+	}
+	ai_strategy = {
+		type = dont_join_wars_with
+		id = GER
+		target_country = FRA
+		value = 500
+	}
+}
+
+EAI_ITA_ignore_yug = {
+	allowed = { tag = ITA }
+	enable = {
+		tag = ITA
+		is_historical_focus_on = yes
+		NOT = { YUG = { has_country_flag = EAI_declare_war_from_ITA } }
+		NOT = { has_war_with = YUG date > 1941.4.1 }
+	}
+
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = ignore
+		id = "YUG"
+		value = 500
+	}
+}
+
+EAI_ITA_ignore_SWI = {
+	allowed = { tag = ITA }
+	enable = { 
+		is_historical_focus_on = yes 
+		SOV = { EAI_THIS_is_threat_to_PREV = yes }
+	}
+	abort_when_not_enabled = yes
+	ai_strategy = {
+		type = ignore_claim
+		id = "SWI"
+		value = 5000
+	}
+	ai_strategy = {
+		type = ignore
+		id = "SWI"
+		value = 5000
+	}
+}
+
+EAI_ITA_dont_justify_vs_GRE = { # Use national focus
+	allowed = { tag = ITA }
+	enable = { 
+		is_historical_focus_on = yes 
+		date > 1939.1.1
+		date < 1941.1.1
+	}
+	abort_when_not_enabled = yes
+	ai_strategy = {
+		type = ignore_claim
+		id = "GRE"
+		value = 5000
+	}
+}
+
+#########################################################
+#	Unit Strategies
+#########################################################
+
+EAI_ITA_area_priority = {
+	allowed = { tag = ITA }
+	enable = {
+		always = yes
+	}
+	abort = { always = no }
+
+	ai_strategy = { type = area_priority id = suez value = 200 }
+}
+
+EAI_ITA_garrison_home = {
+	allowed = { tag = ITA }
+	enable = {
+		has_capitulated = no
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 23 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 31 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 169 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 168 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 29 value = 100000 }
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.15
+		states = { 
+			115
+			156
+			117
+			157
+			162
+			161
+			158
+			160
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.05
+		order_id = 9
+		states = { 
+			2
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ITA_garrison_north_africa = {
+	allowed = { tag = ITA }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.10
+		
+		states = { 
+			451
+			663
+			450
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ITA_dont_defend_AOI = {
+	allowed = { tag = ITA }
+	enable = {
+		AOI = { is_puppet_of = ITA }
+		NOT = { has_country_flag = EAI_path_exists_from_east_africa_to_north_africa }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = dont_defend_ally_borders id = "AOI" value = 500 }
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			CONTROLLER = {
+				OR = {
+					tag = AOI 
+					tag = FRA
+					tag = ENG
+					has_war_with = AOI
+				}
+			}
+			OR = {
+				region = 17    
+				region = 274    
+				region = 273    
+				region = 216    
+				region = 217    
+			}
+		}
+		value = -50000
+	}
+}
+
+###
+
+EAI_ITA_war_in_ethiopia_1 = {
+	allowed = { tag = ITA }
+	enable = { 
+		has_war_with = ETH
+		ETH = { has_capitulated = no }
+		date < 1938.1.1
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = front_unit_request
+		tag = ETH
+		value = 100
+	}
+}
+
+EAI_ITA_war_in_ethiopia_3 = { 
+	allowed = { tag = ITA }
+	enable = { 
+		has_war_with = ETH
+		ETH = { has_capitulated = no }
+		date < 1938.1.1
+		check_variable = { EAI_fielded_eq_ratio > 0.9 }
+		EAI_reserve_manpower_more_than_25p = yes
+	}
+	abort = {
+		NOT = {
+			AND = {
+				has_war_with = ETH
+				ETH = { has_capitulated = no }
+				date < 1938.1.1
+				check_variable = { EAI_fielded_eq_ratio > 0.8 }
+				EAI_reserve_manpower_more_than_20p = yes
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		priority = 5
+		tag = ETH
+		execution_type = rush_weak
+		execute_order = yes
+	}
+}
+
+EAI_ETH_war_in_ethiopia_1 = { # Force ETH to make bad attacks vs AI ITA
+	allowed = { tag = ETH }
+	enable = { 
+		has_war_with = ITA
+		ITA = { is_ai = yes }
+		date < 1938.1.1
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = front_control
+		priority = 500
+		tag = ITA
+		execution_type = rush
+		execute_order = yes
+	}
+
+	ai_strategy = {
+		type = front_unit_request
+		tag = ITA
+		value = -200
+	}
+
+	ai_strategy = { 
+		type = put_unit_buffers 
+		ratio = 0.75
+		order_id = 9 
+		states = { 838 } 
+		subtract_invasions_from_need = no 
+		subtract_fronts_from_need = no
+	}
+}
+
+###
+
+EAI_ITA_warprep_ENG = {
+	enable = {
+		tag = ITA
+		date < 1941.1.1
+		has_government = fascism
+		NOT = { 
+			ITA = { has_capitulated = yes }
+			ITA = { exists = no }
+			ITA = { is_subject = yes }
+		}
+		GER = { has_war_with = FRA }
+		NOT = { 
+			FRA = { has_capitulated = yes }
+			FRA = { exists = no }
+			FRA = { is_subject = yes }
+			is_in_faction_with = FRA
+			has_war_with = FRA
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = conquer
+		id = "FRA"
+		value = 1000
+	}
+}
+
+EAI_ITA_north_africa_west = {
+	allowed = { tag = ITA }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			region = 126
+			any_neighbor_state = { CONTROLLER = { original_tag = FRA } }
+		}
+		value = 100
+	}
+}
+
+EAI_ITA_north_africa_east = {
+	allowed = { tag = ITA }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				region = 126
+				state = 452
+				state = 447
+				state = 446
+				state = 453
+				state = 454
+			}
+			NOT = { any_neighbor_state = { CONTROLLER = { original_tag = FRA } } }
+		}
+		value = 75
+	}
+}
+
+EAI_ITA_ENG_north_africa_front_aggressiveness = {
+	allowed = { OR = { tag = ITA tag = ENG } }
+	enable = {
+		is_historical_focus_on = yes
+		OR = {
+			has_war_with = ENG
+			has_war_with = ITA
+		}
+		ITA = { is_ai = yes }
+		ENG = { is_ai = yes }
+		check_variable = { var = EAI_NA_states_controlled value = EAI_NA_fraction_allowed_to_control compare = greater_than_or_equals }
+		check_variable = { EAI_NA_states_controlled < 1 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		state_trigger = {
+			is_in_array = { global.EAI_north_african_states = THIS.id }
+			OR = {
+				AND = { FROM.FROM = { tag = ITA } is_controlled_by = ENG }
+				AND = { FROM.FROM = { tag = ENG } is_controlled_by = ITA }
+			}
+		}
+
+		execution_type = careful
+	}
+}
+
+#########################################################
+#	Naval
+#########################################################
+
+EAI_ITA_avoid_ETH = {
+	enable = {
+		has_war = yes
+		original_tag = ITA 
+		enemies_naval_strength_ratio > 1.0 
+		NOT = { ETH = { has_country_flag = EAI_naval_invasion_from_ITA } }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 47 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 48 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 61 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 62 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 65 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 103 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 102 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 104 value = 500 }
+}
+
+EAI_ITA_protect_navy = {
+	allowed = { tag = ITA }
+	enable = {
+		EAI_NAV_equipment_production = yes
+		has_deployed_air_force_size = { size < 200 type = naval_bomber }
+
+		num_of_military_factories > 25
+
+		alliance_naval_strength_ratio < 1.0
+
+		NOT = {
+			any_state = {
+				region = 23
+				OR = {
+					CONTROLLER = { has_war_with = ROOT }
+					ROOT = { 
+						controls_state = PREV
+						NOT = { has_full_control_of_state = PREV } 
+					}
+				}
+			}
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				EAI_NAV_equipment_production = yes
+				has_deployed_air_force_size = { size < 400 type = naval_bomber }
+		
+				num_of_military_factories > 25
+		
+				alliance_naval_strength_ratio < 1.0
+		
+				NOT = {
+					any_state = {
+						region = 23
+						OR = {
+							CONTROLLER = { has_war_with = ROOT }
+							ROOT = { 
+								controls_state = PREV
+								NOT = { has_full_control_of_state = PREV } 
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_PATROL" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_STRIKE_FORCE" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_RAIDING" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_NAVAL_INVASION_SUPPORT" value = 500000 }
+}

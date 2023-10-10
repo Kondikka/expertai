@@ -1,0 +1,109 @@
+############################################################################################################
+#	Expert AI mod - startup effects
+############################################################################################################
+
+EAI_startup_effects = {
+
+	EAI_set_version = yes
+
+	### Globals
+
+	EAI_set_province_state_ids = yes
+	EAI_set_state_province_ids = yes
+	EAI_set_province_pos = yes
+	EAI_set_province_neighbors = yes
+	EAI_set_province_terrain_types = yes
+	EAI_set_province_terrain_type = yes
+	EAI_set_state_region_id = yes
+	
+	EAI_variant_equipment_types = yes
+	EAI_FOCUS_CONFIG_types = yes
+	EAI_advisor_types = yes
+	EAI_ESP_operation_types = yes
+	EAI_PC_set_global_variables = yes
+	EAI_create_state_arrays = yes
+	country_event = EAI_C.10002 # EAI_set_resource_variables
+	
+	EAI_TEMPLATE_set_variables = yes
+
+	###
+
+	every_country = { limit = { is_ai = no }
+
+		EAI_check_game_version = yes
+	}
+
+	random_country = {
+
+		EAI_startup_logging = yes
+	}
+
+	###
+
+	random_country = { limit = { is_ai = no } 
+	
+		### Default historical startup settings
+
+		set_global_flag = EAI_neutral_spr
+
+		set_global_flag = EAI_lend_lease
+
+		set_global_flag = EAI_challenging_mode
+		
+		set_variable = { global.EAI_eastern_front = 1 }
+
+		### Show EAI config
+
+		set_country_flag = EAI_config_STARTUP 
+		set_country_flag = EAI_show_country_config_decisions 
+	}
+
+	every_country = { limit = { is_ai = yes }
+
+		EAI_PC_startup = yes
+
+		EAI_construction_monthly_update = yes
+
+		set_country_flag = { flag = EAI_PR_block_research value = 1 days = 10 }
+		EAI_PR_priority_research_update = yes
+		EAI_PR_priority_research_update_daily = yes
+	}
+
+	###
+
+	set_variable = { global.EAI_initialization_delay = 3 }
+
+	### radar script
+	
+	every_state = { limit = { EAI_radar_location = yes }
+
+		set_state_flag = EAI_radar_site
+	}
+
+	### Stop UK from taking all MAL divisions
+
+	if = { limit = { ENG = { is_ai = yes } MAL = { is_ai = yes } }
+
+		ENG ={
+			set_autonomy = {
+				target = MAL
+				autonomy_state = autonomy_puppet
+			}
+		}
+	}
+
+	### Causing issues with ahistorical outcomes for now
+
+	# if = {
+	# 	limit = {
+	# 		is_historical_focus_on = yes
+	# 		EST = { is_ai = yes }
+	# 		LAT = { is_ai = yes }
+	# 		LIT = { is_ai = yes }
+	# 	}
+
+	# 	EST = { load_focus_tree = generic_focus }
+	# 	LAT = { load_focus_tree = generic_focus }
+	# 	LIT = { load_focus_tree = generic_focus }
+	# }
+}

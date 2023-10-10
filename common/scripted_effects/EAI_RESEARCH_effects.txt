@@ -1,0 +1,321 @@
+############################################################################################################
+#	Expert AI mod - misc effects
+############################################################################################################
+
+EAI_RESEARCH_on_tech_researched = {
+
+	clear_temp_array = execute_effects_on_researched_techs
+	for_each_loop = { array = researched_techs
+		if = { limit = { NOT = { is_in_array = { EAI_researched_techs = v } } }
+			add_to_array = { EAI_researched_techs = v }
+			add_to_temp_array = { exec_effects_on_researched_techs = v }
+		}
+	}
+	for_each_loop = { array = exec_effects_on_researched_techs value = new_tech
+
+		EAI_RESEARCH_on_tech_researched_strategies = yes
+	}
+}
+
+EAI_RESEARCH_on_tech_researched_strategies = {
+
+	EAI_PC_on_research = yes
+}
+
+### AI keeps taking doctrines in its old doctrine even if the mod switches doctrines
+
+EAI_RESEARCH_doctrine_limits = {
+
+	if = { limit = { EAI_land_doctrine_progress_limit = yes } 
+
+		if = { limit = { NOT = { has_country_flag = EAI_land_doctrine_progress_limit } } 
+		
+			set_country_flag = EAI_land_doctrine_progress_limit
+			add_dynamic_modifier = { modifier = EAI_block_land_doctrine_upgrade_modifier }
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DOCTRINE: EAI_land_doctrine_progress_limit" } 
+		}
+	}
+	else = { clr_country_flag = EAI_land_doctrine_progress_limit }
+
+	### Limit naval doctrine research
+
+	if = { limit = { EAI_naval_doctrine_progress_limit = yes } 
+
+		if = { limit = { NOT = { has_country_flag = EAI_naval_doctrine_progress_limit } } 
+		
+			set_country_flag = EAI_naval_doctrine_progress_limit
+			add_dynamic_modifier = { modifier = EAI_block_naval_doctrine_upgrade_modifier }
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DOCTRINE: EAI_naval_doctrine_progress_limit" } 
+		}
+	}
+	else = { clr_country_flag = EAI_naval_doctrine_progress_limit }
+
+	### Limit air doctrine research
+
+	if = { limit = { EAI_air_doctrine_progress_limit = yes } 
+
+		if = { limit = { NOT = { has_country_flag = EAI_air_doctrine_progress_limit } } 
+		
+			set_country_flag = EAI_air_doctrine_progress_limit
+			add_dynamic_modifier = { modifier = EAI_block_air_doctrine_upgrade_modifier }
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DOCTRINE: EAI_air_doctrine_progress_limit" } 
+		}
+	}
+	else = { clr_country_flag = EAI_air_doctrine_progress_limit }
+}
+
+EAI_RESEARCH_doctrine_switch_fix = {
+
+	EAI_RESEARCH_land_doctrine_switch_fix = yes
+	EAI_RESEARCH_air_doctrine_switch_fix = yes
+	EAI_RESEARCH_naval_doctrine_switch_fix = yes
+}
+
+EAI_RESEARCH_land_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_land_doctrine_switch NOT = { has_country_flag = EAI_land_doctrine_progress_limit } }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		subtract_from_temp_variable = { xp_cost_reduction_modifier = 10 } # Accounts for the +1000% cost modifier applied in order to stop the AI from taking doctrines
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_army_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MW_DOCTRINE } NOT = { has_tech = mobile_warfare } }
+
+				set_technology = { mobile_warfare = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_SF_DOCTRINE } NOT = { has_tech = superior_firepower } }
+
+				set_technology = { superior_firepower = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_GB_DOCTRINE } NOT = { has_tech = trench_warfare } }
+
+				set_technology = { trench_warfare = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MA_DOCTRINE } NOT = { has_tech = mass_assault } }
+
+				set_technology = { mass_assault = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_land_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed land doctrine switch" }
+		}
+	}
+}
+
+EAI_RESEARCH_air_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_air_doctrine_switch }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@air_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		subtract_from_temp_variable = { xp_cost_reduction_modifier = 10 } # Accounts for the +1000% cost modifier applied in order to stop the AI from taking doctrines
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_air_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_SD_DOCTRINE } NOT = { has_tech = air_superiority } }
+
+				set_technology = { air_superiority = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_BFS_DOCTRINE } NOT = { has_tech = formation_flying } }
+
+				set_technology = { formation_flying = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_OI_DOCTRINE } NOT = { has_tech = force_rotation } }
+
+				set_technology = { force_rotation = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_air_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed air doctrine switch" }
+		}
+	}
+}
+
+EAI_RESEARCH_naval_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_naval_doctrine_switch }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@naval_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		subtract_from_temp_variable = { xp_cost_reduction_modifier = 10 } # Accounts for the +1000% cost modifier applied in order to stop the AI from taking doctrines
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_navy_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } NOT = { has_tech = fleet_in_being } }
+
+				set_technology = { fleet_in_being = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } NOT = { has_tech = trade_interdiction } }
+
+				set_technology = { trade_interdiction = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } NOT = { has_tech = base_strike } }
+
+				set_technology = { base_strike = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_naval_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed naval doctrine switch" }
+		}
+	}
+}
+
+###
+
+EAI_RESEARCH_check_for_empty_research_slots = {
+
+	for_each_loop = { array = global.technology
+
+		if = { limit = { check_variable = { i > 0 } is_researching_technology = var:v }
+			
+			add_to_temp_variable = { techs_being_researched = 1 }
+		}
+	}
+
+	if = { 
+		limit = { 
+			NOT = { has_country_flag = EAI_PR_block_research }
+			check_variable = { techs_being_researched < amount_research_slots } 
+		}
+
+		set_country_flag = EAI_unused_research_slots
+		add_to_variable = { EAI_unused_research_slots_count = 1 }
+		if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_unused_research_slots" }
+	}
+	else = { 
+		clr_country_flag = EAI_unused_research_slots 
+		clear_variable = EAI_unused_research_slots_count
+	}
+
+	if = { 
+		limit = { 
+			NOT = { has_country_flag = EAI_PR_block_research }
+			check_variable = { EAI_unused_research_slots_count > 3 } 
+		}
+
+		set_country_flag = EAI_unused_research_slots_extended
+		if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_unused_research_slots_extended" }
+	}
+	else = { clr_country_flag = EAI_unused_research_slots_extended }
+}
+
+############################################################################################################
+
+### Research factors
+
+EAI_RESEARCH_research_factors = {
+
+	EAI_RESEARCH_armor_research_factor = yes
+	EAI_RESEARCH_naval_research_factor = yes
+}
+
+EAI_RESEARCH_armor_research_factor = {
+
+	@ARMOR_INDUSTRY_DIVISOR = 100
+	@ARMOR_INDUSTRY_WEIGHT = 0.7
+	
+	@ARMOR_RESEARCH_SLOT_DIVISOR = 5
+	@ARMOR_RESEARCH_SLOT_WEIGHT = 0.3
+
+	set_temp_variable = { research_factor = 0 }
+
+	###
+
+	set_temp_variable = { industry_factor = num_of_military_factories }
+	divide_temp_variable = { industry_factor = @ARMOR_INDUSTRY_DIVISOR }
+	clamp_temp_variable = { var = industry_factor max = 1 }
+	multiply_temp_variable = { industry_factor = @ARMOR_INDUSTRY_WEIGHT }
+	add_to_temp_variable = { research_factor = industry_factor }
+
+	###
+
+	set_temp_variable = { research_slot_factor = amount_research_slots }
+	divide_temp_variable = { research_slot_factor = @ARMOR_RESEARCH_SLOT_DIVISOR }
+	clamp_temp_variable = { var = research_slot_factor max = 1 }
+	multiply_temp_variable = { research_slot_factor = @ARMOR_RESEARCH_SLOT_WEIGHT }
+	add_to_temp_variable = { research_factor = research_slot_factor }
+	
+	###
+
+	clamp_temp_variable = { var = research_factor min = 0.01 max = 1 }
+	set_variable = { EAI_RESEARCH_armor_research_factor = research_factor }
+}
+
+EAI_RESEARCH_naval_research_factor = {
+
+	@NAVAL_INDUSTRY_DIVISOR = 50
+	@NAVAL_INDUSTRY_WEIGHT = 0.6
+	
+	@NAVAL_SHIP_DIVISOR = 100
+	@NAVAL_SHIP_WEIGHT = 0.2
+
+	@NAVAL_RESEARCH_SLOT_DIVISOR = 5
+	@NAVAL_RESEARCH_SLOT_WEIGHT = 0.2
+
+	set_temp_variable = { research_factor = 0 }
+
+	###
+
+	set_temp_variable = { dockyard_factor = num_of_naval_factories }
+	divide_temp_variable = { dockyard_factor = @NAVAL_INDUSTRY_DIVISOR }
+	clamp_temp_variable = { var = dockyard_factor max = 1 }
+	multiply_temp_variable = { dockyard_factor = @NAVAL_INDUSTRY_WEIGHT }
+	add_to_temp_variable = { research_factor = dockyard_factor }
+
+	###
+
+	set_temp_variable = { ship_factor = EAI_num_surface_ships }
+	divide_temp_variable = { ship_factor = @NAVAL_SHIP_DIVISOR }
+	clamp_temp_variable = { var = ship_factor max = 1 }
+	multiply_temp_variable = { ship_factor = @NAVAL_SHIP_WEIGHT }
+	add_to_temp_variable = { research_factor = ship_factor }
+
+	###
+
+	set_temp_variable = { research_slot_factor = amount_research_slots }
+	divide_temp_variable = { research_slot_factor = @NAVAL_RESEARCH_SLOT_DIVISOR }
+	clamp_temp_variable = { var = research_slot_factor max = 1 }
+	multiply_temp_variable = { research_slot_factor = @NAVAL_RESEARCH_SLOT_WEIGHT }
+	add_to_temp_variable = { research_factor = research_slot_factor }
+	
+	###
+
+	clamp_temp_variable = { var = research_factor min = 0.01 max = 1 }
+	set_variable = { EAI_RESEARCH_naval_research_factor = research_factor }
+}

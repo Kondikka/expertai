@@ -6,7 +6,7 @@ EAI_submarine_early = {
 	category = naval
 	roles = { naval_submarine }
 	priority = {
-		base = 1
+		base = 0
 	}
 	EARLY_SUBMARINE_1 = { # to make task force reinforcement work
 		role_icon_index = 6
@@ -41,286 +41,238 @@ EAI_submarine_early = {
 EAI_submarine = {
 	category = naval
 	roles = { naval_submarine }
-	priority = {
-		base = 100
-		modifier = { factor = 0 check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
+	priority = { # Priority of design among all roles (1-10)
+		base = 0
+		modifier = { add = 5 check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_ON } }
+		modifier = { add = 5 check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } }
 	}
 	
-	BASIC_SUBMARINE_0 = {
+	##############################################################################
+	### 	BASIC
+	##############################################################################
+
+	BASIC_SUBMARINE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 100 has_tech = basic_ship_hull_submarine }
-			modifier = { add = -900 has_tech = improved_ship_hull_submarine }
-			modifier = { factor = 0 has_tech = cruiser_submarines }
+			base = 0
+			modifier = { 
+				add = 10000
+
+				### Requirements
+				has_tech = basic_ship_hull_submarine
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_submarine_2
-			match_value = 2000
+			match_value = 1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub
-				fixed_ship_engine_slot = sub_ship_engine
-				rear_1_custom_slot = {  module = empty module = ship_torpedo_sub }
+				
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_2 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_2 upgrade = current }
+
+				# CUSTOM
+				rear_1_custom_slot = { module = ship_torpedo_sub_2 upgrade = current }
 			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
-	}
-	BASIC_SUBMARINE_1 = {
-		role_icon_index = 6
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = basic_ship_hull_submarine }
-			modifier = { add = -900 has_tech = improved_ship_hull_submarine }
-			modifier = { factor = 0 has_tech = cruiser_submarines }
-		}
-
-		target_variant = {
-			type = ship_hull_submarine_2
-			match_value = 2000
-
-			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_2
-				fixed_ship_engine_slot = sub_ship_engine_2
-				rear_1_custom_slot = ship_torpedo_sub_2
-			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
 		}
 	}
 
-	CRUISER_SUBMARINE_0 = {
+	##############################################################################
+	### 	CRUISER
+	##############################################################################
+
+	CRUISER_SUBMARINE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 100 has_tech = cruiser_submarines }
-			modifier = { add = -900 has_tech = improved_ship_hull_submarine }
+			base = 0
+			modifier = { 
+				add = 20000
+
+				### Requirements
+				has_tech = basic_ship_hull_submarine
+				has_tech = cruiser_submarines
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_cruiser_submarine
-			match_value = 4000
+			match_value = 1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub
-				fixed_ship_engine_slot = sub_ship_engine
-				front_1_custom_slot = { module = empty module = ship_torpedo_sub }
-				mid_1_custom_slot = {  module = empty any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = {  module = empty module = ship_torpedo_sub }
+				
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_2 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_2 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_torpedo_sub_2 upgrade = current }
+				mid_1_custom_slot = { module = empty }
+				rear_1_custom_slot = { module = ship_torpedo_sub_2 upgrade = current }
 			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
-	}
-	CRUISER_SUBMARINE_1 = {
-		role_icon_index = 6
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = cruiser_submarines }
-			modifier = { add = -900 OR = { has_tech = improved_ship_hull_submarine has_tech = basic_submarine_snorkel } }
-		}
-
-		target_variant = {
-			type = ship_hull_cruiser_submarine
-			match_value = 4000
-
-			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_2
-				fixed_ship_engine_slot = sub_ship_engine_2
-				front_1_custom_slot = ship_torpedo_sub_2
-				mid_1_custom_slot = empty
-				rear_1_custom_slot = ship_torpedo_sub_2
-			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
-	}
-	CRUISER_SUBMARINE_2 = {
-		role_icon_index = 6
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = cruiser_submarines has_tech = basic_submarine_snorkel }
-			modifier = { add = -900 has_tech = improved_ship_hull_submarine }
-		}
-
-		target_variant = {
-			type = ship_hull_cruiser_submarine
-			match_value = 4000
-
-			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_2
-				fixed_ship_engine_slot = sub_ship_engine_2
-				front_1_custom_slot = ship_torpedo_sub_2
-				mid_1_custom_slot = { any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = ship_torpedo_sub_2
-			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-			module = ship_sub_snorkel
 		}
 	}
 
-	IMPROVED_SUBMARINE_0 = {
+	##############################################################################
+	### 	IMPROVED
+	##############################################################################
+
+	IMPROVED_SUBMARINE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 100 has_tech = improved_ship_hull_submarine }
-			modifier = { add = -900 has_tech = advanced_ship_hull_submarine }
+			base = 0
+			modifier = { 
+				add = 30000
+
+				### Requirements
+				has_tech = improved_ship_hull_submarine
+
+				### Block after unlocking the next version
+				NOT = {
+					AND = {
+						has_tech = basic_submarine_snorkel
+					}
+				}
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_submarine_3
-			match_value = 4000
+			match_value = 1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub
-				fixed_ship_engine_slot = sub_ship_engine
-				front_1_custom_slot = { module = empty module = ship_torpedo_sub }
-				mid_1_custom_slot = {  module = empty any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = {  module = empty module = ship_torpedo_sub }
+
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_3 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_3 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_torpedo_sub_3 upgrade = current }
+				mid_1_custom_slot = { module = empty }
+				rear_1_custom_slot = { module = ship_torpedo_sub_3 upgrade = current }
 			}
 		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
 	}
-	IMPROVED_SUBMARINE_1 = {
+
+	IMPROVED_SUBMARINE_UPDATE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = improved_ship_hull_submarine }
-			modifier = { add = -900 OR = { has_tech = advanced_ship_hull_submarine has_tech = basic_submarine_snorkel } }
+			base = 0
+			modifier = { 
+				add = 30000
+
+				### Requirements
+				has_tech = improved_ship_hull_submarine
+
+				### Added
+				has_tech = basic_submarine_snorkel
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_submarine_3
-			match_value = 4000
+			match_value = 1.1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_3
-				fixed_ship_engine_slot = sub_ship_engine_3
-				front_1_custom_slot = ship_torpedo_sub_3
-				mid_1_custom_slot = empty
-				rear_1_custom_slot = ship_torpedo_sub_3
+
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_3 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_3 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_torpedo_sub_3 upgrade = current }
+				mid_1_custom_slot = { module = ship_sub_snorkel_1 }
+				rear_1_custom_slot = { module = ship_torpedo_sub_3 upgrade = current }
 			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
-	}
-	IMPROVED_SUBMARINE_2 = {
-		role_icon_index = 6
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = improved_ship_hull_submarine has_tech = basic_submarine_snorkel }
-			modifier = { add = -900 has_tech = advanced_ship_hull_submarine }
-		}
-
-		target_variant = {
-			type = ship_hull_submarine_3
-			match_value = 4000
-
-			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_3
-				fixed_ship_engine_slot = sub_ship_engine_3
-				front_1_custom_slot = ship_torpedo_sub_3
-				mid_1_custom_slot = { any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = ship_torpedo_sub_3
-			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
 		}
 	}
 
-	ADVANCED_SUBMARINE_0 = {
+	##############################################################################
+	### 	ADVANCED
+	##############################################################################
+
+	ADVANCED_SUBMARINE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 100 has_tech = advanced_ship_hull_submarine }
+			base = 0
+			modifier = { 
+				add = 40000
+
+				### Requirements
+				has_tech = advanced_ship_hull_submarine
+				has_tech = basic_submarine_snorkel
+
+				### Block after unlocking the next version
+				NOT = {
+					AND = {
+						has_tech = improved_submarine_snorkel
+					}
+				}
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_submarine_4
-			match_value = 6000
+			match_value = 1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub
-				fixed_ship_engine_slot = sub_ship_engine
-				front_1_custom_slot = { module = empty module = ship_torpedo_sub }
-				mid_1_custom_slot = {  module = empty any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = {  module = empty module = ship_torpedo_sub }
+
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_4 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_4 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_torpedo_sub_4 upgrade = current }
+				mid_1_custom_slot = { module = ship_sub_snorkel_1 }
+				rear_1_custom_slot = { module = ship_torpedo_sub_4 upgrade = current }
 			}
 		}
-
-		requirements = {
-			module = ship_torpedo_sub
-		}
 	}
-	ADVANCED_SUBMARINE_1 = {
+
+	ADVANCED_SUBMARINE_UPDATE = {
 		role_icon_index = 6
 		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = advanced_ship_hull_submarine }
-			modifier = { add = -900 has_tech = basic_submarine_snorkel }
+			base = 0
+			modifier = { 
+				add = 40000
+
+				### Requirements
+				has_tech = advanced_ship_hull_submarine
+				has_tech = basic_submarine_snorkel
+
+				### Added
+				has_tech = improved_submarine_snorkel
+			}
 		}
 
 		target_variant = {
 			type = ship_hull_submarine_4
-			match_value = 6000
+			match_value = 1.1
 
 			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_4
-				fixed_ship_engine_slot = sub_ship_engine_4
-				front_1_custom_slot = ship_torpedo_sub_4
-				mid_1_custom_slot = empty
-				rear_1_custom_slot = ship_torpedo_sub_4
+
+				# ENGINE
+				fixed_ship_engine_slot = { module = sub_ship_engine_4 upgrade = current }
+
+				# MAIN
+				fixed_ship_torpedo_slot = { module = ship_torpedo_sub_4 upgrade = current }
+
+				# CUSTOM
+				front_1_custom_slot = { module = ship_torpedo_sub_4 upgrade = current }
+				mid_1_custom_slot = { module = ship_sub_snorkel_2 }
+				rear_1_custom_slot = { module = ship_torpedo_sub_4 upgrade = current }
 			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-			module = ship_sub_snorkel
-		}
-	}
-	ADVANCED_SUBMARINE_2 = {
-		role_icon_index = 6
-		priority = {
-			base = -1
-			modifier = { add = 1000 has_tech = advanced_ship_hull_submarine has_tech = basic_submarine_snorkel }
-		}
-
-		target_variant = {
-			type = ship_hull_submarine_4
-			match_value = 6000
-
-			modules = {
-				fixed_ship_torpedo_slot = ship_torpedo_sub_4
-				fixed_ship_engine_slot = sub_ship_engine_4
-				front_1_custom_slot = ship_torpedo_sub_4
-				mid_1_custom_slot = { any_of = { ship_sub_snorkel_2 ship_sub_snorkel_1 } }
-				rear_1_custom_slot = ship_torpedo_sub_4
-			}
-		}
-
-		requirements = {
-			module = ship_torpedo_sub
-			module = ship_sub_snorkel
 		}
 	}
 }

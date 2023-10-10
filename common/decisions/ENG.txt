@@ -1,3 +1,221 @@
+ENG_narvik_crisis_cat = {
+	ENG_narvik_crisis = {
+		icon = generic_operation
+		available = {
+			OR = {
+				GER = {
+					has_war_with = NOR
+				}
+				NOR = {
+					any_core_state = {
+						controller  = { original_tag = GER }
+					}
+				}
+			}
+
+			SWE = { 
+				NOT = { has_war_with = ROOT }
+				NOT = { has_war_with = NOR }
+				NOT = { has_war_with = GER }
+				exists = yes
+				is_subject = no
+			}
+
+			NOR = {
+				OR = {
+					is_in_faction_with = ROOT
+					has_capitulated = yes
+					exists = no
+				}
+			}
+
+			OR = {
+				144 = { is_controlled_by = ROOT }
+				any_allied_country = {
+					controls_state = 144
+				}
+			}
+
+			
+			divisions_in_state = {
+				state = 144
+				size > 3 
+			}
+		}
+
+		complete_effect = {
+			SWE = {
+				add_opinion_modifier = {
+					target = PREV
+					modifier = SWE_ENG_invaded_swe
+				}
+				add_opinion_modifier = {
+					target = PREV
+					modifier = SWE_ENG_invaded_swe_opinion
+				}
+			}
+			declare_war_on = {
+				target = SWE
+				type = liberate_wargoal
+			}
+			144 = {
+				controller = {
+					if = {
+						limit = {
+							controller = { is_in_faction_with = ROOT } #needs to be here otherwise it throws errors
+						}
+
+						declare_war_on = {
+							target = SWE
+							type = liberate_wargoal
+						}
+
+						if = {
+							limit = { controller = { NOT = { has_war_with = SWE }}}
+							ROOT = { set_variable = { ENG_narvik_controller = PREV } }
+						}
+					}
+				}
+			}
+			GER = { country_event = { id = AAT_britain_narvik.2 hours = 1} }
+			SWE = { country_event = { id = AAT_britain_narvik.2 hours = 1 } }
+			activate_mission = ENG_explode_the_swedish_iron_ore_mine
+			hidden_effect = {
+				set_country_flag = ENG_activated_plan_rfour
+			}
+		}
+
+		ai_will_do = {
+			base = 0
+			modifier = {
+				is_historical_focus_on = no
+				OR = {
+					has_completed_focus = ENG_no_further_appeasement
+					has_completed_focus = uk_scandinavian_focus
+				}
+
+				NOR = { is_ai = yes }
+				add = 1
+			}
+		}
+	}
+
+	ENG_narvik_crisis_blow_up_mines = {
+		icon = generic_operation
+		available = {
+			OR = {
+				controls_province = 3095
+				any_allied_country = {
+					controls_province = 3095
+				}
+			}
+			OR = {
+				controls_province = 11155
+				any_allied_country = {
+					controls_province = 11155
+				}
+			}
+			OR = {
+				has_active_mission = ENG_explode_the_swedish_iron_ore_mine
+				has_war_with = SWE
+			}
+		}
+
+		visible = {
+			NOT = {
+				666 = { 
+					has_dynamic_modifier = {
+						modifier = SWE_blown_up_mines
+					}
+				}
+			}
+		}
+		cancel_trigger = {
+			NOT = {
+				controls_province = 3095
+				controls_province = 11155
+				OR = {
+					has_active_mission = ENG_explode_the_swedish_iron_ore_mine 
+					has_war_with = SWE
+				}
+			}
+
+		}
+		days_remove = 12
+		complete_effect = {
+			add_days_mission_timeout = {
+				mission = ENG_explode_the_swedish_iron_ore_mine
+				days = 13
+			}
+		}
+		remove_effect = {
+			666 = {
+				add_dynamic_modifier = {
+					modifier = SWE_blown_up_mines
+				}
+			}
+			if = {
+				limit = {
+					has_country_flag = ENG_activated_plan_rfour
+				}
+				country_event = { id = AAT_britain_narvik.1 }
+				SWE = {
+					country_event = { id = AAT_britain_narvik.3 }
+				}
+				GER = {
+					country_event = { id = AAT_britain_narvik.3 }
+				}
+
+				hidden_effect = {
+					clr_country_flag = ENG_activated_plan_rfour
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	ENG_explode_the_swedish_iron_ore_mine = { # warning for Canada
+
+		icon = eng_support_imperialist_coup
+		
+		available = {
+			has_dynamic_modifier = {
+				modifier = SWE_blown_up_mines
+			}
+		}
+		activation = {
+			always = no
+		}
+		days_mission_timeout = 60
+		fire_only_once = yes
+
+		visible = {
+			always = yes
+		}
+
+		cancel_if_not_visible = no
+
+		is_good = no
+
+		complete_effect = {
+			
+		}
+
+		timeout_effect = {
+			white_peace = {
+				tag = SWE
+			}
+			add_war_support = -0.1
+			add_stability = -0.1
+			custom_effect_tooltip = ENG_explode_the_swedish_iron_ore_mine_tt
+		}
+	}
+}
+
+
 ENG_organize_the_blackshirts = {
 
 	ENG_urge_restraint = {
@@ -8498,6 +8716,7 @@ political_actions = {
 			has_government = democratic
 			has_war_with = GER
 			IRE = { exists = yes }
+			NOT = { is_in_faction_with = IRE }
 		}
 		
 		complete_effect = {
@@ -8547,35 +8766,26 @@ political_actions = {
 		visible = {
 			has_war = yes
 			NOT = { has_war_with = POR }
+			POR = { is_in_faction = no }
 		}
 		
 		complete_effect = {
-			POR = { country_event = generic.5 }
+			hidden_effect = {
+
+				POR = {
+					save_event_target_as = alliance_applicant 
+					country_event = generic.5 
+				}
+			}
 		}
 
 		ai_will_do = {
-			base = 0
+			factor = 1
 			modifier = {
-				add = 1
-
-				is_historical_focus_on = no
-
-				any_other_country = {
-					original_tag = SPR
-					has_war_with = ROOT
-				}
-			}
-			modifier = { #EAI
-				add = 100
-				
-				is_historical_focus_on = yes
-
-				any_neighbor_country = {
-					original_tag = SPR
-
-					OR = { 
-						any_enemy_country = { has_war_with = ROOT }
-						is_in_faction_with = GER
+				factor = 0
+				NOT = {
+					any_enemy_country = {
+						original_tag = SPR
 					}
 				}
 			}
@@ -8982,8 +9192,20 @@ operations = {
 			has_government = democratic
 			has_war_with = GER
 			ICE = { exists = yes }
-			NOR = { has_capitulated = yes }
-			is_in_faction_with = NOR
+			IF = {
+				limit = {
+					NOR = { has_government = democratic }
+				}
+				NOR = { has_capitulated = yes }
+				is_in_faction_with = NOR
+			}
+			ELSE = {
+				any_country_with_original_tag = {
+					original_tag_to_check = NOR 
+					has_capitulated = yes
+					is_in_faction_with = ROOT 
+				}
+			}
 		}
 
 		cost = 50
@@ -8992,6 +9214,12 @@ operations = {
 
 		ai_will_do = { #EAI
 			base = 0
+			
+			modifier = {
+				factor = 0
+
+				is_historical_focus_on = yes
+			}
 		}
 		
 		visible = {
@@ -8999,11 +9227,113 @@ operations = {
 			has_war_with = GER
 			ICE = { exists = yes }
 			NOT = { ICE = { is_in_faction_with = ROOT } }
+			ICE = {
+				NOT = { has_completed_focus = ICE_united_we_stand }
+			}
 		}
 		
 		complete_effect = {
-			ICE =  { country_event = { id = britain.25 days = 1} }
+			ICE = { country_event = { id = britain.25 days = 1} }
 			add_popularity = { ideology = democratic popularity = -0.05 }
+		}
+	}
+
+	# the Occupation of the Faroes
+	ENG_operation_valentine = {
+
+		icon = generic_operation
+	
+		allowed = {
+			tag = ENG
+		}
+		
+		available = { #Dublicate of Visibility intented
+			DEN = {
+				is_subject = yes
+				NOT = {
+					is_in_faction_with = var:DEN.DEN_overlord_nation
+				}
+			}
+			has_war_with = var:DEN.DEN_overlord_nation
+			337 = {
+				is_controlled_by = DEN
+			}
+		}
+
+		cost = 50
+
+		fire_only_once = yes
+
+		ai_will_do = {
+			# We want to do this
+			base = 50
+			modifier = {
+				# Fascist Germany is a lot more scary than other versions of Germany
+				factor = 2 	
+				GER = {
+					has_government = fascism
+				}
+			}
+			modifier = {
+				# Iceland has gone their own path, so we can consolidate the North Sea
+				factor = 2 	
+				ICE = {
+					has_completed_focus = ICE_declare_absolute_neutrality
+				}
+			}
+			modifier = {
+				# Norway has already fallen, we are too late
+				factor = 6
+				any_country = {
+					has_government = democratic
+					original_tag = NOR
+					is_in_faction_with = ROOT
+					has_capitulated = yes
+				}
+			}
+		}
+		
+		visible = {
+			original_tag = ENG
+			DEN = {
+				is_subject = yes
+				NOT = {
+					is_in_faction_with = var:DEN.DEN_overlord_nation
+				}
+			}
+			has_war_with = var:DEN.DEN_overlord_nation
+			337 = {
+				is_controlled_by = DEN
+			}
+			has_dlc = "Arms Against Tyranny"
+		}
+		
+		complete_effect = {
+			DEN = { country_event = { id = AAT_USA_events.02 days = 2 } }
+			add_popularity = { 
+				ideology = ROOT 
+				popularity = -0.02
+			}
+			add_stability = -0.01
+			ROOT = {
+				transfer_state = 337
+			}
+			337 = {
+				add_building_construction = {
+					type = air_base
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = coastal_bunker
+					level = 2
+					instant_build = yes
+					province = 13003
+				}	
+			}
+			hidden_effect = {
+				set_global_flag = ENG_occuped_DEN_faroes
+			}
 		}
 	}
 	
@@ -9021,8 +9351,20 @@ operations = {
 			has_war_with = GER
 			IRE = { exists = yes }
 			NOT = { is_in_faction_with = IRE }
-			NOR = { has_capitulated = yes }
-			is_in_faction_with = NOR
+			IF = {
+				limit = {
+					NOR = { has_government = democratic }
+				}
+				NOR = { has_capitulated = yes }
+				is_in_faction_with = NOR
+			}
+			ELSE = {
+				any_country_with_original_tag = {
+					original_tag_to_check = NOR 
+					has_capitulated = yes
+					is_in_faction_with = ROOT
+				}
+			}
 			FRA = { has_capitulated = yes }
 			is_in_faction_with = FRA
 		}
@@ -9060,6 +9402,7 @@ operations = {
 			add_state_claim = 134
 			add_state_claim = 135
 			declare_war_on = { target = IRE type = annex_everything }
+			add_stability = -0.05
 			add_popularity = { ideology = democratic popularity = -0.03 }
 		}
 	}

@@ -1,0 +1,202 @@
+############################################################################################################
+#	Expert AI mod
+############################################################################################################
+
+EAI_PR_priority_research_update_daily = {
+
+	EAI_PR_block_research = yes
+
+	# On research completed
+	if = { limit = { check_variable = { EAI_prev_researched_techs_num < researched_techs^num } }
+
+		set_variable = { EAI_prev_researched_techs_num = researched_techs^num }
+
+		EAI_PR_clean_priority_research_queue = yes
+		EAI_PR_priority_research_update = yes
+	}
+
+	EAI_PR_select_priority_tech = yes
+}
+
+EAI_PR_priority_research_update = {
+
+	EAI_priority_research_strategies = yes
+
+	EAI_PR_sort_priority_research_queue = yes
+
+	if = { limit = { has_country_flag = EAI_priority_research_logging } EAI_PR_print_queue = yes }
+}
+
+###
+
+# If there is a queue with consecutive techs (concentrated_industry2 > concentrated_industry3), research has to be blocked in the moment where a tech slot becomes free in order to give the priority system time to select the next tech
+EAI_PR_block_research = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_block_research_update } }
+
+		set_temp_variable = { active_researchs_num = 0 }
+
+		for_each_loop = { array = global.technology
+
+			if = { limit = { check_variable = { i > 0 } is_researching_technology = var:v }
+
+				add_to_temp_variable = { active_researchs_num = 1 }
+			}
+		}
+
+		if = { limit = { check_variable = { active_researchs_num = amount_research_slots } }
+
+			set_country_flag = { flag = EAI_PR_block_research value = 1 days = 9 }
+			set_country_flag = { flag = EAI_PR_block_priority_research value = 1 days = 6 }
+			set_country_flag = { flag = EAI_block_research_update value = 1 days = 3 }
+		}
+	}
+}
+
+EAI_PR_add_to_priority_research_queue = {
+
+	if = {
+		limit = {
+			NOT = {
+				is_researching_technology = var:_prio_tech
+				has_tech = var:_prio_tech
+			}
+		}
+
+		if = { limit = { check_variable = { _prio_val > EAI_priority_research_value^_prio_tech } }
+
+			set_variable = { EAI_priority_research_value^_prio_tech = _prio_val }
+			set_temp_variable = { sort_priority_list = 1 }
+			set_temp_variable = { print_change = 1 }
+		}
+
+		if = { limit = { NOT = { is_in_array = { EAI_priority_research_queue = _prio_tech } } }
+
+			add_to_array = { EAI_priority_research_queue = _prio_tech }
+			set_temp_variable = { sort_priority_list = 1 }
+			set_temp_variable = { print_change = 1 }
+		}
+
+		if = { limit = { check_variable = { print_change = 1 } has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: added [?_prio_tech.GetTokenKey] prio = [?_prio_val]" }
+	}
+
+	set_temp_variable = { print_change = 0 }
+	set_temp_variable = { _prio_tech = 0 }
+	set_temp_variable = { _prio_val = 0 }
+}
+
+EAI_PR_clean_priority_research_queue = {
+
+	if = { limit = { has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: EAI_PR_clean_priority_research_queue" }
+
+	clear_array = EAI_priority_research_block_techs
+
+	if = { limit = { check_variable = { EAI_priority_research_queue^num > 0 } }
+
+		for_each_loop = { array = EAI_priority_research_queue
+
+			if = {
+				limit = {
+					OR = {
+						is_researching_technology = var:v
+						has_tech = var:v
+					}
+				}
+
+				add_to_temp_array = { remove_priority_research_array = v }
+			}
+		}
+
+		if = { limit = { check_variable = { remove_priority_research_array^num > 0 } }
+
+			for_each_loop = { array = remove_priority_research_array
+		
+				remove_from_array = { array = EAI_priority_research_queue value = v }
+
+				if = { limit = { has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: removed [?v.GetTokenKey]" }
+			}
+		}
+
+		clear_temp_array = remove_priority_research_array
+	}
+}
+
+EAI_PR_sort_priority_research_queue = {
+
+	if = { limit = { check_variable = { sort_priority_list = 1 } }
+
+		set_temp_variable = { sort_tech = 1 }
+		while_loop_effect = { break = break_1
+			limit = {
+				check_variable = { sort_tech < EAI_priority_research_queue^num }
+			}
+
+			set_temp_variable = { _prio_tech = EAI_priority_research_queue^sort_tech }
+
+			set_temp_variable = { j = sort_tech }
+			subtract_from_temp_variable = { j = 1 }
+
+			while_loop_effect = { break = break_2
+				limit = {
+					check_variable = { var = j value = 0 compare = greater_than_or_equals }
+
+					set_temp_variable = { prio_tech_j = EAI_priority_research_queue^j }
+					check_variable = { EAI_priority_research_value^prio_tech_j < EAI_priority_research_value^_prio_tech }
+				}
+
+				set_temp_variable = { j2 = j }
+				add_to_temp_variable = { j2 = 1 }
+				set_variable = { EAI_priority_research_queue^j2 = EAI_priority_research_queue^j }
+
+				subtract_from_temp_variable = { j = 1 }
+			}
+
+			set_temp_variable = { j3 = j }
+			add_to_temp_variable = { j3 = 1 }
+			set_variable = { EAI_priority_research_queue^j3 = _prio_tech }
+
+			###
+
+			add_to_temp_variable = { sort_tech = 1 }
+		}
+	}
+
+	set_temp_variable = { sort_priority_list = 0 }
+}
+
+EAI_PR_select_priority_tech = {
+
+	set_temp_variable = { tmp_priority_research_current_tech = EAI_priority_research_current_tech }
+	set_variable = { EAI_priority_research_current_tech = 0 }
+
+	for_each_loop = { array = EAI_priority_research_queue
+
+		if = { 
+			limit = { 
+				can_research = var:v 
+				NOT = { 
+					is_researching_technology = var:v 
+					is_in_array = { EAI_priority_research_block_techs = v } 
+				} 
+			}
+
+			if = { limit = { NOT = { check_variable = { tmp_priority_research_current_tech = v } } has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: selected [?v.GetTokenKey]" }
+
+			set_variable = { EAI_priority_research_current_tech = v }
+
+			set_temp_variable = { break = 1 }
+		}
+	}
+
+	set_temp_variable = { break = 0 }
+}
+
+EAI_PR_print_queue = {
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: queue: (next = [?EAI_priority_research_current_tech.GetTokenKey])"
+
+	for_each_loop = { array = EAI_priority_research_queue
+
+		log = "> [?v.GetTokenKey] - [?EAI_priority_research_value^v]"
+	}
+}

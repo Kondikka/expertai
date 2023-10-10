@@ -1,0 +1,331 @@
+############################################################################################################
+# 	Expert AI mod - priority construction AI
+############################################################################################################
+
+### Refineries
+
+@EAI_PC_build_refineries_TYPE_ID = 1
+@EAI_PC_build_refineries_PRIO = 1000
+EAI_PC_build_refineries = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_REF }
+	set_temp_variable = { _project_type_id = @EAI_PC_build_refineries_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_build_refineries_PRIO }
+	set_temp_variable = { _project_cancel_unbuildable = 1 }
+
+	EAI_PC_build_refineries_STRATEGIES = yes
+
+	if = {
+		limit = {
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+
+			###
+
+			check_variable = { EAI_PC_build_refineries_STRATEGIES = 1 }
+		}
+
+		if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
+
+			EAI_get_shared_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+
+			if = { limit = { EAI_PC_can_build_project = yes NOT = { EAI_PC_has_same_type_project_here = yes } }
+
+				EAI_PC_start_project = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_build_refineries_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_build_refineries_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+			OR = {
+
+				### Strategies
+
+				# AND = {
+				# 	check_variable = { EAI_rubber_resource_shortage = 3 }
+				# }
+		
+				AND = {
+					tag = GER
+		
+					synthetic_refinery < 20
+		
+					date > 1938.1.1
+					date < 1941.1.1
+				}
+			}
+		}
+	
+		set_temp_variable = { EAI_PC_build_refineries_STRATEGIES = 1 }
+	}
+}
+
+### Silos
+
+@EAI_PC_build_fuel_silos_TYPE_ID = 2
+@EAI_PC_build_fuel_silos_PRIO = 1000
+EAI_PC_build_fuel_silos = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_SILO }
+	set_temp_variable = { _project_type_id = @EAI_PC_build_fuel_silos_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_build_fuel_silos_PRIO }
+	set_temp_variable = { _project_cancel_unbuildable = 1 }
+
+	EAI_PC_build_fuel_silos_STRATEGIES = yes
+
+	if = {
+		limit = {
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+
+			###
+
+			check_variable = { EAI_PC_build_fuel_silos_STRATEGIES = 1 }
+		}
+
+		if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
+
+			EAI_get_shared_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+
+			if = { limit = { EAI_PC_can_build_project = yes NOT = { EAI_PC_has_same_type_project_here = yes } }
+
+				EAI_PC_start_project = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_build_fuel_silos_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_build_fuel_silos_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+			OR = {
+
+				### Strategies
+
+				AND = {
+					tag = JAP
+		
+					check_variable = { max_fuel_k < 2000 }
+
+					check_variable = { EAI_PC_built_type_PC_SILO_num < 15 }
+		
+					num_of_civilian_factories > 50
+				}
+
+				AND = {
+					tag = ENG
+		
+					check_variable = { max_fuel_k < 2500 }
+
+					check_variable = { EAI_PC_built_type_PC_SILO_num < 20 }
+		
+					num_of_civilian_factories > 50
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_PC_build_fuel_silos_STRATEGIES = 1 }
+	}
+}
+
+### Radar
+
+@EAI_PC_build_radar_TYPE_ID = 3
+@EAI_PC_build_radar_PRIO = 1900
+EAI_PC_build_radar = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_RADAR }
+	set_temp_variable = { _project_type_id = @EAI_PC_build_radar_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_build_radar_PRIO }
+	set_temp_variable = { _project_cancel_unbuildable = 1 }
+
+	EAI_PC_build_radar_STRATEGIES = yes
+
+	if = { 
+		limit = { 
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+
+			###
+
+			check_variable = { EAI_PC_build_radar_STRATEGIES = 1 }
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_PC_build_radar" }
+
+		random_scope_in_array = { array = controlled_states 
+			limit = { 
+				EAI_radar_location_2 = yes 
+				EAI_PC_can_build_project = yes 
+				NOT = { EAI_PC_has_same_type_project_here = yes } 
+			}
+
+			EAI_PC_start_project = yes
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_build_radar_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_build_radar_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+			OR = {
+
+				### Strategies
+
+				AND = {
+					threat > 0.5
+
+					any_of_scopes = { array = controlled_states 
+
+						EAI_radar_location_2 = yes 
+						EAI_PC_can_build_project = yes 
+						NOT = { EAI_PC_has_same_type_project_here = yes } 
+					}
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_PC_build_radar_STRATEGIES = 1 }
+	}
+}
+
+### Infrastructure
+
+@EAI_PC_resource_extraction_TYPE_ID = 4
+@EAI_PC_resource_extraction_PRIO = 1000
+EAI_PC_resource_extraction = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_INF }
+	set_temp_variable = { _project_type_id = @EAI_PC_resource_extraction_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_resource_extraction_PRIO }
+	set_temp_variable = { _project_cancel_unbuildable = 1 }
+
+	EAI_PC_resource_extraction_STRATEGIES = yes
+	
+	if = {
+		limit = {
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+
+			###
+
+			check_variable = { EAI_PC_resource_extraction_STRATEGIES = 1 }
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_PC_resource_extraction" }
+
+		if = { limit = { check_variable = { EAI_has_resource_slot_scores = 0 } }
+
+			EAI_get_resource_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_resource_slot_scores
+
+			if = { 
+				limit = { 
+					EAI_PC_can_build_project = yes
+					NOT = { EAI_PC_has_same_type_project_here = yes }
+				}
+
+				EAI_PC_start_project = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_resource_extraction_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_resource_extraction_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+			OR = {
+
+				### Strategies
+
+				# Needs resources and has a state with a lot of resources
+				AND = {
+					any_of_scopes = { array = controlled_states
+
+						EAI_PC_can_build_project = yes
+						NOT = { EAI_PC_has_same_type_project_here = yes }
+
+						OR = {
+							AND = { has_resources_amount = { resource = oil amount > 50 } 			ROOT = { has_war = yes fuel_ratio < 0.5 } }
+							AND = { has_resources_amount = { resource = aluminium amount > 50 } 	check_variable = { ROOT.EAI_needs_aluminium = 3 } }
+							AND = { has_resources_amount = { resource = rubber amount > 50 } 		check_variable = { ROOT.EAI_needs_rubber = 3 } }
+							AND = { has_resources_amount = { resource = tungsten amount > 50 } 		check_variable = { ROOT.EAI_needs_tungsten = 3 } }
+							AND = { has_resources_amount = { resource = steel amount > 50 } 		check_variable = { ROOT.EAI_needs_steel = 3 } }
+							AND = { has_resources_amount = { resource = chromium amount > 50 } 		check_variable = { ROOT.EAI_needs_chromium = 3 } }
+						}
+					}
+				}
+
+				# Minors increase resources for trade and to help faction
+				AND = {
+					is_major = no
+
+					OR = {
+						has_war = no
+						AND = {
+							NOT = { has_country_flag = EAI_MILITARY_trend_losing_war }
+							any_allied_country = {
+								is_major = yes
+							}
+						}
+					}
+
+					any_of_scopes = { array = controlled_states
+
+						EAI_PC_can_build_project = yes
+						NOT = { EAI_PC_has_same_type_project_here = yes }
+
+						OR = {
+							AND = { has_resources_amount = { resource = oil amount > 50 } }
+							AND = { has_resources_amount = { resource = aluminium amount > 50  }
+							AND = { has_resources_amount = { resource = rubber amount > 50  }
+							AND = { has_resources_amount = { resource = tungsten amount > 50  }
+							AND = { has_resources_amount = { resource = steel amount > 50  }
+							AND = { has_resources_amount = { resource = chromium amount > 50  }
+						}
+					}
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_PC_resource_extraction_STRATEGIES = 1 }
+	}
+}

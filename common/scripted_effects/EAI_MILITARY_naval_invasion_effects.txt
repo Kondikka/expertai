@@ -1,0 +1,346 @@
+############################################################################################################
+#	Expert AI mod - scripted invasion AI effects
+############################################################################################################
+
+### Selects the preferred invasion target
+
+EAI_INVASION_update_strategy = {
+
+	# Block invasions against targets that definitely should not be invaded
+	EAI_INVASION_block_targets = yes
+
+	# List of eligible targets for preferred invasion
+	clear_temp_array = updated_naval_invasion_targets
+	every_other_country = { limit = { EAI_INVASION_THIS_is_valid_target_of_ROOT = yes } 
+		
+		add_to_temp_array = { array = updated_naval_invasion_targets value = THIS.id }
+	}
+
+	# Cancel previous preferred target
+	EAI_INVASION_cancel_invalid_target = yes
+	
+	# Select a preferred invasion target
+	if = { limit = { EAI_INVASION_enable = yes }
+
+		resize_temp_array = { naval_invasion_priorities = 5 }
+		for_each_loop = { array = naval_invasion_priorities index = invasion_prio break = selected_invasion_target
+
+			### Invasion priorities
+
+			if = { 		limit = { check_variable = { invasion_prio = 0 } } EAI_INVASION_player_coordinated_invasion = yes }
+			
+			else_if = { limit = { check_variable = { invasion_prio = 1 } } EAI_INVASION_historical_invasions = yes }
+
+			else_if = { limit = { check_variable = { invasion_prio = 2 } } EAI_INVASION_support_leader_invasion = yes }
+
+			else_if = { limit = { check_variable = { invasion_prio = 3 } } EAI_INVASION_support_strongest_ally_invasion = yes }
+
+			else_if = { limit = { check_variable = { invasion_prio = 4 } } EAI_INVASION_invasion_target_selector = yes }
+		}
+	}
+	else = {
+
+		EAI_INVASION_cancel_target = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_cancelled_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: no target selected" } 
+		set_temp_variable = { log_cancelled_invasion = 0 }
+	}
+}
+
+###
+
+EAI_INVASION_cancel_invalid_target = {
+
+	if = { 
+		limit = { 
+			has_variable = EAI_naval_invasion_target 
+
+			NOT = { EAI_INVASION_THIS_is_coordinated_invasion_target_of_ROOT = yes }
+			
+			var:EAI_naval_invasion_target = { EAI_INVASION_ROOT_cancel_invasion_target_on_THIS = yes }
+		}
+		
+		if = {
+			limit = {
+				any_enemy_country = { 
+					is_in_array = { array = updated_naval_invasion_targets value = THIS.id }
+					NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT }
+				}
+			} 
+			
+			var:EAI_naval_invasion_target = {
+				set_country_flag = { flag = EAI_stop_invasions_@ROOT value = 1 days = 30 }
+			}
+		}
+		
+		EAI_INVASION_cancel_target = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_cancelled_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_cancel_invalid_target" } 
+		set_temp_variable = { log_cancelled_invasion = 0 }
+	}
+}
+
+###
+
+EAI_INVASION_player_coordinated_invasion = {
+
+	if = { 
+		limit = { 
+			any_other_country = {
+				EAI_PREV_on_same_side_with_THIS = yes
+				has_country_flag = EAI_coordinated_naval_invasion
+				set_temp_variable = { coordinated_naval_invasion_iniatiator = THIS.id }
+			}
+		}
+		
+		var:coordinated_naval_invasion_iniatiator = {
+
+			var:EAI_coordinated_naval_invasion_target = {
+
+				if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+
+					ROOT = {
+						set_variable = { EAI_coordinated_naval_invasion_iniatiator = coordinated_naval_invasion_iniatiator }
+						EAI_INVASION_set_target = yes
+					}
+
+					if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_started_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_player_coordinated_invasion" } 
+					set_temp_variable = { log_started_invasion = 0 }
+				}
+			}
+		}
+
+		set_temp_variable = { selected_invasion_target = 1 }
+	}
+}
+
+EAI_INVASION_support_leader_invasion = {
+
+	if = {
+		limit = {
+			NOT = { is_faction_leader = yes }
+
+			OR = {
+				var:faction_leader = { 
+					has_variable = EAI_naval_invasion_target
+					NOT = { tag = ROOT }
+					has_capitulated = no
+					var:EAI_naval_invasion_target = { is_major = yes }
+					set_temp_variable = { leader_invasion_target = EAI_naval_invasion_target }
+				}
+				var:overlord = { 
+					has_variable = EAI_naval_invasion_target
+					NOT = { tag = ROOT }
+					has_capitulated = no
+					var:EAI_naval_invasion_target = { is_major = yes }
+					set_temp_variable = { leader_invasion_target = EAI_naval_invasion_target }
+				}
+			}
+		}
+
+		var:leader_invasion_target = {
+
+			if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+
+				ROOT = { 
+					EAI_INVASION_cancel_target = yes
+					EAI_INVASION_set_target = yes
+				}
+
+				if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_started_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_support_leader_invasion" } 
+				set_temp_variable = { log_started_invasion = 0 }
+			}
+		}
+
+		set_temp_variable = { selected_invasion_target = 1 }
+	}
+}
+
+EAI_INVASION_support_strongest_ally_invasion = {
+
+	if = {
+		limit = {
+			has_army_manpower = { size > 250000 }
+		
+			OR = {
+				is_faction_leader = no
+				has_capitulated = yes
+			}
+
+			any_allied_country = {
+				NOT = { tag = ROOT }
+				has_variable = EAI_naval_invasion_target
+				NOT = {
+					any_allied_country = {
+						NOT = { tag = ROOT }
+						strength_ratio = { tag = PREV ratio > 1.0 }
+					}
+				}
+				set_temp_variable = { strongest_member_invasion_target = EAI_naval_invasion_target }
+			}
+		}
+
+		var:strongest_member_invasion_target = {
+
+			if = { limit = { NOT = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+
+				ROOT = { 
+					EAI_INVASION_cancel_target = yes
+					EAI_INVASION_set_target = yes
+				}
+
+				if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_started_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_support_strongest_ally_invasion" } 
+				set_temp_variable = { log_started_invasion = 0 }
+			}
+		}
+
+		set_temp_variable = { selected_invasion_target = 1 }
+	}
+}
+
+EAI_INVASION_historical_invasions = {
+
+	if = { limit = { any_of_scopes = { array = updated_naval_invasion_targets EAI_INVASION_invasion_strategies = yes  } }
+			
+		random_scope_in_array = { array = updated_naval_invasion_targets limit = { EAI_INVASION_invasion_strategies = yes }
+			
+			ROOT = { EAI_INVASION_set_target = yes }
+			
+			if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_started_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_historical_invasions" } 
+			set_temp_variable = { log_started_invasion = 0 }
+		}
+
+		set_temp_variable = { selected_invasion_target = 1 }
+	}
+}
+
+EAI_INVASION_invasion_target_selector = {
+
+	if = { limit = { check_variable = { EAI_invasion_target_country = 0 } }
+
+		set_temp_variable = { EAI_invasion_min_distance = 99999 }
+		set_temp_variable = { EAI_invasion_target_country = 0 }
+
+		for_each_scope_loop = { array = updated_naval_invasion_targets
+
+			for_each_scope_loop = { array = core_states 
+			
+				if = { limit = { is_controlled_by = PREV }
+
+					for_each_scope_loop = { array = ROOT.core_states 
+
+						if = { 
+							limit = { 
+								is_controlled_by = ROOT 
+								check_variable = { EAI_invasion_min_distance > distance_to@PREV } 
+							}
+
+							set_temp_variable = { EAI_invasion_min_distance = distance_to@PREV }
+							set_temp_variable = { EAI_invasion_target_country = PREV.PREV.id }
+						}
+					}
+				}
+			}
+		}
+
+		if = { limit = { NOT = { check_variable = { EAI_invasion_target_country = 0 } } }
+
+			var:EAI_invasion_target_country = { 
+
+				ROOT = { EAI_INVASION_set_target = yes }
+
+				if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging check_variable = { log_started_invasion = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: reason: EAI_INVASION_invasion_target_selector" } 
+				set_temp_variable = { log_started_invasion = 0 }
+			}
+
+			set_temp_variable = { selected_invasion_target = 1 }
+		}
+	}
+}
+
+###
+
+EAI_INVASION_set_target = { # THIS = INVADER, PREV = TARGET
+
+	if = { limit = { NOT = { check_variable = { EAI_naval_invasion_target = PREV.id } } }
+
+		set_country_flag = { flag = EAI_naval_invasion_min_duration value = 1 days = 150 }	
+		set_country_flag = { flag = EAI_naval_invasion_max_duration value = 1 days = 270 }	
+		set_variable = { EAI_naval_invasion_target = PREV.id }
+
+		for_each_scope_loop = { array = PREV.controlled_states
+		
+			if = { limit = { is_coastal = yes }
+			
+				add_to_array = { array = PREV.EAI_naval_invasion_target_states value = THIS.id }
+			}
+		}
+		
+		PREV = { set_country_flag = { flag = EAI_naval_invasion_from_@PREV value = 1 days = 180 } }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: set preferred target = [?EAI_naval_invasion_target.GetName]" } 
+		set_temp_variable = { log_started_invasion = 1 }
+	}
+}
+
+EAI_INVASION_cancel_target = { # THIS = INVADER
+
+	if = { limit = { has_variable = EAI_naval_invasion_target }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: cancelled preferred target = [?EAI_naval_invasion_target.GetName]" } 
+		set_temp_variable = { log_cancelled_invasion = 1 }
+
+		var:EAI_naval_invasion_target = {
+		
+			clr_country_flag = EAI_naval_invasion_from_@PREV 
+		}
+		
+		clear_array = EAI_naval_invasion_target_states
+		clr_country_flag = EAI_naval_invasion_min_duration
+		clear_variable = EAI_naval_invasion_target
+	}
+}
+
+EAI_INVASION_block_targets = {
+
+	clear_temp_array = invasion_block_targets
+
+	every_other_country = { limit = { EAI_INVASION_exclude_target = yes } 
+		
+		add_to_temp_array = { array = invasion_block_targets value = THIS.id }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_naval_invasion_logging NOT = { is_in_array = { array = EAI_INVASION_block_target value = PREV.id } } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: blocking invasion = [This.GetName]" } 
+	}
+
+	clear_array = EAI_INVASION_block_target
+
+	for_each_loop = { array = invasion_block_targets
+	
+		add_to_array = { EAI_INVASION_block_target = v }
+	}
+}
+
+EAI_INVASION_print_target = {
+
+	log = "[GetYear] [GetMonth] | AI | [Root.GetName] | INVASION: current target = [?EAI_naval_invasion_target.GetTag]"
+
+	every_other_country = { limit = { EAI_INVASION_THIS_is_valid_target_of_ROOT = yes } 
+	
+		log = "EAI_INVASION_THIS_is_valid_target_of_ROOT = [This.GetTag]"
+	}
+
+	every_other_country = { limit = { EAI_INVASION_invasion_strategies = yes } 
+	
+		log = "EAI_INVASION_invasion_strategies = [This.GetTag]"
+	}
+
+	every_other_country = { limit = { EAI_INVASION_block_invasion_strategies = yes } 
+	
+		log = "EAI_INVASION_block_invasion_strategies = [This.GetTag]"
+	}
+
+	for_each_loop = { array = EAI_INVASION_block_targets
+	
+		log = "EAI_INVASION_block_targets: [?v.getname]"
+	}
+}

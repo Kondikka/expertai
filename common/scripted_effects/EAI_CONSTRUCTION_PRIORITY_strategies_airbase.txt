@@ -1,0 +1,930 @@
+############################################################################################################
+# 	Expert AI mod - priority construction AI
+############################################################################################################
+
+###############################################################
+###		Airbase construction strategies
+###############################################################
+
+@EAI_PC_AIRBASE_strategies_TYPE_ID = 20
+@EAI_PC_AIRBASE_strategies_PRIO = 0
+EAI_PC_AIRBASE_strategies = {
+
+	set_temp_variable = { strategy_type_id = @EAI_PC_AIRBASE_strategies_TYPE_ID }
+
+	if = {
+		limit = {
+			EAI_wants_to_build_aircraft = yes
+			check_variable = { num_deployed_planes > 1000 }
+			num_of_civilian_factories_available_for_projects > 10
+		}
+
+		###
+
+		EAI_PC_AIRBASE_country_strategies = yes
+
+		### EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY
+
+		if = {
+			limit = {
+				always = yes
+			}
+
+			every_enemy_country = { EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = yes }
+
+			EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = yes
+
+			if = { limit = { NOT = { check_variable = { best_scored_target_ = 0 } } }
+
+				set_temp_variable = { _project_building_type = global.EAI_PC_AIR }
+				set_temp_variable = { _project_building_type_id = strategy_type_id }
+				set_temp_variable = { _project_building_prio = @EAI_PC_AIRBASE_strategies_PRIO }
+				var:best_scored_target_ = { EAI_PC_start_project = yes }
+
+				if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AIRBASE: EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = [?best_scored_target_.GetName] - [?best_target_score_]" }
+			}
+		}
+
+		### _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY
+
+		if = {
+			limit = {
+				any_controlled_state = { is_coastal = yes }
+			}
+
+			every_enemy_country = { EAI_PC_AIRBASE_get_best_target_on_isolated_states_ADD_TO_ARRAY = yes }
+
+			_AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = yes
+
+			if = { limit = { NOT = { check_variable = { best_scored_target_ = 0 } } }
+				
+				set_temp_variable = { _project_building_type = global.EAI_PC_AIR }
+				set_temp_variable = { _project_building_type_id = strategy_type_id } add_to_temp_variable = { _project_building_type_id = 1 }
+				set_temp_variable = { _project_building_prio = @EAI_PC_AIRBASE_strategies_PRIO }
+				var:best_scored_target_ = { EAI_PC_start_project = yes }
+
+				if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AIRBASE: _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = [?best_scored_target_.GetName] - [?best_target_score_]" }
+			}
+		}
+	}
+}
+
+EAI_PC_AIRBASE_country_strategies = {
+
+	### USA
+
+	if = { limit = { ROOT = { tag = USA } }
+
+		if = { 
+			limit = { 
+				date > 1940.1.1
+				JAP = { EAI_THIS_is_threat_to_PREV = yes }
+			}
+
+			JAP = { EAI_PC_AIRBASE_get_best_target_on_isolated_states_ADD_TO_ARRAY = yes }
+		}
+	}
+
+	### JAP
+
+	if = { limit = { ROOT = { tag = JAP } }
+
+		if = { 
+			limit = { 
+				threat > 0.9
+				OR = {
+					USA = { EAI_THIS_is_threat_to_PREV = yes }
+					AND = {
+						any_enemy_country = { is_major = yes }
+						alliance_naval_strength_ratio < 3
+					}
+				}
+				OR = {
+					NOT = { CHI = { EAI_THIS_is_threat_to_PREV = yes } }
+					CHI = { surrender_progress > 0.7 }
+					has_country_flag = EAI_MILITARY_trend_winning_war
+					AND = {
+						any_enemy_country = { is_major = yes }
+						alliance_naval_strength_ratio < 3
+					}
+				}
+			}
+
+			every_country = {
+				limit = {
+					OR = {
+						tag = USA
+						is_in_faction_with = ENG
+					}
+					EAI_THIS_is_threat_to_PREV = yes
+				}
+
+				EAI_PC_AIRBASE_get_best_target_on_isolated_states_ADD_TO_ARRAY = yes
+			}
+		}
+	}
+
+	### GER 
+
+	if = { limit = { ROOT = { tag = GER } }
+
+		if = { 
+			limit = { 
+				date > 1940.1.1
+				any_other_country = {
+					is_in_faction_with = SOV
+					EAI_THIS_is_threat_to_PREV = yes
+				}
+			}
+
+			every_country = {
+				limit = {
+					is_in_faction_with = SOV
+					EAI_THIS_is_threat_to_PREV = yes
+				}
+
+				EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = yes
+			}
+		}
+	}
+
+	### SOV 
+
+	if = { limit = { ROOT = { tag = SOV } }
+
+		if = { 
+			limit = { 
+				date > 1940.1.1
+				any_other_country = {
+					is_in_faction_with = GER
+					EAI_THIS_is_threat_to_PREV = yes
+				}
+			}
+
+			every_country = {
+				limit = {
+					is_in_faction_with = GER
+					EAI_THIS_is_threat_to_PREV = yes
+				}
+
+				EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = yes
+			}
+		}
+	}
+}
+
+EAI_PC_AIRBASE_test = {
+
+	every_state = {
+
+		set_variable = { EAI_debug_value = 0 }
+		set_variable = { EAI_debug_value_2 = 0 }
+	}
+
+	set_country_flag = EAI_PC_AIRBASE_score_logging
+	set_temp_variable = { _project_building_type = global.EAI_PC_AIR }
+
+	###
+
+	# POL = { EAI_PC_AIRBASE_get_best_target_on_borders_VS_COUNTRY = yes }
+
+	###
+
+	EAI_PC_AIRBASE_get_best_target_on_borders_VS_ENEMIES = yes
+	# EAI_PC_AIRBASE_get_best_target_on_isolated_states_VS_ENEMIES = yes
+
+	###
+
+	# every_country = {
+	# 	limit = {
+	# 		is_in_faction_with = GER
+	# 		EAI_THIS_is_threat_to_PREV = yes
+	# 	}
+
+	# 	EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = yes
+	# }
+	# ROOT = { 
+	# 	every_enemy_country = {
+	# 		EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = yes
+	# 	}
+	# }
+	# JAP = { EAI_PC_AIRBASE_get_best_target_on_isolated_states_ADD_TO_ARRAY = yes }
+	# _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = yes
+	# EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = yes
+	
+	# EAI_PC_AIRBASE_strategies = yes
+
+	###
+
+	clr_country_flag = EAI_PC_AIRBASE_score_logging
+
+	force_update_map_mode = { limit = { always = yes } mapmode = debug_map_mode_airbase }
+}
+
+### EAI_PC_AIRBASE_get_best_target_on_borders
+
+EAI_PC_AIRBASE_get_best_target_on_borders_ADD_TO_ARRAY = {
+	
+	if = { limit = { NOT = { is_in_array = { EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = THIS.id } } }
+
+		add_to_temp_array = { EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = THIS.id }
+	}
+}
+
+EAI_PC_AIRBASE_get_best_target_on_borders_VS_ENEMIES = { 
+	
+	ROOT = { 
+		every_enemy_country = {
+			add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+		}
+	}
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_borders = yes }
+
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+EAI_PC_AIRBASE_get_best_target_on_borders_VS_COUNTRY = { # COUNTRY = CURRENT SCOPE
+
+	add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_borders = yes }
+
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY = { # TARGETS = EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY
+
+	for_each_scope_loop = { array = EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY
+		add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+	}
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_borders = yes }
+
+	clear_temp_array = EAI_PC_AIRBASE_get_best_target_on_borders_VS_ARRAY
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+EAI_PC_AIRBASE_get_best_target_on_borders = {
+
+	### Which states to evaluate
+
+	clear_temp_array = airbase_border_states
+	clear_temp_array = scored_target_states
+	
+	for_each_scope_loop = { array = controlled_states
+
+		if = {
+			limit = {
+				impassable = no
+
+				any_neighbor_state = {
+					CONTROLLER = {
+						is_in_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+					}
+				}
+			}
+
+			add_to_temp_array = { airbase_border_states = THIS.id }
+			add_to_temp_array = { scored_target_states = THIS.id }
+		}
+	}
+
+	### Get controlled states within radius of border states
+
+	set_temp_variable = { state_radius = 100 }
+	for_each_loop = { array = airbase_border_states value = tmp_border_state
+
+		for_each_scope_loop = { array = ROOT.controlled_states
+
+			if = { 
+				limit = { 
+					impassable = no
+					NOT = { is_in_array = { airbase_border_states = THIS.id } } 
+					NOT = {
+						any_neighbor_state = {
+							CONTROLLER = {
+								is_in_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+							}
+						}
+					}
+				}
+
+				var:tmp_border_state = {
+
+					if = { 
+						limit = { 
+							OR = {
+								check_variable = { distance_to@PREV < state_radius } 
+								PREV = { any_neighbor_state = { state = var:tmp_border_state } }
+							}
+						}
+
+						if = { limit = { NOT = { is_in_array = { scored_target_states = PREV.id } } }
+							add_to_temp_array = { scored_target_states = PREV.id }
+						}
+					}
+				}
+			}
+		}
+	}
+
+	### Calculate balance of airbases within a distance of each border state
+
+	set_temp_variable = { state_radius = 100 }
+	set_temp_variable = { enemy_state_radius = 150 }
+	for_each_loop = { array = airbase_border_states value = tmp_border_state
+
+		### Target country airbases in radius
+
+		for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+
+			for_each_scope_loop = { array = controlled_states
+
+				var:tmp_border_state = {
+
+					if = { limit = { check_variable = { distance_to@PREV < enemy_state_radius } }
+
+						add_to_temp_variable = { enemy_airbases_in_range_@THIS = PREV.building_level@air_base }
+					}
+				}
+			}
+		}
+
+		### Own airbases in radius
+
+		for_each_scope_loop = { array = ROOT.controlled_states
+
+			var:tmp_border_state = {
+
+				if = { limit = { check_variable = { distance_to@PREV < state_radius } }
+
+					add_to_temp_variable = { owned_airbases_in_range_@THIS = PREV.building_level@air_base }
+				}
+			}
+		}
+
+		var:tmp_border_state = {
+			set_temp_variable = { airbase_balance_@THIS = owned_airbases_in_range_@THIS }
+			subtract_from_temp_variable = { airbase_balance_@THIS = enemy_airbases_in_range_@THIS }
+		}
+	}
+
+	###
+
+	set_temp_variable = { _AIRBASE_get_wanted_airbases_deploy_fraction = 0.5 }
+	EAI_PC_AIRBASE_get_num_wanted_airbases = yes
+
+	######################################################
+	### Final score calculation
+	######################################################
+
+	set_temp_variable = { EAI_PC_AIRBASE_get_airbase_balance_score_WEIGHT = 15 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_wanted_airbases_score_WEIGHT = 15 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_distance_score_WEIGHT = 10 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_airbase_level_score_WEIGHT = 5 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_infra_level_score_WEIGHT = 5 }
+
+	clear_temp_array = scored_target_states_scores
+	resize_temp_array = { scored_target_states_scores = scored_target_states^num }
+	for_each_loop = { array = scored_target_states value = tmp_potential_target_state index = tmp_potential_target_state_index
+
+		var:tmp_potential_target_state = { if = { limit = { always = yes }
+
+			clear_temp_array = modifier_score_factors
+			clear_temp_array = modifier_score_weights
+
+			######################################################
+			### Weighed modifiers
+			######################################################
+
+			set_temp_variable = { state_radius = 100 }
+			clear_temp_array = _AIRBASE_get_airbase_balance_score_targets
+			for_each_scope_loop = { array = airbase_border_states
+				if = { 
+					limit = { 
+						check_variable = { distance_to@PREV < state_radius } 
+						check_variable = { airbase_balance_@THIS < 0 } 
+					}
+
+					add_to_temp_array = { _AIRBASE_get_airbase_balance_score_targets = THIS.id }
+				}
+			}
+			EAI_PC_AIRBASE_get_airbase_balance_score = yes
+			
+			set_temp_variable = { state_radius = 100 }
+			clear_temp_array = _AIRBASE_get_wanted_airbases_score_targets
+			for_each_scope_loop = { array = airbase_border_states
+				if = { limit = { check_variable = { distance_to@PREV < state_radius } }
+
+					set_temp_variable = { _AIRBASE_get_wanted_airbases_owned_airbases_@THIS = owned_airbases_in_range_@THIS }
+					add_to_temp_array = { _AIRBASE_get_wanted_airbases_score_targets = THIS.id }
+				}
+			}
+			EAI_PC_AIRBASE_get_wanted_airbases_score = yes
+			
+			set_temp_variable = { _preferred_max_distance = 100 }
+			EAI_PC_AIRBASE_get_distance_score = yes
+
+			EAI_PC_AIRBASE_get_airbase_size_score = yes
+
+			EAI_PC_AIRBASE_get_infrastructure_score = yes
+
+			######################################################
+
+			EAI_PC_SCORE_get_weighed_score = yes
+
+			######################################################
+			### Final score modifiers
+			######################################################
+
+			EAI_PC_AIRBASE_final_score_build_on_existing_airbase_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_airbase_maxed_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_over_wanted_airbases_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_already_building_airbase_here_modifier = yes
+			
+			EAI_PC_SCORE_final_score_not_fully_controlled_modifier = yes
+
+			######################################################
+
+			EAI_PC_SCORE_get_final_score = yes
+		} }
+	}
+
+	###
+
+	EAI_PC_SCORE_select_best_target = yes
+}
+
+### EAI_PC_AIRBASE_get_best_target_on_isolated_states
+
+EAI_PC_AIRBASE_get_best_target_on_isolated_states_ADD_TO_ARRAY = {
+	
+	if = { limit = { NOT = { is_in_array = { _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = THIS.id } } }
+
+		add_to_temp_array = { _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = THIS.id }
+	}
+}
+
+EAI_PC_AIRBASE_get_best_target_on_isolated_states_VS_ENEMIES = { 
+	
+	ROOT = { 
+		every_enemy_country = {
+			add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+		}
+	}
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_isolated_states = yes }
+
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+EAI_PC_AIRBASE_get_best_target_on_isolated_states_VS_COUNTRY = { # COUNTRY = CURRENT SCOPE
+	
+	add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_isolated_states = yes }
+
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+_AIRBASE_get_best_target_on_isolated_states_VS_ARRAY = { # TARGETS = _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY
+	
+	for_each_scope_loop = { array = _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY
+		add_to_temp_array = { _AIRBASE_get_best_target_on_TARGET_COUNTRIES = THIS.id }
+	}
+
+	ROOT = { EAI_PC_AIRBASE_get_best_target_on_isolated_states = yes }
+
+	clear_temp_array = _AIRBASE_get_best_target_on_isolated_states_VS_ARRAY
+	clear_temp_array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+}
+
+EAI_PC_AIRBASE_get_best_target_on_isolated_states = {
+
+	### Get controlled isolated states
+	
+	clear_temp_array = scored_target_states
+	for_each_scope_loop = { array = controlled_states
+
+		if = { 
+			limit = { 
+				OR = {
+					EAI_is_island_state = yes
+
+					AND = {
+						set_temp_variable = { neighbor_state_exists = 0 }
+						any_neighbor_state = {
+							add_to_temp_variable = { neighbor_state_exists = 1 }
+							always = no
+						}
+					}
+					check_variable = { neighbor_state_exists < 2 }
+
+					AND = {
+						is_coastal = yes
+						set_temp_variable = { neighbor_state_exists = 0 }
+						any_neighbor_state = {
+							OR = {
+								is_controlled_by = ROOT
+								CONTROLLER = { tag = var:_AIRBASE_get_best_target_on_TARGET_COUNTRIES }
+							}
+							add_to_temp_variable = { neighbor_state_exists = 1 }
+							always = no
+						}
+					}
+					check_variable = { neighbor_state_exists = 0 }
+				}
+			}
+
+			add_to_temp_array = { scored_target_states = THIS.id }
+		}
+	}
+
+	###
+
+	set_temp_variable = { _AIRBASE_get_wanted_airbases_deploy_fraction = 0.25 }
+	EAI_PC_AIRBASE_get_num_wanted_airbases = yes
+
+	######################################################
+	### Final score calculation
+	######################################################
+
+	set_temp_variable = { EAI_PC_AIRBASE_get_wanted_airbases_score_WEIGHT = 10 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_distance_score_WEIGHT = 10 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_airbase_level_score_WEIGHT = 5 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_infra_level_score_WEIGHT = 1 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_naval_danger_score_WEIGHT = 5 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_nearby_airbases_score_WEIGHT = 5 }
+	
+	clear_temp_array = scored_target_states_scores
+	resize_temp_array = { scored_target_states_scores = scored_target_states^num }
+	for_each_loop = { array = scored_target_states value = tmp_potential_target_state index = tmp_potential_target_state_index
+
+		var:tmp_potential_target_state = { if = { limit = { always = yes }
+
+			clear_temp_array = modifier_score_factors
+			clear_temp_array = modifier_score_weights
+
+			######################################################
+			### Weighed modifiers
+			######################################################
+
+			clear_temp_array = _AIRBASE_get_wanted_airbases_score_targets
+			set_temp_variable = { _AIRBASE_get_wanted_airbases_owned_airbases_@THIS = building_level@air_base }
+			add_to_temp_array = { _AIRBASE_get_wanted_airbases_score_targets = THIS.id }
+			EAI_PC_AIRBASE_get_wanted_airbases_score = yes
+
+			set_temp_variable = { _preferred_max_distance = 500 }
+			EAI_PC_AIRBASE_get_distance_score = yes
+
+			EAI_PC_AIRBASE_get_airbase_size_score = yes
+
+			EAI_PC_AIRBASE_get_infrastructure_score = yes
+
+			EAI_PC_AIRBASE_get_naval_danger_score = yes
+
+			EAI_PC_AIRBASE_get_nearby_airbases_score = yes
+
+			######################################################
+
+			EAI_PC_SCORE_get_weighed_score = yes
+
+			######################################################
+			### Final score modifiers
+			######################################################
+
+			EAI_PC_AIRBASE_final_score_build_on_existing_airbase_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_airbase_maxed_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_over_wanted_airbases_modifier = yes
+
+			EAI_PC_AIRBASE_final_score_already_building_airbase_here_modifier = yes
+
+			EAI_PC_SCORE_final_score_not_fully_controlled_modifier = yes
+
+			######################################################
+
+			EAI_PC_SCORE_get_final_score = yes
+		} }
+	}
+
+	###
+
+	EAI_PC_SCORE_select_best_target = yes
+}
+
+### Misc functions
+
+EAI_PC_AIRBASE_get_potential_target_shortest_distance_to_targets = {
+
+	set_temp_variable = { best_distance = 100000 }
+	set_temp_variable = { worst_distance = 0 }
+
+	for_each_loop = { array = scored_target_states value = tmp_potential_target_state
+
+		var:tmp_potential_target_state = {
+
+			set_temp_variable = { state_best_distance_@THIS = 100000 }
+
+			for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+
+				for_each_scope_loop = { array = controlled_states
+
+					var:tmp_potential_target_state = {
+
+						if = { limit = { check_variable = { distance_to@PREV < state_best_distance_@THIS } }
+							set_temp_variable = { state_best_distance_@THIS = distance_to@PREV } 
+						}
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { state_best_distance_@THIS < best_distance } }
+				set_temp_variable = { best_distance = state_best_distance_@THIS }
+			}
+			if = { limit = { check_variable = { state_best_distance_@THIS > worst_distance } }
+				set_temp_variable = { worst_distance = state_best_distance_@THIS }
+			}
+		}
+	}
+}
+
+EAI_PC_AIRBASE_get_num_wanted_airbases = {
+
+	set_temp_variable = { wanted_airbases = ROOT.num_deployed_planes }
+	multiply_temp_variable = { wanted_airbases = _AIRBASE_get_wanted_airbases_deploy_fraction }
+
+	divide_temp_variable = { wanted_airbases = 200 }
+	round_temp_variable = wanted_airbases
+
+	clamp_temp_variable = { var = wanted_airbases min = 0 max = 10 }
+}
+
+EAI_PC_AIRBASE_get_min_max_distances = {
+
+	set_temp_variable = { min_distance_ = 10000 }
+	set_temp_variable = { max_distance_ = 0 }
+	for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+	
+		for_each_scope_loop = { array = controlled_states
+
+			for_each_loop = { array = scored_target_states
+			
+				var:v = {
+					if = { limit = { check_variable = { distance_to@PREV < min_distance_ } }
+						set_temp_variable = { min_distance_ = distance_to@PREV } 
+					}
+					if = { limit = { check_variable = { distance_to@PREV > max_distance_ } }
+						set_temp_variable = { max_distance_ = distance_to@PREV } 
+					}
+				}
+			}
+		}
+	}
+}
+
+### Final score modifiers
+
+EAI_PC_AIRBASE_final_score_build_on_existing_airbase_modifier = {
+
+	if = { limit = { NOT = { air_base > 0 } } 
+
+		multiply_temp_variable = { final_score = 0.75 } 
+	}
+}
+
+EAI_PC_AIRBASE_final_score_airbase_maxed_modifier = {
+
+	if = { limit = { NOT = { air_base < 10 } } 
+
+		multiply_temp_variable = { final_score = 0.0 } 
+	}
+}
+
+EAI_PC_AIRBASE_final_score_over_wanted_airbases_modifier = {
+
+	if = { limit = { check_variable = { building_level@air_base > wanted_airbases } }
+
+		multiply_temp_variable = { final_score = 0.5 } 
+	}
+}
+
+EAI_PC_AIRBASE_final_score_already_building_airbase_here_modifier = {
+
+	if = { 
+		limit = {
+			set_temp_variable = { _project_building_type = global.EAI_PC_AIR } 
+			EAI_PC_has_same_type_project_here = yes
+		}
+
+		multiply_temp_variable = { final_score = 0.0 } 
+	}
+}
+
+### Score weights
+
+# Prefers building closer to enemy
+EAI_PC_AIRBASE_get_distance_score = {
+
+	set_temp_variable = { state_best_distance = 100000 }
+	set_temp_variable = { is_neighbor = 0 } 
+	for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+
+		for_each_loop = { array = controlled_states
+
+			var:v = {
+	
+				var:tmp_potential_target_state = {
+	
+					if = { limit = { check_variable = { distance_to@PREV < state_best_distance } }
+						set_temp_variable = { state_best_distance = distance_to@PREV } 
+					}
+					if = { limit = { any_neighbor_state = { state = var:v } }
+						set_temp_variable = { is_neighbor = 1 } 
+					}
+				}
+			}
+		}
+	}
+
+	if = { limit = { check_variable = { is_neighbor = 1 } }
+	
+		set_temp_variable = { state_best_distance = 0 }
+	}
+
+	###
+
+	set_temp_variable = { distance_score_factor = state_best_distance }
+	clamp_temp_variable = { var = distance_score_factor min = 0 max = _preferred_max_distance }
+	divide_temp_variable = { distance_score_factor = _preferred_max_distance }
+
+	multiply_temp_variable = { distance_score_factor = -1 }
+	add_to_temp_variable = { distance_score_factor = 1 }
+	clamp_temp_variable = { var = distance_score_factor min = 0.0 max = 1.0 }
+
+	###
+
+	add_to_temp_array = { modifier_score_factors = distance_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_distance_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - distance_score_factor [?distance_score_factor] - weight [?EAI_PC_AIRBASE_get_distance_score_WEIGHT]" }
+
+	set_temp_variable = { _scale_to_min_max = 0 }
+}
+
+# Wants to avoid building one giant airbases
+EAI_PC_AIRBASE_get_airbase_size_score = {
+
+	set_temp_variable = { airbase_level_score_factor = building_level@air_base }
+	divide_temp_variable = { airbase_level_score_factor = 10 }
+	multiply_temp_variable = { airbase_level_score_factor = -1 }
+	add_to_temp_variable = { airbase_level_score_factor = 1 }
+	clamp_temp_variable = { var = airbase_level_score_factor min = 0.0 max = 1.0 }
+
+	###
+
+	add_to_temp_array = { modifier_score_factors = airbase_level_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_airbase_level_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - airbase_level_score_factor [?airbase_level_score_factor] - weight [?EAI_PC_AIRBASE_get_airbase_level_score_WEIGHT]" }
+}
+
+# Prefers more infrastructure
+EAI_PC_AIRBASE_get_infrastructure_score = {
+
+	set_temp_variable = { infra_level_score_factor = building_level@infrastructure }
+	divide_temp_variable = { infra_level_score_factor = 5 }
+	clamp_temp_variable = { var = infra_level_score_factor min = 0.0 max = 1.0 }
+
+	###
+	
+	add_to_temp_array = { modifier_score_factors = infra_level_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_infra_level_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - infra_level_score_factor [?infra_level_score_factor] - weight [?EAI_PC_AIRBASE_get_infra_level_score_WEIGHT]" }
+}
+
+# Wants this many airbases in a single state
+EAI_PC_AIRBASE_get_wanted_airbases_score = {
+
+	set_temp_variable = { wanted_airbases_score_factor = 0 }
+
+	if = { limit = { check_variable = { _AIRBASE_get_wanted_airbases_score_targets^num > 0 } }
+
+		set_temp_variable = { min_owned_airbases = 100 }
+		for_each_scope_loop = { array = _AIRBASE_get_wanted_airbases_score_targets
+
+			if = { limit = { check_variable = { _AIRBASE_get_wanted_airbases_owned_airbases_@THIS < min_owned_airbases } }
+				set_temp_variable = { min_owned_airbases = _AIRBASE_get_wanted_airbases_owned_airbases_@THIS }
+			}
+		}
+		set_temp_variable = { wanted_airbases_score_factor = wanted_airbases }
+		subtract_from_temp_variable = { wanted_airbases_score_factor = min_owned_airbases }
+		divide_temp_variable = { wanted_airbases_score_factor = wanted_airbases }
+		clamp_temp_variable = { var = wanted_airbases_score_factor min = 0.0 max = 1.0 }
+	}
+
+	###
+		
+	add_to_temp_array = { modifier_score_factors = wanted_airbases_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_wanted_airbases_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - wanted_airbases_score_factor [?wanted_airbases_score_factor] - weight [?EAI_PC_AIRBASE_get_wanted_airbases_score_WEIGHT] - wanted_airbases [?wanted_airbases]" }
+}
+
+# Wants to match the target countries' airbase numbers around target states
+EAI_PC_AIRBASE_get_airbase_balance_score = {
+
+	@EAI_PC_AIRBASE_get_airbase_balance_score_divisor = 50
+
+	set_temp_variable = { balance_score_factor = 0 }
+
+	for_each_scope_loop = { array = _AIRBASE_get_airbase_balance_score_targets
+
+		add_to_temp_variable = { balance_score_factor = airbase_balance_@THIS }
+	}
+
+	multiply_temp_variable = { balance_score_factor = -1 }
+	divide_temp_variable = { balance_score_factor = @EAI_PC_AIRBASE_get_airbase_balance_score_divisor }
+	clamp_temp_variable = { var = balance_score_factor min = 0.0 max = 1.0 }
+
+	###
+
+	add_to_temp_array = { modifier_score_factors = balance_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_airbase_balance_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - balance_score_factor [?balance_score_factor] - weight [?EAI_PC_AIRBASE_get_airbase_balance_score_WEIGHT]" }
+}
+
+# Naval danger from target countries
+EAI_PC_AIRBASE_get_naval_danger_score = {
+
+	set_temp_variable = { naval_danger_score_factor = 0 }
+	for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+		
+		add_to_temp_variable = { naval_danger_score_factor = num_ships }
+	}
+	divide_temp_variable = { naval_danger_score_factor = ROOT.num_ships }
+	clamp_temp_variable = { var = naval_danger_score_factor min = 0.0 max = 1.0 }
+
+	###
+
+	add_to_temp_array = { modifier_score_factors = naval_danger_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_naval_danger_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - naval_danger_score_factor [?naval_danger_score_factor] - weight [?EAI_PC_AIRBASE_get_naval_danger_score_WEIGHT]" }
+}
+
+# Airforce danger from target countries
+EAI_PC_AIRBASE_get_air_danger_score = {
+
+	set_temp_variable = { air_danger_score_factor = 0 }
+	for_each_scope_loop = { array = _AIRBASE_get_best_target_on_TARGET_COUNTRIES
+		
+		add_to_temp_variable = { air_danger_score_factor = num_deployed_planes }
+	}
+	divide_temp_variable = { air_danger_score_factor = ROOT.num_deployed_planes }
+	clamp_temp_variable = { var = air_danger_score_factor min = 0.0 max = 1.0 }
+
+	###
+
+	add_to_temp_array = { modifier_score_factors = air_danger_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_air_danger_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - air_danger_score_factor [?air_danger_score_factor] - weight [?EAI_PC_AIRBASE_get_air_danger_score_WEIGHT]" }
+}
+
+# Wants less airbases around a single state
+EAI_PC_AIRBASE_get_nearby_airbases_score = {
+	
+	set_temp_variable = { nearby_airbases_score_factor = 0 }
+
+	set_temp_variable = { nearby_airbases = 0 }
+	for_each_scope_loop = { array = ROOT.controlled_states
+		if = {
+			limit = {
+				NOT = { check_variable = { tmp_potential_target_state = THIS.id } }
+				var:tmp_potential_target_state = { check_variable = { distance_to@PREV < 100 } }
+			}
+
+			add_to_temp_variable = { nearby_airbases = building_level@air_base }
+		}
+	}
+	clamp_temp_variable = { var = nearby_airbases min = wanted_airbases }
+	set_temp_variable = { nearby_airbases_score_factor = wanted_airbases }
+	multiply_temp_variable = { nearby_airbases_score_factor = 2 }
+	divide_temp_variable = { nearby_airbases_score_factor = nearby_airbases }
+	clamp_temp_variable = { var = nearby_airbases_score_factor min = 0 max = 1 }
+	
+	###
+
+	add_to_temp_array = { modifier_score_factors = nearby_airbases_score_factor }
+	add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_nearby_airbases_score_WEIGHT }
+
+	if = { limit = { ROOT = { has_country_flag = EAI_PC_AIRBASE_score_logging } } log = "[this.getname] - nearby_airbases_score_factor [?nearby_airbases_score_factor] - weight [?EAI_PC_AIRBASE_get_nearby_airbases_score_WEIGHT]" }
+}

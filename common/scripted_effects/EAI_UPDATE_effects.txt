@@ -1,0 +1,448 @@
+############################################################################################################
+#	Expert AI mod - update effects
+############################################################################################################
+
+EAI_hourly_update = {
+
+	every_country = { limit = { is_ai = yes }
+
+		EAI_PC_hourly_update = yes
+	}
+}
+
+EAI_daily_update = {
+
+	#################################################
+	### 	Global daily update
+	#################################################
+
+	if = { limit = { NOT = { has_global_flag = EAI_global_daily_update } }
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: daily global" }  
+
+		set_global_flag = { flag = EAI_global_daily_update value = 1 days = 1 }
+
+		EAI_save_compatibility = yes
+
+		EAI_track_calendar_month = yes
+
+		EAI_MILITARY_track_state_control_time = yes
+
+		EAI_MILITARY_track_province_control_time = yes
+
+		add_to_variable = { global.EAI_days_elapsed = 1 }
+
+		### Hourly update
+
+		if = { limit = { NOT = { has_global_flag = EAI_hourly_update } }
+
+			set_global_flag = { flag = EAI_hourly_update value = 1 days = 1 }
+
+			set_variable = { global.EAI_hourly_tick = 2 }
+
+			EAI_hourly_update = yes
+
+			add_to_variable = { global.EAI_hourly_tick = 1 }
+
+			country_event = { id = EAI_hourly_update.0 hours = 2 }
+		}
+	}
+
+	#################################################
+	### 	Country daily update
+	#################################################
+
+	if = { limit = { is_ai = yes } 
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: daily country" }  
+
+		if = { limit = { NOT = { has_country_flag = EAI_construction_startup } check_variable = { global.EAI_days_elapsed < 30 } }
+
+			set_country_flag = EAI_construction_startup
+		
+			EAI_construction_startup = yes
+		}
+
+		if = {
+			limit = { 
+				check_variable = { global.EAI_days_elapsed > global.EAI_initialization_delay } # Delay before configuring countries at the start of the game
+				NOT = { has_country_flag = EAI_initialized }
+				NOT = { has_country_flag = EAI_player_is_configuring_this_country }
+			}
+
+			set_country_flag = EAI_initialized
+
+			if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI initialized" }
+
+			if = { limit = { NOT = { has_country_flag = EAI_player_is_configuring_this_country } }
+			
+				EAI_FOCUS_CONFIG/set_focuses = yes
+			}
+
+			EAI_armor_intel_startup_targets = yes
+
+			EAI_monthly_update = yes 
+
+			EAI_bimonthly_update = yes
+
+			EAI_weekly_update = yes
+		}
+
+		if = { limit = { NOT = { has_country_flag = EAI_bimonthly_update } }
+
+			EAI_bimonthly_update = yes
+
+			set_country_flag = { flag = EAI_bimonthly_update value = 1 days = 15 }
+		}
+
+		EAI_RESEARCH_on_tech_researched = yes
+
+		EAI_PR_priority_research_update_daily = yes
+	
+		#################################################
+		### 	Misc
+		#################################################
+
+		EAI_MILITARY_daily_update = yes
+
+		EAI_construction_update_daily = yes
+
+		EAI_LAW_manpower_shortage_days = yes
+
+		EAI_TEMPLATE_block_field_upgrade = yes
+
+		EAI_DEBUG_milestones = yes
+
+		EAI_RELATIONS_daily_update = yes
+
+		EAI_PP_store = yes
+
+		EAI_LAW_priority_decisions = yes
+
+		EAI_debug_tracking_daily = yes
+
+		EAI_ATTACHE_attache_xp_gain = yes
+
+		EAI_XP_manage_xp = yes
+
+		EAI_XP_manage_command_power = yes
+
+		EAI_ESP_add_finished_agency_upgrade = yes
+		
+		EAI_ESP_available_operatives = yes
+
+		EAI_test_daily = yes
+
+		if = { limit = { check_variable = { EAI_PC_active_projects > 0 } }
+
+			for_each_loop = { array = EAI_PC_target_state
+
+				if = { limit = { check_variable = { v < 0 } }
+
+					set_temp_variable = { _project_id = i }
+
+					if = { 
+						limit = { 
+							OR = {
+								CONTROLLER = { has_war_with = ROOT } # target state controller at war with project owner
+							}
+						}
+
+						EAI_PC_end_project = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+EAI_weekly_update = {
+
+	#################################################
+	### 	Global weekly update
+	#################################################
+
+	if = { limit = { NOT = { has_global_flag = EAI_global_weekly_update } }
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: weekly global" }  
+
+		set_global_flag = { flag = EAI_global_weekly_update value = 1 days = 2 }
+
+		### 
+
+		every_country = {
+
+			EAI_calculate_fielded_eq_ratio = yes
+
+			EAI_calculate_reserve_mp_ratio = yes
+		}
+
+		EAI_PC_AA_strategic_bombing_danger_value_weekly = yes
+	}
+
+	#################################################
+	### 	Country weekly update
+	#################################################
+
+	if = { limit = { is_ai = yes }
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: weekly country" }  
+
+		###
+
+		EAI_PC_weekly_update = yes
+
+		EAI_difficulty_weekly_update = yes
+
+		EAI_debug_tracking = yes
+
+		EAI_logging = yes
+
+		EAI_RESEARCH_doctrine_limits = yes
+
+		EAI_RELATIONS_strategies = yes
+
+		EAI_RESEARCH_check_for_empty_research_slots = yes
+
+		EAI_enemies_air_strength_ratio = yes
+
+		EAI_CIC_to_total_factories_ratio = yes
+
+		EAI_RESOURCE_calculate_resource_need = yes
+
+		EAI_LAW_upgrade = yes
+
+		EAI_calculate_army_manpower = yes
+
+		EAI_build_armies_fix = yes
+
+		EAI_RESEARCH_doctrine_switch_fix = yes
+
+		EAI_ATTACHE_recall_invalid_attache = yes
+
+		EAI_ATTACHE_strategies = yes
+
+		EAI_MILITARY_weekly_update = yes
+
+		EAI_mobile_warfare_doctrine_tech_switch_to_manpower_branch = yes
+
+		if = { limit = { check_variable = { EAI_prepare_for_war_targets^num > 0 } }
+
+			for_each_scope_loop = { array = EAI_prepare_for_war_targets
+
+				if = { limit = { NOT = { has_country_flag = EAI_prepare_for_war_from_@ROOT } }
+
+					add_to_temp_array = { remove_prepare_for_war_targets = THIS.id }
+				}
+			}
+
+			for_each_scope_loop = { array = remove_prepare_for_war_targets
+
+				remove_from_array = { array = ROOT.EAI_prepare_for_war_targets value = THIS.id }
+			}
+		}
+	}
+}
+
+EAI_bimonthly_update = {
+
+	#################################################
+	### 	Global bimonthly update
+	#################################################
+
+	if = { limit = { NOT = { has_global_flag = EAI_global_bimonthly_update } }
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: bimonthly global" }  
+
+		set_global_flag = { flag = EAI_global_bimonthly_update value = 1 days = 2 }
+	}
+
+	#################################################
+	### 	Country bimonthly update
+	#################################################
+
+	if = { limit = { is_ai = yes }
+
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: bimonthly country" }  
+
+		###
+
+		EAI_construction_bimonthly_update = yes
+
+		EAI_difficulty_bimonthly_update = yes
+
+		EAI_RESOURCE_check_resource_shortages = yes
+
+		EAI_RESOURCE_check_resource_needs = yes
+
+		EAI_RESOURCE_extraction_decisions = yes
+
+		EAI_TRADE_strategies = yes
+
+		if = { limit = { has_dlc = "La Resistance" }
+
+			EAI_ESP_update_strategy = yes
+		}
+
+		EAI_TEMPLATE_set_template_flags = yes
+
+		EAI_check_division_limits = yes
+
+		if = { limit = { EAI_build_infantry = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_build_infantry } } 
+			
+				set_country_flag = EAI_build_infantry
+			}
+		}
+		else = { clr_country_flag = EAI_build_infantry }
+
+		EAI_GER_swap_in_himmler = yes
+
+		EAI_remove_research_slots_from_minors_setting = yes
+
+		EAI_save_original_capital_location = yes
+
+		EAI_MILITARY_bimonthly_update = yes
+	}
+}
+
+EAI_monthly_update = {
+
+	#################################################
+	### 	Global monthly update
+	#################################################
+
+	if = { limit = { NOT = { has_global_flag = EAI_global_monthly_update } }
+
+		set_global_flag = { flag = EAI_global_monthly_update value = 1 days = 2 }
+
+		add_to_variable = { global.EAI_months_elapsed = 1 }
+
+		###
+
+		every_country = {
+
+			EAI_num_fighters_deployed = yes
+		}
+	}
+
+	#################################################
+	### 	Country monthly update
+	#################################################
+
+	if = { limit = { is_ai = yes }
+		
+		if = { limit = { has_country_flag = EAI_update_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | UPDATE: monthly country" }  
+
+		###
+
+		set_variable = { global.EAI_years_elapsed = global.year }
+		subtract_from_variable = { global.EAI_years_elapsed = 1936 }
+
+		###
+
+		EAI_fighter_variant_selection = yes
+
+		EAI_FOCUS_UPDATE_update = yes
+
+		EAI_construction_monthly_update = yes
+
+		EAI_MILITARY_monthly_update = yes
+
+		EAI_PATHFIND_strategies = yes
+
+		EAI_calculate_reserve_eq_ratio = yes
+
+		EAI_ESP_max_agency_upgrades = yes
+
+		EAI_ESP_force_upgrade_agency = yes
+
+		EAI_advisor_strategies = yes
+
+		EAI_RESEARCH_research_factors = yes
+
+		if = { limit = { NOT = { has_dlc = "No Step Back" } }
+
+			EAI_upgrade_land_equipment = yes
+		}
+
+		if = { limit = { NOT = { has_dlc = "By Blood Alone" } }
+
+			EAI_upgrade_air_equipment = yes
+		}
+		
+		EAI_TEMPLATE_upgrades = yes
+
+		EAI_armor_intel_check = yes
+
+		if = { limit = { EAI_mobilize_army = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_mobilize_army } } 
+			
+				set_country_flag = EAI_mobilize_army
+				if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | mobilizing army" }  
+			}
+		}
+		else = { clr_country_flag = EAI_mobilize_army }
+
+		EAI_INVASION_update_strategy = yes 
+		
+		EAI_LEND_LEASE_update_strategy = yes
+		
+		EAI_VOLUNTEERS_update_strategy = yes
+
+		EAI_PRODUCTION_army_production_strategies = yes
+
+		EAI_PRODUCTION_aircraft_production_strategies = yes
+
+		EAI_PRODUCTION_navy_production_strategies = yes
+
+		if = { limit = { EAI_defend_core = yes } 
+
+			if = { limit = { NOT = { has_country_flag = EAI_defend_core } } 
+			
+				set_country_flag = EAI_defend_core
+			}
+		}
+		else = { clr_country_flag = EAI_defend_core }
+
+		EAI_num_surface_ships = yes
+
+		if = {
+			limit = {
+				any_enemy_country = {
+					has_mined = {
+						target = ROOT
+						value > 100
+					}
+				}
+			}
+			set_country_flag = EAI_enemy_mines_on_our_coasts
+		}
+		else = { clr_country_flag = EAI_enemy_mines_on_our_coasts }
+
+		if = {
+			limit = {
+				any_enemy_country = {
+					has_mined = {
+						target = ROOT
+						value > 500
+					}
+				}
+			}
+			set_country_flag = EAI_enemy_mines_on_our_coasts_critical
+		}
+		else = { clr_country_flag = EAI_enemy_mines_on_our_coasts_critical }
+
+		EAI_RESOURCE_calculate_fuel_need = yes
+	}
+}
+
+EAI_update_all = {
+
+	EAI_daily_update = yes
+	EAI_weekly_update = yes
+	EAI_bimonthly_update = yes
+	EAI_monthly_update = yes
+}

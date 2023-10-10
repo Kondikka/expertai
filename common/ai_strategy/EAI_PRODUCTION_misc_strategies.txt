@@ -1,0 +1,102 @@
+############################################################################################################
+#	Expert AI mod - misc production strategies
+############################################################################################################
+
+EAI_PROD_MISC_PROD_default_production_minors = {
+	enable = { is_major = no }
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_variant_production_factor id = infantry_equipment value = 50 }
+
+	# ai_strategy = { type = air_factory_balance                                  value = -25 }
+}
+
+EAI_PROD_MISC_PROD_build_armies_fix = { # Something is blocking the AI from building armies in 1.11
+	enable = {
+		has_country_flag = EAI_build_armies_fix
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = infantry value = 500 }
+	ai_strategy = { type = force_build_armies value = 500 }
+}
+
+EAI_PROD_MISC_PROD_civil_war_equipment = {
+	enable = {
+		is_major = no
+	
+		num_of_military_factories < 25
+		
+		has_civil_war = yes
+	
+		has_equipment = { infantry_equipment < 25000 }
+	}
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = no
+			
+				num_of_military_factories < 25
+				
+				has_civil_war = yes
+			
+				has_equipment = { infantry_equipment < 50000 } 
+			}
+		}
+	}
+	
+	ai_strategy = { type = equipment_production_min_factories id = infantry value = 15 }
+	
+	ai_strategy = { type = equipment_production_factor id = armor value = 0.1 }
+	ai_strategy = { type = equipment_production_factor id = artillery value = -200 }
+	ai_strategy = { type = equipment_variant_production_factor id = support_equipment value = -200 }
+}
+
+# when building DD+SS, prioritise subs
+EAI_PROD_MISC_PROD_build_some_destroyers_with_subs = {
+	enable = { 
+		has_country_flag = EAI_TI_DD_navy_production_strategy
+		has_country_flag = EAI_TI_SS_navy_production_strategy
+
+		NOT = { EAI_wants_to_build_capital_ships = yes }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = role_ratio id = naval_screen value = -240 }
+	ai_strategy = { type = role_ratio id = naval_escort value = -190 }
+}
+
+EAI_PROD_MISC_PROD_build_some_destroyers_with_subs_2 = {
+	enable = { 
+		has_country_flag = EAI_TI_DD_navy_production_strategy
+		has_country_flag = EAI_TI_SS_navy_production_strategy
+
+		check_variable = { num_ships_with_type@destroyer > 40 }
+		check_variable = { num_ships_with_type@submarine < 99 }
+
+		NOT = { EAI_wants_to_build_capital_ships = yes }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = role_ratio id = naval_screen value = -10 }
+}
+
+# Makes AI minors build infantry according to their division cap and mobilization status
+EAI_PROD_MISC_PROD_build_infantry_strategy = {
+	enable = { has_country_flag = EAI_build_infantry }
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = infantry 							value = 200 }
+}
+
+EAI_PROD_MISC_PROD_force_build = {
+	enable = { num_divisions < 1 }
+
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = force_build_armies value = 1 }
+}

@@ -91,6 +91,10 @@ focus_tree = {
 		}
 
 		completion_reward = { #TODO_Manu: This is just copy-pasted from the old focus -> Is this what we want?
+			# hidden_effect = { #EAI
+			# 	set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 14 }
+			# 	set_country_flag = { flag = EAI_pause_ALL_focuses value = 1 days = 14 }
+			# }
 			if = {
 				limit = {
 					all_owned_state = {
@@ -480,7 +484,7 @@ focus_tree = {
 		completion_reward = {
 			hidden_effect = {
 				add_to_variable = { SOV_fyp_production_factory_efficiency_gain_factor = 0.05 }
-				add_to_variable = { SOV_fyp_consumer_goods_factor = 0.05 }
+				add_to_variable = { SOV_fyp_consumer_goods_factor = 0.10 }
 			}
 			if = {
 				limit = {
@@ -1794,6 +1798,9 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
+			hidden_effect = { #EAI
+				set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 1 }
+			}
 			add_research_slot = 1
 			if = {
 				limit = {
@@ -2068,7 +2075,22 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_INDUSTRY}
 
 		completion_reward = {
-			custom_effect_tooltip = SOV_merge_aircraft_plants_tt
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				every_military_industrial_organization = {
+					limit = {
+						has_mio_trait = SOV_mio_trait_merge_plant_no_28 #All Aircraft MIOs have this trait
+					}
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_28
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_150
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_vef_plant
+				}
+			}
+			else = {
+				custom_effect_tooltip = SOV_merge_aircraft_plants_tt
+			}
 		}
 	}
 
@@ -3023,7 +3045,64 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_INDUSTRY}
 
 		completion_reward = {
-			custom_effect_tooltip = SOV_merge_naval_plants_tt
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				if = {
+					limit = {
+						has_dlc = "Man the Guns"
+					}
+					mio:SOV_nevskoye_design_bureau_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_370
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_5
+					}
+
+					mio:SOV_rubin_design_bureau_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_370
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_363
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_190
+					}
+
+					mio:SOV_black_sea_shipyard_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_mariupol_plant
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_leninskaya_kuznitsa_plant
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_340
+					}
+
+					mio:SOV_sevastopol_marine_plant_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_mariupol_plant
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_200
+					}
+				}
+				else = {
+					mio:SOV_nevskoye_design_bureau_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_370_no_mtg
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_5
+					}
+
+					mio:SOV_rubin_design_bureau_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_370_no_mtg
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_363
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_190
+					}
+
+					mio:SOV_black_sea_shipyard_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_mariupol_plant_no_mtg
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_leninskaya_kuznitsa_plant
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_340
+					}
+
+					mio:SOV_sevastopol_marine_plant_organization = {
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_mariupol_plant_no_mtg
+						unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_200
+					}
+				}
+				
+			}
+			else = {
+				custom_effect_tooltip = SOV_merge_naval_plants_tt
+			}
 		}
 	}
 
@@ -3946,20 +4025,34 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH FOCUS_FILTER_NAVY_XP FOCUS_FILTER_ARMY_XP}
 
 		completion_reward = {
-			set_variable = { SOV_red_fleet_naval_invasion_capacity = 10 }
-			set_variable = { SOV_red_fleet_invasion_preparation = -0.1 }
-			set_variable = { SOV_red_fleet_special_forces_cap = 0.1 }
-			custom_effect_tooltip = SOV_naval_infantry_ns_tt
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				add_potential_special_forces_tree = yes
+				add_doctrine_cost_reduction = {
+					name = SOV_naval_infantry
+					cost_reduction = 0.25
+					uses = 2
+					category = special_forces_doctrine
+				}
+			}
+			else = {
+				set_variable = { SOV_red_fleet_naval_invasion_capacity = 10 }
+				set_variable = { SOV_red_fleet_invasion_preparation = -0.1 }
+				set_variable = { SOV_red_fleet_special_forces_cap = 0.1 }
+				custom_effect_tooltip = SOV_naval_infantry_ns_tt
+				
+				add_tech_bonus = {
+					name = SOV_naval_infantry
+					bonus = 1
+					uses = 1
+					category = marine_tech
+				}
+			}
 
 			navy_experience = 25
 			army_experience = 25
-
-			add_tech_bonus = {
-				name = SOV_naval_infantry
-				bonus = 1
-				uses = 1
-				category = marine_tech
-			}
 		}
 	}
 
@@ -4637,7 +4730,41 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_INDUSTRY}
 
 		completion_reward = {
-			custom_effect_tooltip = SOV_merge_tank_and_materiel_plants_tt
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				#TANKS
+				every_military_industrial_organization = {
+					limit = {
+						has_mio_trait = SOV_mio_trait_merge_plant_no_174 #All Tank MIOs have this trait
+					}
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_174
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_112
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_ural_heavy_machine_building_plant
+				}
+
+				#MATERIEL
+				every_military_industrial_organization = {
+					limit = {
+						has_mio_trait = SOV_mio_trait_merge_nkmz_plant #All Materiel MIOs have this trait
+					}
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_nkmz_plant
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_magnitogorsk_metallurgical_plant
+				}
+				mio:SOV_grabin_design_bureau_organization = {
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_172
+				}
+				mio:SOV_tula_arms_plant_organization = {
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_plant_no_622
+				}
+				mio:SOV_gaz_organization = {
+					unlock_mio_trait_tooltip = SOV_mio_trait_merge_automobile_tool_plant
+				}
+			}
+			else = {
+				custom_effect_tooltip = SOV_merge_tank_and_materiel_plants_tt
+			}
 		}
 	}
 
@@ -5423,6 +5550,14 @@ focus_tree = {
 		relative_position_id = SOV_move_industry_to_the_urals
 		cost = 5
 
+		historical_ai = {
+
+			any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_219
+			
+				CONTROLLER = { has_war_with = ROOT }
+			}
+		}
+
 		available = {
 			219 = {
 				is_controlled_by = ROOT
@@ -6203,7 +6338,7 @@ focus_tree = {
 			#Spawn Penal divisions
 			custom_effect_tooltip = SOV_penal_battalions_spawn_tt
 			hidden_effect = {
-				set_technology = { penal_infantry = 1 popup = no }
+				#set_technology = { penal_infantry = 1 popup = no } #Note: Granting tech will make the penal battalion available for any template
 
 				division_template = {
 					name = "Shtrafnaya Chast"
@@ -6489,6 +6624,9 @@ focus_tree = {
 					remove_idea = SOV_politicized_military_humanism
 					add_idea = SOV_politicized_military_battle_priests
 				}
+			}
+			else = {	
+				add_ideas = SOV_politicized_military_battle_priests
 			}
 		}
 	}
@@ -6980,9 +7118,6 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_INDUSTRY FOCUS_FILTER_SOV_POLITICAL_PARANOIA}
 
 		completion_reward = {
-			hidden_effect = { #EAI
-				set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 1 }
-			}
 			add_to_variable = { SOV_the_politburo_good_consumer_goods_factor = -0.02 }
 			add_to_variable = { SOV_the_politburo_production_speed_buildings_factor = 0.05 } 
 			add_to_variable = { SOV_the_politburo_global_building_slots_factor = 0.1 } 
@@ -7132,6 +7267,10 @@ focus_tree = {
 		}
 
 		completion_reward = {
+			hidden_effect = { #EAI
+				set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 10 }
+				set_country_flag = { flag = EAI_pause_ALL_focuses value = 1 days = 10 }
+			}
 			clr_country_flag = SOV_paranoia_do_not_cancel_focus_flag
 			set_country_flag = { flag = SOV_paranoia_random_purge_cooldown_from_focus_flag days = 15 } #Used to prevent random purges from popping up while this is active
 			set_country_flag = SOV_second_moscow_trial_flag #Used to unlock the next purge focus
@@ -7243,9 +7382,9 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_POLITICAL FOCUS_FILTER_SOV_POLITICAL_PARANOIA}
 
 		completion_reward = {
-			hidden_effect = { #EAI
-				set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 1 }
-			}
+			# hidden_effect = { #EAI
+			# 	set_country_flag = { flag = EAI_pause_national_focuses value = 1 days = 1 }
+			# }
 			add_to_variable = { SOV_the_politburo_political_power_factor = 0.05 }
 			add_to_variable = { SOV_the_politburo_max_surrender_limit_offset = 0.05 }
 			custom_effect_tooltip = SOV_the_workers_dictatorship_ns_tt
@@ -7574,6 +7713,8 @@ focus_tree = {
 
 		available = {
 			has_government = communism
+			NOT = { has_global_flag = AAT_trotsky_sent_to_stalin }
+			has_global_flag = AAT_trotsky_in_mexico
 		}
 		
 		search_filters = {FOCUS_FILTER_SOV_POLITICAL_PARANOIA}
@@ -13347,7 +13488,11 @@ ai_will_do = {
 		}
 
 		bypass = {
-			has_full_control_of_state = 146
+			OR = {
+				has_full_control_of_state = 146
+				is_in_faction_with = FIN
+				has_country_flag = FIN_finno_soviet_pact_flag
+			}
 		}
 		
 		search_filters = {FOCUS_FILTER_ANNEXATION}
@@ -13367,6 +13512,8 @@ ai_will_do = {
 					country_event = { id = finland.1 hours = 16 random_hours = 8 }
 				}
 			}
+			custom_effect_tooltip = if_they_accept_tt
+			event_option_tooltip = soviet.12.a
 		}
 	}
 
@@ -13828,24 +13975,36 @@ ai_will_do = {
 
 		bypass = {
 			OR = {
-				owns_state = 78 #Bessarabia
-				78 = {
-					owner = { is_in_faction_with = ROOT }
+				AND = {
+					OR = {
+						owns_state = 78 #Bessarabia
+						78 = {
+							owner = { is_in_faction_with = ROOT }
+						}
+					}
+					OR = {
+						owns_state = 80 #Bucovina
+						80 = {
+							owner = { is_in_faction_with = ROOT }
+						}
+					}
+					OR = {
+						owns_state = 766 #Southern Bessarabia
+						766 = {
+							owner = { is_in_faction_with = ROOT }
+						}
+					}
 				}
-			}
-			OR = {
-				owns_state = 80 #Bucovina
-				80 = {
-					owner = { is_in_faction_with = ROOT }
-				}
-			}
-			OR = {
-				owns_state = 766 #Southern Bessarabia
-				766 = {
-					owner = { is_in_faction_with = ROOT }
+				any_country = {
+					owns_state = 78
+					owns_state = 80
+					owns_state = 766
+					has_war_with = ROOT
 				}
 			}
 		}
+
+		will_lead_to_war_with = ROM
 		
 		search_filters = { FOCUS_FILTER_ANNEXATION }
 		completion_reward = { #This is now generic and will target any potential (multiple) controllers for these states.
@@ -14706,7 +14865,7 @@ ai_will_do = {
 			modifier = {
 				factor = 0
 				has_civil_war = yes
-			}	
+			}
 			modifier = { factor = 0 has_country_flag = EAI_pause_national_focuses } #EAI
 		}
 		
@@ -14778,12 +14937,51 @@ ai_will_do = {
 		relative_position_id = SOV_two_red_flags
 		cost = 5
 
+		historical_ai = { #EAI war focus
+
+			### General situation
+
+			NOT = { EAI_is_not_independent = yes }
+
+			surrender_progress < 0.1
+
+			NOT = {
+				any_home_area_neighbor_country = {
+					has_war_with = ROOT
+				}
+			}
+
+			### Army size and timing
+
+			strength_ratio = { tag = JAP ratio > 1 }
+
+			### State of war with GER
+
+			OR = {
+				NOT = { GER = { EAI_THIS_is_threat_to_PREV = yes } }
+			}
+
+			### No strong enemies
+
+			OR = {
+				NOT = {
+					any_enemy_country = {
+						strength_ratio = { tag = ROOT ratio > 2 }
+					}
+				}
+			}
+		}
+
 		ai_will_do = {
 			factor = 1
+			modifier = { #EAI
+				factor = 0
+				is_historical_focus_on = yes				
+			}
 			modifier = {
 				factor = 0
 				has_civil_war = yes
-			}	
+			}
 			modifier = { factor = 0 has_country_flag = EAI_pause_national_focuses } #EAI
 		}
 		
@@ -15032,19 +15230,40 @@ ai_will_do = {
 			modifier = {
 				factor = 0
 				has_civil_war = yes
-			}	
+			}
 			modifier = { factor = 0 has_country_flag = EAI_pause_national_focuses } #EAI
 		}
 		
 		mutually_exclusive = { focus = SOV_the_threat_from_the_land_of_the_rising_sun }
 
 		bypass = {
-			NOT = { country_exists = JAP }
+			OR = {
+				NOT = { country_exists = JAP }
+				
+				655 = {
+					is_owned_and_controlled_by = JAP
+				}
+
+				AND = {
+					JAP = {
+						has_government = ROOT
+					}
+					537 = {
+						is_owned_and_controlled_by = ROOT
+					}
+				}
+			}
 		}
 
 		available = {			
 			NOT = { has_war_with = JAP }
 			is_subject = no
+			655 = {
+				is_owned_and_controlled_by = ROOT
+			}
+			537 = {
+				is_owned_and_controlled_by = JAP
+			}
 		}
 		
 		search_filters = {}

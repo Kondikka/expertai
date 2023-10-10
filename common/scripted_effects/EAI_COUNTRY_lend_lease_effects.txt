@@ -1,0 +1,163 @@
+############################################################################################################
+#	Expert AI mod - scripted lendlease AI effects
+############################################################################################################
+
+### Sets targets for lend lease
+
+EAI_LEND_LEASE_update_strategy = {
+
+	# Select lend lease targets
+	if = { limit = { EAI_LEND_LEASE_enable = yes }
+
+		resize_temp_array = { lend_lease_priorities = 2 }
+		for_each_loop = { array = lend_lease_priorities index = lend_lease_prio break = selected_lend_lease_target
+
+			### Lend lease priorities
+
+			if = { 		limit = { check_variable = { lend_lease_prio = 0 } } EAI_LEND_LEASE_player_coordinated_lend_lease = yes }
+			
+			else_if = { limit = { check_variable = { lend_lease_prio = 1 } } EAI_LEND_LEASE_lend_lease_target_selector = yes }
+		}
+	}
+	else = {
+
+		EAI_LEND_LEASE_clear_all_targets = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_lend_lease_logging check_variable = { log_ended_lendlease = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: reason: lend lease disabled" } 
+		set_temp_variable = { log_ended_lendlease = 0 }
+	}
+}
+
+EAI_LEND_LEASE_player_coordinated_lend_lease = {
+
+	if = {
+		limit = {
+			any_other_country = {
+				EAI_PREV_on_same_side_with_THIS = yes
+				has_country_flag = EAI_coordinated_lend_lease
+				set_temp_variable = { coordinated_lend_lease_iniatiator = THIS.id }
+			}
+		}
+
+		var:coordinated_lend_lease_iniatiator = {
+
+			var:EAI_coordinated_lend_lease_target = {
+
+				if = { limit = { NOT = { has_country_flag = EAI_lend_lease_from_@ROOT } }
+
+					ROOT = {
+						EAI_LEND_LEASE_clear_all_targets = yes
+
+						if = { limit = { ROOT = { has_country_flag = EAI_lend_lease_logging check_variable = { log_ended_lendlease = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: reason: EAI_LEND_LEASE_player_coordinated_lend_lease" } 
+						set_temp_variable = { log_ended_lendlease = 0 }
+						
+						EAI_LEND_LEASE_set_target = yes
+
+						if = { limit = { ROOT = { has_country_flag = EAI_lend_lease_logging check_variable = { log_started_lendlease = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: reason: EAI_LEND_LEASE_player_coordinated_lend_lease" } 
+						set_temp_variable = { log_started_lendlease = 0 }
+					}
+				}
+			}
+		}
+
+		set_temp_variable = { selected_lend_lease_target = 1 }
+	}
+}
+
+EAI_LEND_LEASE_lend_lease_target_selector = {
+
+	# List of eligible targets for lend lease
+	clear_temp_array = updated_lend_lease_targets
+	every_other_country = { limit = { EAI_LEND_LEASE_THIS_is_valid_target_of_ROOT = yes } 
+	
+		add_to_temp_array = { array = updated_lend_lease_targets value = THIS.id }
+	}
+
+	# Cancel targets
+	for_each_scope_loop = { array = EAI_lend_lease_targets 
+		
+		if = { limit = { NOT = { is_in_array = { array = updated_lend_lease_targets value = THIS.id } } }
+
+			EAI_LEND_LEASE_cancel_target = yes
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_lend_lease_logging check_variable = { log_ended_lendlease = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: reason: EAI_LEND_LEASE_lend_lease_target_selector" } 
+		set_temp_variable = { log_ended_lendlease = 0 }
+	}
+
+	# Set targets
+	for_each_scope_loop = { array = updated_lend_lease_targets 
+		
+		ROOT = { EAI_LEND_LEASE_set_target = yes }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_lend_lease_logging check_variable = { log_started_lendlease = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: reason: EAI_LEND_LEASE_lend_lease_target_selector" } 
+		set_temp_variable = { log_started_lendlease = 0 }
+	}
+}
+
+###
+
+EAI_LEND_LEASE_set_target = { # THIS = SENDER PREV = TARGET
+	
+	if = { limit = { NOT = { is_in_array = { array = EAI_lend_lease_targets value = PREV.id } } }
+
+		PREV = { set_country_flag = EAI_lend_lease_from_@PREV }
+		add_to_array = { array = EAI_lend_lease_targets value = PREV.id }
+
+		if = { limit = { has_country_flag = EAI_lend_lease_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | LEND-LEASE: set target [Prev.GetName]" } 	
+		set_temp_variable = { log_started_lendlease = 1 }
+	}
+}
+
+EAI_LEND_LEASE_cancel_target = { # THIS = TARGET PREV = SENDER
+
+	if = { limit = { is_in_array = { array = PREV.EAI_lend_lease_targets value = THIS.id } }
+
+		clr_country_flag = EAI_lend_lease_from_@PREV
+
+		# compare tags because the id may not match after civil wars
+		for_each_loop = { array = PREV.EAI_lend_lease_targets
+
+			var:v = {
+				if = { limit = { tag = PREV } 
+				
+					remove_from_array = { array = PREV.PREV.EAI_lend_lease_targets index = i }
+					set_temp_variable = { break = 1 } 
+				}
+			}
+		}
+		set_temp_variable = { break = 0 } 
+
+		if = { limit = { PREV = { has_country_flag = EAI_lend_lease_logging } } log = "[GetYear] [GetMonth] | AI | [Prev.GetName] | LEND-LEASE: cancelled target [This.GetName]" } 
+		set_temp_variable = { log_ended_lendlease = 1 }
+	}
+}
+
+EAI_LEND_LEASE_clear_all_targets = { # THIS = SENDER
+
+	if = { limit = { check_variable = { EAI_lend_lease_targets^num > 0 } }
+
+		every_country = { limit = { has_country_flag = EAI_lend_lease_from_@PREV }
+			
+			EAI_LEND_LEASE_cancel_target = yes
+		}
+
+		clear_array = EAI_lend_lease_targets
+	}
+}
+
+EAI_LEND_LEASE_print_target = {
+
+	for_each_scope_loop = { array = EAI_lend_lease_targets
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: current target = [This.GetTag]"
+	}
+}
+
+EAI_LEND_LEASE_print_potential_target = {
+
+	every_other_country = { limit = { EAI_LEND_LEASE_THIS_is_valid_target_of_ROOT = yes } 
+	
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | LEND-LEASE: potential target = [This.GetTag]"
+	}
+}

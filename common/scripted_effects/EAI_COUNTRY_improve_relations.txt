@@ -1,0 +1,269 @@
+############################################################################################################
+#	Expert AI mod - misc effects
+############################################################################################################
+
+### Improve relations system
+
+EAI_RELATIONS_strategies = {
+
+	### FRA
+
+	if = { limit = { tag = FRA }
+
+		### Attache
+
+		# if = {
+		# 	limit = {
+		# 		country_exists = SPD
+		# 		SPD = {
+		# 			has_civil_war = yes
+		# 			NOT = { EAI_ATTACHE_has_received_attache_from_ROOT = yes }
+		# 		}
+		# 	}
+		
+		# 	set_temp_variable = { _target_opinion = 40 }
+		# 	SPD = { EAI_RELATIONS_start = yes }
+		# }
+	}
+
+	### ENG
+
+	if = { limit = { tag = ENG }
+
+		### Attache
+
+		if = {
+			limit = {
+				country_exists = SPD
+				SPD = {
+					has_civil_war = yes
+					NOT = { EAI_ATTACHE_has_received_attache_from_ROOT = yes }
+				}
+			}
+		
+			set_temp_variable = { _target_opinion = 30 }
+			SPD = { EAI_RELATIONS_start = yes }
+		}
+	}
+
+	### SOV
+
+	if = { limit = { tag = SOV }
+
+		### Attache
+
+		if = {
+			limit = {
+				country_exists = SPD
+				SPD = {
+					has_civil_war = yes
+					NOT = { EAI_ATTACHE_has_received_attache_from_ROOT = yes }
+				}
+			}
+		
+			set_temp_variable = { _target_opinion = 30 }
+			SPD = { EAI_RELATIONS_start = yes }
+		}
+
+		### SOV_gosproyektstroy_1
+
+		if = { 
+			limit = {
+				NOT = { is_in_array = { PREV.EAI_RELATIONS_targets = THIS.id } }
+
+				has_idea = SOV_gosproyektstroy_1
+
+				NOT = { has_country_flag = SOV_gosproyektstroy_upgrade_in_progress_flag }
+				USA = {
+					NOT = {
+						has_opinion = {
+							target = ROOT
+							value > 29
+						}
+					}
+					SOV_is_valid_subject = yes
+					NOT = { has_war_with = ROOT }
+				}
+
+				set_temp_variable = { _check_pp = 50 }
+				EAI_PP_has_check_pp = yes
+			}
+
+			set_temp_variable = { _target_opinion = 35 }
+			USA = { EAI_RELATIONS_start = yes }
+		}
+		else_if = {
+			limit = {
+				is_in_array = { PREV.EAI_RELATIONS_targets = THIS.id }
+
+				NOT = {
+					AND = {
+						has_idea = SOV_gosproyektstroy_1
+
+						NOT = { has_country_flag = SOV_gosproyektstroy_upgrade_in_progress_flag }
+						USA = {
+							NOT = {
+								has_opinion = {
+									target = ROOT
+									value > 35
+								}
+							}
+							SOV_is_valid_subject = yes
+							NOT = { has_war_with = ROOT }
+						}
+					}
+				}
+			}
+
+			USA = { EAI_RELATIONS_stop = yes }
+		}
+	}
+
+	### GER
+
+	if = { limit = { tag = GER }
+
+		### Attache
+
+		if = {
+			limit = {
+				country_exists = SPA
+				SPA = {
+					has_civil_war = yes
+					NOT = { EAI_ATTACHE_has_received_attache_from_ROOT = yes }
+				}
+			}
+		
+			set_temp_variable = { _target_opinion = 30 }
+			SPA = { EAI_RELATIONS_start = yes }
+		}
+	}
+
+	### ITA
+
+	if = { limit = { tag = ITA }
+
+		### Attache
+
+		if = {
+			limit = {
+				country_exists = SPA
+				SPA = {
+					has_civil_war = yes
+					NOT = { EAI_ATTACHE_has_received_attache_from_ROOT = yes }
+				}
+			}
+		
+			set_temp_variable = { _target_opinion = 30 }
+			SPA = { EAI_RELATIONS_start = yes }
+		}
+	}
+}
+
+EAI_RELATIONS_enabled = {
+
+	set_temp_variable = { EAI_RELATIONS_enabled = 0 }
+
+	if = { 
+		limit = {
+			set_temp_variable = { _check_pp = 15 }
+			EAI_PP_has_check_pp = yes
+		}
+
+		set_temp_variable = { EAI_RELATIONS_enabled = 1 }
+	}
+}
+
+EAI_RELATIONS_THIS_is_valid_target_of_PREV = {
+
+	set_temp_variable = { EAI_RELATIONS_THIS_is_valid_target_of_PREV = 0 }
+
+	if = { 
+		limit = {
+			NOT = { 
+				has_war_with = PREV
+				has_opinion	= { target = PREV value > 50 }
+			} 
+		}
+
+		set_temp_variable = { EAI_RELATIONS_THIS_is_valid_target_of_PREV = 1 }
+	}
+}
+
+EAI_RELATIONS_start = { # THIS = TARGET # PREV = SENDER
+
+	EAI_RELATIONS_enabled = yes
+	EAI_RELATIONS_THIS_is_valid_target_of_PREV = yes
+
+	if = { 
+		limit = { 
+			check_variable = { EAI_RELATIONS_enabled = 1 }
+			check_variable = { EAI_RELATIONS_THIS_is_valid_target_of_PREV = 1 }
+			NOT = { has_country_flag = EAI_RELATIONS_cooldown_@PREV }
+			NOT = { is_in_array = { PREV.EAI_RELATIONS_targets = THIS.id } }
+			check_variable = { opinion@PREV < _target_opinion }
+		}
+
+		set_temp_variable = { _pp_cost = 10 }
+		EAI_PP_pay_pp_cost = yes
+
+		add_to_array = { PREV.EAI_RELATIONS_targets = THIS.id }
+		add_to_array = { PREV.EAI_RELATIONS_target_opinions = _target_opinion }
+		set_country_flag = { flag = EAI_RELATIONS_cooldown_@PREV value = 1 days = 90 }
+
+		if = { limit = { PREV = { has_country_flag = EAI_relation_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RELATION: started = [This.GetName]" }
+	}
+}
+
+EAI_RELATIONS_stop = { # THIS = TARGET
+
+	remove_from_array = { PREV.EAI_RELATIONS_targets = THIS.id }
+
+	if = { limit = { PREV = { has_country_flag = EAI_relation_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RELATION: stopped = [This.GetName]" }
+}
+
+EAI_RELATIONS_daily_update = {
+
+	for_each_loop = { array = EAI_RELATIONS_targets
+
+		var:v = {
+			EAI_RELATIONS_THIS_is_valid_target_of_PREV = yes
+
+			if = {
+				limit = {
+					check_variable = { EAI_RELATIONS_THIS_is_valid_target_of_PREV = 1 }
+					ROOT = { has_political_power > 1 }
+					check_variable = { opinion@PREV < PREV.EAI_RELATIONS_target_opinions^i }
+				}
+
+				# Add opinion
+				add_opinion_modifier = {
+					target = PREV
+					modifier = EAI_RELATION_modifier
+				}
+
+				if = { limit = { PREV = { has_country_flag = EAI_relation_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RELATION: added opinion = [This.GetName]" }
+
+				# Different ideology group
+				if = { limit = { NOT = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+
+					ROOT = {
+						set_temp_variable = { _pp_cost = 0.4 }
+						EAI_PP_pay_pp_cost = yes
+					}
+
+					if = { limit = { PREV = { has_country_flag = EAI_relation_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RELATION: removed PP for [This.GetName]" }
+				}
+			}
+			else = {
+
+				add_to_temp_array = { remove_relation_targets = THIS.id }
+			}
+		}
+	}
+
+	for_each_scope_loop = { array = remove_relation_targets
+		
+		EAI_RELATIONS_stop = yes
+	}
+}

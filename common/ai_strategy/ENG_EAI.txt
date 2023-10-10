@@ -1,0 +1,871 @@
+# befriend
+# conquer
+# antagonize
+# build_ship
+# build_army
+# unit_ratio
+# build_building
+# research_tech
+# garrison
+# protect
+# influence
+
+#########################################################
+#	Production Strategies
+#########################################################
+
+EAI_ENG_air_production = {
+	allowed = { tag = ENG }
+	enable = { always = yes }
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = air_factory_balance value = 125 }
+}
+
+EAI_ENG_focus_on_fighters = {
+	allowed = { tag = ENG }
+	enable = { 
+		EAI_FTR_equipment_production = yes
+		has_deployed_air_force_size = { size < 3000 type = fighter }
+	}
+	abort = {
+		NOT = {
+			AND = {
+				EAI_FTR_equipment_production = yes
+				has_deployed_air_force_size = { size < 3500 type = fighter }
+			}
+		}
+	}
+
+	ai_strategy = { type = equipment_variant_production_factor id = medium_plane_fighter_airframe value = -3 }
+	ai_strategy = { type = equipment_variant_production_factor id = small_plane_cas_airframe value = -2 }
+	ai_strategy = { type = equipment_variant_production_factor id = small_plane_cas_airframe value = -3 }
+	ai_strategy = { type = equipment_variant_production_factor id = large_plane_airframe value = -99 }
+}
+
+EAI_ENG_focus_on_screens = {
+	allowed = { tag = ENG }
+	enable = { 
+		OR = {
+			EAI_DD_navy_production = yes
+			EAI_ASW_DD_navy_production = yes
+		}
+		has_war = no
+		has_navy_size = { size < 200 unit = destroyer }
+	}
+	abort = { 
+		NOT = {
+			AND = {
+				OR = {
+					EAI_DD_navy_production = yes
+					EAI_ASW_DD_navy_production = yes
+				}
+				has_war = no
+				has_navy_size = { size < 250 unit = destroyer }
+			}
+		}
+	}
+
+	ai_strategy = { type = role_ratio id = naval_carrier value = -500 }
+	ai_strategy = { type = role_ratio id = naval_capital_bb value = -500 }
+	ai_strategy = { type = role_ratio id = naval_capital_bc value = -500 }
+	ai_strategy = { type = role_ratio id = naval_cruiser_heavy value = -500 }
+	ai_strategy = { type = role_ratio id = naval_cruiser_light value = -500 }
+	ai_strategy = { type = role_ratio id = naval_submarine value = -4000 }
+	ai_strategy = { type = role_ratio id = naval_mine_sweeper value = -500 }
+	ai_strategy = { type = role_ratio id = naval_mine_layer value = -500 }
+}
+
+EAI_ENG_naval_bombers = {
+	allowed = { tag = ENG }
+	enable = { 
+		EAI_NAV_equipment_production = yes
+		has_deployed_air_force_size = { size < 400 type = naval_bomber }
+		num_of_military_factories > 50
+	}
+	abort = {
+		NOT = {
+			AND = {
+				EAI_NAV_equipment_production = yes
+				has_deployed_air_force_size = { size < 800 type = naval_bomber }
+				num_of_military_factories > 50
+			}
+		}	
+	}
+
+	ai_strategy = { type = equipment_production_min_factories id = naval_bomber value = 5 }
+}
+
+#########################################################
+#	Diplomacy Strategies
+#########################################################
+
+EAI_ENG_ignore_fin = {
+	allowed = { tag = ENG }
+	enable = {
+		country_exists = FIN
+		is_historical_focus_on = yes
+	}
+	abort = {
+		OR = {
+			FIN = { is_in_faction_with = GER }
+			FIN = { is_in_faction_with = SOV }
+		}
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "FIN"
+		value = 400
+	}
+}
+
+EAI_ENG_ignore_fin_2 = {
+	allowed = { tag = FIN }
+	enable = {
+		country_exists = ENG
+		is_historical_focus_on = yes
+	}
+	abort = {
+		FIN = { is_in_faction_with = GER }
+		FIN = { is_in_faction_with = SOV }
+	}
+	
+	ai_strategy = {
+		type = ignore
+		id = "FIN"
+		value = 400
+	}
+}
+
+EAI_ENG_befriend_middle_east = {
+	allowed = { tag = FIN }
+	enable = { 
+		is_historical_focus_on = yes
+
+		ENG = { any_enemy_country = { is_major = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = YEM target = non_aggression_pact value = 500 }
+	ai_strategy = { type = diplo_action_desire id = SAU target = non_aggression_pact value = 500 }
+	ai_strategy = { type = diplo_action_desire id = OMA target = non_aggression_pact value = 500 }
+}
+
+EAI_ENG_befriend_middle_east_2 = {
+	enable = { 
+		is_historical_focus_on = yes
+
+		OR = {
+			tag = YEM
+			tag = SAU
+			tag = OMA
+		}
+		
+		ENG = { any_enemy_country = { is_major = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_acceptance id = ENG target = non_aggression_pact value = 500 }
+}
+
+#########################################################
+#	Unit Strategies
+#########################################################
+
+EAI_ENG_area_priority = {
+	allowed = { tag = ENG }
+	enable = {
+		always = yes
+	}
+	abort = { always = no }
+
+	ai_strategy = { type = area_priority id = suez value = 200 }
+}
+
+EAI_ENG_garrison = {
+	allowed = { tag = ENG }
+	enable = {
+		is_in_faction_with = FRA
+		FRA = { has_capitulated = yes }
+		has_war_with = GER
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = garrison value = 50 }
+}
+
+EAI_ENG_garrison_home = {
+	allowed = { tag = ENG }
+	enable = {
+		has_capitulated = no
+	}
+	abort_when_not_enabled = yes
+
+	### england
+
+	ai_strategy = { type = strategic_air_importance id = 18 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 1 value = 100000 }
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.50
+		states = { 
+			127
+			125
+			123
+			338
+			122
+			129
+			130
+			132 
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.10
+		order_id = 9
+		states = { 
+			126
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ENG_garrison_singapore = {
+	allowed = { tag = ENG }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.25
+		states = { 
+			336
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_ENG_allies_garrison_iceland = {
+	enable = {
+		is_in_faction_with = ICE
+		OR = {
+			tag = ENG
+			AND = {
+				tag = USA
+				is_in_faction_with = ENG
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.1
+		states = { 
+			100
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.1
+		states = { 
+			101
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+###
+
+EAI_ENG_ALLIES_strategic_bombing_GER = {
+	enable = {
+		has_deployed_air_force_size = { size > 99 type = strategic_bomber }
+		is_in_faction_with = ENG
+		has_war_with = GER
+		GER = { has_capitulated = no }
+		NOT = { 
+			AND = {
+				surrender_progress > 0
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = strategic_air_importance id = 6 value = 250000 }
+	ai_strategy = { type = strategic_air_importance id = 7 value = 250000 }
+	ai_strategy = { type = strategic_air_importance id = 8 value = 250000 }
+}
+
+EAI_ENG_ALLIES_strategic_bombing_ITA = {
+	enable = {
+		has_deployed_air_force_size = { size > 99 type = strategic_bomber }
+		is_in_faction_with = ENG
+		has_war_with = ITA
+		ITA = { has_capitulated = no }
+		NOT = { 
+			AND = {
+				surrender_progress > 0
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = strategic_air_importance id = 21 value = 250000 }
+	ai_strategy = { type = strategic_air_importance id = 23 value = 250000 }
+}
+
+EAI_ENG_ALLIES_strategic_bombing_JAP = {
+	enable = {
+		has_deployed_air_force_size = { size > 99 type = strategic_bomber }
+		is_in_faction_with = ENG
+		has_war_with = JAP
+		JAP = { has_capitulated = no }
+		NOT = { 
+			AND = {
+				surrender_progress > 0
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = strategic_air_importance id = 154 value = 250000 }
+}
+
+###
+
+EAI_ENG_allies_avoid_BALKANS_during_blitz = {
+	enable = {
+		is_historical_focus_on = yes
+
+		OR = {
+			has_war_with = GER
+			has_war_with = ITA
+		}
+
+		NOT = { 
+			original_tag = GRE
+			original_tag = YUG
+		}
+
+		NOT = {
+			any_state = {
+				OR = {
+					region = 24
+					region = 27
+					region = 26
+					region = 25
+				}
+				OR = {
+					is_owned_by = ROOT
+					is_controlled_by = ROOT
+				}
+			}
+		}
+
+		any_state = {
+			OR = {
+				region = 24
+				region = 27
+				region = 26
+				region = 25
+			}
+			CONTROLLER = {
+				OR = {
+					has_war_with = GER
+					has_war_with = ITA
+				}
+			}
+		}
+
+		OR = {
+			has_global_flag = EAI_GER_yugoslavia_blitz
+			has_global_flag = EAI_ITA_greece_blitz
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 24
+		strategic_region = 27
+		strategic_region = 26
+		strategic_region = 25
+		value = -400
+	}
+}
+
+EAI_ENG_avoid_FRA_during_blitz = {
+	allowed = { tag = ENG }
+	enable = {
+		has_global_flag = EAI_GER_france_blitz
+		GER = { is_ai = yes }
+		ITA = { is_ai = yes }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 5
+		strategic_region = 19
+		strategic_region = 20
+		strategic_region = 208
+		strategic_region = 7
+		strategic_region = 21
+		value = -80
+	}
+}
+
+EAI_ENG_CW_avoid_FRA_during_blitz = {
+	enable = {
+		NOT = { tag = ENG tag = FRA }
+		is_in_faction_with = ENG
+
+		has_global_flag = EAI_GER_france_blitz
+		GER = { is_ai = yes }
+		ITA = { is_ai = yes }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 5
+		strategic_region = 19
+		strategic_region = 20
+		strategic_region = 208
+		strategic_region = 7
+		strategic_region = 21
+		value = -100
+	}
+}
+
+EAI_ENG_CW_defend_FRA = {
+	allowed = {
+		OR = {
+			tag = ENG
+			tag = CAN
+			tag = AST
+			tag = SAF
+			tag = NZL
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+
+		GER = { is_ai = no }
+
+		OR = { tag = ENG is_subject_of = ENG }
+						
+		has_war_with = GER
+		
+		is_in_faction_with = FRA
+		
+		FRA = { has_capitulated = no }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = force_defend_ally_borders id = "FRA" value = 500 }
+	ai_strategy = { type = force_defend_ally_borders id = "BEL" value = 500 }
+	ai_strategy = { type = force_defend_ally_borders id = "HOL" value = 500 }
+	ai_strategy = { type = force_defend_ally_borders id = "LUX" value = 500 }
+}
+
+EAI_ENG_CW_avoid_DEN_during_blitz = {
+	allowed = {
+		OR = {
+			tag = ENG
+			tag = FRA
+			is_subject_of = ENG
+		}
+	}
+	enable = {
+		has_global_flag = EAI_norway_invasion_rush
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "DEN" value = 500 }
+}
+
+EAI_ENG_allies_avoid_NOR_during_blitz = {
+	enable = {
+		NOT = { original_tag = NOR }
+		has_war_with = GER
+		GER = { has_country_flag = EAI_norway_invasion }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = front_unit_request
+		area = just_norway
+		value = -400
+	}
+}
+
+EAI_ENG_ignore_RAJ = {
+	allowed = { tag = ENG }
+	enable = {
+		any_enemy_country = {
+			capital_scope = { is_on_continent = europe }
+			has_capitulated = no
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "RAJ" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "AST" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "INS" value = 500 }
+}
+
+EAI_RAJ_ignore_ENG = {
+	allowed = { tag = RAJ }
+	enable = {
+		always = yes
+	}
+	abort = { always = no }
+	
+	ai_strategy = { type = dont_defend_ally_borders id = "ENG" value = 500 }
+	ai_strategy = { type = dont_defend_ally_borders id = "FRA" value = 500 }
+}
+
+EAI_ENG_prepare_for_war_vs_ITA = {
+	allowed = { tag = ENG }
+	enable = {
+		is_historical_focus_on = yes
+
+		OR = {
+			GER = { has_war_with = FRA }
+			GER = { has_completed_focus = GER_danzig_or_war }
+			GER = { focus_progress = { focus = GER_danzig_or_war progress > 0 } }
+		}
+
+		NOT = { has_war_with = ITA }
+
+		ITA = {
+			GER = { EAI_PREV_has_same_ideology_with_THIS = yes } 
+			EAI_THIS_is_threat_to_PREV = yes 
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = prepare_for_war
+		id = "ITA"
+		value = 100
+	}
+	ai_strategy = {
+		type = prepare_for_war
+		id = "AOI"
+		value = 100
+	}
+}
+
+EAI_ENG_north_africa_east = {
+	allowed = { tag = ENG }
+	enable = {
+		surrender_progress < 0.2
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				region = 126
+				state = 452
+				state = 447
+				state = 446
+				state = 453
+				state = 454
+			}
+			any_neighbor_state = { CONTROLLER = { original_tag = ITA } }
+		}
+		value = 50
+	}
+
+	ai_strategy = { type = strategic_air_importance id = 128 value = 50000 }
+	ai_strategy = { type = strategic_air_importance id = 225 value = 50000 }
+
+	ai_strategy = {
+		type = theatre_distribution_demand_increase
+		id = 447
+		value = 10
+	}
+}
+
+EAI_ENG_france_air_defense = {
+	allowed = { tag = ENG }
+	enable = {
+		has_war_with = GER
+		has_war_together_with = FRA
+		FRA = { has_capitulated = no }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 5 value = 50000 }
+}
+
+EAI_ENG_last_stand = {
+	allowed = { tag = ENG }
+	enable = {
+		has_war = yes
+		any_owned_state = {
+			OR = {
+				region = 1
+				region = 2
+				region = 3
+			}
+			NOT = { is_fully_controlled_by = ENG }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	### japan
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		state_trigger = {
+			OR = {
+				region = 1
+				region = 2
+				region = 3
+			}
+		}
+
+		ratio > 0.75
+		execution_type = rush_weak
+		execute_order = yes
+	}
+
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 1
+		strategic_region = 2
+		strategic_region = 3
+		value = 400
+	}
+}
+
+EAI_ENG_invasion_of_iraq = {
+	allowed = { tag = ENG }
+	enable = {
+		OR = {
+			has_country_flag = EAI_ENG_invasion_of_iraq
+			focus_progress = { focus = uk_iraq_focus progress > 0 }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_unit_request
+		state_trigger = {
+			OR = {
+				state = 656
+				state = 291
+			}
+		}
+		value = 100
+	}
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		state_trigger = {
+			OR = {
+				state = 656
+				state = 291
+			}
+		}
+		ratio > 0.1
+		execution_type = rush
+	}
+}
+
+EAI_allies_offensive_vs_JAP_in_china_careful = {
+	enable = {
+		is_in_faction_with = ENG
+		has_war_with = JAP
+		has_war_with = GER
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		priority = 10
+		area = EAI_east_asia
+		ratio > 0.75
+		execution_type = careful
+	}
+}
+
+#########################################################
+#	Naval
+#########################################################
+
+EAI_allies_avoid_GER = {
+	enable = {
+		has_war_with = GER
+
+		NOT = { GER = { has_capitulated = yes } }
+
+		alliance_naval_strength_ratio < 4
+
+		NOT = { check_variable = { EAI_naval_invasion_target = GER.id } }
+
+		NOT = { # unblock if holding these states
+			19 = { CONTROLLER = { has_war_with = GER } }
+			23 = { CONTROLLER = { has_war_with = GER } }
+			30 = { CONTROLLER = { has_war_with = GER } }
+			14 = { CONTROLLER = { has_war_with = GER } }
+			15 = { CONTROLLER = { has_war_with = GER } }
+			785 = { CONTROLLER = { has_war_with = GER } }
+			29 = { CONTROLLER = { has_war_with = GER } }
+			6 = { CONTROLLER = { has_war_with = GER } }
+			35 = { CONTROLLER = { has_war_with = GER } }
+			7 = { CONTROLLER = { has_war_with = GER } }
+			36 = { CONTROLLER = { has_war_with = GER } }
+			56 = { CONTROLLER = { has_war_with = GER } }
+			59 = { CONTROLLER = { has_war_with = GER } }
+			58 = { CONTROLLER = { has_war_with = GER } }
+			99 = { CONTROLLER = { has_war_with = GER } }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 18 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 16 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 42 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 47 value = 50 }
+}
+
+EAI_allies_avoid_JAP = {
+	enable = {
+		has_war_with = JAP
+
+		NOT = { JAP = { has_capitulated = yes } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 90 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 79 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 76 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 75 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 75 value = 50 }
+}
+
+EAI_allies_avoid_mediterranean = {
+	enable = { 
+		has_war_with = ITA
+
+		ENG = { EAI_PREV_on_same_side_with_THIS = yes }
+		
+		NOT = { original_tag = USA } 
+
+		alliance_naval_strength_ratio < 8 
+		
+		NOT = { ITA = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+
+		NOT = { # unblock if holding these states
+			115 = { CONTROLLER = { has_war_with = ITA } }
+			156 = { CONTROLLER = { has_war_with = ITA } }
+			117 = { CONTROLLER = { has_war_with = ITA } }
+			157 = { CONTROLLER = { has_war_with = ITA } }
+			2 = { CONTROLLER = { has_war_with = ITA } }
+			162 = { CONTROLLER = { has_war_with = ITA } }
+			161 = { CONTROLLER = { has_war_with = ITA } }
+			158 = { CONTROLLER = { has_war_with = ITA } }
+			160 = { CONTROLLER = { has_war_with = ITA } }
+			736 = { CONTROLLER = { has_war_with = ITA } }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 68 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 168 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 169 value = 500 }
+	ai_strategy = { type = naval_avoid_region id = 29 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 69 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 100 value = 50 }
+}
+
+EAI_allies_avoid_baltic = {
+	enable = { 
+		has_war = yes
+		ENG = { EAI_PREV_on_same_side_with_THIS = yes }
+		OR = { has_war_with = SOV has_war_with = GER } 
+		NOT = { 58 = { CONTROLLER = { is_in_faction_with = ENG } } }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_avoid_region id = 206 value = 5000 }
+	ai_strategy = { type = naval_avoid_region id = 9 value = 5000 }
+	ai_strategy = { type = naval_avoid_region id = 173 value = 5000 }
+}
+
+EAI_allies_invade_normandy = {
+	enable = {
+		OR = {
+			is_in_faction_with = ENG
+			is_in_faction_with = USA
+		}
+		check_variable = { EAI_naval_invasion_target = GER.id }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_208 value = 2000 }
+	ai_strategy = { type = area_priority id = EAI_area_priority_region_19 value = 2000 }
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			OR = {
+				region = 208
+				region = 19
+			}
+		}
+		value = 5
+	}
+
+	ai_strategy = {
+		type = invasion_unit_request
+		state_trigger = { 
+			NOT = {
+				region = 208
+				region = 19
+			}
+			NOT = { FROM = { FROM.FROM = { check_variable = { ai_strategy_invade@PREV > 1000 } } } }
+		}
+		value = -2000
+	}
+}

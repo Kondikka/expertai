@@ -4,7 +4,7 @@
 
 add_namespace = generic
 
-# President dies
+# COUNTRY INFLUENCING OUR POLITICS
 country_event = {
 	id = generic.1
 	title = generic.1.t
@@ -57,6 +57,20 @@ country_event = {
 			}
 			effect_tooltip = {
 				add_offsite_building = { type = arms_factory level = 2 }
+			}
+		}
+		if = { #If Finland is suffering Estonian Fascist stuff - Super frankenstein'ed tooltip due to loc limitations :) 
+			limit = {
+				original_tag = FIN
+				FROM = { original_tag = EST }
+				has_idea = EST_vaps_organizing_in_FIN
+			}
+			effect_tooltip = {
+				add_ideas = EST_vaps_organizing_in_FIN
+			}
+			custom_effect_tooltip = DECISION_WILL_BE_REMOVED_IF
+			effect_tooltip = {
+				activate_decision = ban_fascist_party
 			}
 		}
 	}
@@ -170,12 +184,22 @@ country_event = {
 		}
 		ai_chance = {
 			base = 100
+			modifier = { # For shared Nordic Tree in AAT
+				factor = 1.7
+				FROM = {
+					has_country_flag = NORDIC_requesting_through_NORDIC_shared
+				}
+			}
+
 		}
 		add_to_faction = FROM
 		FROM = { country_event = { id = generic.3 hours = 6 } }
 		hidden_effect = {
 			set_country_flag = alliance_inviter@ROOT
-			FROM = { set_country_flag = alliance_applicant@ROOT }
+			FROM = { 
+				set_country_flag = alliance_applicant@ROOT
+				clr_country_flag = NORDIC_requesting_through_NORDIC_shared # For shared Nordic Tree in AAT
+			}
 			news_event = { id = news.289 hours = 12 }
 		}
 	}
@@ -191,12 +215,21 @@ country_event = {
 		}
 		ai_chance = {
 			base = 100
+			modifier = { # For shared Nordic Tree in AAT
+				factor = 1.7
+				FROM = {
+					has_country_flag = NORDIC_requesting_through_NORDIC_shared
+				}
+			}
 		}
 		add_to_faction = FROM
 		FROM = { country_event = { id = generic.3 hours = 6 } }
 		hidden_effect = {
 			set_country_flag = alliance_inviter@ROOT
-			FROM = { set_country_flag = alliance_applicant@ROOT }
+			FROM = { 
+				set_country_flag = alliance_applicant@ROOT
+				clr_country_flag = NORDIC_requesting_through_NORDIC_shared # For shared Nordic Tree in AAT 
+			}
 			news_event = { id = news.289 hours = 12 }
 		}
 	}
@@ -603,6 +636,8 @@ country_event = {
 				}
 				has_government = democratic
 			}
+			#Lone Wolf Finland can't join any factions
+			FIN_is_lone_wolf_finland = no
 		}
 		ai_chance = {
 			base = 100
@@ -651,6 +686,8 @@ country_event = {
 				}
 				has_government = fascism
 			}
+			#Lone Wolf Finland can't join any factions
+			FIN_is_lone_wolf_finland = no
 		}
 		ai_chance = {
 			base = 100
@@ -680,6 +717,8 @@ country_event = {
 				}
 				has_government = communism
 			}
+			#Lone Wolf Finland can't join any factions
+			FIN_is_lone_wolf_finland = no
 		}
 		ai_chance = {
 			base = 100
@@ -729,9 +768,19 @@ country_event = {
 					has_government = communism
 				}
 			}
+			#Lone Wolf Finland can't join any factions
+			FIN_is_lone_wolf_finland = no
 		}
 		ai_chance = {
 			base = 100
+
+			modifier = { #EAI
+				factor = 10
+				original_tag = SIA
+				FROM = {
+					original_tag = JAP
+				}
+			}
 			
 			modifier = {
 				factor = 0.5
@@ -817,6 +866,7 @@ country_event = {
 			}
 
 			modifier = { factor = 0 original_tag = PRC FROM = { original_tag = CHI } is_historical_focus_on = yes } #EAI
+			modifier = { factor = 0 original_tag = SIA FROM = { original_tag = JAP } is_historical_focus_on = yes } #EAI
 			
 			modifier = {
 				factor = 0.5
@@ -881,6 +931,13 @@ country_event = {
 					has_completed_focus = SOV_covert_support_for_spanish_poum
 				}
 			}
+		}
+		#Lone Wolf Finland can't join any factions - Tooltip for player
+		if = {
+			limit = {	
+				FIN_is_lone_wolf_finland = yes
+			}
+			custom_effect_tooltip = FIN_the_lone_wolf_no_faction_tt
 		}
 		FROM = { 
 			country_event = { id = generic.7 hours = 6 }
@@ -1197,8 +1254,9 @@ country_event = {
 			}
 			ROOT = { #EAI
 				recall_attache = PREV
-				PREV = { EAI_recall_attache = yes }
+				PREV = { EAI_ATTACHE_recall_attache = yes }
 			}
+			ROOT = { recall_attache = PREV }
 		}
 		FROM = {
 			country_event = { id = generic.15 days = 1 }

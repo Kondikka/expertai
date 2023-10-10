@@ -1,0 +1,1086 @@
+############################################################################################################
+#	Expert AI mod - scripted variant AI effects
+############################################################################################################
+
+### Only used for the old non-DLC systems
+# Deprecated/out of date
+
+EAI_variant_equipment_types = {
+
+	# LAND
+
+	set_variable = { global.EAI_LARM_EQ 		= 1 }
+	set_variable = { global.EAI_LSPART_EQ 		= 2 }
+	set_variable = { global.EAI_LTD_EQ 			= 3 }
+	set_variable = { global.EAI_LSPAA_EQ 		= 4 }
+
+	set_variable = { global.EAI_MARM_EQ 		= 5 }
+	set_variable = { global.EAI_MSPART_EQ 		= 6 }
+	set_variable = { global.EAI_MTD_EQ 			= 7 }
+	set_variable = { global.EAI_MSPAA_EQ 		= 8 }
+
+	set_variable = { global.EAI_HARM_EQ 		= 9 }
+	set_variable = { global.EAI_HSPART_EQ 		= 10 }
+	set_variable = { global.EAI_HTD_EQ 			= 11 }
+	set_variable = { global.EAI_HSPAA_EQ 		= 12 }
+
+	set_variable = { global.EAI_MODARM_EQ 		= 24 }
+	set_variable = { global.EAI_MODSPART_EQ 	= 25 }
+	set_variable = { global.EAI_MODTD_EQ 		= 26 }
+	set_variable = { global.EAI_MODSPAA_EQ 		= 27 }
+
+	# AIR
+
+	set_variable = { global.EAI_FTR_EQ 			= 13 }
+	set_variable = { global.EAI_JFTR_EQ 		= 14 }
+	set_variable = { global.EAI_CVFTR_EQ 		= 15 }
+
+	set_variable = { global.EAI_HFTR_EQ 		= 16 }
+
+	set_variable = { global.EAI_CAS_EQ 			= 17 }
+
+	set_variable = { global.EAI_TAC_EQ 			= 18 }
+	set_variable = { global.EAI_JTAC_EQ 		= 19 }
+
+	set_variable = { global.EAI_NAV_EQ 			= 20 }
+	set_variable = { global.EAI_CVNAV_EQ 		= 21 }
+
+	set_variable = { global.EAI_STRAT_EQ 		= 22 }
+	set_variable = { global.EAI_JSTRAT_EQ 		= 23 }
+}
+
+EAI_upgrade_variant = {
+
+	# Find the current level of this variant
+	meta_effect = { 
+		text = { set_temp_variable = { EAI_VARIANT/variant_level = [x] } } 
+		x = "[EAI_GetVariantLevel]" 
+	}
+
+	# Upgrade as many levels as possible with the current xp
+	while_loop_effect = {
+		limit = {
+			check_variable = { EAI_VARIANT/variant_level < 4 }
+
+			meta_trigger = { 
+				text = { NOT = { check_variable = { [x]_experience < [y] } } } 
+				x = "[EAI_GetExperienceType]"
+				y = "[EAI_GetRequiredXp]" 
+			}
+		}
+
+		if = { limit = { has_country_flag = EAI_variant_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VARIANTS: upgraded [EAI_GetEquipmentType] [?EAI_VARIANT/equipment_tech_level|.0], [EAI_GetVariantUpgrade]" } 
+
+		# Create variant
+		meta_effect = {
+			text = { 
+				create_equipment_variant = { type = [x]_[y] [u] } 
+				set_temp_variable = { minus_xp = [z] }
+				multiply_temp_variable = { minus_xp = -1 }
+				[w]_experience = minus_xp
+				add_to_temp_variable = { EAI_VARIANT/variant_level = 1 }
+				set_variable = { EAI_VARIANT/[x]_[y] = EAI_VARIANT/variant_level }
+			}
+			x = "[EAI_GetEquipmentType]"
+			y = "[?EAI_VARIANT/equipment_tech_level|.0]"
+			u = "[EAI_GetVariantUpgrade]"
+			w = "[EAI_GetExperienceType]"
+			z = "[EAI_GetRequiredXp]"
+		}
+
+		# Only one upgrade on early techs to not waste xp
+		if = { limit = { check_variable = { EAI_VARIANT/equipment_tech_level < 2 } } set_temp_variable = { break = 1 } }
+	}
+}
+
+###
+
+EAI_upgrade_land_equipment = {
+
+	# XP type used
+	set_temp_variable = { EAI_VARIANT/xp_type = 1 }
+	
+	EAI_variant_upgrade_LARM = yes
+	EAI_variant_upgrade_LSPAA = yes
+	EAI_variant_upgrade_LSPART = yes
+
+	EAI_variant_upgrade_MARM = yes
+	EAI_variant_upgrade_MTD = yes
+	EAI_variant_upgrade_MSPART = yes
+	EAI_variant_upgrade_MSPAA = yes
+
+	EAI_variant_upgrade_HARM = yes
+	EAI_variant_upgrade_HTD = yes
+	EAI_variant_upgrade_HSPART = yes
+	EAI_variant_upgrade_HSPAA = yes
+
+	EAI_variant_upgrade_MODARM = yes
+	EAI_variant_upgrade_MODTD = yes
+	EAI_variant_upgrade_MODSPART = yes
+	EAI_variant_upgrade_MODSPAA = yes
+}
+
+EAI_upgrade_air_equipment = {
+
+	# XP type used
+	set_temp_variable = { EAI_VARIANT/xp_type = 2 }
+
+	meta_effect = {
+		text = { 
+			[x]_experience = EAI_[x]_xp
+			set_variable = { EAI_[x]_xp = 0 }
+		}
+		x = "[EAI_GetExperienceType]"
+	}
+
+	###
+	
+	EAI_variant_upgrade_FTR = yes
+	EAI_variant_upgrade_JFTR = yes
+	EAI_variant_upgrade_CVFTR = yes
+
+	EAI_variant_upgrade_HFTR = yes
+
+	EAI_variant_upgrade_CAS = yes
+
+	EAI_variant_upgrade_TAC = yes
+	EAI_variant_upgrade_JTAC = yes
+
+	EAI_variant_upgrade_NAV = yes
+	EAI_variant_upgrade_CVNAV = yes
+
+	EAI_variant_upgrade_STRAT = yes
+	EAI_variant_upgrade_JSTRAT = yes
+
+	###
+
+	EAI_XP_manage_xp = yes
+}
+
+EAI_variant_upgrade_CAS = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+			
+			EAI_CAS_military_focus = yes
+
+			EAI_fighter_developed = yes
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON } }
+				EAI_strat_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = CAS3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = CAS2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = CAS1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_CAS_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_FTR = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = fighter3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = fighter2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = fighter1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_FTR_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_CVFTR = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			OR = { has_tech = basic_carrier has_tech = basic_ship_hull_carrier }
+
+			EAI_fighter_developed = yes
+			EAI_bomber_developed = yes
+			EAI_CV_aircraft_production = yes
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = cv_fighter3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = cv_fighter2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = cv_fighter1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_CVFTR_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_JFTR = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = jet_fighter2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = jet_fighter1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_JFTR_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_HFTR = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			NOT = { check_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_OFF } }
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = heavy_fighter3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = heavy_fighter2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = heavy_fighter1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_HFTR_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_NAV = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+			
+			EAI_fighter_developed = yes
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON } }
+				EAI_strat_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = naval_bomber3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = naval_bomber2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = naval_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_NAV_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_CVNAV = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			OR = { has_tech = basic_carrier has_tech = basic_ship_hull_carrier }
+
+			EAI_fighter_developed = yes
+			EAI_bomber_developed = yes
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON } }
+				EAI_strat_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = naval_bomber3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = naval_bomber2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = naval_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_CVNAV_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_STRAT = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_OFF } }
+				EAI_fighter_developed = yes
+				EAI_bomber_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = strategic_bomber3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = strategic_bomber2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = strategic_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_STRAT_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_JSTRAT = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+			
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_OFF } }
+				EAI_fighter_developed = yes
+				EAI_bomber_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = jet_strategic_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_JSTRAT_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_TAC = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			EAI_TAC_military_focus = yes
+
+			EAI_fighter_developed = yes
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON } }
+				EAI_strat_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = tactical_bomber3 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = tactical_bomber2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = tactical_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_TAC_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_JTAC = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+			
+			EAI_TAC_military_focus = yes
+
+			EAI_fighter_developed = yes
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/strategic_bomber = global.EAI_ON } }
+				EAI_strat_developed = yes
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = jet_tactical_bomber2 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = jet_tactical_bomber1 } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_JTAC_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_HARM = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
+			}
+
+			if = { 
+				limit = { 
+					check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } 
+					OR = { check_variable = { EAI_FOCUS/LAND/armor_design = global.EAI_B_ARM_DESIGN } check_variable = { EAI_FOCUS/LAND/armor_design = global.EAI_C_ARM_DESIGN } } 
+				}
+				EAI_hspart_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_marm_developed = yes
+				EAI_mspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+				EAI_htd_developed = yes
+				EAI_hspaa_developed = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				has_country_flag = EAI_harm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_heavy_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_heavy_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_heavy_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_HARM_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_HTD = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+			
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_hspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_marm_developed = yes
+				EAI_mspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+					EAI_mtd_developed = yes
+					EAI_mspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				has_country_flag = EAI_harm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_heavy_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_heavy_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_heavy_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_HTD_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_HSPART = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } NOT = { check_variable = { EAI_FOCUS/LAND/armor_design = global.EAI_B_ARM_DESIGN } check_variable = { EAI_FOCUS/LAND/armor_design = global.EAI_C_ARM_DESIGN } } }
+				EAI_harm_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_marm_developed = yes
+				EAI_mspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+					EAI_mtd_developed = yes
+					EAI_mspaa_developed = yes
+				}
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+					EAI_hspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				has_country_flag = EAI_harm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_heavy_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_heavy_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_heavy_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_HSPART_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_HSPAA = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_hspart_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_marm_developed = yes
+				EAI_mspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+				}
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+					EAI_mtd_developed = yes
+					EAI_mspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				has_country_flag = EAI_harm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_heavy_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_heavy_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_heavy_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_HSPAA_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_LARM = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+			
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS }
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT }
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_light_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_light_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_LARM_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_LSPART = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_light_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_light_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_LSPART_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_LSPAA = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_light_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_light_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_LSPAA_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MARM = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_harm_developed = yes
+				EAI_hspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } NOT = { check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN } } }
+					EAI_mspaa_developed = yes
+				}
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN } }
+					EAI_mspart_developed = yes
+				}
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+					EAI_hspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				has_country_flag = EAI_marm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_medium_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_medium_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_medium_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MARM_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MTD = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_mspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_harm_developed = yes
+				EAI_hspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+					EAI_hspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				has_country_flag = EAI_marm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_medium_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_medium_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_medium_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MTD_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MSPART = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_mtd_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_harm_developed = yes
+				EAI_hspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } NOT = { check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN } } }
+					EAI_marm_developed = yes
+				}
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } check_variable = { EAI_FOCUS/LAND/motorized_design = global.EAI_A_MOT_DESIGN } }
+					EAI_mspaa_developed = yes
+				}
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+					EAI_hspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				has_country_flag = EAI_marm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_medium_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_medium_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_medium_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MSPART_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MSPAA = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+			
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				EAI_marm_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS } }
+				EAI_harm_developed = yes
+				EAI_hspaa_developed = yes
+			}
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS } }
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_MTD_AT_DESIGN } }
+					EAI_mtd_developed = yes
+				}
+
+				if = { limit = { check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_HTD_AT_DESIGN } }
+					EAI_htd_developed = yes
+					EAI_hspaa_developed = yes
+				}
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				has_country_flag = EAI_marm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = advanced_medium_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 3 } }
+			else_if = { limit = { has_tech = improved_medium_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 2 } }
+			else_if = { limit = { has_tech = basic_medium_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+
+			EAI_save_xp_for_advanced_techs = yes
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MSPAA_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MODARM = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS }
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_MARM_ATTACHMENT }
+
+				check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_HARM_FOCUS }
+				check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_HARM_ATTACHMENT }
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_MARM_FOCUS } }
+				has_country_flag = EAI_marm_template_upgrade
+			}
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = main_battle_tank } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MODARM_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MODTD = {
+	if = {
+		limit = {
+			##################################################################################################
+
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = modern_td } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MODTD_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MODSPART = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = modern_art } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+			
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MODSPART_EQ }
+		EAI_upgrade_variant = yes
+	}
+}
+
+EAI_variant_upgrade_MODSPAA = {
+	if = {
+		limit = {
+			##################################################################################################
+			
+			### Priorities
+
+			##################################################################################################
+
+			# Find the current tech level
+			if = { 		limit = { has_tech = modern_spaa } set_temp_variable = { EAI_VARIANT/equipment_tech_level = 1 } }
+
+			else_if = { set_temp_variable = { EAI_VARIANT/equipment_tech_level = -1 } }
+			
+			# Found something to upgrade
+			check_variable = { EAI_VARIANT/equipment_tech_level > 0 }
+		}
+
+		set_temp_variable = { EAI_VARIANT/equipment_type = global.EAI_MODSPAA_EQ }
+		EAI_upgrade_variant = yes
+	}
+}

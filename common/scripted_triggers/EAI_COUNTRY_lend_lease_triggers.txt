@@ -1,0 +1,632 @@
+######################################################
+#	Expert AI mod - scripted lendlease AI triggers
+######################################################
+
+### ROOT = LEASER
+### THIS = TARGET
+
+EAI_LEND_LEASE_enable = {
+
+	NOT = { surrender_progress > 0 has_country_flag = EAI_MILITARY_trend_losing_war }
+}
+
+EAI_LEND_LEASE_THIS_is_valid_target_of_ROOT = {
+
+	has_global_flag = EAI_lend_lease
+
+	set_temp_variable = { lend_lease_sender_id = ROOT.id }
+	set_temp_variable = { lend_lease_target_id = THIS.id }
+
+	#####################################################################################################
+	#	LEASER
+	#####################################################################################################
+
+	var:lend_lease_sender_id = {
+
+		has_capitulated = no
+
+		OR = {
+			var:lend_lease_target_id = {
+
+				var:lend_lease_sender_id = {
+				
+					has_country_flag = EAI_supports_@PREV
+				}
+			}
+
+			AND = { # Lend lease to enable espionage operations
+				is_in_faction_with = var:lend_lease_target_id
+				num_of_operatives > 1
+			}
+
+			AND = {
+				EAI_LEND_LEASE_sender_strategies = yes
+				NOT = { surrender_progress > 0.05 }
+			}
+		}
+
+		### Neutral countries ll to neighbors only
+
+		if = { limit = { EAI_neutral_country = yes }
+
+			var:lend_lease_target_id = {
+
+				var:lend_lease_sender_id = {
+				
+					is_neighbor_of = PREV
+					has_opinion = { target = PREV value > 25 }
+				}
+			}
+		}
+
+		### Limits just any country from using lend-lease, such as random minors in south america
+
+		if = {
+			limit = {
+				NOT = {
+					EAI_major_country = yes
+					is_major = yes
+					is_in_faction = yes
+					has_war = yes
+				}
+			}
+
+			OR = {
+				AND = {
+					var:lend_lease_target_id = {
+
+						var:lend_lease_sender_id = {
+						
+							is_neighbor_of = PREV
+							has_opinion = { target = PREV value > 50 }
+						}
+					}
+				}
+
+				### Special rules
+
+				AND = {
+					has_government = fascism
+					var:lend_lease_target_id = { original_tag = SPR EAI_fascist_nation = yes has_civil_war = yes }
+				}
+			}
+		}
+
+		### Rules for subjects
+
+		if = { limit = { is_subject = yes }
+
+			OR = {
+				is_subject_of = var:lend_lease_target_id
+				var:lend_lease_target_id = { any_enemy_country = { has_war_with = var:lend_lease_sender_id } }
+			}
+		}
+
+		### When should it lend lease a country depending on ideology
+
+		# Democratic countries
+
+		if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+
+					EAI_democratic_nation = yes
+				}
+				else = { # Behave according to the faction leader's ideology
+
+					var:faction_leader = { EAI_democratic_nation = yes }
+				}
+			}
+
+			var:lend_lease_target_id = {
+
+				OR = {
+					AND = {
+						EAI_democratic_nation = yes
+					}
+
+					AND = { 
+						EAI_communist_nation = yes
+						has_offensive_war = no
+					}
+
+					AND = { 
+						EAI_nonaligned_nation = yes
+						has_offensive_war = no
+					}
+
+					is_in_faction_with = ROOT
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# Communist countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+
+					EAI_communist_nation = yes
+				}
+				else = { # Behave according to the faction leader's ideology
+
+					var:faction_leader = { EAI_communist_nation = yes }
+				}
+			}
+
+			var:lend_lease_target_id = {
+
+				OR = {
+					AND = {
+						EAI_communist_nation = yes
+					}
+
+					AND = {
+						OR = {
+							EAI_democratic_nation = yes
+							EAI_nonaligned_nation = yes
+						}
+
+						any_country = { # Sender and target or their allies share a border
+
+							OR = { 
+								tag = PREV 
+								is_in_faction_with = PREV 
+								is_subject_of = PREV 
+								has_war_together_with = PREV 
+							}
+
+							any_neighbor_country = { 
+								OR = { 
+									tag = var:lend_lease_sender_id 
+									is_in_faction_with = var:lend_lease_sender_id 
+									is_subject_of = var:lend_lease_sender_id 
+									has_war_together_with = var:lend_lease_sender_id 
+								} 
+							}
+						}
+					}
+
+					is_in_faction_with = ROOT
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# Fascist countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+
+					EAI_fascist_nation = yes
+				}
+				else = { # Behave according to the faction leader's ideology
+
+					var:faction_leader = { EAI_fascist_nation = yes }
+				}
+			}
+
+			var:lend_lease_target_id = {
+
+				OR = {
+					EAI_fascist_nation = yes
+
+					AND = {
+						EAI_nonaligned_nation = yes
+
+						any_country = { # Sender and target or their allies share a border
+
+							OR = { 
+								tag = PREV 
+								is_in_faction_with = PREV 
+								is_subject_of = PREV 
+								has_war_together_with = PREV 
+							}
+
+							any_neighbor_country = { 
+								OR = { 
+									tag = var:lend_lease_sender_id 
+									is_in_faction_with = var:lend_lease_sender_id 
+									is_subject_of = var:lend_lease_sender_id 
+									has_war_together_with = var:lend_lease_sender_id 
+								} 
+							}
+						}
+					}
+
+					is_in_faction_with = ROOT
+					has_war_together_with = ROOT
+				}
+			}
+		}
+
+		# Nonaligned countries
+
+		else_if = {
+			limit = { 
+				if = { limit = { is_in_faction = no }
+
+					EAI_nonaligned_nation = yes
+				}
+				else = { # Behave according to the faction leader's ideology
+
+					var:faction_leader = { EAI_nonaligned_nation = yes }
+				}
+			}
+
+			var:lend_lease_target_id = {
+
+				OR = {
+					AND = {
+						any_country = { # Sender and target or their allies share a border
+
+							OR = { 
+								tag = PREV 
+								is_in_faction_with = PREV 
+								is_subject_of = PREV 
+								has_war_together_with = PREV 
+							}
+
+							any_neighbor_country = { 
+								OR = { 
+									tag = var:lend_lease_sender_id 
+									is_in_faction_with = var:lend_lease_sender_id 
+									is_subject_of = var:lend_lease_sender_id 
+									has_war_together_with = var:lend_lease_sender_id 
+								} 
+							}
+						}
+					}
+
+					is_in_faction_with = ROOT
+					has_war_together_with = ROOT
+				}
+			}
+		}
+	}
+
+	#####################################################################################################
+	#	TARGET
+	#####################################################################################################
+
+	var:lend_lease_target_id = {
+
+		has_war = yes 
+
+		NOT = {
+			tag = var:lend_lease_sender_id
+			has_war_with = var:lend_lease_sender_id
+		}
+
+		# If sender is at war and has a home area neighbor enemy, target should also be home area adjacent
+		if = {
+			limit = {
+				var:lend_lease_sender_id = {
+					any_home_area_neighbor_country = {
+						has_war_with = PREV
+					}
+				}
+			}
+
+			var:lend_lease_target_id = {
+				any_home_area_neighbor_country = {
+					tag = var:lend_lease_sender_id
+				}
+			}
+
+			var:lend_lease_sender_id = {
+				any_home_area_neighbor_country = {
+					tag = var:lend_lease_target_id
+				}
+			}
+		}
+
+		# If target is an enemy of another country of sender's ideology, do not send LL
+		if = {
+			limit = {
+				any_enemy_country = {
+
+					if = { limit = { var:lend_lease_sender_id = { is_in_faction = yes } }
+					
+						var:lend_lease_sender_id.faction_leader = { EAI_PREV_has_same_ideology_with_THIS = yes }
+					}
+					else = {
+						var:lend_lease_sender_id = { EAI_PREV_has_same_ideology_with_THIS = yes }
+					}
+
+					NOT = { has_war_with = var:lend_lease_sender_id }
+				}
+			}
+
+			always = no
+		}
+
+		### 
+
+		OR = {
+			has_country_flag = EAI_receives_support_@THIS
+
+			AND = {
+				EAI_LEND_LEASE_target_strategies = yes
+
+				### Why should it receive lend lease
+
+				OR = {
+					any_enemy_country = { has_war_with = var:lend_lease_sender_id }
+					
+					var:lend_lease_sender_id = { has_opinion = { target = PREV value > 25 } }
+					
+					is_in_faction_with = var:lend_lease_sender_id
+					
+					has_war_together_with = var:lend_lease_sender_id
+
+					### Support wars against other ideologies
+
+					AND = {
+						any_enemy_country = { EAI_fascist_nation = yes }
+						var:lend_lease_sender_id = { NOT = { EAI_fascist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { EAI_communist_nation = yes }
+						var:lend_lease_sender_id = { NOT = { EAI_communist_nation = yes } }
+					}
+					AND = {
+						any_enemy_country = { EAI_democratic_nation = yes }
+						var:lend_lease_sender_id = { NOT = { EAI_democratic_nation = yes } }
+					}
+
+					### Shared ideology
+
+					var:lend_lease_sender_id = { 
+						NOT = { has_government = neutrality } 
+						EAI_PREV_has_same_ideology_with_THIS = yes 
+					}
+				}
+
+				###
+
+				if = { limit = { has_capitulated = yes }
+
+					OR = {
+						has_army_manpower = { size > 100000 }
+						has_manpower > 100000
+						num_of_operatives > 1
+					}
+				}
+
+				### Why should it NOT lend lease
+				
+				NOT = { 
+					AND = { # The enemy of this country has a NAP with sender or faction member
+					
+						# No shared enemies between sender and target
+						NOT = { any_enemy_country = { has_war_with = var:lend_lease_sender_id } }
+						
+						any_enemy_country = { 
+							any_other_country = { 
+								OR = { 
+									tag = var:lend_lease_sender_id
+									is_subject_of = var:lend_lease_sender_id 
+									var:lend_lease_sender_id = { is_subject_of = PREV } 
+									is_in_faction_with = var:lend_lease_sender_id 
+								} 
+
+								has_non_aggression_pact_with = PREV 
+							}
+						}
+					}
+				}
+			}
+		}
+
+		### If a land route isnt available, check that the target has convoys
+
+		if = {
+			limit = {
+				NOT = { has_country_flag = EAI_lend_lease_from_@ROOT } # Only check when starting lend-lease
+
+				NOT = { 
+					any_home_area_neighbor_country = { 
+						NOT = { has_war_with = ROOT has_war_with = var:lend_lease_target_id tag = var:lend_lease_target_id }
+						
+						OR = {
+							tag = var:lend_lease_sender_id
+
+							any_home_area_neighbor_country = { 
+								NOT = { has_war_with = ROOT has_war_with = var:lend_lease_target_id tag = var:lend_lease_target_id }
+
+								OR = {
+									tag = var:lend_lease_sender_id
+									any_home_area_neighbor_country = { tag = var:lend_lease_sender_id } 
+								}
+							} 
+						}
+					} 
+				}
+			}
+
+			stockpile_ratio = { archetype = convoy ratio > 50 }
+		}
+	}
+}
+
+#####################################################
+#	Strategies
+#####################################################
+
+# lend_lease_sender_id
+# lend_lease_target_id
+
+EAI_LEND_LEASE_sender_strategies = {
+	
+	# GER should focus on stockpiling for itself
+	if = { 
+		limit = {
+			original_tag = GER 
+			has_war = yes 
+		}
+		
+		OR = {
+			SOV = { has_capitulated = yes }
+			SOV = { exists = no }
+			SOV = { is_subject = yes }
+			is_in_faction_with = SOV
+			SOV = { NOT = { has_government = communism } }
+		}
+	}
+
+	if = { # build up its army first
+		limit = { 
+			original_tag = GER 
+			has_war = no 
+		}
+
+		has_army_manpower = { size > 550000 }
+	}
+	
+	# SOV should focus on stockpiling for itself
+	if = { 
+		limit = { 
+			original_tag = SOV 
+			has_war = yes 
+		}
+		
+		OR = {
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			is_in_faction_with = GER
+			GER = { NOT = { has_government = fascism } }
+		}
+	}
+
+	if = { limit = { original_tag = JAP }
+
+		date > 1938.1.1
+	}
+
+	if = { limit = { original_tag = CHI }
+
+		has_equipment = { infantry_equipment > 50000 }
+	}
+}
+
+EAI_LEND_LEASE_target_strategies = {
+	
+	# Axis shouldn't lend lease Asia
+	if = { 
+		limit = { 
+			var:lend_lease_sender_id = { 
+				is_in_faction_with = GER 
+				has_war = yes 
+				capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } }
+			} 
+		}
+
+		var:lend_lease_target_id = {
+			capital_scope = { NOT = { is_on_continent = asia is_on_continent = oceania } }
+		}
+	}
+
+	# Axis shouldn't LL Japan's enemies
+	if = { 
+		limit = { 
+			var:lend_lease_sender_id = { is_in_faction_with = GER } 
+			GER = { JAP = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+		}
+
+		var:lend_lease_target_id = { NOT = { has_war_with = JAP } }
+	}
+
+	# Japan shouldn't lend lease Europe
+	if = {
+		limit = { 
+			var:lend_lease_sender_id = { 
+				OR = { original_tag = JAP is_subject_of = JAP is_in_faction_with = JAP } 
+				capital_scope = { OR = { is_on_continent = asia is_on_continent = oceania } }
+			} 
+		}
+		
+		var:lend_lease_target_id = {
+			OR = {
+				capital_scope = { OR = { is_on_continent = asia is_on_continent = oceania } }
+				is_neighbor_of = ROOT # land border
+			}
+		}
+	}
+
+	# Make things easer for AI GER vs SOV
+	if = { 
+		limit = { 
+			var:lend_lease_target_id = { original_tag = SOV }
+			GER = { is_ai = yes } 
+		}
+
+		OR = {
+			var:lend_lease_target_id = { surrender_progress > 0.0 }
+			var:lend_lease_sender_id = { has_government = communism }
+		}
+	}
+	
+	# SOV should focus on stockpiling for itself
+	if = { 
+		limit = { 
+			var:lend_lease_sender_id = { original_tag = SOV } 
+			var:lend_lease_target_id = { NOT = { original_tag = SPR original_tag = CHI } }
+			NOT = { var:lend_lease_target_id = { has_war_together_with = var:lend_lease_sender_id } }
+		}
+		
+		OR = {
+			GER = { has_capitulated = yes }
+			GER = { exists = no }
+			GER = { is_subject = yes }
+			is_in_faction_with = GER
+			GER = { NOT = { has_government = fascism } }
+		}
+	}
+
+	# Make things easier for AI JAP vs CHI
+	if = { 
+		limit = { 
+			var:lend_lease_target_id = { 
+				has_war_with = JAP 
+				OR = { original_tag = CHI original_tag = PRC original_tag = XSM original_tag = GXC original_tag = YUN original_tag = SHX }
+			}
+			JAP = { is_ai = yes }
+			NOT = { var:lend_lease_target_id = { has_war_together_with = var:lend_lease_sender_id } }
+		}
+
+		date < 1940.1.1
+
+		OR = {
+			AND = { var:lend_lease_sender_id = { tag = USA } CHI = { surrender_progress > 0.5 } }
+			AND = { var:lend_lease_sender_id = { is_in_faction_with = SOV } CHI = { surrender_progress > 0.0 } }
+			CHI = { surrender_progress > 0.75 }
+			CHI = { is_subject = yes }
+		}
+	}
+	
+	# Make things easier for AI GER vs POL
+	if = { 
+		limit = { 
+			var:lend_lease_target_id = { original_tag = POL }
+			GER = { is_ai = yes } 
+		}
+		
+		OR = {
+			NOT = { is_in_faction_with = ENG }
+			date > 1941.1.1
+		}
+	}
+
+	# USA doesnt need lend-lease
+	if = { 
+		limit = { 
+			var:lend_lease_target_id = { original_tag = USA }
+		}
+		
+		is_major = no
+	}
+}

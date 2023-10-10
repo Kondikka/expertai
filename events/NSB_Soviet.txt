@@ -2240,6 +2240,9 @@ country_event = {
 
 		trigger = {
 			NOT = { is_in_faction_with = FROM }
+			
+			#Lone Wolf Finland can't join any factions
+			FIN_is_lone_wolf_finland = no
 		}
 
 		FROM = { add_to_faction = ROOT }
@@ -2249,6 +2252,26 @@ country_event = {
 		}
 		hidden_effect = {
 			FROM = { country_event = { id = NSB_soviet_foreign_politics_events.151 hours = 1 } }
+
+			# AI more friendly
+			add_ai_strategy = { 
+				type = befriend 
+				id = FROM
+				value = 100
+			}
+			FROM = {
+				add_ai_strategy = { 
+					type = befriend 
+					id = ROOT
+					value = 100
+				}
+			}
+
+			add_ai_strategy = {
+				type = alliance
+				id = FROM		
+				value = 200
+			}
 		}
 	}
 
@@ -2308,6 +2331,14 @@ country_event = {
 			NOT = { has_government = FROM }
 		}
 
+		#Lone Wolf Finland can't join any factions - Tooltip for player
+		if = {
+			limit = {	
+				FIN_is_lone_wolf_finland = yes
+			}
+			custom_effect_tooltip = FIN_the_lone_wolf_no_faction_tt
+		}
+
 		set_politics = { ruling_party = FROM }
 		add_opinion_modifier = {
 			target = FROM
@@ -2315,6 +2346,19 @@ country_event = {
 		}
 		hidden_effect = {
 			FROM = { country_event = { id = NSB_soviet_foreign_politics_events.158 hours = 1 } }
+			# AI more friendly
+			add_ai_strategy = { 
+				type = befriend 
+				id = FROM
+				value = 20
+			}
+			FROM = {
+				add_ai_strategy = { 
+					type = befriend 
+					id = ROOT
+					value = 20
+				}
+			}
 		}
 	}
 
@@ -2337,6 +2381,14 @@ country_event = {
 					has_guaranteed = ROOT
 				}
 			}
+		}
+
+		#Lone Wolf Finland can't join any factions - Tooltip for player
+		if = {
+			limit = {	
+				FIN_is_lone_wolf_finland = yes
+			}
+			custom_effect_tooltip = FIN_the_lone_wolf_no_faction_tt
 		}
 
 		add_popularity = {
@@ -3241,7 +3293,7 @@ country_event = {
 
 		ai_chance = {
 			base = 10
-			modifier = { factor = 1000 tag = SOV is_historical_focus_on = yes } #EAI
+			modifier = { factor = 1000 is_historical_focus_on = yes } #EAI
 			modifier = {
 				factor = 100
 				is_in_faction_with = FROM
@@ -3312,7 +3364,7 @@ country_event = {
 
 		ai_chance = {
 			base = 1
-			modifier = { factor = 0 tag = SOV is_historical_focus_on = yes } #EAI
+			modifier = { factor = 0 is_historical_focus_on = yes } #EAI
 		}
 
 		custom_effect_tooltip = NSB_soviet_foreign_politics_events.153_soviets_alone_tt
@@ -4486,7 +4538,7 @@ country_event = {
 					instant_build = yes
 				}
 			}
-			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.01 }
+			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.02 }
 		}
 		custom_effect_tooltip = SOV_sinikiang_influence_cg_tt_sik
 
@@ -4696,7 +4748,7 @@ country_event = {
 				modifier = SOV_complied_with_our_demands
 			}
 
-			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.01 }
+			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.02 }
 			custom_effect_tooltip = SOV_sinikiang_influence_cg_tt_sik
 
 			effect_tooltip = {
@@ -4973,7 +5025,7 @@ country_event = {
 				modifier = SOV_complied_with_our_demands
 			}
 
-			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.01 }
+			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.02 }
 			custom_effect_tooltip = SOV_sinikiang_influence_cg_tt_sik
 
 			effect_tooltip = {
@@ -5195,7 +5247,7 @@ country_event = {
 				modifier = SOV_complied_with_our_demands
 			}
 
-			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.01 }
+			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.02 }
 			custom_effect_tooltip = SOV_sinikiang_influence_cg_tt_sik
 
 			SOV = {
@@ -5516,7 +5568,7 @@ country_event = {
 				}
 			}
 
-			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.01 }
+			add_to_variable = { SOV_fyp_consumer_goods_factor = -0.02 }
 			custom_effect_tooltip = SOV_sinikiang_influence_cg_tt_sik
 
 			effect_tooltip = {
@@ -8002,11 +8054,23 @@ country_event = {
 			SOV_left_opposition_civil_war_start = yes 
 
 			# Return Trotsky from Mexico
-			set_global_flag = flag_trotsky_returning_to_ussr_from_mexico
-			MEX = { country_event = { id = mexico.22 hours = 1} }	
+			if = {
+				limit = {
+					has_global_flag = AAT_trotsky_in_mexico
+				}
+				set_global_flag = flag_trotsky_returning_to_ussr_from_mexico
+				MEX = { country_event = { id = mexico.22 hours = 1} }	
+			}
+			else_if = {
+				limit = {
+					has_global_flag = NOR_trotsky_in_norway
+				}
+				set_global_flag = flag_trotsky_returning_to_ussr_from_norway
+				set_global_flag = NOR_trotsky_in_soviet
+				clr_global_flag = NOR_trotsky_in_norway
+				NOR = { country_event = { id = mexico.22 hours = 1} }
+			}
 		}
-
-
 	}
 	option = {
 		name = NSB_soviet_communist_civil_war.001.b
@@ -9696,6 +9760,56 @@ country_event = {
 			hidden_effect = { 653 = { set_state_name = SOV_Yekaterinburg } }
 		}
 
+		# Dnipropetrovsk / Dnipro / Yekaterinoslav
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 11437
+				name = SOV_Dnipro
+			}
+			hidden_effect = { 226 = { set_state_name = SOV_Dnipro } }
+		}
+
+		# Voroshilovgrad / Luhansk / Luhansk
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 9461
+				name = SOV_Luhansk
+			}
+			hidden_effect = { 228 = { set_state_name = SOV_Luhansk } }
+		}
+
+		# Krasnodar / Yekaterinodar / Yekaterinodar
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 3734
+				name = SOV_Yekaterinodar
+			}
+			hidden_effect = { 234 = { set_state_name = SOV_Yekaterinodar } }
+		}
+
+		# Kuybyshev / Samara / Samara
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 11225
+				name = SOV_Samara
+			}
+			hidden_effect = { 251 = { set_state_name = SOV_Samara } }
+		}
+
+		# Ulyanovsk / Simbirsk / Simbirsk
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 392
+				name = SOV_Simbirsk
+			}
+			hidden_effect = { 250 = { set_state_name = SOV_Simbirsk } }
+		}
+
 	}
 	# Tsaritsyn
 	option = {
@@ -9832,6 +9946,56 @@ country_event = {
 				name = SOV_Yekaterinburg
 			}
 			hidden_effect = { 653 = { set_state_name = SOV_Yekaterinburg } }
+		}
+
+		# Dnipropetrovsk / Dnipro / Yekaterinoslav
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 11437
+				name = SOV_Yekaterinoslav
+			}
+			hidden_effect = { 226 = { set_state_name = SOV_Yekaterinoslav } }
+		}
+
+		# Voroshilovgrad / Luhansk / Luhansk
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 9461
+				name = SOV_Luhansk
+			}
+			hidden_effect = { 228 = { set_state_name = SOV_Luhansk } }
+		}
+
+		# Krasnodar / Yekaterinodar / Yekaterinodar
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 3734
+				name = SOV_Yekaterinodar
+			}
+			hidden_effect = { 234 = { set_state_name = SOV_Yekaterinodar } }
+		}
+
+		# Kuybyshev / Samara / Samara
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 11225
+				name = SOV_Samara
+			}
+			hidden_effect = { 251 = { set_state_name = SOV_Samara } }
+		}
+
+		# Ulyanovsk / Simbirsk / Simbirsk
+		IF = {
+			limit = { SOV_is_exiles = yes }
+			set_province_name = {
+				id = 392
+				name = SOV_Simbirsk
+			}
+			hidden_effect = { 250 = { set_state_name = SOV_Simbirsk } }
 		}
 	
 		
@@ -11656,6 +11820,72 @@ country_event = {
 					set_variable = { SOV_nationalist_country = KAR }
 					set_country_flag = KAR_uprising_flag
 					SOV = { country_event = NSB_soviet_nationalist.001 }
+					IF = {
+						limit = {
+							FIN = {
+								exists = yes
+								NOT = {
+									has_government = communism
+								}
+							}
+						}
+						FIN = { country_event = AAT_finland_kinship_war.06 }
+					}
+					hidden_effect = {
+						#Add Repola and Uhtua VPs
+						add_victory_points = {
+							province = 6098 #Repola
+							value = 1
+						}
+						add_victory_points = {
+							province = 3067 #Uhtua
+							value = 1
+						}
+						#Add Porajärvi VP
+						add_victory_points = {
+							province = 6094 #Porajärvi
+							value = 1
+						}
+
+						KAR = {
+							set_capital = {
+								state = 215
+							}
+
+							division_template = {
+							    name = "Karjalan Metsäsissit"
+								is_locked = yes
+								priority = 1
+								template_counter = 27
+								regiments = {
+									infantry = { x = 0 y = 0 }
+									infantry = { x = 0 y = 1 }
+									infantry = { x = 0 y = 2 }
+									infantry = { x = 1 y = 0 }
+									infantry = { x = 1 y = 1 }
+								}
+							}
+							every_owned_state = {
+								limit = { is_core_of = KAR }
+								create_unit = { 
+									division = "name = \"Karjalan Metsäsissit\" division_template = \"Karjalan Metsäsissit\" start_experience_factor = 0.05 start_equipment_factor = 0.95"
+									owner = KAR
+									count = 1
+								}
+							}
+							# Add extra country leader trait to the possible leaders (fascist & non-aligned)
+							KAR_ukki_vainamoinen = {
+								add_country_leader_trait = {
+								 	ideology = fascism_ideology
+								 	trait = veteran_guerrilla_fighter
+								 }
+							}
+							KAR_jalmari_takkinen = {
+								add_country_leader_trait = veteran_guerrilla_fighter
+							}
+						}
+					}
+					
 				}
 				# The Caucasus 
 				3 = { # Georgian uprising
@@ -11710,6 +11940,22 @@ country_event = {
 					set_country_flag = azr_uprising_flag
 					SOV = { country_event = NSB_soviet_nationalist.001 }
 				}
+				2 = { # Kalmyk uprising
+					modifier = {
+						add = SOV_civil_war_months
+						always = yes
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_country_flag = KAL_uprising_flag
+							KAL = { exists = yes }
+						}
+					}
+					set_variable = { SOV_nationalist_country = KAL }
+					set_country_flag = KAL_uprising_flag
+					SOV = { country_event = NSB_soviet_nationalist.001 }
+				}
 				1 = { # DAG uprising
 					modifier = {
 						add = SOV_civil_war_months
@@ -11754,6 +12000,77 @@ country_event = {
 					}
 					set_variable = { SOV_nationalist_country = CIN }
 					set_country_flag = CIN_uprising_flag
+					SOV = { country_event = NSB_soviet_nationalist.001 }
+				}
+				1 = { # ABK uprising
+					modifier = {
+						add = SOV_civil_war_months
+						always = yes
+					}
+					modifier = {
+						factor = 0.25
+						any_state = {
+							is_core_of = ABK
+							is_controlled_by = SOV
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_country_flag = ABK_uprising_flag
+							ABK = { exists = yes }
+						}
+					}
+					set_variable = { SOV_nationalist_country = ABK }
+					set_country_flag = ABK_uprising_flag
+					SOV = { country_event = NSB_soviet_nationalist.001 }
+				}
+
+				# The Urals
+				1 = { # KOM uprising
+					modifier = {
+						add = SOV_civil_war_months
+						always = yes
+					}
+					modifier = {
+						factor = 0.25
+						any_state = {
+							is_core_of = KOM
+							is_controlled_by = SOV
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_country_flag = KOM_uprising_flag
+							KOM = { exists = yes }
+						}
+					}
+					set_variable = { SOV_nationalist_country = KOM }
+					set_country_flag = KOM_uprising_flag
+					SOV = { country_event = NSB_soviet_nationalist.001 }
+				}
+				1 = { # NEN uprising
+					modifier = {
+						add = SOV_civil_war_months
+						always = yes
+					}
+					modifier = {
+						factor = 0.25
+						any_state = {
+							is_core_of = NEN
+							is_controlled_by = SOV
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_country_flag = NEN_uprising_flag
+							NEN = { exists = yes }
+						}
+					}
+					set_variable = { SOV_nationalist_country = NEN }
+					set_country_flag = NEN_uprising_flag
 					SOV = { country_event = NSB_soviet_nationalist.001 }
 				}
 
@@ -11917,6 +12234,29 @@ country_event = {
 					}
 					set_variable = { SOV_nationalist_country = KYR }
 					set_country_flag = KYR_uprising_flag
+					SOV = { country_event = NSB_soviet_nationalist.001 }
+				}
+				1 = { # TAJ uprising
+					modifier = {
+						add = SOV_civil_war_months
+						always = yes
+					}
+					modifier = {
+						factor = 0.25
+						any_state = {
+							is_core_of = TAJ
+							is_controlled_by = SOV
+						}
+					}
+					modifier = {
+						factor = 0
+						OR = {
+							has_country_flag = TAJ_uprising_flag
+							TAJ = { exists = yes }
+						}
+					}
+					set_variable = { SOV_nationalist_country = TAJ }
+					set_country_flag = TAJ_uprising_flag
 					SOV = { country_event = NSB_soviet_nationalist.001 }
 				}
 

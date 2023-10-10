@@ -173,17 +173,13 @@ characters = {
 				grand_battle_plan_expert
 			}
 			ai_will_do = { #EAI
-				factor = 50000
-				modifier = { # Theorist priority
-					factor = 0
-					has_army_experience < 150
-					has_war = no
-					check_variable = { modifier@experience_gain_army < 0.3 } # Has not taken army staff
-				}
-				modifier = { 
-					factor = 0 
-					NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
-				}
+				base = 0
+
+				modifier = { add = 1 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+
+				modifier = { add = 500 has_political_power > 300 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+
+				modifier = { factor = 0 has_political_power < 210 }
 			}
 		}
 
@@ -219,7 +215,9 @@ characters = {
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				base = 10
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 
@@ -255,6 +253,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -302,15 +302,37 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
-				modifier = {
-					add = 10
 
-					OR = {
-						has_war = yes
-						date > 1939.1.1
-						has_political_power > 400
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 30 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
 					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
 				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -357,6 +379,16 @@ characters = {
 			traits = {
 				mobile_warfare_expert
 			}
+
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+
+				modifier = { add = 500 has_political_power > 300 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+
+				modifier = { factor = 0 has_political_power < 210 }
+			}
 		}
 		
 		corps_commander = {
@@ -391,6 +423,37 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 30 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					}
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -509,6 +572,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -551,7 +616,38 @@ characters = {
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				base = 10
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -979,15 +1075,37 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
-				modifier = { 
-					add = 1
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 30 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
 					
-					OR = {
-						has_war = yes 
-						date > 1941.1.1
-						has_political_power > 400
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
 					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
 				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -1024,6 +1142,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -1115,7 +1235,38 @@ characters = {
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				base = 1
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -1342,6 +1493,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1371,6 +1524,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1398,6 +1553,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1425,6 +1582,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1454,6 +1613,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1478,6 +1639,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1502,6 +1665,37 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 30 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1548,7 +1742,38 @@ characters = {
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				base = 1
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1577,6 +1802,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1605,6 +1832,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1633,6 +1862,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1666,6 +1897,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1716,8 +1949,10 @@ characters = {
 					}
 				}
 			}
-			ai_will_do = {
-				base = 0.3
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -1778,8 +2013,10 @@ characters = {
 					}
 				}
 			}
-			ai_will_do = {
-				base = 0.3
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -1829,8 +2066,10 @@ characters = {
 					}
 				}
 			}
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -1881,8 +2120,10 @@ characters = {
 					}
 				}
 			}
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -1924,6 +2165,8 @@ characters = {
 			cost = 50
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		advisor = {
@@ -1941,7 +2184,10 @@ characters = {
 				head_of_intelligence 
 			}
 			ai_will_do = { #EAI
-				base = 40000
+				base = 1
+
+				modifier = { factor = 0 has_political_power < 210 }
+
 				modifier = {
 					factor = 0
 					OR = {
@@ -1986,8 +2232,10 @@ characters = {
 			traits = {
 				prince_of_terror
 			}
-			ai_will_do = {
-				base = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2019,8 +2267,40 @@ characters = {
 			traits = {
 				war_industrialist 
 			}
-			ai_will_do = {
-				base = 3.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					### Pick order condition
+
+					set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					# if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+					# 	if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					# }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
+				
 				modifier = {
 					factor = 0
 					OR = {
@@ -2055,8 +2335,10 @@ characters = {
 				quartermaster_general 
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2091,8 +2373,10 @@ characters = {
 				armaments_organizer
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2136,8 +2420,36 @@ characters = {
 				captain_of_industry
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					###
+
+					if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					# if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					# if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+					# 	if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					# }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# # if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# # if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# # if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
+
 				modifier = {
 					factor = 0
 					OR = {
@@ -2178,7 +2490,10 @@ characters = {
 			}
 
 			ai_will_do = { #EAI
-				base = 30000
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
+
 				modifier = {
 					factor = 0
 					OR = {
@@ -2215,7 +2530,35 @@ characters = {
 			}
 
 			ai_will_do = { #EAI
-				base = 50000
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ITA_ai_behavior option = DEFAULT }
+
+					###
+
+					# if = { limit = { has_character = ITA_adelchi_serena ITA_adelchi_serena = { is_advisor = yes } } has_idea = ITA_adelchi_serena } 
+					# if = { limit = { has_character = ITA_alberto_beneduce ITA_alberto_beneduce = { is_advisor = yes } } has_idea = ITA_alberto_beneduce } 
+					# if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+					# 	if = { limit = { has_character = ITA_giacomo_acerbo ITA_giacomo_acerbo = { is_advisor = yes } } has_idea = ITA_giacomo_acerbo }
+					# }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_ugo_cavallero ITA_ugo_cavallero = { is_advisor = yes } } has_idea = ugo_cavallero } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_aldo_pellegrini ITA_aldo_pellegrini = { is_advisor = yes } } has_idea = ITA_aldo_pellegrini } }
+					# else_if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_italo_balbo ITA_italo_balbo = { is_advisor = yes } } has_idea = italo_balbo } }
+					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = ITA_inigo_campioni ITA_inigo_campioni = { is_advisor = yes } } has_idea = inigo_campioni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_alfredo_guzzoni ITA_alfredo_guzzoni = { is_advisor = yes } } has_idea = alfredo_guzzoni } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_ettore_muti ITA_ettore_muti = { is_advisor = yes } } has_idea = ettore_muti } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ITA_carlo_bergamini ITA_carlo_bergamini = { is_advisor = yes } } has_idea = carlo_bergamini } }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
+
 				modifier = {
 					factor = 0
 					OR = {
@@ -2262,8 +2605,10 @@ characters = {
 				editor
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2298,8 +2643,10 @@ characters = {
 			}
 			on_add = {
 			}
-			ai_will_do = {
-				base = 0.500
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2332,8 +2679,10 @@ characters = {
 			traits = {
 				backroom_backstabber 
 			}
-			ai_will_do = {
-				base = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2380,8 +2729,10 @@ characters = {
 					has_government = fascism 
 				}
 			}
-			ai_will_do = {
-				base = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					OR = {
@@ -2464,6 +2815,8 @@ characters = {
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -2570,8 +2923,10 @@ characters = {
 				nuclear_scientist # Nuclear guy
 			}
 
-			ai_will_do = {
-				base = 0.100
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2605,8 +2960,10 @@ characters = {
 				old_figurehead
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0.5
 					OR = {
@@ -2644,8 +3001,10 @@ characters = {
 			}
 			on_add = {
 			}
-			ai_will_do = {
-				base = 3.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2673,8 +3032,10 @@ characters = {
 				staunch_monarchist
 			}
 
-			ai_will_do = {
+			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					add = 100
 					OR = {
@@ -2711,8 +3072,10 @@ characters = {
 				economist
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2758,8 +3121,10 @@ characters = {
 					has_government = democratic 
 				}
 			}
-			ai_will_do = {
-				base = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					ITA_is_socialist_ai = no
@@ -2856,8 +3221,10 @@ characters = {
 				minister_of_posts_and_telegraphs # Christian Democracy guy
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					ITA_is_communist_ai = yes
@@ -2895,8 +3262,10 @@ characters = {
 				liberal_professor # Liberal Philosophy professor and Minister of Education
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					ITA_is_communist_ai = yes
@@ -2927,8 +3296,10 @@ characters = {
 				captain_of_industry # Ministry of Public Works and later Ambassador to USA
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2958,8 +3329,10 @@ characters = {
 				anti_fascist_chaplain
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}	
@@ -3048,7 +3421,7 @@ characters = {
 		}
 		
 		corps_commander = {
-			traits = { militias_officer organizer cautious } #Partisan
+			traits = { militias_officer organizer trait_cautious } #Partisan
 			skill = 2
 			attack_skill = 1
 			defense_skill = 2
@@ -3123,6 +3496,8 @@ characters = {
 
 			ai_will_do = { #EAI
 				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 
@@ -3220,8 +3595,10 @@ characters = {
 				gallo 
 			}
 
-			ai_will_do = {
-				base = 0.800
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0.1
 					ITA_is_socialist_ai = yes
@@ -3263,21 +3640,29 @@ characters = {
 			slot = political_advisor
 			idea_token = ITA_palmiro_togliatti
 			allowed = {
-				original_tag = ITA
+				OR = {
+					original_tag = ITA
+					original_tag = SWE
+				}
 				has_dlc = "By Blood Alone"
 			}
 			available = {
 				OR = {
-					has_completed_focus = ITA_unite_the_opposition
-					has_completed_focus = ITA_defy_the_duce
-				}
-				NOT = { has_completed_focus = ITA_culto_del_duce }
-				NOT = { has_completed_focus = ITA_convene_the_grand_council }
-				NOT = { 
-					has_country_leader = {
-						character = ITA_palmiro_togliatti
-						ruling_only = yes
+					AND = {
+						OR = {
+							has_completed_focus = ITA_unite_the_opposition
+							has_completed_focus = ITA_defy_the_duce
+						}
+						NOT = { has_completed_focus = ITA_culto_del_duce }
+						NOT = { has_completed_focus = ITA_convene_the_grand_council }
+						NOT = { 
+							has_country_leader = {
+								character = ITA_palmiro_togliatti
+								ruling_only = yes
+							}
+						}
 					}
+					SWE_refuge_for_revolutionaries_trigger = yes
 				}
 			}
 			
@@ -3285,8 +3670,10 @@ characters = {
 				marxist_fundamentalist
 			}
 			
-			ai_will_do = {
-				base = 0.100
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 10
 					has_stability < 0.3
@@ -3341,8 +3728,10 @@ characters = {
 				marxist_philosopher
 			}
 			
-			ai_will_do = {
-				base = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					ITA_is_socialist_ai = yes
@@ -3379,8 +3768,10 @@ characters = {
 				economist
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -3397,24 +3788,35 @@ characters = {
 			slot = political_advisor
 			idea_token = ITA_fausto_gullo
 			allowed = {
-				original_tag = ITA
+				OR = {
+					original_tag = ITA
+					original_tag = SWE
+				}
 				has_dlc = "By Blood Alone"
+			
 			}
 			available = {
 				OR = {
-					has_completed_focus = ITA_the_popular_front
 					AND = {
-						has_government = democratic
-						has_completed_focus = ITA_common_ground
+						OR = {
+							has_completed_focus = ITA_the_popular_front
+							AND = {
+								has_government = democratic
+								has_completed_focus = ITA_common_ground
+							}
+						}
 					}
+					SWE_refuge_for_revolutionaries_trigger = yes
 				}
 			}
 			traits = {
 				minister_of_peasants #"Minister of Peasants" Agrarian Reforms
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -3441,8 +3843,10 @@ characters = {
 				partisans_organizer
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -3459,21 +3863,31 @@ characters = {
 			slot = political_advisor
 			idea_token = ITA_ignazio_silone
 			allowed = {
-				original_tag = ITA
+				OR = {
+					original_tag = ITA
+					original_tag = SWE
+				}
 				has_dlc = "By Blood Alone"
 			}
 			available = {
 				OR = {
-					has_completed_focus = ITA_the_path_to_progress
-					has_completed_focus = ITA_bring_back_exiled_intellectuals
+					AND = {
+						OR = {
+							has_completed_focus = ITA_the_path_to_progress
+							has_completed_focus = ITA_bring_back_exiled_intellectuals
+						}
+					}
+					SWE_refuge_for_revolutionaries_trigger = yes
 				}
 			}
 			traits = {
 				revolutionary_poet # Writer intelectual
 			}
 
-			ai_will_do = {
-				base = 0.300
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ITA_ai_behavior option = DEFAULT } } }
 				modifier = {
 					factor = 0
 					ITA_is_socialist_ai = yes

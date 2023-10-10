@@ -223,7 +223,7 @@ country_event = {
 		name = soviet.5.a
 		create_wargoal = {
 			type = take_state
-			target = ROM
+			target = FROM
 			generator = { 78 }
 		}
 		hidden_effect = {
@@ -370,8 +370,18 @@ country_event = {
 		name = soviet.12.a
 		SOV = { 
 			transfer_state = 146
+			custom_effect_tooltip = FIN_remove_soviet_claims_in_other_states_tt
 		}
 		hidden_effect = {
+			FIN = {
+				every_core_state = {
+					limit = {
+						is_owned_by = PREV
+						is_claimed_by = ROOT
+					}
+					remove_claim_by = ROOT 
+				} 
+			}
 			SOV = {
 				country_event = { days = 1 id = news.13 }
 			}
@@ -397,7 +407,7 @@ country_event = {
 		}				
 		hidden_effect = {
 			SOV = {
-				country_event = { days = 1 id = news.12 }				
+				country_event = { days = 1 id = news.12 }
 			}
 		}
 	}
@@ -1185,7 +1195,7 @@ country_event = {
 	}
 }
 
-# Demand Karjala
+# Demand Karjala - UNUSED
 country_event = {
 	id = soviet.31
 	title = soviet.31.t
@@ -2704,3 +2714,132 @@ country_event = {
 #		name = soviet.73.a
 #	}
 #}
+
+
+# Polish event for Returning occupied territory
+country_event = {
+	id = soviet.74
+	title = soviet.74.t
+	desc = soviet.74.d
+	picture = GFX_report_event_SOV_demands
+	is_triggered_only = yes 
+
+	trigger = {
+		
+	}
+	#fire_only_once = yes
+	
+	option = {
+		name = soviet.74.a
+		ai_chance = {
+			base = 1
+		}
+		POL = {
+			add_autonomy_score = { 
+				value = -250 
+				localization = POL_accepted_states
+			}
+			add_popularity = {
+				ideology = FROM
+				popularity = 0.05
+			}
+		}
+		FROM  ={
+			every_owned_state = {
+				limit = {
+					is_core_of = POL 
+					OR = {
+						# Białystok
+						state = 97 
+						# Uncontested Polish Cores
+						NOT = {
+							any_country_with_core = {
+								NOT = { tag = POL }
+							}
+						}
+					}
+					
+				}
+				transfer_state_to = POL
+			}
+		}
+		FROM = {
+			country_event = {
+				id = soviet.75
+				hours = 2 
+				random_hours = 6 
+			}
+		}
+	}
+	option = {
+		name = soviet.74.b
+		ai_chance = {
+			base = 0
+		}
+		POL = {
+			add_autonomy_score = { 
+				value = 250 
+				localization = POL_refused_states
+			}
+		}
+		FROM = {
+			every_owned_state = {
+				limit = {
+					is_core_of = POL 
+					OR = {
+						# Białystok
+						state = 97 
+						# Uncontested Polish Cores
+						NOT = {
+							any_country_with_core = {
+								NOT = { tag = POL }
+							}
+						}
+					}
+					
+				}
+				remove_core_of = POL  
+				add_core_of = SOV
+				add_claim_by = POL 
+			}
+		}
+		FROM = {
+			country_event = {
+				id = soviet.76
+				hours = 2 
+				random_hours = 6 
+			}
+		}
+	}
+}
+
+# Poland Accepted
+country_event = {
+	id = soviet.75
+	title = soviet.75.t
+	desc = soviet.75.d
+	picture = GFX_report_event_SOV_demands
+	is_triggered_only = yes 
+	option = {
+		name = soviet.75.a
+		ai_chance = {
+			base = 1
+		}
+		add_stability = 0.05
+	}
+}
+
+# Poland refused
+country_event = {
+	id = soviet.76
+	title = soviet.76.t
+	desc = soviet.76.d
+	picture = GFX_report_event_SOV_demands
+	is_triggered_only = yes 
+	option = {
+		name = soviet.76.a
+		ai_chance = {
+			base = 1
+		}
+	}
+}

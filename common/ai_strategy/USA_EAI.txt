@@ -1,0 +1,283 @@
+# befriend
+# conquer
+# antagonize
+# build_ship
+# build_army
+# unit_ratio
+# build_building
+# research_tech
+# garrison
+# protect
+# influence
+
+#########################################################
+#	Production Strategies
+#########################################################
+
+EAI_USA_air_production = {
+	allowed = { tag = USA }
+	enable = { always = yes }
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = air_factory_balance value = 100 }
+}
+
+EAI_USA_strategic_bombers = {
+	allowed = { tag = USA }
+	enable = {
+		has_tech = improved_large_airframe
+		
+		is_major = yes
+		EAI_STR_equipment_production = yes
+		has_deployed_air_force_size = { size < 1000 type = strategic_bomber }
+	}
+	abort = {
+		NOT = {
+			AND = {
+				is_major = yes
+				EAI_STR_equipment_production = yes
+				has_deployed_air_force_size = { size < 2000 type = strategic_bomber }
+			}
+		}
+	}
+
+	ai_strategy = { type = equipment_production_min_factories id = strategic_bomber value = 30 }
+}
+
+EAI_USA_stockpile_for_lend_leasing = {
+	allowed = { tag = USA }
+	enable = {
+		is_historical_focus_on = yes
+		
+		date < 1939.1.1
+		has_war = no
+		has_equipment = { infantry_equipment < 10000 }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_factor id = infantry            value = 400 }
+	ai_strategy = { type = equipment_production_factor id = motorized           value = 400 }
+
+	ai_strategy = { type = equipment_production_factor id = fighter             value = -100 }
+	ai_strategy = { type = equipment_production_factor id = interceptor         value = -100 }
+	ai_strategy = { type = equipment_production_factor id = tactical_bomber     value = -100 }
+	ai_strategy = { type = equipment_production_factor id = cas                 value = -100 }
+}
+
+EAI_USA_strategy = {
+	allowed = { tag = USA }
+	enable = { is_major = yes }
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = build_army id = area_defense value = 40 }
+	ai_strategy = { type = equipment_production_min_factories id = convoy value = 10 }
+}
+
+#########################################################
+#	Diplomacy Strategies
+#########################################################
+
+EAI_USA_joins_allies = {
+	allowed = { OR = { tag = USA tag = ENG } }
+	enable = {
+		is_historical_focus_on = yes
+		USA = {
+			ENG = { EAI_PREV_has_same_ideology_with_THIS = yes }
+			OR = {
+				has_war_with = JAP
+				has_war_with = GER
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = alliance
+		id = "ENG"			
+		value = 2000
+	}
+	
+	ai_strategy = {
+		type = alliance
+		id = "USA"			
+		value = 2000
+	}
+}
+
+#########################################################
+#	Unit Strategies
+#########################################################
+
+EAI_USA_area_priority = {
+	allowed = { tag = USA }
+	enable = {
+		always = yes
+	}
+	abort = { always = no }
+
+	ai_strategy = { type = area_priority id = asia value = 200 }
+}
+
+EAI_USA_garrison = {
+	allowed = { tag = USA }
+	enable = {
+		always = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = garrison value = 50 }
+}
+
+EAI_USA_garrison_allies = {
+	allowed = { tag = USA }
+	enable = {
+		is_in_faction_with = ENG
+		has_war = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.3
+		states = { 
+
+			### uk
+			127
+			126
+			125
+			123
+			338
+			122
+			129
+			130
+			132 
+
+			### ast
+			520
+			521
+			522
+			517
+			285
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_USA_garrison_PHI = {
+	allowed = { tag = USA }
+	enable = {
+		PHI = { is_subject_of = ROOT }
+		JAP = { is_ai = no }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.15
+		states = { 
+			### phi
+			623
+			327
+			624
+			625
+			627
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+#########################################################
+#	Naval
+#########################################################
+
+EAI_USA_strike_force_pacific = {
+	allowed = { tag = USA }
+	enable = {
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT
+			}
+		}
+
+		any_enemy_country = {
+			capital_scope = { OR = { is_on_continent = asia is_on_continent = pacific is_on_continent = oceania } }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strike_force_home_base id = 105 }
+}
+
+EAI_USA_strike_force_europe = {
+	allowed = { tag = USA }
+	enable = {
+		NOT = {
+			any_home_area_neighbor_country = {
+				has_war_with = ROOT
+			}
+		}
+
+		any_enemy_country = {
+			capital_scope = { is_on_continent = europe }
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strike_force_home_base id = 18 }
+}
+
+EAI_USA_invade_VIC = {
+	allowed = { tag = USA }
+
+	enable = {
+		has_war_with = GER
+		OR = { 
+			is_in_faction_with = USA 
+			is_in_faction_with = ENG 
+		} 
+		check_variable = { EAI_army_manpower > 60 }
+		
+		VIC = { 
+			has_government= fascism
+			any_of_scopes = { array = global.EAI_operation_torch_states_array
+
+				is_controlled_by = VIC
+				is_coastal = yes
+			}
+			OR = {
+				has_army_manpower = { size < 1000000 }
+				date > 1941.1.1
+			}
+			if = { limit = { is_historical_focus_on = yes } 
+			
+				OR = {
+					date > 1942.1.1
+					GER = { surrender_progress > 0.2 }
+					SOV = { surrender_progress > 0.2 }
+				}
+			}
+		} 
+		
+		GER = { has_war_with = SOV }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = antagonize
+		id = VIC
+		value = 2500
+	}
+
+	ai_strategy = {
+		type = declare_war
+		id = VIC
+		value = 500
+	}
+}

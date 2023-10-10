@@ -1,0 +1,153 @@
+# befriend
+# conquer
+# antagonize
+# build_ship
+# build_army
+# unit_ratio
+# build_building
+# research_tech
+# garrison
+# protect
+# influence
+
+#########################################################
+#	Production Strategies
+#########################################################
+
+EAI_FRA_air_production = {
+	allowed = { tag = FRA }
+	enable = { always = yes }
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = air_factory_balance value = 75 }
+}
+
+#########################################################
+#	Diplomacy Strategies
+#########################################################
+
+EAI_FRA_garrison_home = {
+	allowed = { tag = FRA }
+	enable = {
+		has_capitulated = no
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 19 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 20 value = 100000 }
+	ai_strategy = { type = strategic_air_importance id = 208 value = 100000 }
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.10
+		states = { 
+			15
+			19
+			14
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.10
+		order_id = 9
+		states = { 
+			16
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+#########################################################
+#	Unit Strategies
+#########################################################
+
+EAI_FRA_prepare_for_war_vs_GER = {
+	allowed = { tag = FRA }
+	enable = {
+		is_historical_focus_on = yes
+
+		tag = FRA
+
+		date < 1941.1.1
+
+		NOT = { EAI_is_not_independent = yes }
+
+		OR = {
+			GER = { has_war_with = FRA }
+			GER = { has_completed_focus = GER_danzig_or_war }
+			GER = { focus_progress = { focus = GER_danzig_or_war progress > 0 } }
+		}
+
+		GER = { EAI_THIS_is_threat_to_PREV = yes }
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 5 value = 50000 }
+	ai_strategy = { type = strategic_air_importance id = 19 value = 50000 }
+	ai_strategy = {
+		type = front_unit_request
+		strategic_region = 19
+		strategic_region = 7
+		strategic_region = 5
+		value = 25
+	}
+	ai_strategy = {
+		type = prepare_for_war
+		id = GER
+		value = 100
+	}
+}
+
+EAI_FRA_prepare_for_war_vs_ITA = {
+	allowed = { tag = FRA }
+	enable = {
+		is_historical_focus_on = yes
+
+		OR = {
+			GER = { has_war_with = FRA }
+			GER = { has_completed_focus = GER_danzig_or_war }
+			GER = { focus_progress = { focus = GER_danzig_or_war progress > 0 } }
+		}
+
+		NOT = { has_war_with = ITA }
+
+		ITA = {
+			GER = { EAI_PREV_has_same_ideology_with_THIS = yes } 
+			EAI_THIS_is_threat_to_PREV = yes 
+		}
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = prepare_for_war
+		id = ITA
+		value = 100
+	}
+}
+
+EAI_FRA_focus_on_europe = {
+	enable = {
+		tag = FRA
+		date < 1941.1.1
+		NOT = { has_capitulated = yes }
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = garrison value = -50 }
+	
+	ai_strategy = { type = area_priority id = north_america value = -400 }
+	ai_strategy = { type = area_priority id = south_america value = -400 }
+	ai_strategy = { type = area_priority id = asia value = -400 }
+	ai_strategy = { type = area_priority id = middle_east value = -400 }
+	ai_strategy = { type = area_priority id = pacific value = -400 }
+	ai_strategy = { type = area_priority id = oceania value = -400 }
+	ai_strategy = { type = area_priority id = africa value = -400 }
+	ai_strategy = { type = area_priority id = suez value = -400 }
+}

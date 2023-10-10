@@ -9,8 +9,8 @@
 
 
 	
-NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.15 -- 0.25
-NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
+-- NDefines.NMilitary.EXPERIENCE_COMBAT_FACTOR = 0.15 -- 0.25
+-- NDefines.NMilitary.DIG_IN_FACTOR = 0.01 -- 0.02
 
 
 
@@ -68,7 +68,7 @@ NDefines.NAI.DEFAULT_LEGACY_VARIANT_CREATION_XP_CUTOFF_AIR  = 999 --25	-- Same a
 
 NDefines.NAI.VARIANT_CREATION_XP_RESERVE_LAND = 50 --50					-- If the AI lacks army XP to create a variant it will reserve this much XP for variant creation so that it will eventually be able to create a variant.
 NDefines.NAI.VARIANT_CREATION_XP_RESERVE_NAVY = 50 --50					-- Same as above but for navy XP.
-NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR  = 50 --50					-- Same as above but for air XP.
+NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR = 50 --50					-- Same as above but for air XP.
 
 -- The AI uses the below values when selecting which design to make among the types that use the tank designer
 -- (the tank designer DLC feature must be active). For each role, the highest priority AI design that can be
@@ -82,7 +82,7 @@ NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR  = 50 --50					-- Same as above but
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_ABSENT = 1 --1000000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_LESSER_TECH = 1 --10000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_EQUAL_TECH = 1 --100
-NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 1
+NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 100
 
 -- If a template may be reinforced with the archetype it's considered to be "demanded". If multiple conditions
 -- are met, e.g. it's both in the field and in training, the largest value is used.
@@ -114,7 +114,7 @@ NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_DOCTRINE = 1     -- How quickly is desi
 --EAI: make sure land template desire is always at the top, if the doctrine desire is high but the mod blocks it, AI wont create templates
 NDefines.NAI.DESIRE_USE_XP_TO_UPDATE_LAND_TEMPLATE = 100.0 --2.0    -- How quickly is desire to update/create templates accumulated?
 
-NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 2.0  -- How quickly is desire to update/create land equipment variants accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 50.0  -- How quickly is desire to update/create land equipment variants accumulated?
 NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_NAVAL_EQUIPMENT = 100.0 -- How quickly is desire to update/create naval equipment variants accumulated?
 NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_AIR_EQUIPMENT = 100.0   -- How quickly is desire to update/create air equipment variants accumulated?
 
@@ -131,24 +131,24 @@ NDefines.NAI.GARRISON_TEMPLATE_SCORE_MANPOWER_FACTOR = 0.05 -- formula is (templ
 
 ---------------
 
-NDefines.NAI.REFIT_SHIP_RELUCTANCE = 5000							-- How often to consider refitting to new equipment variants for ships in the field
-NDefines.NAI.REFIT_SHIP_PERCENTAGE_OF_FORCES = 0.0				-- How big part of the navy that should be considered for refitting
+-- NDefines.NAI.REFIT_SHIP_RELUCTANCE = 5000							-- How often to consider refitting to new equipment variants for ships in the field
+-- NDefines.NAI.REFIT_SHIP_PERCENTAGE_OF_FORCES = 0.0				-- How big part of the navy that should be considered for refitting
 
 NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
 
-NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0 --0.005
-NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0 --0.01
+-- NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0 --0.005
+-- NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0 --0.01
 --NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0 -- -1.0			            -- This score is reduced the higher width is when comparing pure changes with no target
-NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	        -- This score is reduced the farther the width is from the target width (if set)
+-- NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	        -- This score is reduced the farther the width is from the target width (if set)
 --NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 0 --60					            -- max days we keep track of since failure of a design update
 
 --NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0 --200
 --NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0 --100
 --NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0 --500
 
-NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 --7
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.25 --0.1
-NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 365 --180 --50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
+NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 1 
+NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.01
+-- NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
 --NDefines.NAI.LOW_PRIO_TEMPLATE_PENALTY_FOR_FRONTS = 100000		-- penalty to make ai less likely to assign low prio units to fronts
@@ -159,8 +159,8 @@ NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 365 --180 --50                       
 
 -- NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTORY = 0.1 --1 		        			-- How many units a country wants is partially based on how much military industry that is available
 
--- NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_WARTIME = 0.2 				-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during war time
--- NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.1     		-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during peace time
+NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_WARTIME = 0.2 				-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during war time
+NDefines.NAI.DEPLOYED_UNIT_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.1     		-- deployment will try to buffer a ratio of deployed manpower (for reinforcements) during peace time
 
 -- NDefines.NAI.MAX_AVAILABLE_MANPOWER_RATIO_TO_BUFFER_WARTIME = 0.2			-- deployment will try to buffer a ratio of manpower (for reinforcements) during war time
 -- NDefines.NAI.MAX_AVAILABLE_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.1		-- deployment will try to buffer a ratio of manpower (for reinforcements) during peace time
@@ -170,9 +170,18 @@ NDefines.NAI.MANPOWER_RATIO_REQUIRED_TO_PRIO_MOBILIZATION_LAW = 0.4		-- percenta
 NDefines.NAI.MAX_SUPPLY_DIVISOR = 0.25  --1.75
 -- NDefines.NAI.MIN_SUPPLY_USE_SANITY_CAP = 100	                                -- Ignore supply cap if below this value when deciding on how many divisions to produce.
 
--- Should be managed by EAI
-NDefines.NAI.MANPOWER_FREE_USAGE_THRESHOLD = 1 --500000					            -- If AI has this much manpower he doesn't care about the percentage
-NDefines.NAI.MANPOWER_RESERVED_THRESHOLD = 0 --0.25					                -- The AI will not deploy more units if he goes below this percentag
+	-- Calculating wanted nr of divisions
+-- NDefines.NAI.WANTED_UNITS_INDUSTRY_FACTOR = 5                        -- How many units a country wants is partially based on how much military industry that is available
+-- NDefines.NAI.WANTED_UNITS_THREAT_BASE = 0.7                             -- If no threat, multiply min wanted units by this
+-- NDefines.NAI.WANTED_UNITS_THREAT_MAX = 25.0                             -- Normalized threat is clamped to this
+-- NDefines.NAI.WANTED_UNITS_WAR_THREAT_FACTOR = 1.5                       -- Factor threat with this if country is at war. this value is overriden by the value in ideology database if that value exceedes this.
+-- NDefines.NAI.WANTED_UNITS_DANGEROUS_NEIGHBOR_FACTOR = 1.25              -- Factor if has dangerous neighbor
+-- NDefines.NAI.WANTED_UNITS_MANPOWER_DIVISOR = 22000                      -- Normalizing divisor for AI manpower. (for each x max available manpower, they want one division)
+-- NDefines.NAI.WANTED_UNITS_WEIGHT_FRONTS_WANT = 1                      -- Weight of front needs when computing final nr wanted units
+-- NDefines.NAI.WANTED_UNITS_WEIGHT_FACTORIES = 1                        -- Weight of military factories when computing final nr wanted units
+-- NDefines.NAI.WANTED_UNITS_WEIGHT_MANPOWER = 1                         -- Weight of manpower availability when computing final nr wanted units
+-- NDefines.NAI.WANTED_UNITS_MIN_DEFENCE_FACTOR = 0.4						-- Factor on units required for min defence
+	-- End of calculating wanted nr of divisions
 
 -- NDefines.NAI.MIN_FIELD_STRENGTH_TO_BUILD_UNITS = 0.7 --0.7			            -- Cancel unit production if below this to get resources out to units in the field
 -- NDefines.NAI.MIN_MANPOWER_TO_BUILD_UNITS = 0.7 --0.7					        -- Cancel unit production if below this to get resources out to units in the field
@@ -198,8 +207,8 @@ NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1 -- [0.4] -- Base value for 
 NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 1
 NDefines.NAI.NEEDED_NAVAL_FACTORIES_EXPENSIVE_SHIP_BONUS = 1000
 NDefines.NAI.PRODUCTION_MAX_PROGRESS_TO_SWITCH_NAVAL = 0.001 -- temp fix
-NDefines.NAI.PRODUCTION_WAIT_TO_FINISH_IF_EXPENSIVE = 0.01
-NDefines.NAI.PRODUCTION_WAIT_TO_FINISH_IF_CHEAP = 0.01
+NDefines.NAI.PRODUCTION_WAIT_TO_FINISH_IF_EXPENSIVE = 0.25
+NDefines.NAI.PRODUCTION_WAIT_TO_FINISH_IF_CHEAP = 0.75
 
 NDefines.NAI.NAVAL_DOCKYARDS_SHIP_FACTOR = 1000			-- The extent to which number of dockyards play into amount of sips a nation wants
 NDefines.NAI.NAVAL_BASES_SHIP_FACTOR = 1000				-- The extent to which number of naval bases play into amount of sips a nation wants
@@ -248,6 +257,19 @@ NDefines.NAI.BUILDING_TARGETS_BUILDING_PRIORITIES = { -- buildings in order of p
 	'arms_factory',
 	'dockyard',
 }
+
+-- <start> construction prioritization
+NDefines.NAI.CONSTRUCTION_PRIO_INFRASTRUCTURE = 0.20                                    -- base prio for infrastructure in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_CIV_FACTORY = 0.80                                       -- base prio for civilian factories in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_MIL_FACTORY = 0.70                                       -- base prio for military factories in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_RAILWAY = 4.00                                           -- base prio for railways in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_RAILWAY_GUN_REPAIR = 15.00                               -- base prio for railway gun repairs in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_UNSPECIFIED = 0.50                                       -- base prio for unspecified buildings (none of the categories above) in the construction queue
+NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_OCCUPIED_TERRITORY = 1.00                         -- factor prio with this if occupied territory
+NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_OWNED_NONCORE = 1.50                              -- factor prio with this if owned non-core territory
+NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_OWNED_CORE = 2.00                                 -- factor prio with this if owned core territory
+NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_REPAIRING = 0.30                                  -- factor prio with this if building is being repaired
+-- <end> construction prioritization
 
 NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 1
 --NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
@@ -470,10 +492,10 @@ NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to 
 
 NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to get assigned to a mission
 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	3800, -- PATROL - 100000	
+	100000, -- PATROL 	
 	1000, -- STRIKE FORCE 
 	1500, -- CONVOY RAIDING
-	3000, -- CONVOY ESCORT - 1000
+	1000, -- CONVOY ESCORT
 	-1, -- MINES PLANTING	
 	300, -- MINES SWEEPING	
 	0, -- TRAIN
@@ -483,10 +505,10 @@ NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to ge
 
 NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce ratio
 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	1.5, -- PATROL		
-	6, -- STRIKE FORCE 
+	1.5, -- PATROL
+	4, -- STRIKE FORCE
 	1.5, -- CONVOY RAIDING
-	2, -- CONVOY ESCORT
+	4, -- CONVOY ESCORT
 	2, -- MINES PLANTING
 	2, -- MINES SWEEPING
 	0, -- TRAIN
@@ -500,9 +522,9 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 
 --ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = --0.3 -- if we are fighting against an enemy home area from our home area and if the enemy area is larger than this ratio, non strategy invasions are disabled
 
-NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000							-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
-NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 --0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
-NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
+-- NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000							-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
+-- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 --0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
+-- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
 
 -- NDefines.NAI.MAX_SCREEN_FORCES_FOR_INVASION_SUPPORT = 0.0 -- max ratio of screens forces to be used in naval invasion missions
 -- NDefines.NAI.MAX_CAPITAL_FORCES_FOR_INVASION_SUPPORT = 0.05 -- max ratio of capital forces to be used in naval invasion missions
@@ -513,11 +535,11 @@ NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the est
 -- NDefines.NAI.DESIRED_UNITS_FACTOR_INVASION_ORDER = 1.0			-- Factor for desired number of units to assign to naval invasion orders
 -- NDefines.NAI.MIN_UNITS_FACTOR_INVASION_ORDER = 1.0				-- Factor for min number of units to assign to naval invasion orders
 
-NDefines.NAI.INVASION_DISTANCE_RANDOMNESS = 300									-- This higher the value the more unpredictable the invasions. Compares to actual map distance in pixels.
-NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12 --24								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+-- NDefines.NAI.INVASION_DISTANCE_RANDOMNESS = 300									-- This higher the value the more unpredictable the invasions. Compares to actual map distance in pixels.
+-- NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12 --24								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
 
 --NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = --15   -- AI will consider using floating harbors for naval invasion if invasion area is larger than this many provinces
-NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 600.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
+-- NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 600.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
 
 -- NDefines.NAI.MAX_UNIT_RATIO_FOR_INVASIONS = --0.4                         -- countries won't use armies more than this ratio of total units for invasions
 -- NDefines.NAI.MIN_UNIT_RATIO_FOR_INVASIONS = --0.1                         -- don't allocate more divisions than this for naval invasions

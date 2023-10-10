@@ -1,0 +1,251 @@
+############################################################################################################
+#	Expert AI mod - scripted volunteer/expeditionary AI effects
+############################################################################################################
+
+### Sets targets for volunteers
+
+EAI_VOLUNTEERS_update_strategy = {
+
+	# Select volunteer targets
+	if = { limit = { EAI_VOLUNTEERS_enable = yes }
+
+		resize_temp_array = { volunteer_priorities = 1 }
+		for_each_loop = { array = volunteer_priorities index = volunteer_prio break = selected_volunteer_target
+
+			### Volunteer priorities
+
+			if = { 		limit = { check_variable = { volunteer_prio = 0 } } EAI_VOLUNTEERS_volunteer_target_selector = yes }
+		}
+	}
+	else = {
+
+		EAI_VOLUNTEERS_cancel_all_targets = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_ended_volunteers = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: reason: volunteers disabled" } 
+		set_temp_variable = { log_ended_volunteers = 0 }
+	}
+
+	EAI_EXPEDITIONARY_update_strategy = yes
+}
+
+EAI_VOLUNTEERS_volunteer_target_selector = {
+
+	# List of eligible targets for volunteers
+	clear_temp_array = updated_volunteer_targets
+	every_other_country = { limit = { EAI_VOLUNTEERS_THIS_is_valid_target_of_ROOT = yes } 
+	
+		add_to_temp_array = { array = updated_volunteer_targets value = THIS.id }
+	}
+
+	# Cancel targets
+	for_each_scope_loop = { array = EAI_volunteer_targets 
+		
+		if = { limit = { NOT = { is_in_array = { array = updated_volunteer_targets value = THIS.id } } }
+
+			EAI_VOLUNTEERS_cancel_target = yes
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_ended_volunteers = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: reason: EAI_VOLUNTEERS_volunteer_target_selector" } 
+		set_temp_variable = { log_ended_volunteers = 0 }
+	}
+
+	# Set volunteer targets
+	for_each_scope_loop = { array = updated_volunteer_targets 
+		
+		ROOT = { EAI_VOLUNTEERS_set_target = yes }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_started_volunteers = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: reason: EAI_VOLUNTEERS_volunteer_target_selector" } 
+		set_temp_variable = { log_started_volunteers = 0 }
+	}
+}
+
+###
+
+EAI_VOLUNTEERS_set_target = { # THIS = SENDER PREV = TARGET
+
+	if = { limit = { NOT = { is_in_array = { array = EAI_volunteer_targets value = PREV.id } } }
+
+		PREV = { set_country_flag = EAI_volunteers_from_@PREV }
+		add_to_array = { array = EAI_volunteer_targets value = PREV.id }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging } } log = "[GetYear] [GetMonth] | AI | [This.GetName] | VOLUNTEERS: set target [Prev.GetName]" } 
+		set_temp_variable = { log_started_volunteers = 1 }
+	}
+}
+
+EAI_VOLUNTEERS_cancel_target = { # THIS = TARGET PREV = SENDER
+
+	if = { limit = { is_in_array = { array = PREV.EAI_volunteer_targets value = THIS.id } }
+
+		clr_country_flag = EAI_volunteers_from_@PREV
+		
+		# compare tags because the id may not match after civil wars
+		for_each_loop = { array = PREV.EAI_volunteer_targets
+
+			var:v = {
+				if = { limit = { tag = PREV } 
+				
+					remove_from_array = { array = PREV.PREV.EAI_volunteer_targets index = i }
+					set_temp_variable = { break = 1 } 
+				}
+			}
+		}
+		set_temp_variable = { break = 0 } 
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging } } log = "[GetYear] [GetMonth] | AI | [Prev.GetName] | VOLUNTEERS: cancel target [This.GetName]" } 
+		set_temp_variable = { log_ended_volunteers = 1 }
+	}
+}
+
+EAI_VOLUNTEERS_cancel_all_targets = { # THIS = SENDER
+
+	if = { limit = { check_variable = { EAI_volunteer_targets^num > 0 } }
+	
+		every_country = { limit = { has_country_flag = EAI_volunteers_from_@PREV }
+			
+			EAI_VOLUNTEERS_cancel_target = yes
+		}
+
+		clear_array = EAI_volunteer_targets
+	}
+}
+
+EAI_VOLUNTEERS_print_target = {
+
+	for_each_scope_loop = { array = EAI_volunteer_targets
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: current target = [This.GetTag]"
+	}
+}
+
+EAI_VOLUNTEERS_print_potential_target = {
+
+	every_other_country = { limit = { EAI_VOLUNTEERS_THIS_is_valid_target_of_ROOT = yes } 
+	
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | VOLUNTEERS: potential target = [This.GetTag]"
+	}
+}
+
+##################################################################
+# 	Expeditionaries
+##################################################################
+
+EAI_EXPEDITIONARY_update_strategy = {
+
+	# Select expeditionary targets
+	if = { limit = { EAI_EXPEDITIONARY_enable = yes }
+
+		resize_temp_array = { expeditionary_priorities = 1 }
+		for_each_loop = { array = expeditionary_priorities index = expeditionary_prio break = selected_expeditionary_target
+
+			### Expeditionary priorities
+
+			if = { 		limit = { check_variable = { expeditionary_prio = 0 } } EAI_EXPEDITIONARY_expeditionary_target_selector = yes }
+		}
+	}
+	else = {
+
+		EAI_EXPEDITIONARY_cancel_all_targets = yes
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_ended_expeditionary = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARIES: reason: expeditionaries disabled" } 
+		set_temp_variable = { log_ended_expeditionary = 0 }
+	}
+}
+
+EAI_EXPEDITIONARY_expeditionary_target_selector = {
+
+	# List of eligible targets for expeditionaries
+	clear_temp_array = updated_expeditionary_targets
+	every_other_country = { limit = { EAI_EXPEDITIONARY_THIS_is_valid_target_of_ROOT = yes } 
+	
+		add_to_temp_array = { array = updated_expeditionary_targets value = THIS.id }
+	}
+
+	# Cancel targets
+	for_each_scope_loop = { array = EAI_expeditionary_targets 
+		
+		if = { limit = { NOT = { is_in_array = { array = updated_expeditionary_targets value = THIS.id } } }
+
+			EAI_EXPEDITIONARY_cancel_target = yes
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_ended_expeditionary = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: reason: EAI_EXPEDITIONARY_expeditionary_target_selector" } 
+		set_temp_variable = { log_ended_expeditionary = 0 }
+	}
+
+	# Set expeditionary targets
+	for_each_scope_loop = { array = updated_expeditionary_targets 
+		
+		ROOT = { EAI_EXPEDITIONARY_set_target = yes }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging check_variable = { log_started_expeditionary = 1 } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: reason: EAI_EXPEDITIONARY_expeditionary_target_selector" } 
+		set_temp_variable = { log_started_expeditionary = 0 }
+	}
+}
+
+###
+
+EAI_EXPEDITIONARY_set_target = { # THIS = SENDER PREV = TARGET
+
+	if = { limit = { NOT = { is_in_array = { array = EAI_expeditionary_targets value = PREV.id } } }
+
+		PREV = { set_country_flag = EAI_volunteers_from_@PREV }
+		add_to_array = { array = EAI_expeditionary_targets value = PREV.id }
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging } } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EXPEDITIONARIES: set target [Prev.GetName]" } 
+		set_temp_variable = { log_started_expeditionary = 1 }
+	}
+}
+
+EAI_EXPEDITIONARY_cancel_target = { # THIS = TARGET PREV = SENDER
+
+	if = { limit = { is_in_array = { array = EAI_expeditionary_targets value = PREV.id } }
+
+		clr_country_flag = EAI_volunteers_from_@PREV
+		
+		# compare tags because the id may not match after civil wars
+		for_each_loop = { array = PREV.EAI_expeditionary_targets
+
+			var:v = {
+				if = { limit = { tag = PREV } 
+				
+					remove_from_array = { array = PREV.PREV.EAI_expeditionary_targets index = i }
+					set_temp_variable = { break = 1 } 
+				}
+			}
+		}
+		set_temp_variable = { break = 0 } 
+
+		if = { limit = { ROOT = { has_country_flag = EAI_volunteer_logging } } log = "[GetYear] [GetMonth] | AI | [Prev.GetName] | EXPEDITIONARIES: cancel target [This.GetName]" } 
+		set_temp_variable = { log_ended_expeditionary = 1 }
+	}
+}
+
+EAI_EXPEDITIONARY_cancel_all_targets = { # THIS = SENDER
+
+	if = { limit = { check_variable = { EAI_expeditionary_targets^num > 0 } }
+	
+		every_country = { limit = { has_country_flag = EAI_volunteers_from_@PREV }
+			
+			EAI_EXPEDITIONARY_cancel_target = yes
+		}
+
+		clear_array = EAI_expeditionary_targets
+	}
+}
+
+EAI_EXPEDITIONARY_print_target = {
+
+	for_each_scope_loop = { array = EAI_expeditionary_targets
+
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARIES: current target = [This.GetTag]"
+	}
+}
+
+EAI_EXPEDITIONARY_print_potential_target = {
+
+	every_other_country = { limit = { EAI_EXPEDITIONARY_THIS_is_valid_target_of_ROOT = yes } 
+	
+		log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EXPEDITIONARY: potential target = [This.GetTag]"
+	}
+}

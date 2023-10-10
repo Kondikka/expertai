@@ -1049,7 +1049,7 @@ USA_aid_britain = {
 			war_support_weekly = 0.001		
 			industrial_capacity_factory = 0.02
 			industrial_capacity_dockyard = 0.02
-			consumer_goods_factor = -0.05
+			consumer_goods_factor = -0.15
 		}
 
 		days_remove = 360
@@ -3054,4 +3054,111 @@ USA_decolonisation = {
 			}
 		}
 	}
+}
+
+operations = {
+
+	USA_initiate_the_greenland_patrol = {
+
+		icon = generic_operation
+	
+		allowed = {
+			tag = USA
+		}
+		
+		available = {
+			OR = {
+				has_government = democratic
+				has_government = neutrality
+			}
+			101 = {
+				is_owned_and_controlled_by = DEN
+			}
+			DEN = {
+				OR = {
+					AND = {
+						has_war = yes
+						surrender_progress > 0.49
+					}
+					is_subject = yes
+				}
+			}
+			IF = {
+				limit = {	
+					DEN = {
+						is_subject = yes
+					}
+				}
+				DEN = {
+					overlord = {
+						OR = {
+							original_tag = GER
+							original_tag = SOV
+						}
+						NOT = {
+							has_government = democratic
+						}
+						NOT = {
+							is_in_faction_with = ROOT
+						}
+					}
+				}
+			}
+		}
+
+		cost = 50
+
+		fire_only_once = yes
+
+		ai_will_do = {
+			base = 30
+			modifier = {
+				factor = 10 
+				ENG = {
+					has_war_with = GER
+					has_subject = CAN
+				}	
+				GER = {
+					has_government = fascism
+				}
+			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
+		}
+		
+		visible = {
+			tag = USA
+			OR = {
+				has_government = democratic
+				has_government = neutrality
+			}
+			101 = {
+				is_owned_and_controlled_by = DEN
+			}
+			OR = {
+				GER = {
+					has_war = yes
+				}
+				SOV = {
+					has_war = yes
+				}
+				DEN = {
+					has_war = yes
+				}
+			}
+			has_dlc = "Arms Against Tyranny"
+		}
+		
+		complete_effect = {
+			DEN = { country_event = { id = AAT_USA_events.01 days = 2 } }
+			add_ideas = USA_greenland_patrol_idea
+			ROOT = {
+				transfer_state = 101
+			}
+		}
+	}
+
+
 }

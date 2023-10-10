@@ -213,8 +213,60 @@ FRA_vichy_france = {
 		is_good = no
 
 		timeout_effect = {
+			# Remove states that should not go to Germany - then Germany annexes Vichy France
+			hidden_effect = {
+				random_country = {
+					limit = {
+						original_tag = FRA 
+						NOT = { tag = ROOT }
+						has_war_with = GER 
+					}
+					set_variable = { GER.transfer_target = THIS }
+					# transfer states to Free France if controlled by Free france
+					ROOT  = {
+						every_owned_state = {
+							limit = { is_controlled_by = PREV.PREV }
+							transfer_state_to = GER.transfer_target
+						}
+					}
+					# transfer non-core states to Free France if Germany does not have troops in them 
+					ROOT  = {
+						every_owned_state = {
+							limit = { 
+								NOT = { is_core_of = FRA }
+								is_controlled_by_ROOT_or_ally = yes 
+							}
+							set_variable = { GER.state_to_target = THIS}
+							IF = {
+								limit = {
+									GER = {
+										divisions_in_state = {
+											state = GER.state_to_target
+											size < 1
+										}
+										NOT = {
+											any_allied_country = {
+												NOT = { tag = ROOT }
+												divisions_in_state = {
+													state = GER.state_to_target
+													size > 0
+												}
+											}
+										}
+									}
+								}
+								transfer_state_to = GER.transfer_target
+							}
+						}
+					}
+				}
+				GER = { annex_country = { target = ROOT } }
+			}
+
 			transfer_navy = { target = GER }
-			GER = { annex_country = { target = ROOT } }
+			effect_tooltip = {
+				GER = { annex_country = { target = ROOT } }
+			}
 			if = {
 				limit = {
 					NOT = { has_country_flag = scuttled_fleet }
@@ -441,6 +493,17 @@ FRA_weapons_purchases_category = {
 				type = infantry_equipment
 				amount = 2500
 			}
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				add_equipment_subsidy = {
+					cic = 500
+					equipment_type = infantry_equipment
+					seller_tags = { USA } 
+				}
+			}
+
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -2 }
 			}
@@ -478,6 +541,16 @@ FRA_weapons_purchases_category = {
 			add_equipment_to_stockpile = {
 				type = artillery_equipment
 				amount = 75
+			}
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				add_equipment_subsidy = {
+					cic = 250
+					equipment_type = artillery_equipment
+					seller_tags = { USA } 
+				}
 			}
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -3 }
@@ -536,6 +609,16 @@ FRA_weapons_purchases_category = {
 					type = light_tank_chassis
 					amount = 50
 				}
+				if = {
+					limit = {
+						has_dlc = "Arms Against Tyranny"
+					}
+					add_equipment_subsidy = {
+						cic = 500
+						equipment_type = light_tank_chassis
+						seller_tags = { USA } 
+					}
+				}
 			}
 			else_if = {
 				limit = {
@@ -551,6 +634,16 @@ FRA_weapons_purchases_category = {
 				add_equipment_to_stockpile = {
 					type = medium_tank_chassis
 					amount = 50
+				}
+				if = {
+					limit = {
+						has_dlc = "Arms Against Tyranny"
+					}
+					add_equipment_subsidy = {
+						cic = 500
+						equipment_type = medium_tank_chassis
+						seller_tags = { USA } 
+					}
 				}
 			}
 			USA = {
@@ -607,6 +700,16 @@ FRA_weapons_purchases_category = {
 					variant_name = "P-36A"
 				}	
 			}
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				add_equipment_subsidy = {
+					cic = 500
+					equipment_type = small_plane_airframe
+					seller_tags = { USA } 
+				}
+			}
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -5 }
 			}
@@ -662,6 +765,16 @@ FRA_weapons_purchases_category = {
 					variant_name = "B-18"
 				}
 			}
+			if = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				add_equipment_subsidy = {
+					cic = 500
+					equipment_type = medium_plane_airframe
+					seller_tags = { USA } 
+				}
+			}
 			USA = {
 				add_offsite_building = { type = industrial_complex level = -5 }
 			}
@@ -706,6 +819,11 @@ FRA_spanish_intervention_category = {
 				has_stability < 0.3
 				factor = 5
 			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability > 0.4
+			}
 		}
 		complete_effect = {
 			FROM = {
@@ -739,6 +857,11 @@ FRA_spanish_intervention_category = {
 			modifier = {
 				has_stability < 0.3
 				factor = 0
+			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability < 0.8
 			}
 		}
 		days_remove = -1
@@ -829,6 +952,12 @@ FRA_spanish_intervention_category = {
 				has_stability < 0.4
 				factor = 0
 			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability < 0.8
+				has_war_support > 0.25
+			}
 		}
 		days_remove = -1
 		modifier = {
@@ -890,6 +1019,11 @@ FRA_spanish_intervention_category = {
 				has_stability < 0.45
 				factor = 0
 			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability < 0.8
+			}
 		}
 	}
 
@@ -950,6 +1084,11 @@ FRA_spanish_intervention_category = {
 				has_stability < 0.5
 				factor = 0
 			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability < 0.8
+			}
 		}
 		days_remove = -1
 		modifier = {
@@ -1003,6 +1142,11 @@ FRA_spanish_intervention_category = {
 			modifier = {
 				has_stability < 0.8
 				factor = 0.5
+			}
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+				has_stability < 0.8
 			}
 		}
 		days_remove = -1
@@ -1231,12 +1375,34 @@ economy_decisions = {
 					instant_build = yes
 				}
 			}
+			IF = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				mio:FRA_amiot_organization = {
+					set_mio_name_key = SNCAN
+					add_mio_research_bonus = -0.02
+					add_mio_funds_gain_factor = 0.05
+					
+				}
+				hidden_effect = {
+					mio:FRA_amiot_organization = {
+						set_mio_icon = GFX_idea_FRA_sncan
+					}
+				}
+
+			}
 		}
 		days_remove = 120
 		cost = 50
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 5
+
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
 		}
 		
 	}
@@ -1268,12 +1434,34 @@ economy_decisions = {
 					instant_build = yes
 				}
 			}
+			IF = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				mio:FRA_bloch_organization = {
+					set_mio_name_key = SNCAN
+					add_mio_research_bonus = -0.02
+					add_mio_funds_gain_factor = 0.05
+					
+				}
+				hidden_effect = {
+					mio:FRA_bloch_organization = {
+						set_mio_icon = GFX_idea_FRA_sncao
+					}
+				}
+
+			}
 		}
 		days_remove = 120
 		cost = 50
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 5
+
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
 		}
 	}
 	FRA_reorganize_aviation_industry_center = {
@@ -1306,12 +1494,29 @@ economy_decisions = {
 					instant_build = yes
 				}
 			}
+			IF = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				custom_effect_tooltip = invites_mio_tt
+				show_mio_tooltip = FRA_SNCAC_organization
+				mio:FRA_SNCAC_organization = {
+					add_mio_size = 2
+					add_mio_research_bonus = -0.02
+					add_mio_funds_gain_factor = 0.05
+				}
+			}
 		}
 		days_remove = 120
 		cost = 50
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 5
+
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
 		}
 	}
 	FRA_reorganize_aviation_industry_south_east = {
@@ -1344,12 +1549,34 @@ economy_decisions = {
 					instant_build = yes
 				}
 			}
+			IF = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				mio:FRA_morane_saulnier_organization = {
+					set_mio_name_key = SNCAN
+					add_mio_research_bonus = -0.02
+					add_mio_funds_gain_factor = 0.05
+					
+				}
+				hidden_effect = {
+					mio:FRA_morane_saulnier_organization = {
+						set_mio_icon = GFX_idea_FRA_sncase
+					}
+				}
+
+			}
 		}
 		days_remove = 120
 		cost = 50
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 5
+
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
 		}
 	}
 	FRA_reorganize_aviation_industry_south_west = {
@@ -1381,12 +1608,34 @@ economy_decisions = {
 					instant_build = yes
 				}
 			}
+			IF = {
+				limit = {
+					has_dlc = "Arms Against Tyranny"
+				}
+				mio:FRA_levasseur_organization = {
+					set_mio_name_key = SNCAN
+					add_mio_research_bonus = -0.02
+					add_mio_funds_gain_factor = 0.05
+					
+				}
+				hidden_effect = {
+					mio:FRA_levasseur_organization = {
+						set_mio_icon = GFX_idea_FRA_sncaso
+					}
+				}
+
+			}
 		}
 		days_remove = 120
 		cost = 50
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 5
+
+			modifier = { #EAI
+				factor = 0
+				has_political_power < 200
+			}
 		}
 	}
 }
@@ -1648,9 +1897,13 @@ FRA_intervention_in_overseas_territories = {
 		ai_will_do = { #EAI
 			base = 0
 
-			modifier = {
+			modifier = { # Crash fix
 				add = 10000
 				date > 1943.1.1
+				set_temp_variable = { tmp = global.EAI_days_elapsed }
+				modulo_temp_variable = { tmp = 100 }
+				check_variable = { tmp > 20 }
+				check_variable = { tmp < 25 }
 			}
 		}
 	}
@@ -1883,9 +2136,13 @@ FRA_intervention_in_overseas_territories = {
 		ai_will_do = { #EAI
 			base = 0
 
-			modifier = {
+			modifier = { # Crash fix
 				add = 10000
-				date > 1942.1.1
+				date > 1941.6.1
+				set_temp_variable = { tmp = global.EAI_days_elapsed }
+				modulo_temp_variable = { tmp = 100 }
+				check_variable = { tmp > 30 }
+				check_variable = { tmp < 35 }
 			}
 		}
 		
@@ -2174,9 +2431,13 @@ FRA_intervention_in_overseas_territories = {
 		ai_will_do = { #EAI
 			base = 0
 
-			modifier = {
+			modifier = { # Crash fix
 				add = 10000
 				date > 1942.1.1
+				set_temp_variable = { tmp = global.EAI_days_elapsed }
+				modulo_temp_variable = { tmp = 100 }
+				check_variable = { tmp > 40 }
+				check_variable = { tmp < 45 }
 			}
 		}
 	}
@@ -2344,11 +2605,6 @@ FRA_intervention_in_overseas_territories = {
 		cost = 25
 		ai_will_do = { #EAI
 			base = 0
-
-			modifier = {
-				add = 10000
-				date > 1942.1.1
-			}
 		}
 	}
 	FRA_promise_independence_to_west_africa = {
@@ -2588,9 +2844,13 @@ FRA_intervention_in_overseas_territories = {
 		ai_will_do = { #EAI
 			base = 0
 
-			modifier = {
+			modifier = { # Crash fix
 				add = 10000
 				date > 1942.1.1
+				set_temp_variable = { tmp = global.EAI_days_elapsed }
+				modulo_temp_variable = { tmp = 100 }
+				check_variable = { tmp > 0 }
+				check_variable = { tmp < 5 }
 			}
 		}
 	}
@@ -2660,9 +2920,13 @@ FRA_intervention_in_overseas_territories = {
 		ai_will_do = { #EAI
 			base = 0
 
-			modifier = {
+			modifier = { # Crash fix
 				add = 10000
 				date > 1942.1.1
+				set_temp_variable = { tmp = global.EAI_days_elapsed }
+				modulo_temp_variable = { tmp = 100 }
+				check_variable = { tmp > 10 }
+				check_variable = { tmp < 15 }
 			}
 		}
 	}

@@ -31,8 +31,12 @@ characters={
 			traits  = {
 				royalist_bulldog 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 
@@ -85,8 +89,12 @@ characters={
 			traits  = {
 				economic_organizer 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -138,8 +146,12 @@ characters={
 					has_government  = communism 
 				}
 			}
-			ai_will_do  = {
-				factor  = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -208,7 +220,37 @@ characters={
 			}
 			cost = 200
 			ai_will_do = { #EAI
-				base = 10
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 10 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					# if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -251,17 +293,13 @@ characters={
 				grand_battle_plan_expert
 			}
 			ai_will_do = { #EAI
-				factor = 50000
-				modifier = { # Theorist priority
-					factor = 0
-					has_army_experience < 150
-					has_war = no
-					check_variable = { modifier@experience_gain_army < 0.3 } # Has not taken army staff
-				}
-				modifier = { 
-					factor = 0 
-					NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
-				}
+				base = 0
+
+				modifier = { add = 1 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+
+				modifier = { add = 500 has_political_power > 300 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+
+				modifier = { factor = 0 has_political_power < 210 }
 			}
 		}
 		
@@ -298,7 +336,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -450,21 +492,11 @@ characters={
 			traits = {
 				military_theorist
 			}
+
 			ai_will_do = { #EAI
-				factor = 50000
-				modifier = { 
-					factor = 0 
-					OR = {
-						AND = {
-							check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE }
-							has_available_idea_with_traits = { idea = blitzkrieg_theorist limit = 1 }
-						}
-						AND = {
-							check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE }
-							has_available_idea_with_traits = { idea = grand_battle_plan_expert limit = 1 }
-						}
-					}
-				}
+				base = 1
+
+				modifier = { factor = 0 has_political_power < 210 }
 			}
 		}
 		
@@ -598,7 +630,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0.001
+				base = 0
+				
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 
@@ -754,7 +790,37 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 10
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -829,14 +895,10 @@ characters={
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
-				modifier = {
-					add = 1
 
-					OR = {
-						date > 1939.1.1
-						has_war = yes
-					}
-				}
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -872,7 +934,37 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 		
@@ -1052,20 +1144,9 @@ characters={
 				military_theorist
 			}
 			ai_will_do = { #EAI
-				factor = 50000
-				modifier = { 
-					factor = 0 
-					OR = {
-						AND = {
-							check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE }
-							has_available_idea_with_traits = { idea = blitzkrieg_theorist limit = 1 }
-						}
-						AND = {
-							check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE }
-							has_available_idea_with_traits = { idea = grand_battle_plan_expert limit = 1 }
-						}
-					}
-				}
+				base = 1
+
+				modifier = { factor = 0 has_political_power < 210 }
 			}
 		}
 	}
@@ -1096,7 +1177,11 @@ characters={
 			}
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1119,7 +1204,11 @@ characters={
 			traits = { naval_theorist }
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1144,7 +1233,11 @@ characters={
 			}
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1170,7 +1263,11 @@ characters={
 			}
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1198,7 +1295,11 @@ characters={
 			}
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1226,7 +1327,11 @@ characters={
 			}
 
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1255,11 +1360,13 @@ characters={
 				blitzkrieg_theorist
 			}
 			ai_will_do = { #EAI
-				factor = 50000
-				modifier = { 
-					factor = 0 
-					NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
-				}
+				base = 0
+
+				modifier = { add = 1 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+
+				modifier = { add = 500 has_political_power > 300 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+
+				modifier = { factor = 0 has_political_power < 210 }
 			}
 		}
 	}
@@ -1342,7 +1449,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0.001
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1371,14 +1482,10 @@ characters={
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
-				modifier = {
-					add = 1
 
-					OR = {
-						date > 1939.1.1
-						has_war = yes
-					}
-				}
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1401,7 +1508,11 @@ characters={
 			}
 			cost =  50
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1427,7 +1538,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1451,14 +1566,36 @@ characters={
 			cost = 100
 			ai_will_do = { #EAI
 				base = 0
-				modifier = {
-					add = 1
 
-					OR = {
-						date > 1939.1.1
-						has_war = yes
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
 					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
 				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1481,7 +1618,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1513,7 +1654,37 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				base = 10
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1537,7 +1708,37 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order conditions
+
+					NOT = { check_variable = { command_power < 20 } }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1561,7 +1762,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1585,7 +1790,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1615,14 +1824,10 @@ characters={
 			cost = 200
 			ai_will_do = { #EAI
 				base = 0
-				modifier = {
-					add = 1
 
-					OR = {
-						date > 1939.1.1
-						has_war = yes
-					}
-				}
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1646,7 +1851,11 @@ characters={
 			}
 			cost = 100
 			ai_will_do = { #EAI
-				factor = 0
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1672,8 +1881,12 @@ characters={
 				army_commando_3
 			}
 			cost = 200
-			ai_will_do = {
-				factor = 0.200
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1726,8 +1939,12 @@ characters={
 					has_government  = democratic 
 				}
 			}
-			ai_will_do  = {
-				factor  = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1769,8 +1986,12 @@ characters={
 					has_government  = fascism 
 				}
 			}
-			ai_will_do  = {
-				factor  = 0.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1803,7 +2024,33 @@ characters={
 				silent_workhorse 
 			}
 			ai_will_do = { #EAI
-				factor = 100000
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					###
+
+					# has_idea = ENG_philip_kerr
+					# if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+					# 	has_idea = ENG_maxwell_aitken 
+					# }
+					# if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}		
 	}
@@ -1844,8 +2091,37 @@ characters={
 				war_industrialist 
 			}
 			ai_will_do = { #EAI
-				factor = 100000
-				modifier = { factor = 0 NOT = { has_idea = ENG_philip_kerr } }
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					### Pick order condition
+
+					set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					# if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+					# 	has_idea = ENG_maxwell_aitken 
+					# }
+					# if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1885,8 +2161,12 @@ characters={
 			traits  = {
 				quartermaster_general 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1911,8 +2191,12 @@ characters={
 			traits  = {
 				princess_of_terror 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1945,8 +2229,12 @@ characters={
 			traits  = {
 				socialist_novelist 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -1963,7 +2251,10 @@ characters={
 			slot = political_advisor
 			idea_token = ENG_sylvia_pankhurst
 			available  = {
-				has_government  = communism 
+				OR = {
+					has_government  = communism 
+					SWE_refuge_for_revolutionaries_trigger = yes
+				}
 			}
 			allowed  = {
 				OR = {
@@ -1975,14 +2266,23 @@ characters={
 						original_tag = ETH
 						has_dlc = "By Blood Alone"
 					}
+
+					AND = {
+						original_tag = SWE
+						has_aat = yes
+					}
 				}
 				
 			}
 			traits  = {
 				red_suffragette 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 			on_add = {
 				owner = {
@@ -2023,8 +2323,12 @@ characters={
 			traits  = {
 				old_figurehead 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2328,8 +2632,12 @@ characters={
 			traits  = {
 				face_licker 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2365,8 +2673,12 @@ characters={
 			traits  = {
 				heels_nipper 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2402,8 +2714,12 @@ characters={
 			traits  = {
 				snuggler 
 			}
-			ai_will_do  = {
-				factor  = 1.000
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 		}
 	}
@@ -2428,6 +2744,35 @@ characters={
 			traits  = {
 				head_of_intelligence 
 			}
+			ai_will_do = { #EAI
+				base = 0
+
+				modifier = { # Pick order
+					add = 500
+					has_game_rule = { rule = ENG_ai_behavior option = DEFAULT }
+
+					###
+
+					has_idea = ENG_philip_kerr
+					if = { limit = { set_temp_variable = { tmp_wants_mic = EAI_BUILDING_build_num_MIC } subtract_from_temp_variable = { tmp_wants_mic = num_of_military_factories } check_variable = { tmp_wants_mic > 2 } }
+					
+						has_idea = ENG_maxwell_aitken 
+					}
+					if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = ENG_alan_brooke ENG_alan_brooke = { is_advisor = yes } } has_idea = alan_brooke } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_andrew_cunningham ENG_andrew_cunningham = { is_advisor = yes } } has_idea = andrew_cunningham } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_charles_portal ENG_charles_portal = { is_advisor = yes } } has_idea = charles_portal } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_kenneth_anderson ENG_kenneth_anderson = { is_advisor = yes } } has_idea = kenneth_anderson } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_sholto_douglas ENG_sholto_douglas = { is_advisor = yes } } has_idea = sholto_douglas } }
+					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = ENG_archibald_wavell ENG_archibald_wavell = { is_advisor = yes } } has_idea = archibald_wavell } }
+					# if = { limit = { has_character = eng_stewart_menzies eng_stewart_menzies = { is_advisor = yes } } has_idea = eng_stewart_menzies }
+				}
+
+				modifier = { add = 1 has_political_power > 300 }
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
+			}
 		}
 	}
 
@@ -2448,12 +2793,12 @@ characters={
 					has_done_agency_upgrade  = upgrade_form_department 
 				}
 			}
-			ai_will_do  = {
-				factor  = 1.000
-				modifier  = {
-					has_political_power < 200.000
-					factor  = 0.000
-				}
+			ai_will_do = { #EAI
+				base = 0
+
+				###
+
+				modifier = { add = 1 NOT = { has_game_rule = { rule = ENG_ai_behavior option = DEFAULT } } }
 			}
 			allowed  = {
 				original_tag  = ENG

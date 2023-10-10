@@ -1,0 +1,172 @@
+############################################################################################################
+#	Expert AI mod - scripted AI effects
+############################################################################################################
+
+EAI_TRADE_needed_trade_factories = {
+
+	set_temp_variable = { trade_factories = 0 } # add imported resources as well
+	if = { limit = { check_variable = { resource@steel < 0 } } add_to_temp_variable = { trade_factories = resource@steel } }
+	if = { limit = { check_variable = { resource@aluminium < 0 } } add_to_temp_variable = { trade_factories = resource@aluminium } }
+	if = { limit = { check_variable = { resource@rubber < 0 } } add_to_temp_variable = { trade_factories = resource@rubber } }
+	if = { limit = { check_variable = { resource@tungsten < 0 } } add_to_temp_variable = { trade_factories = resource@tungsten } }
+	if = { limit = { check_variable = { resource@oil < 0 } } add_to_temp_variable = { trade_factories = resource@oil } }
+	if = { limit = { check_variable = { resource@chromium < 0 } } add_to_temp_variable = { trade_factories = resource@chromium } }
+
+	multiply_temp_variable = { trade_factories = -1 }
+	divide_temp_variable = { trade_factories = 8 }
+	round_temp_variable = trade_factories
+
+	set_variable = { EAI_TRADE_needed_trade_factories = trade_factories }
+}
+
+EAI_TRADE_strategies = {
+
+	every_country = { EAI_TRADE_allow_trade = yes }
+
+	### FIN - industrial strategy
+
+	if = { 
+		limit = { 
+			tag = FIN
+			date < 1940.1.1
+			has_war = no
+		}
+
+		every_other_country = {
+			EAI_TRADE_block_trade = yes
+		}
+	}
+
+	### JAP - industrial strategy
+
+	if = { 
+		limit = { 
+			tag = JAP
+			date < 1938.1.1
+			has_war = no
+		}
+
+		every_other_country = {
+			limit = { NOT = { tag = SOV } }
+			EAI_TRADE_block_trade = yes
+		}
+	}
+
+	### SOV - industrial strategy
+
+	if = { 
+		limit = { 
+			tag = SOV
+			date < 1938.1.1
+			has_war = no
+		}
+
+		every_other_country = {
+			EAI_TRADE_block_trade = yes
+		}
+	}
+	
+	### GER - stop oversea trade
+
+	if = { 
+		limit = { 
+			GER = { is_ai = yes EAI_PREV_on_same_side_with_THIS = yes }
+			capital_scope = { OR = { is_on_continent = europe is_on_continent = middle_east } }
+			has_war = yes 
+			alliance_naval_strength_ratio < 2
+		}
+
+		every_country = {
+			limit = { 
+				NOT = { capital_scope = { OR = { is_on_continent = europe is_on_continent = middle_east } } } 
+				NOT = { is_neighbor_of = ROOT }
+			}
+
+			EAI_TRADE_block_trade = yes
+		}
+	}
+
+	### GER - avoid early oil trades
+
+	if = { 
+		limit = { 
+			tag = GER
+			has_war = no
+			fuel_ratio > 0.1
+		}
+
+		every_country = {
+			limit = { 
+				date < 1939.1.1
+				check_variable = { resource_produced@oil > 8 }
+			}
+
+			EAI_TRADE_block_trade = yes
+		}
+	}
+
+	### JAP - stop oversea trade
+
+	if = { 
+		limit = { 
+			JAP = { is_ai = yes EAI_PREV_on_same_side_with_THIS = yes }
+			capital_scope = { OR = { is_on_continent = asia is_on_continent = pacific is_on_continent = oceania } }
+			has_war = yes 
+			alliance_naval_strength_ratio < 2
+		}
+
+		every_country = { 
+			limit = { 
+				NOT = { capital_scope = { OR = { is_on_continent = asia is_on_continent = pacific is_on_continent = oceania } } }
+				NOT = { is_neighbor_of = ROOT }
+			}
+
+			EAI_TRADE_block_trade = yes
+		}
+	}
+
+	### ROM - direct oil trade to GER when needed
+
+	if = { 
+		limit = { 
+			GER = { is_ai = yes fuel_ratio < 0.5 }
+			OR = { is_in_faction_with = GER has_non_aggression_pact_with = GER GER = { EAI_PREV_has_same_ideology_with_THIS = yes } }
+			NOT = { original_tag = GER original_tag = ROM }
+			ROM = { is_in_faction_with = GER }
+			NOT = { AND = { original_tag = ITA fuel_ratio < 0.25 } }
+			fuel_ratio > 0.1
+		}
+		
+		ROM = { 
+			EAI_TRADE_block_trade = yes
+		}
+	}
+}
+
+EAI_TRADE_block_trade = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_TRADE_block_trade_to_@PREV } }
+
+		set_country_flag = EAI_TRADE_block_trade_to_@PREV
+
+		add_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_1 } 
+		add_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_2 } 
+		add_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_3 } 
+
+		# log = "[GetYear] [GetMonth] | AI | [Prev.GetName] | TRADE: blocking trade against [This.GetName]"
+	}
+}
+
+EAI_TRADE_allow_trade = {
+
+	if = { limit = { has_country_flag = EAI_TRADE_block_trade_to_@PREV }
+
+		clr_country_flag = EAI_TRADE_block_trade_to_@PREV
+
+		remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_1 } 
+		remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_2 } 
+		remove_opinion_modifier = { target = PREV modifier = EAI_trade_opinion_3 } 
+
+		# log = "[GetYear] [GetMonth] | AI | [Prev.GetName] | TRADE: allowing trade against [This.GetName]"
+	}
+}

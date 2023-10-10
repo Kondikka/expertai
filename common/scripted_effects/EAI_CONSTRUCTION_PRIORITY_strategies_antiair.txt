@@ -1,0 +1,270 @@
+############################################################################################################
+# 	Expert AI mod - priority construction AI
+############################################################################################################
+
+###############################################################
+###		Antiair construction strategies
+###############################################################
+
+@EAI_PC_AA_strategies_TYPE_ID = 10
+@EAI_PC_AA_strategies_PRIO = 0
+EAI_PC_AA_strategies = {
+
+	set_temp_variable = { strategy_type_id = @EAI_PC_AA_strategies_TYPE_ID }
+
+	if = {
+		limit = {
+			always = yes
+		}
+
+		EAI_PC_AA_country_strategies = yes
+
+		### EAI_PC_AA_get_best_target_on_controlled_states
+
+		if = {
+			limit = {
+				always = yes
+			}
+
+			set_temp_variable = { best_scored_target_ = 0 }
+			set_temp_variable = { best_target_score_ = 0 }
+			EAI_PC_AA_get_best_target_on_controlled_states = yes
+
+			if = { limit = { NOT = { check_variable = { best_scored_target_ = 0 } } }
+
+				set_temp_variable = { _project_building_type = global.EAI_PC_AA }
+				set_temp_variable = { _project_building_type_id = @EAI_PC_AA_strategies_TYPE_ID }
+				set_temp_variable = { _project_building_prio = @EAI_PC_AA_strategies_PRIO }
+				var:best_scored_target_ = { EAI_PC_start_project = yes }
+
+				if = { limit = { ROOT = { has_country_flag = EAI_PC_AA_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | AA: EAI_PC_AA_get_best_target_on_controlled_states = [?best_scored_target_.GetName] - [?best_target_score_]" }
+			}
+		}
+	}
+}
+
+EAI_PC_AA_country_strategies = {
+
+}
+
+EAI_PC_AA_test = {
+
+	every_state = {
+
+		set_variable = { EAI_debug_value = 0 }
+		set_variable = { EAI_debug_value_2 = 0 }
+	}
+
+	set_country_flag = EAI_PC_AA_score_logging
+
+	###
+
+	EAI_PC_AA_get_best_target_on_controlled_states = yes
+
+	###
+
+	clr_country_flag = EAI_PC_AA_score_logging
+
+	force_update_map_mode = { limit = { always = yes } mapmode = debug_map_mode_airbase }
+}
+
+EAI_PC_AA_get_best_target_on_controlled_states = {
+
+	### Which states to evaluate
+
+	clear_temp_array = scored_target_states
+	
+	for_each_scope_loop = { array = controlled_states
+
+		if = {
+			limit = {
+				is_in_array = { PREV.EAI_bombed_regions = THIS.EAI_region_id }
+			}
+
+			add_to_temp_array = { scored_target_states = THIS.id }
+		}
+	}
+
+	### Add all states within the same strategic regions as above states
+
+	for_each_scope_loop = { array = scored_target_states
+
+		for_each_scope_loop = { array = PREV.controlled_states
+
+			if = { limit = { check_variable = { THIS.EAI_region_id = PREV.EAI_region_id } }
+
+				if = { limit = { NOT = { is_in_array = { scored_target_states = THIS.id } } }
+					add_to_temp_array = { scored_target_states = THIS.id }
+				}
+			}
+		}
+	}
+
+	######################################################
+	### Final score calculation
+	######################################################
+
+	set_temp_variable = { EAI_PC_AIRBASE_get_region_danger_score_WEIGHT = 10 }
+	set_temp_variable = { EAI_PC_AIRBASE_get_region_damage_score_WEIGHT = 15 }
+
+	clear_temp_array = scored_target_states_scores
+	resize_temp_array = { scored_target_states_scores = scored_target_states^num }
+	for_each_loop = { array = scored_target_states value = tmp_potential_target_state index = tmp_potential_target_state_index
+
+		var:tmp_potential_target_state = { if = { limit = { always = yes }
+
+			clear_temp_array = modifier_score_factors
+			clear_temp_array = modifier_score_weights
+
+			######################################################
+			### Weighed modifiers
+			######################################################
+
+			###### Region danger
+
+			set_temp_variable = { region_danger_score_factor = 0 }
+
+			set_temp_variable = { region_danger_score_factor = PREV.EAI_PC_AA_strategic_bombing_activity_region_value^EAI_region_id }
+			divide_temp_variable = { region_danger_score_factor = 50 }
+			clamp_temp_variable = { var = region_danger_score_factor min = 0.0 max = 1.0 }
+
+			###
+
+			add_to_temp_array = { modifier_score_factors = region_danger_score_factor }
+			add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_region_danger_score_WEIGHT }
+
+			if = { limit = { ROOT = { has_country_flag = EAI_PC_AA_score_logging } } log = "[this.getname] - region_danger_score_factor [?region_danger_score_factor] - weight [?EAI_PC_AIRBASE_get_region_danger_score_WEIGHT]" }
+
+			###### Region damage
+
+			set_temp_variable = { region_damage_score_factor = 0 }
+
+			set_temp_variable = { tmp_damaged_buildings = 0 }
+			for_each_scope_loop = { array = PREV.controlled_states
+
+				if = { limit = { check_variable = { EAI_region_id = PREV.EAI_region_id } }
+			
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@infrastructure }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@arms_factory }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@industrial_complex }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@air_base }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@dockyard }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@anti_air_building }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@synthetic_refinery }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@fuel_silo }
+					add_to_temp_variable = { tmp_damaged_buildings = damaged_building_level@radar_station }
+				}
+			}
+
+			divide_temp_variable = { tmp_damaged_buildings = 10 }
+
+			set_temp_variable = { region_damage_score_factor = tmp_damaged_buildings }
+			clamp_temp_variable = { var = region_damage_score_factor min = 0.0 max = 1.0 }
+
+			###
+
+			add_to_temp_array = { modifier_score_factors = region_damage_score_factor }
+			add_to_temp_array = { modifier_score_weights = EAI_PC_AIRBASE_get_region_damage_score_WEIGHT }
+
+			if = { limit = { ROOT = { has_country_flag = EAI_PC_AA_score_logging } } log = "[this.getname] - region_damage_score_factor [?region_damage_score_factor] - weight [?EAI_PC_AIRBASE_get_region_damage_score_WEIGHT]" }
+
+			######################################################
+
+			EAI_PC_SCORE_get_weighed_score = yes
+
+			######################################################
+			### Final score modifiers
+			######################################################
+
+			if = { limit = { NOT = { is_in_home_area = yes } } 
+
+				multiply_temp_variable = { final_score = 0.75 } 
+			}
+
+			EAI_PC_SCORE_final_score_not_fully_controlled_modifier = yes
+
+			EAI_PC_SCORE_final_score_state_borders_enemy_modifier = yes
+
+			EAI_PC_AA_final_score_airbase_maxed_modifier = yes
+
+			EAI_PC_AA_final_score_already_building_AA_here_modifier = yes
+
+			######################################################
+
+			EAI_PC_SCORE_get_final_score = yes
+		} }
+	}
+
+	###
+
+	EAI_PC_SCORE_select_best_target = yes
+}
+
+### Misc functions
+
+EAI_PC_AA_strategic_bombing_danger_value_weekly = {
+
+	every_country = {
+
+		clear_temp_array = new_bombed_regions
+		every_controlled_state = { 
+			
+			if = { limit = { days_since_last_strategic_bombing < 7 }
+
+				if = { limit = { NOT = { is_in_array = { PREV.EAI_bombed_regions = THIS.EAI_region_id } } }
+					add_to_array = { PREV.EAI_bombed_regions = THIS.EAI_region_id }
+				}
+
+				if = { limit = { NOT = { is_in_array = { new_bombed_regions = THIS.EAI_region_id } } }
+					add_to_temp_array = { new_bombed_regions = THIS.EAI_region_id }
+				}
+
+				add_to_variable = { PREV.EAI_PC_AA_strategic_bombing_activity_region_value^EAI_region_id = 1 }
+			}
+		}
+
+		clear_temp_array = remove_bombed_regions
+		for_each_loop = { array = EAI_bombed_regions
+
+			if = { limit = { NOT = { is_in_array = { new_bombed_regions = v } } }
+
+				subtract_from_variable = { EAI_PC_AA_strategic_bombing_activity_region_value^v = 1 }
+			}
+
+			if = { limit = { check_variable = { EAI_PC_AA_strategic_bombing_activity_region_value^v < 1 } }
+
+				add_to_temp_array = { remove_bombed_regions = v }
+			}
+
+		}
+
+		for_each_loop = { array = remove_bombed_regions
+
+			remove_from_array = { array = EAI_bombed_regions value = v }
+		}
+	}
+}
+
+### Final score modifiers
+
+EAI_PC_AA_final_score_already_building_AA_here_modifier = {
+
+	if = { 
+		limit = {
+			set_temp_variable = { _project_building_type = global.EAI_PC_AA } 
+			EAI_PC_has_same_type_project_here = yes
+		}
+
+		multiply_temp_variable = { final_score = 0.0 } 
+	}
+}
+
+EAI_PC_AA_final_score_airbase_maxed_modifier = {
+
+	if = { limit = { NOT = { free_building_slots = { building = anti_air_building size > 0 include_locked = no } } } 
+
+		multiply_temp_variable = { final_score = 0.0 } 
+	}
+}
+
+### Score weights
