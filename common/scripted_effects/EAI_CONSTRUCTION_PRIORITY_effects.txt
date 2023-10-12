@@ -575,6 +575,12 @@ EAI_PC_set_max_factory_limit = { if = { limit = { has_country_flag = EAI_PC_trac
 		clamp_variable = { var = EAI_PC_factories_limit max = _assign_max }
 	}
 
+	if = { limit = { NOT = { check_variable = { _assign_fraction < 1 } } NOT = { check_variable = { _assign_max > 0 } } }
+	
+		set_country_flag = EAI_PC_assign_all_available_factories
+	}
+	else = { clr_country_flag = EAI_PC_assign_all_available_factories }
+
 	set_temp_variable = { _assign_fraction = 0 }
 	set_temp_variable = { _assign_max = 0 }
 }
@@ -618,7 +624,10 @@ EAI_PC_manage_civilian_factories = { if = { limit = { has_country_flag = EAI_PC_
 	set_variable = { EAI_PC_reserved_factories_available = EAI_available_civilian_factories }
 
 	# Factory limit
-	clamp_variable = { var = EAI_PC_reserved_factories_available min = 0 max = EAI_PC_factories_limit }
+	if = { limit = { NOT = { has_country_flag = EAI_PC_assign_all_available_factories } }
+	
+		clamp_variable = { var = EAI_PC_reserved_factories_available min = 0 max = EAI_PC_factories_limit }
+	}
 
 	###
 
