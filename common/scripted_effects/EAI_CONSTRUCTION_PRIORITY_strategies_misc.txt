@@ -304,11 +304,11 @@ EAI_PC_resource_extraction_STRATEGIES = {
 
 						OR = {
 							AND = { has_resources_amount = { resource = oil amount > 50 } }
-							AND = { has_resources_amount = { resource = aluminium amount > 50  }
-							AND = { has_resources_amount = { resource = rubber amount > 50  }
-							AND = { has_resources_amount = { resource = tungsten amount > 50  }
-							AND = { has_resources_amount = { resource = steel amount > 50  }
-							AND = { has_resources_amount = { resource = chromium amount > 50  }
+							AND = { has_resources_amount = { resource = aluminium amount > 50 } }
+							AND = { has_resources_amount = { resource = rubber amount > 50 } }
+							AND = { has_resources_amount = { resource = tungsten amount > 50 } }
+							AND = { has_resources_amount = { resource = steel amount > 50 } }
+							AND = { has_resources_amount = { resource = chromium amount > 50 } }
 						}
 					}
 				}
@@ -316,5 +316,77 @@ EAI_PC_resource_extraction_STRATEGIES = {
 		}
 
 		set_temp_variable = { EAI_PC_resource_extraction_STRATEGIES = 1 }
+	}
+}
+
+### Conversion
+
+@EAI_PC_conversion_to_civ_TYPE_ID = 5
+@EAI_PC_conversion_to_civ_PRIO = 3000
+EAI_PC_conversion_to_civ = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_MTC }
+	set_temp_variable = { _project_type_id = @EAI_PC_conversion_to_civ_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_conversion_to_civ_PRIO }
+	set_temp_variable = { _project_cancel_unbuildable = 0 }
+
+	EAI_PC_conversion_to_civ_STRATEGIES = yes
+	
+	if = {
+		limit = {
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+
+			###
+
+			check_variable = { EAI_PC_conversion_to_civ_STRATEGIES = 1 }
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_conversion_to_civ_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_PC_conversion_to_civ" }
+
+		if = { limit = { check_variable = { EAI_has_shared_slot_scores = 0 } }
+
+			EAI_get_shared_slot_scores = yes
+		}
+
+		for_each_scope_loop = { array = EAI_shared_slot_scores
+
+			if = { 
+				limit = { 
+					EAI_PC_can_build_project = yes
+					NOT = { EAI_PC_has_same_type_project_here = yes }
+				}
+
+				EAI_PC_start_project = yes
+				set_temp_variable = { break = 1 }
+			}
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_conversion_to_civ_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_conversion_to_civ_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+			OR = {
+
+				### Strategies
+
+				AND = {
+					OR = {
+						check_variable = { EAI_aluminium_resource_massive_shortage = 3 }
+						check_variable = { EAI_rubber_resource_massive_shortage = 3 }
+						check_variable = { EAI_steel_resource_massive_shortage = 3 }
+					}
+				}
+			}
+		}
+
+		set_temp_variable = { EAI_PC_conversion_to_civ_STRATEGIES = 1 }
 	}
 }
