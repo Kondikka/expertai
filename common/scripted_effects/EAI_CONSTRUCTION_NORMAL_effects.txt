@@ -168,13 +168,17 @@ EAI_BUILDING_FACTORY_get_building_values = {
 
 	set_temp_variable = { EAI_BUILDING_num_available_CIC = num_of_civilian_factories_available_for_projects }
 	add_to_temp_variable = { EAI_BUILDING_num_available_CIC = EAI_PC_assigned_factories_total }
+	add_to_temp_variable = { EAI_BUILDING_num_available_CIC = EAI_ESP_force_upgrade_agency_factories }
 
 	set_temp_variable = { EAI_BUILDING_num_reserved_CIC = EAI_BUILDING_num_CIC }
 	subtract_from_temp_variable = { EAI_BUILDING_num_reserved_CIC = EAI_BUILDING_num_available_CIC }
 
 	set_temp_variable = { EAI_BUILDING_num_consumer_CIC = EAI_BUILDING_num_CIC }
 	add_to_temp_variable = { EAI_BUILDING_num_consumer_CIC = EAI_BUILDING_num_MIC }
-	multiply_temp_variable = { EAI_BUILDING_num_consumer_CIC = modifier@consumer_goods_factor }
+	set_temp_variable = { tmp_mult = modifier@consumer_goods_expected_value }
+	set_temp_variable = { tmp_mult_2 = modifier@consumer_goods_factor }
+	add_to_temp_variable = { tmp_mult_2 = 1 }
+	multiply_temp_variable = { EAI_BUILDING_num_consumer_CIC = tmp_mult }
 
 	set_temp_variable = { EAI_BUILDING_num_MIC = num_of_military_factories }
 
@@ -250,6 +254,7 @@ EAI_BUILDING_FACTORY_set_building_target_flags = {
 
 	set_temp_variable = { EAI_BUILDING_num_slots_assigned = EAI_BUILDING_num_free_slots }
 	multiply_temp_variable = { EAI_BUILDING_num_slots_assigned = 0.25 }
+	clamp_temp_variable = { var = EAI_BUILDING_num_slots_assigned min = 1 }
 
 	### Num of extra buildings needed
 
@@ -426,6 +431,78 @@ EAI_BUILDING_FACTORY_force_ratio_NIC = {
 	divide_temp_variable = { result_value = b }
 
 	set_temp_variable = { EAI_BUILDING_target_weight_NIC = result_value }
+}
+
+EAI_BUILDING_FACTORY_force_target_ratio = { # _target_ratio_NIC, _target_ratio_MIC, _target_ratio_CIC
+
+	set_temp_variable = { target_max = EAI_BUILDING_num_CIC }
+	set_temp_variable = { target_max_ratio = _target_ratio_CIC }
+	if = { limit = { check_variable = { EAI_BUILDING_num_MIC > target_max } } 
+		set_temp_variable = { target_max = EAI_BUILDING_num_MIC } 
+		set_temp_variable = { target_max_ratio = _target_ratio_MIC }
+	}
+	if = { limit = { check_variable = { EAI_BUILDING_num_NIC > target_max } } 
+		set_temp_variable = { target_max = EAI_BUILDING_num_NIC } 
+		set_temp_variable = { target_max_ratio = _target_ratio_NIC }
+	}
+
+	divide_temp_variable = { target_max = target_max_ratio }
+
+	###
+
+	set_temp_variable = { tmp_target_num_CIC = target_max }
+	multiply_temp_variable = { tmp_target_num_CIC = _target_ratio_CIC }
+	set_temp_variable = { tmp_target_num_MIC = target_max }
+	multiply_temp_variable = { tmp_target_num_MIC = _target_ratio_MIC }
+	set_temp_variable = { EAI_BUILDING_target_num_NIC = target_max }
+	multiply_temp_variable = { tmp_target_num_NIC = _target_ratio_NIC }
+
+	###
+
+	if = {
+		limit = {
+			OR = {
+				check_variable = { tmp_target_num_CIC > EAI_BUILDING_num_CIC }
+				check_variable = { tmp_target_num_MIC > EAI_BUILDING_num_MIC }
+				check_variable = { tmp_target_num_NIC > EAI_BUILDING_num_NIC }
+			}
+		}
+	
+		if = { limit = { check_variable = { tmp_target_num_CIC > EAI_BUILDING_num_CIC } }
+			set_temp_variable = { EAI_BUILDING_target_num_CIC = EAI_BUILDING_num_total_slots }
+			multiply_temp_variable = { EAI_BUILDING_target_num_CIC = _target_ratio_CIC }
+		}
+		else = { set_temp_variable = { EAI_BUILDING_target_num_CIC = EAI_BUILDING_num_CIC } }
+	
+		if = { limit = { check_variable = { tmp_target_num_MIC > EAI_BUILDING_num_MIC } }
+			set_temp_variable = { EAI_BUILDING_target_num_MIC = EAI_BUILDING_num_total_slots }
+			multiply_temp_variable = { EAI_BUILDING_target_num_MIC = _target_ratio_MIC }
+		}
+		else = { set_temp_variable = { EAI_BUILDING_target_num_MIC = EAI_BUILDING_num_MIC } }
+		
+		if = { limit = { check_variable = { tmp_target_num_NIC > EAI_BUILDING_num_NIC } }
+			set_temp_variable = { EAI_BUILDING_target_num_NIC = EAI_BUILDING_num_total_slots }
+			multiply_temp_variable = { EAI_BUILDING_target_num_NIC = _target_ratio_NIC }
+		}
+		else = { set_temp_variable = { EAI_BUILDING_target_num_NIC = EAI_BUILDING_num_NIC } }
+	}
+	else = {
+	
+		set_temp_variable = { EAI_BUILDING_target_num_CIC = EAI_BUILDING_num_total_slots }
+		multiply_temp_variable = { EAI_BUILDING_target_num_CIC = _target_ratio_CIC }
+
+		set_temp_variable = { EAI_BUILDING_target_num_MIC = EAI_BUILDING_num_total_slots }
+		multiply_temp_variable = { EAI_BUILDING_target_num_MIC = _target_ratio_MIC }
+
+		set_temp_variable = { EAI_BUILDING_target_num_NIC = EAI_BUILDING_num_total_slots }
+		multiply_temp_variable = { EAI_BUILDING_target_num_NIC = _target_ratio_NIC }
+	}
+
+	###
+
+	set_temp_variable = { _target_ratio_CIC = 0 }
+	set_temp_variable = { _target_ratio_MIC = 0 }
+	set_temp_variable = { _target_ratio_NIC = 0 }
 }
 
 ###############################################################

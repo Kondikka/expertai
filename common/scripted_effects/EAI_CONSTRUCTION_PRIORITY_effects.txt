@@ -1100,61 +1100,57 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 				}
 			
 				EAI_PC_get_new_project_ID = yes
+				set_temp_variable = { _project_id = new_project_ } 
+
+				###
+
+				PREV = { 
+					EAI_PC_get_building_cost = yes
+					EAI_PC_get_build_speed = yes
+					add_to_array = { EAI_PC_projects_in_state_of_@PREV = _project_id }
+				}
+
+				set_variable = { EAI_PC_build_time^_project_id = building_cost_ }
+				divide_variable = { EAI_PC_build_time^_project_id = construction_speed_ }
+
+				###
 	
-				if = { limit = { NOT = { check_variable = { new_project_ = -1 } } }
-		
-					set_temp_variable = { _project_id = new_project_ } 
+				set_variable = { EAI_PC_progress^_project_id = building_cost_ }
+				set_variable = { EAI_PC_project_cost^_project_id = building_cost_ }
+				set_variable = { EAI_PC_target_state^_project_id = PREV.id }
+				set_variable = { EAI_PC_target_province^_project_id = _project_province_id }
+				set_variable = { EAI_PC_building_type^_project_id = _project_building_type }
+				set_variable = { EAI_PC_priority^_project_id = _project_priority }
+				set_variable = { EAI_PC_type_id^_project_id = _project_type_id }
+				if = { limit = { check_variable = { _project_cancel_unbuildable = 1 } } set_variable = { EAI_PC_cancel_unbuildable^_project_id = 1 } }
 
-					###
+				###
+	
+				add_to_array = { EAI_PC_queue = new_project_ }
+				add_to_variable = { EAI_PC_active_projects = 1 }
+	
+				if = { 
+					limit = { 
+						OR = {
+							has_country_flag = EAI_priority_construction_logging
+							AND = { has_country_flag = EAI_PC_AA_logging check_variable = { _project_building_type = global.EAI_PC_AA } }
+							AND = { has_country_flag = EAI_PC_AIRBASE_logging check_variable = { _project_building_type = global.EAI_PC_AIR } }
+							AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
+							AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
+						}
+					} 
 
-					PREV = { 
-						EAI_PC_get_building_cost = yes
-						EAI_PC_get_build_speed = yes
-						add_to_array = { EAI_PC_projects_in_state_of_@PREV = _project_id }
-					}
-
-					set_variable = { EAI_PC_build_time^_project_id = building_cost_ }
-					divide_variable = { EAI_PC_build_time^_project_id = construction_speed_ }
-
-					###
-		
-					set_variable = { EAI_PC_progress^_project_id = building_cost_ }
-					set_variable = { EAI_PC_project_cost^_project_id = building_cost_ }
-					set_variable = { EAI_PC_target_state^_project_id = PREV.id }
-					set_variable = { EAI_PC_target_province^_project_id = _project_province_id }
-					set_variable = { EAI_PC_building_type^_project_id = _project_building_type }
-					set_variable = { EAI_PC_priority^_project_id = _project_priority }
-					set_variable = { EAI_PC_type_id^_project_id = _project_type_id }
-					if = { limit = { check_variable = { _project_cancel_unbuildable = 1 } } set_variable = { EAI_PC_cancel_unbuildable^_project_id = 1 } }
-
-					###
-		
-					add_to_array = { EAI_PC_queue = new_project_ }
-					add_to_variable = { EAI_PC_active_projects = 1 }
-		
-					if = { 
-						limit = { 
-							OR = {
-								has_country_flag = EAI_priority_construction_logging
-								AND = { has_country_flag = EAI_PC_AA_logging check_variable = { _project_building_type = global.EAI_PC_AA } }
-								AND = { has_country_flag = EAI_PC_AIRBASE_logging check_variable = { _project_building_type = global.EAI_PC_AIR } }
-								AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
-								AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
-							}
-						} 
-
-						set_temp_variable = { v0 = i }
-						set_temp_variable = { v1 = _project_id }
-						set_temp_variable = { v2 = EAI_PC_building_type^_project_id }
-						set_temp_variable = { v3 = EAI_PC_assigned_factories^_project_id }
-						set_temp_variable = { v4 = EAI_PC_progress^_project_id }
-						set_temp_variable = { v5 = EAI_PC_priority^_project_id }
-						set_temp_variable = { v6 = EAI_PC_build_time^_project_id }
-						set_temp_variable = { v7 = EAI_PC_target_state^_project_id }
-						set_temp_variable = { v8 = EAI_PC_target_province^_project_id }
-						set_temp_variable = { v9 = EAI_PC_type_id^_project_id }
-						log = "[GetYear] [GetMonth] | AI | [THIS.GetName] | PC STARTED: ID=[?v1] | TP=[?v2] | C=[?v4] | L=[?v7.GetName] | PRV=[?v8] | PRIO=[?v5] | TID=[?v9]"
-					}
+					set_temp_variable = { v0 = i }
+					set_temp_variable = { v1 = _project_id }
+					set_temp_variable = { v2 = EAI_PC_building_type^_project_id }
+					set_temp_variable = { v3 = EAI_PC_assigned_factories^_project_id }
+					set_temp_variable = { v4 = EAI_PC_progress^_project_id }
+					set_temp_variable = { v5 = EAI_PC_priority^_project_id }
+					set_temp_variable = { v6 = EAI_PC_build_time^_project_id }
+					set_temp_variable = { v7 = EAI_PC_target_state^_project_id }
+					set_temp_variable = { v8 = EAI_PC_target_province^_project_id }
+					set_temp_variable = { v9 = EAI_PC_type_id^_project_id }
+					log = "[GetYear] [GetMonth] | AI | [THIS.GetName] | PC STARTED: ID=[?v1] | TP=[?v2] | C=[?v4] | L=[?v7.GetName] | PRV=[?v8] | PRIO=[?v5] | TID=[?v9]"
 				}
 				
 				add_to_temp_variable = { final_building_level = 1 }

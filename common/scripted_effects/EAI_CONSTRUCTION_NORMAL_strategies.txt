@@ -49,7 +49,8 @@
 @EAI_MIN_AVAILABLE_NUM_CIC = 5
 @EAI_HIGH_AVAILABLE_NUM_CIC = 100
 @EAI_MAX_AVAILABLE_NUM_CIC = 200
-@EAI_MIN_RATIO_AVAILABLE_CIC = 0.25
+@EAI_MIN_RATIO_AVAILABLE_CIC = 0.15
+@EAI_MIN_RATIO_CIC = 0.33
 @EAI_MAX_CONSUMER_GOODS_FACTOR_AVOID_CIC = 0.5
 @EAI_MAX_CONSUMER_GOODS_FACTORIES_AVOID_CIC = 75
 
@@ -59,7 +60,7 @@
 @EAI_MAX_NUM_MIC = 400
 
 # NIC
-@EAI_MIN_CONSTRUCTION_SPEED_AVOID_NIC = 0.4
+@EAI_MIN_CONSTRUCTION_SPEED_AVOID_NIC = 0.2
 @EAI_HIGH_NUM_NIC = 75
 @EAI_MAX_NUM_NIC = 100
 @EAI_MINOR_COUNTRY_NIC_FACTOR = 0.25
@@ -92,7 +93,6 @@ EAI_BUILDING_FACTORY_general_building_weight_modifiers = { # Set weights which d
 		set_temp_variable = { EAI_BUILDING_target_weight_MIC = 100 }
 		set_temp_variable = { EAI_BUILDING_target_weight_NIC = 25 }
 	}
-
 
 	###################################################
 	###		Modifiers
@@ -143,7 +143,7 @@ EAI_BUILDING_FACTORY_general_building_weight_modifiers = { # Set weights which d
 		limit = { 
 			OR = {
 				check_variable = { EAI_BUILDING_num_available_CIC < @EAI_MIN_AVAILABLE_NUM_CIC }
-				check_variable = { EAI_BUILDING_ratio_available_CIC < @EAI_MIN_RATIO_AVAILABLE_CIC }
+				check_variable = { EAI_BUILDING_ratio_CIC < @EAI_MIN_RATIO_CIC }
 			} 
 			NOT = { check_variable = { EAI_BUILDING_num_available_CIC > @EAI_HIGH_AVAILABLE_NUM_CIC } }
 		}
@@ -157,7 +157,7 @@ EAI_BUILDING_FACTORY_general_building_weight_modifiers = { # Set weights which d
 	if = { 
 		limit = { 
 			has_war = no
-			date < 1938.1.1
+			date < 1937.6.1
 			threat < 0.5
 		}
 
@@ -271,11 +271,12 @@ EAI_BUILDING_FACTORY_special_building_weight_modifiers = { # Special case weight
 	# FRA and ENG military buildup
 	if = {
 		limit = {
-			date > 1938.1.1
+			date > 1937.1.1
 			OR = {
 				tag = ENG
 				tag = FRA
 			}
+			check_variable = { EAI_BUILDING_num_CIC > 45 }
 			check_variable = { EAI_BUILDING_num_MIC < 100 }
 			has_war = no
 		}
@@ -289,8 +290,8 @@ EAI_BUILDING_FACTORY_special_building_weight_modifiers = { # Special case weight
 	# ITA military buildup
 	if = {
 		limit = {
-			date > 1938.1.1
-			check_variable = { EAI_BUILDING_num_CIC > 45 }
+			date > 1937.1.1
+			check_variable = { EAI_BUILDING_num_CIC > 35 }
 			check_variable = { EAI_BUILDING_num_MIC < 100 }
 			has_war = no
 		}
@@ -372,45 +373,106 @@ EAI_BUILDING_FACTORY_special_building_target_modifiers = { # Modify target num o
 	set_temp_variable = { lock_target_num_MIC = 0 }
 	set_temp_variable = { lock_target_num_NIC = 0 }
 
-	###
+	#################################
+	### General strategy
+	#################################
 
-	# Needs more CIC but targeted num is lower than owned num
-	if = { 
-		limit = { 
-			check_variable = { EAI_BUILDING_num_available_CIC < @EAI_MIN_AVAILABLE_NUM_CIC }
-			check_variable = { EAI_BUILDING_target_num_CIC < EAI_BUILDING_num_CIC }
+	# Peace time industrial strategy - focus CIC
+	if = { limit = { has_war = no }
+	
+		if = { 
+			limit = { 
+				AND = {
+					date < 1937.6.1
+					threat < 0.5
+				}
+				OR = {
+					has_idea = civilian_economy
+					has_idea = low_economic_mobilisation
+				}
+			}
+	
+			set_temp_variable = { _target_ratio_CIC = 1.0 }
+			set_temp_variable = { _target_ratio_MIC = 0.0 }
+			set_temp_variable = { _target_ratio_NIC = 0.0 }
+			EAI_BUILDING_FACTORY_force_target_ratio = yes
+	
+			if = { limit = { has_country_flag = EAI_building_logging } log = "Peace time industrial strategy - focus CIC" }
 		}
-
-		set_temp_variable = { EAI_BUILDING_target_num_CIC = EAI_BUILDING_num_CIC }
-		add_to_temp_variable = { EAI_BUILDING_target_num_CIC = @EAI_MIN_AVAILABLE_NUM_CIC }
-
-		if = { limit = { has_country_flag = EAI_building_logging } log = "Needs more CIC but targeted num is lower than owned num" }
+		else_if = {
+			limit = {
+				check_variable = { EAI_BUILDING_ratio_CIC < 0.33 }
+			}
+			
+			set_temp_variable = { _target_ratio_CIC = 0.5 }
+			set_temp_variable = { _target_ratio_MIC = 0.5 }
+			set_temp_variable = { _target_ratio_NIC = 0.0 }
+			EAI_BUILDING_FACTORY_force_target_ratio = yes
+	
+			if = { limit = { has_country_flag = EAI_building_logging } log = "Peace time industrial strategy - focus CIC/MIC" }
+		}
+		else = {
+			
+			set_temp_variable = { _target_ratio_CIC = 0.0 }
+			set_temp_variable = { _target_ratio_MIC = 1.0 }
+			set_temp_variable = { _target_ratio_NIC = 0.0 }
+			EAI_BUILDING_FACTORY_force_target_ratio = yes
+	
+			if = { limit = { has_country_flag = EAI_building_logging } log = "Peace time industrial strategy - focus CIC/MIC" }
+		}
 	}
 
-	# ENG should get more dockyards
-	if = { 
-		limit = { 
-			tag = ENG
-			check_variable = { EAI_BUILDING_num_NIC < 30 }
-		}
+	# War time industrial strategy - focus MIC
+	else = {
 
-		set_temp_variable = { EAI_BUILDING_target_num_NIC = 30 }
-		set_temp_variable = { EAI_BUILDING_target_num_MIC = 0 }
+		set_temp_variable = { _target_ratio_CIC = 0.0 }
+		set_temp_variable = { _target_ratio_MIC = 1.0 }
+		set_temp_variable = { _target_ratio_NIC = 0.0 }
+		EAI_BUILDING_FACTORY_force_target_ratio = yes
 
-		if = { limit = { has_country_flag = EAI_building_logging } log = "ENG should get more dockyards" }
+		if = { limit = { has_country_flag = EAI_building_logging } log = "War time industrial strategy - focus MIC" }
 	}
 
-	# ITA should get more dockyards
-	if = { 
-		limit = { 
-			tag = ITA
-			check_variable = { EAI_BUILDING_num_NIC < 20 }
+	#################################
+	### Country strategy
+	#################################
+
+	# ENG
+	if = { limit = { tag = ENG }
+
+		# Dockyards
+		if = {
+			limit = {
+				check_variable = { EAI_BUILDING_num_NIC < 30 }
+			}
+		
+			set_temp_variable = { lock_target_num_NIC = 1 }
+			set_temp_variable = { EAI_BUILDING_target_num_NIC = 30 }
+			
+			set_temp_variable = { EAI_BUILDING_target_num_MIC = EAI_BUILDING_num_MIC }
+			add_to_temp_variable = { EAI_BUILDING_target_num_MIC = 1 }
+	
+			if = { limit = { has_country_flag = EAI_building_logging } log = "ENG should get more dockyards" }
 		}
+	}
 
-		set_temp_variable = { EAI_BUILDING_target_num_NIC = 30 }
-		set_temp_variable = { EAI_BUILDING_target_num_MIC = 0 }
+	# ITA
+	if = { limit = { tag = ITA }
 
-		if = { limit = { has_country_flag = EAI_building_logging } log = "ITA should get more dockyards" }
+		# Dockyards
+		if = {
+			limit = {
+				check_variable = { EAI_BUILDING_num_NIC < 25 }
+			}
+		
+			set_temp_variable = { lock_target_num_NIC = 1 }
+			set_temp_variable = { EAI_BUILDING_target_num_NIC = 25 }
+	
+			set_temp_variable = { EAI_BUILDING_target_num_MIC = EAI_BUILDING_num_MIC }
+			add_to_temp_variable = { EAI_BUILDING_target_num_MIC = 1 }
+	
+			if = { limit = { has_country_flag = EAI_building_logging } log = "ITA should get more dockyards" }
+		}
 	}
 
 	# JAP
@@ -462,10 +524,7 @@ EAI_BUILDING_FACTORY_special_building_target_modifiers = { # Modify target num o
 	}
 
 	# SOV
-	if = {
-		limit = {
-			tag = SOV
-		}
+	if = { limit = { tag = SOV }
 
 		if = { 
 			limit = { 
@@ -485,6 +544,7 @@ EAI_BUILDING_FACTORY_special_building_target_modifiers = { # Modify target num o
 	# USA 
 	if = { limit = { tag = USA }
 
+		# Dockyards
 		if = {
 			limit = {
 				set_temp_variable = { construction_speed = modifier@production_speed_industrial_complex_factor }
@@ -493,9 +553,28 @@ EAI_BUILDING_FACTORY_special_building_target_modifiers = { # Modify target num o
 			}
 
 			set_temp_variable = { EAI_BUILDING_target_num_NIC = 70 }
-			set_temp_variable = { EAI_BUILDING_target_num_CIC = 0 }
-			set_temp_variable = { EAI_BUILDING_target_num_MIC = 0 }
+			set_temp_variable = { EAI_BUILDING_target_num_CIC = -1 }
+			set_temp_variable = { EAI_BUILDING_target_num_MIC = -1 }
 		}
+	}
+
+	#################################
+	### Special case
+	#################################
+
+	# Needs more CIC
+	if = { 
+		limit = { 
+			check_variable = { EAI_BUILDING_num_available_CIC < @EAI_MIN_AVAILABLE_NUM_CIC }
+			check_variable = { EAI_BUILDING_target_num_CIC < EAI_BUILDING_num_CIC }
+		}
+
+		set_temp_variable = { _target_ratio_CIC = 1.0 }
+		set_temp_variable = { _target_ratio_MIC = 0.0 }
+		set_temp_variable = { _target_ratio_NIC = 0.0 }
+		EAI_BUILDING_FACTORY_force_target_ratio = yes
+
+		if = { limit = { has_country_flag = EAI_building_logging } log = "Needs more CIC" }
 	}
 
 	# Massive resource deficits
@@ -508,8 +587,10 @@ EAI_BUILDING_FACTORY_special_building_target_modifiers = { # Modify target num o
 			}
 		}
 	
-		set_temp_variable = { EAI_BUILDING_target_num_NIC = 0 }
-		set_temp_variable = { EAI_BUILDING_target_num_MIC = 0 }
+		set_temp_variable = { _target_ratio_CIC = 1.0 }
+		set_temp_variable = { _target_ratio_MIC = 0.0 }
+		set_temp_variable = { _target_ratio_NIC = 0.0 }
+		EAI_BUILDING_FACTORY_force_target_ratio = yes
 	}
 }
 
