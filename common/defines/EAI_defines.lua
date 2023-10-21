@@ -254,8 +254,8 @@ NDefines.NAI.BUILDING_TARGETS_BUILDING_PRIORITIES = { -- buildings in order of p
 	'synthetic_refinery',
 	'fuel_silo',
 	'industrial_complex',
-	'arms_factory',
 	'dockyard',
+	'arms_factory',
 }
 
 -- <start> construction prioritization
