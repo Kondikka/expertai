@@ -75,7 +75,6 @@ EAI_is_threat = {
 
 EAI_THIS_is_threat_to_PREV = {
 
-	NOT = { EAI_PREV_has_same_ideology_with_THIS = yes }
 
 	set_temp_variable = { prev_id = PREV.id }
 
@@ -83,12 +82,37 @@ EAI_THIS_is_threat_to_PREV = {
 		has_capitulated = no
 		exists = yes
 
-		NOT = { has_war_together_with = PREV }
-		NOT = { is_subject_of = PREV }
-		NOT = { has_government = PREV }
-		NOT = { is_in_faction_with = PREV }
+		NOT = { EAI_PREV_has_same_ideology_with_THIS = yes }
 		NOT = { var:faction_leader = { var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 		NOT = { var:overlord = { var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
+
+		NOT = { has_war_together_with = PREV }
+		NOT = { var:faction_leader = { has_war_together_with = var:prev_id } }
+		NOT = { var:overlord = { has_war_together_with = var:prev_id } }
+		
+		NOT = { is_subject_of = PREV }
+		NOT = { is_in_faction_with = PREV }
+	}
+}
+
+EAI_THIS_is_aligned_with_PREV = {
+
+	OR = {
+		AND = {
+			OR = {
+				has_government = PREV
+				has_government = neutrality
+			}
+
+			OR = {
+				gives_military_access_to = PREV
+				is_lend_leasing = PREV
+			}
+		}
+
+		is_in_faction_with = PREV
+		is_subject_of = PREV
+		gives_military_access_to = PREV
 	}
 }
 
@@ -111,6 +135,14 @@ EAI_player_intervening = {
 }
 
 ### looks at ideology as well as party popularity to determine real alignment
+
+EAI_THIS_is_ideologically_adjacent_with_PREV = {
+
+	if = { limit = { PREV = { has_government = democratic } } EAI_democratic_nation = yes }
+	else_if = { limit = { PREV = { has_government = communism } } EAI_communist_nation = yes }
+	else_if = { limit = { PREV = { has_government = fascism } } EAI_fascist_nation = yes }
+	else = { always = no }
+}
 
 EAI_democratic_nation = {
 	OR = {

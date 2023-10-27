@@ -12769,7 +12769,12 @@ ai_will_do = {
 			modifier = {
 				factor = 0
 				has_civil_war = yes
-			}	
+			}
+			modifier = { #EAI
+				factor = 0
+
+				is_historical_focus_on = yes
+			}
 		}
 		
 		available = {
@@ -14495,15 +14500,28 @@ ai_will_do = {
 		relative_position_id = SOV_support_afghan_ideology
 		cost = 5
 
-		historical_ai = { #EAI
+		historical_ai = { #EAI war focus
 
-			# always = no #TEMP FIX
+			### General situation
+
+			PER = { EAI_THIS_is_threat_to_PREV = yes }
+
+			PER = { check_variable = { party_popularity@fascism > 0.2 } }
+
+			has_war_with = GER
+
+			### Army size and timing
 
 			date > 1941.6.1
 		}
 
 		ai_will_do = {
 			factor = 1
+			modifier = { #EAI
+				factor = 0
+
+				is_historical_focus_on = yes
+			}
 			modifier = {
 				factor = 0
 				has_civil_war = yes
@@ -14943,31 +14961,33 @@ ai_will_do = {
 
 			NOT = { EAI_is_not_independent = yes }
 
-			surrender_progress < 0.1
+			JAP = { EAI_THIS_is_threat_to_PREV = yes }
 
-			NOT = {
-				any_home_area_neighbor_country = {
-					has_war_with = ROOT
-				}
-			}
+			NOT = { JAP = { EAI_is_not_independent = yes } }
+
+			JAP = { has_government = fascism }
+
+			surrender_progress < 0.1
 
 			### Army size and timing
 
 			strength_ratio = { tag = JAP ratio > 1 }
 
+			date > 1942.1.1
+
 			### State of war with GER
 
 			OR = {
 				NOT = { GER = { EAI_THIS_is_threat_to_PREV = yes } }
+				has_war_with = GER
 			}
 
 			### No strong enemies
 
-			OR = {
-				NOT = {
-					any_enemy_country = {
-						strength_ratio = { tag = ROOT ratio > 2 }
-					}
+			NOT = {
+				any_home_area_neighbor_country = {
+					has_war_with = ROOT
+					strength_ratio = { tag = ROOT ratio > 2 }
 				}
 			}
 		}

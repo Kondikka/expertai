@@ -166,29 +166,32 @@ EAI_PR_sort_priority_research_queue = {
 
 EAI_PR_select_priority_tech = {
 
-	set_temp_variable = { tmp_priority_research_current_tech = EAI_priority_research_current_tech }
-	set_variable = { EAI_priority_research_current_tech = 0 }
-
-	for_each_loop = { array = EAI_priority_research_queue
-
-		if = { 
-			limit = { 
-				can_research = var:v 
-				NOT = { 
-					is_researching_technology = var:v 
-					is_in_array = { EAI_priority_research_block_techs = v } 
-				} 
+	if = { limit = { check_variable = { EAI_priority_research_queue^num > 0 } }
+	
+		set_temp_variable = { tmp_priority_research_current_tech = EAI_priority_research_current_tech }
+		set_variable = { EAI_priority_research_current_tech = 0 }
+	
+		for_each_loop = { array = EAI_priority_research_queue
+	
+			if = { 
+				limit = { 
+					can_research = var:v 
+					NOT = { 
+						is_researching_technology = var:v 
+						is_in_array = { EAI_priority_research_block_techs = v } 
+					} 
+				}
+	
+				if = { limit = { NOT = { check_variable = { tmp_priority_research_current_tech = v } } has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: selected [?v.GetTokenKey]" }
+	
+				set_variable = { EAI_priority_research_current_tech = v }
+	
+				set_temp_variable = { break = 1 }
 			}
-
-			if = { limit = { NOT = { check_variable = { tmp_priority_research_current_tech = v } } has_country_flag = EAI_priority_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PRIO RESEARCH: selected [?v.GetTokenKey]" }
-
-			set_variable = { EAI_priority_research_current_tech = v }
-
-			set_temp_variable = { break = 1 }
 		}
+	
+		set_temp_variable = { break = 0 }
 	}
-
-	set_temp_variable = { break = 0 }
 }
 
 EAI_PR_print_queue = {
