@@ -117,7 +117,7 @@ start_text = "### Generated target template scripts"
 end_text = "### End"
 
 file = "EAI_armor_role.txt"
-text_template = "<key>_target = { roles = { <key>_target } upgrade_prio = { base = 0.01 } match_to_count = 0.96<template>}"
+text_template = "<key>_target = { match_to_count = 0.96 roles = { <key>_target } upgrade_prio = { base = 0.01 }<template>}"
 excluded_template_names = ["EVENT_", "EARLY_"]
 
 def main():

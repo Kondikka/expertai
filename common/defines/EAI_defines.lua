@@ -134,7 +134,7 @@ NDefines.NAI.GARRISON_TEMPLATE_SCORE_MANPOWER_FACTOR = 0.05 -- formula is (templ
 -- NDefines.NAI.REFIT_SHIP_RELUCTANCE = 5000							-- How often to consider refitting to new equipment variants for ships in the field
 -- NDefines.NAI.REFIT_SHIP_PERCENTAGE_OF_FORCES = 0.0				-- How big part of the navy that should be considered for refitting
 
-NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
+-- NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
 
 -- NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0 --0.005
 -- NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0 --0.01

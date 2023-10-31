@@ -1132,7 +1132,12 @@ focus_tree = {
 				}
 			}
 
-			custom_effect_tooltip = when_civil_war_starts_tt
+			if = {
+				limit = {
+					NOT = { has_completed_focus = FIN_the_second_finnish_civil_war }
+				}
+				custom_effect_tooltip = when_civil_war_starts_tt
+			}
 			show_unit_leaders_tooltip = FIN_emil_vaateri
 			show_unit_leaders_tooltip = FIN_eyolf_mattsson
 			show_unit_leaders_tooltip = FIN_toivo_antikainen
@@ -5821,27 +5826,47 @@ focus_tree = {
 		relative_position_id = FIN_military_aid
 		cost = 5
 		available = {
-			any_other_country = {
-				is_in_faction_with = ROOT
+			any_core_state = {
+				state_is_fully_controlled_by_ROOT_or_subject = yes
+				controller = {
+					NORDIC_is_nordic = yes
+				}
+				OR = {
+					has_resources_amount = {
+						resource = steel
+						amount > 0
+					}
+					has_resources_amount = {
+						resource = chromium
+						amount > 0
+					}
+					has_resources_amount = {
+						resource = tungsten
+						amount > 0
+					}
+					has_resources_amount = {
+						resource = aluminium
+						amount > 0
+					}
+				}
 			}
 		}
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		select_effect = {
-			country_event = { id = AAT_finland_misc_events.03 hours = 6 random_hours = 3 }
+			if = {
+				limit = {
+					is_in_faction = yes
+					is_faction_leader = no
+				}
+				set_variable = { FIN_faction_leader_recieving_resource_rights = THIS.faction_leader }
+				country_event = { id = AAT_finland_misc_events.03 hours = 6 random_hours = 3 }
+			}
 		}
 
 		completion_reward = {
-			if = {
-				limit = {
-
-				}
-				custom_effect_tooltip = FIN_mineral_wealth_development_states_tt
-			}
-			else = {
-
-			}
+			custom_effect_tooltip = FIN_mineral_wealth_development_states_tt
 
 			every_state = {
 				limit = {
@@ -5934,6 +5959,7 @@ focus_tree = {
 
 			if = {
 				limit = {
+					check_variable = { FIN_faction_leader_recieving_resource_rights = 0 compare = not_equals }
 					var:FIN_faction_leader_recieving_resource_rights = {
 						has_capitulated = no
 						is_in_faction_with = ROOT
@@ -8483,7 +8509,7 @@ focus_tree = {
 		}
 
 		bypass = {
-			#SMI excluded so that focus can be bypasssed without Kola, which will be cored later.
+			#SMI and KAR excluded so that focus can be bypasssed without Kola, which will be cored later.
 			SWE = {
 				all_core_state = {
 					is_core_of = ROOT
@@ -8550,6 +8576,10 @@ focus_tree = {
 													is_core_of = SMI
 													is_owned_by = SMI
 												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
+												}
 												is_core_of = ICE
 												is_core_of = SWE
 												is_core_of = NOR
@@ -8580,6 +8610,115 @@ focus_tree = {
 					}
 
 					SMI = {
+						every_core_state = {
+							limit = {
+								controller = {
+									original_tag = PREV.PREV
+									FIN_is_valid_neutral_or_enemy = yes
+								}
+							}
+							add_claim_by = ROOT
+						}
+						ROOT = {
+							create_wargoal = {
+								type = annex_everything
+								target = PREV
+							}
+
+							if = {
+								limit = {
+									has_non_aggression_pact_with = PREV
+								}
+								diplomatic_relation = {
+									country = PREV
+									relation = non_aggression_pact
+									active = no
+								}
+							}
+							if = {
+								limit = {
+									has_guaranteed = PREV
+								}
+								diplomatic_relation = {
+									country = PREV
+									relation = guarantee
+									active = no
+								}
+							}
+						}
+					}
+				}
+
+				### KARELIA ### (Only if country exists)
+
+				if = { #Finnish puppet or independent ally - Annexation
+					limit = {
+						KAR = {
+							FIN_is_valid_root_puppet_or_independent_ally = yes
+						}
+					}
+					KAR = {
+						country_event = { id = AAT_finland_diplomacy.14 hours = 1 }
+					}
+				}
+				else_if = { #Ally's puppet and AI - Request puppet transfer
+					limit = {
+						KAR = {
+							FIN_is_valid_allied_puppet_ai = yes
+						}
+					}
+					KAR = {
+						overlord = {
+							if = {
+								limit = {
+									NOT = { is_in_array = { ROOT.countries_with_nordic_territory_array = THIS } }
+								}
+								#This array will be used at the end of the effect to send ONE SINGLE EVENT to each country with Baltic puppets or states with Finnish demands
+								add_to_array = { ROOT.countries_with_nordic_territory_array = THIS }
+							}
+							PREV = {
+								every_controlled_state = {
+									if = {
+										limit = {
+											OR = {
+												AND = {
+													is_core_of = SMI
+													is_owned_by = SMI
+												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
+												}
+												is_core_of = ICE
+												is_core_of = SWE
+												is_core_of = NOR
+												is_core_of = DEN
+												is_owned_by = PREV
+											}
+										}
+										#This array will be used in the ONE event that the country's overlord will receive for transferring the appropriate states
+										add_to_array = { PREV.PREV.FIN_states_requested_by_finland_array = THIS } #store array in overlord
+									}
+									else = {
+										#This array will be used in the ONE event that the country's overlord will receive for transferring states back to the overlord 
+										add_to_array = { PREV.PREV.FIN_states_to_come_back_to_overlord_array = THIS } #store array in overlord
+									}
+								}
+							}
+						}
+					}
+				}
+				else_if = { #Neutral/enemy - Claims and wargoal
+					limit = {
+						KAR = {
+							OR = {
+								FIN_is_valid_neutral_or_enemy = yes
+								has_civil_war = yes
+							}
+						}
+					}
+
+					KAR = {
 						every_core_state = {
 							limit = {
 								controller = {
@@ -8654,6 +8793,10 @@ focus_tree = {
 												AND = {
 													is_core_of = SMI
 													is_owned_by = SMI
+												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
 												}
 												is_core_of = ICE
 												is_core_of = SWE
@@ -8786,6 +8929,10 @@ focus_tree = {
 												AND = {
 													is_core_of = SMI
 													is_owned_by = SMI
+												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
 												}
 												is_core_of = ICE
 												is_core_of = SWE
@@ -8923,6 +9070,10 @@ focus_tree = {
 													is_core_of = SMI
 													is_owned_by = SMI
 												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
+												}
 												is_core_of = ICE
 												is_core_of = SWE
 												is_core_of = NOR
@@ -9058,6 +9209,10 @@ focus_tree = {
 												AND = {
 													is_core_of = SMI
 													is_owned_by = SMI
+												}
+												AND = {
+													is_core_of = KAR
+													is_owned_by = KAR
 												}
 												is_core_of = ICE
 												is_core_of = SWE
