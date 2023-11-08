@@ -120,7 +120,18 @@ EAI_INVASION_exclude_target = { # Stop any invasion against this target
 
 	NOT = { check_variable = { PREV.EAI_naval_invasion_target = THIS.id } }
 
-	has_war_with = ROOT
+	# Dont block invasions against any allied country of target or it messes up the AI?
+	set_temp_variable = { tmp_id = PREV.id }
+	NOT = {
+		any_allied_country = {
+			OR = {
+				var:tmp_id = { check_variable = { EAI_naval_invasion_target = PREV.id } }
+				var:tmp_id = { check_variable = { ai_strategy_invade@PREV > 1000 } }
+			}
+		}
+	}
+
+	# has_war_with = PREV
 
 	any_of_scopes = { array = controlled_states
 		is_coastal = yes
@@ -217,11 +228,16 @@ EAI_INVASION_block_invasion_strategies = {
 			THIS = { original_tag = NOR }
 		}
 
-		# Early allied invasasions vs axis
+		# Early allied invasions vs axis
 		AND = { 
 			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
-			THIS = { GER = { EAI_PREV_on_same_side_with_THIS = yes } } 
+			THIS = { 
+				OR = {
+					GER = { EAI_PREV_on_same_side_with_THIS = yes }
+					GER = { EAI_THIS_is_aligned_with_PREV = yes }
+				}
+			} 
 
 			date < 1943.1.1
 
@@ -231,7 +247,7 @@ EAI_INVASION_block_invasion_strategies = {
 			is_historical_focus_on = yes
 		}
 
-		# Early allied invasasions vs JAP
+		# Early allied invasions vs JAP
 		AND = { 
 			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
@@ -304,6 +320,7 @@ EAI_INVASION_block_invasion_strategies = {
 					}
 					AND = {
 						alliance_naval_strength_ratio < 1.0
+						date < 1944.1.1
 					}
 				}
 			}
