@@ -6308,6 +6308,7 @@ country_event = {
 
 		leave_faction = yes
 
+		#EAI
 		white_peace = GER
 
 		every_enemy_country = {
@@ -6317,6 +6318,7 @@ country_event = {
 
 			PREV = { white_peace = PREV }
 		}
+		#EAI
 
 		remove_resource_rights = 618
 	
@@ -11866,7 +11868,7 @@ country_event = {
 						}
 						#Add Porajärvi VP
 						add_victory_points = {
-							province = 6094 #Porajärvi
+							province = 2998 #Porajärvi
 							value = 1
 						}
 
@@ -12385,7 +12387,6 @@ country_event = {
 					name = SOV_Krasnokokshaysk
 				}
 			}
-
 		}
 	}
 
@@ -12394,16 +12395,42 @@ country_event = {
 		ai_chance = {
 			base = 5 # The AI needs all the help it can get
 		}
-		var:SOV.SOV_nationalist_country = {
-			add_named_threat = { 
-				threat = -1
-				name = indepence_war_threat
+		#Check for Karelian uprising since war against SOS (AI Stalin) is declared there
+		if = {
+			limit = {
+				check_variable = { SOV.SOV_nationalist_country = KAR }
+				FIN = {
+					exists = yes
+					has_capitulated = no
+					has_country_flag = FIN_full_support_for_karelia_flag
+				}
 			}
-			declare_war_on = {
-				target = SOS
-				type = independence_wargoal
+			var:SOV.SOV_nationalist_country = {
+				add_named_threat = { 
+					threat = -1
+					name = indepence_war_threat
+				}
+				effect_tooltip = {
+					declare_war_on = {
+						target = SOS
+						type = independence_wargoal
+					}
+				}
 			}
 		}
+		else = {
+			var:SOV.SOV_nationalist_country = {
+				add_named_threat = { 
+					threat = -1
+					name = indepence_war_threat
+				}
+				declare_war_on = {
+					target = SOS
+					type = independence_wargoal
+				}
+			}
+		}
+
 		var:SOV.SOV_nationalist_country = {
 			give_military_access = ROOT
 		}
@@ -12411,17 +12438,33 @@ country_event = {
 			give_military_access = var:SOV.SOV_nationalist_country
 		}
 	}
+
 	option = {
 		name = NSB_soviet_nationalist.001.b	
 		ai_chance = {
 			base = 1
 		}
-		var:SOV.SOV_nationalist_country = {
-			declare_war_on = {
-				target = SOS
-				type = independence_wargoal
+
+		#Check for Karelian uprising since war against SOS (AI Stalin) is declared there
+		if = {
+			limit = {
+				check_variable = { SOV.SOV_nationalist_country = KAR }
+				FIN = {
+					exists = yes
+					has_capitulated = no
+					has_country_flag = FIN_full_support_for_karelia_flag
+				}
+			}
+			effect_tooltip = {
+				var:SOV.SOV_nationalist_country = {
+					declare_war_on = {
+						target = SOS
+						type = independence_wargoal
+					}
+				}
 			}
 		}
+
 		var:SOV.SOV_nationalist_country = {
 			add_named_threat = { 
 				threat = -1 
@@ -12431,8 +12474,33 @@ country_event = {
 				target = ROOT
 				type = independence_wargoal
 			}
-			
+		}
 
+		#Check for Karelian uprising and Finnish commitment to show in tooltip when appropriate
+		if = {
+			limit = {
+				check_variable = { SOV.SOV_nationalist_country = KAR }
+				FIN = {
+					exists = yes
+					has_capitulated = no
+					has_country_flag = FIN_full_support_for_karelia_flag
+				}
+			}
+			effect_tooltip = {
+				FIN = {
+					add_to_war = {
+						targeted_alliance = KAR
+						enemy = ROOT
+						hostility_reason = asked_to_join
+					}
+				}
+			}
+			hidden_effect = {
+				declare_war_on = {
+					target = FIN
+					type = independence_wargoal
+				}
+			}
 		}
 	}
 }

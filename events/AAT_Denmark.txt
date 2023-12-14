@@ -1070,11 +1070,8 @@ country_event = { #Political Opposition
 		days = 180
 	}
 
-	option = { #fascist lies!
+	option = { #Damn Royalists!
 		name = denmark_political_events.11.a
-		trigger = {
-			has_government = communism
-		}
 		add_timed_idea = {
 			idea = DEN_monarchist_discontent_ns
 			days = 365
@@ -1692,6 +1689,10 @@ country_event = { #Denmark Declares Independence
 				is_major = no
 				has_war_with_major = yes
 			}
+			modifier = { #You're ain't goin' nowhere! Unless we really hurtin' :,(
+				factor = 0.5
+				surrender_progress < 0.5
+			}
 			modifier = { #Don't accept if installed the plenipotentiary
 				factor = 0.5
 				FROM = {
@@ -1765,7 +1766,7 @@ country_event = { #Danish Liberation War
 	option = { #Keep current Government form
 		name = denmark_occupation_event.7.b
 		ai_chance = {
-			base = 5 #TODO_DANNE modify this based on if DEN was fasc/commie since before
+			base = 5 
 			modifier = { #Don't keep ideology if it was forced upon Denmark
 				factor = 0
 				has_country_leader_with_trait = DEN_plenipotentiary
@@ -1782,6 +1783,13 @@ country_event = { #Danish Liberation War
 		}
 
 		DEN_independence_war_effects = yes
+
+		if = { #If the Overlord installed a country leader of their own, that dude needs to go for ever
+			limit = {	
+				has_country_leader_with_trait = DEN_plenipotentiary
+			}
+			retire_country_leader = yes
+		}
 
 		hidden_effect = {
 			play_song = "danish_song_of_liberation"
@@ -1833,6 +1841,13 @@ country_event = { #Denmark becomes independent peacefully
 			}
 		}
 
+		if = { #If the Overlord installed a country leader of their own, that dude needs to go for ever
+			limit = {	
+				has_country_leader_with_trait = DEN_plenipotentiary
+			}
+			retire_country_leader = yes
+		}
+
 		DEN_restore_manpower = yes
 
 		if = {
@@ -1862,6 +1877,7 @@ country_event = { #Denmark becomes independent peacefully
 			right_side = DEN_warfare_side
 			set_value = 0
 		}
+
 		if = {
 			limit = {
 				has_country_flag = DEN_create_danish_brigades_flag
@@ -7611,11 +7627,18 @@ country_event = { #Denmark Demands Iceland's Annexation
 				has_capitulated = yes
 			}
 			modifier = {
-				factor = 3
+				factor = 2
 				has_government = FROM
 			}
 			modifier = {
-				factor = 3
+				factor = 1.5
+				has_opinion = {
+					target = FROM
+					value > 50
+				}
+			}
+			modifier = {
+				factor = 1.5
 				has_opinion = {
 					target = FROM
 					value > 75
@@ -7623,7 +7646,17 @@ country_event = { #Denmark Demands Iceland's Annexation
 			}
 			modifier = {
 				factor = 2
-				enemies_strength_ratio > 0.5
+				strength_ratio = {
+				    tag = FROM
+				    ratio < 0.75
+				}
+			}
+			modifier = {
+				factor = 2
+				strength_ratio = {
+				    tag = FROM
+				    ratio < 0.5
+				}
 			}
 			modifier = {
 				factor = 5
@@ -7672,14 +7705,31 @@ country_event = { #Denmark Demands Iceland's Annexation
 				is_faction_leader = yes
 			}
 			modifier = {
-				factor = 5
-				enemies_strength_ratio < 0.5
+				factor = 3
+				strength_ratio = {
+				    tag = FROM
+				    ratio > 1.25
+				}
+			}
+			modifier = {
+				factor = 3
+				strength_ratio = {
+				    tag = FROM
+				    ratio > 1.5
+				}
 			}
 			modifier = {
 				factor = 5
 				has_opinion = {
 					target = FROM
 					value < 0
+				}
+			}
+			modifier = {
+				factor = 5
+				has_opinion = {
+					target = FROM
+					value < -24
 				}
 			}
 			modifier = {
@@ -7747,12 +7797,22 @@ country_event = { #Denmark Demands Iceland from Overlord
 		ai_chance = {
 			base = 1
 			modifier = {
+				factor = 2
+				strength_ratio = {
+				    tag = FROM
+				    ratio < 0.5
+				}
+			}			
+			modifier = {
 				factor = 0.5
 				any_allied_country = {
 					is_major = yes
 				}
 			}
-			
+			modifier = {
+				factor = 0.5
+				is_major = yes
+			}
 		}
 		effect_tooltip = {
 			FROM = { puppet = ICE }
@@ -7774,7 +7834,10 @@ country_event = { #Denmark Demands Iceland from Overlord
 			}
 			modifier = {
 				factor = 2
-				enemies_strength_ratio < 0.5
+				strength_ratio = {
+				    tag = FROM
+				    ratio > 1.5
+				}
 			}
 			modifier = {
 				factor = 2
@@ -7894,7 +7957,14 @@ country_event = { #Denmark Demands Sweden's Subjugation
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
+				}
+			}
+			modifier = {
+				factor = 5
+				strength_ratio = {
+				    tag = FROM
+				    ratio > 1.5
 				}
 			}
 		}
@@ -8006,10 +8076,10 @@ country_event = { #Denmark Demands Sweden from Norway
 				}
 			}
 			modifier = {
-				factor = 5
+				factor = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8126,7 +8196,14 @@ country_event = { #Denmark Demands Norway's Subjugation
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
+				}
+			}
+			modifier = {
+				factor = 5
+				strength_ratio = {
+				    tag = FROM
+				    ratio > 1.5
 				}
 			}
 		}
@@ -8237,10 +8314,10 @@ country_event = { #Denmark Demands Norway from Sweden
 				}
 			}
 			modifier = {
-				factor = 5
+				factor = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8348,6 +8425,13 @@ country_event = { #Denmark Demands Icelandic Territory
 				factor = 2
 				strength_ratio = {
 				    tag = FROM
+				    ratio < 0.75
+				}
+			}
+			modifier = {
+				factor = 2
+				strength_ratio = {
+				    tag = FROM
 				    ratio < 0.5
 				}
 			}
@@ -8392,7 +8476,7 @@ country_event = { #Denmark Demands Icelandic Territory
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8519,7 +8603,7 @@ country_event = { #Denmark Demands Swedish Territory
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8646,7 +8730,7 @@ country_event = { #Denmark Demands Finnish Territory
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8773,7 +8857,7 @@ country_event = { #Denmark Demands Norwegian Territory
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}
@@ -8852,6 +8936,12 @@ country_event = { #Denmark offers Swedish steel for guarantees
 					value > 49
 				}
 			}
+			modifier = {
+				factor = 2
+				FROM = {
+					is_major = yes
+				}
+			}
 		}
 		effect_tooltip = {
 			ROOT = { give_guarantee = FROM }
@@ -8885,7 +8975,7 @@ country_event = { #Denmark offers Swedish steel for guarantees
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1.5
 				}
 			}
 		}
@@ -9179,7 +9269,7 @@ country_event = { #Denmark offers an Alliance
 				factor = 2
 				strength_ratio = {
 				    tag = FROM
-				    ratio < 0.25
+				    ratio < 0.75
 				}
 			}
 			modifier = {
@@ -9223,14 +9313,14 @@ country_event = { #Denmark offers an Alliance
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.25
+				    ratio > 1.25
 				}
 			}
 			modifier = {
 				factor = 5
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1.5
 				}
 			}
 			modifier = {
@@ -9321,7 +9411,7 @@ country_event = { #Denmark offers tech sharing
 				factor = 2
 				strength_ratio = {
 				    tag = FROM
-				    ratio < 0.25
+				    ratio < 0.75
 				}
 			}
 			modifier = {
@@ -9367,7 +9457,7 @@ country_event = { #Denmark offers tech sharing
 				factor = 15
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1.25
 				}
 			}
 		}
@@ -9460,14 +9550,14 @@ country_event = { #Denmark interferce in our politics; they try to change our id
 				is_in_faction_with = FROM
 			}
 			modifier = {
-				factor = 3
+				factor = 2
 				strength_ratio = {
 				    tag = FROM
-				    ratio < 0.25
+				    ratio < 0.75
 				}
 			}
 			modifier = {
-				factor = 3
+				factor = 2
 				strength_ratio = {
 				    tag = FROM
 				    ratio < 0.5
@@ -9516,14 +9606,14 @@ country_event = { #Denmark interferce in our politics; they try to change our id
 				add = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.25
+				    ratio > 1
 				}
 			}
 			modifier = {
 				add = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1.25
 				}
 			}
 			modifier = {
@@ -9537,7 +9627,7 @@ country_event = { #Denmark interferce in our politics; they try to change our id
 				add = 10
 				has_opinion = {
 					target = FROM
-					value < 24
+					value < -24
 				}
 			}
 		}
@@ -9623,7 +9713,7 @@ country_event = { #Denmark offers subjugation
 				factor = 2
 				strength_ratio = {
 				    tag = FROM
-				    ratio < 0.25
+				    ratio < 0.75
 				}
 			}
 			modifier = {
@@ -9667,14 +9757,28 @@ country_event = { #Denmark offers subjugation
 				factor = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.25
+				    ratio > 1
 				}
 			}
 			modifier = {
 				factor = 10
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1.25
+				}
+			}
+			modifier = {
+				factor = 10
+				has_opinion = {
+					target = FROM
+					value < 0
+				}
+			}
+			modifier = {
+				factor = 10
+				has_opinion = {
+					target = FROM
+					value < -24
 				}
 			}
 		}
@@ -10113,10 +10217,6 @@ country_event = { #The Danish King seeks refuge
 			}
 			modifier = {
 				factor = 2
-				has_government = democratic
-			}
-			modifier = {
-				factor = 2
 				has_opinion = { #We don't like Denmark anyways
 					target = FROM
 					value < 0
@@ -10133,7 +10233,7 @@ country_event = { #The Danish King seeks refuge
 				factor = 2
 				strength_ratio = {
 				    tag = FROM
-				    ratio > 0.5
+				    ratio > 1
 				}
 			}
 		}

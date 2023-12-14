@@ -3507,13 +3507,34 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
-			add_ideas = SOV_mine_warfare_ns
+			if = {
+				limit = {
+					has_dlc = "Man the Guns"
+				}
+				add_ideas = SOV_mine_warfare_ns
 
-			add_tech_bonus = {
-				name = SOV_mine_warfare
-				bonus = 1.0
-				uses = 2
-				category = naval_mines
+				add_tech_bonus = {
+					name = SOV_mine_warfare
+					bonus = 1.0
+					uses = 2
+					category = naval_mines
+				}
+			}
+			else = {
+				add_tech_bonus = {
+					name = SOV_mine_warfare
+					bonus = 0.5
+					uses = 1
+					category = ss_tech
+					category = dd_tech
+				}
+
+				add_doctrine_cost_reduction = {
+					name = SOV_mine_warfare
+					cost_reduction = 0.75
+					uses = 1
+					category = naval_doctrine
+				}
 			}
 		}
 	}
@@ -10030,7 +10051,13 @@ focus_tree = {
 				custom_effect_tooltip = SOV_coup_detat_success_tt
 				hidden_effect = {
 					set_global_flag = SOV_soviet_civil_war_over
-					SOV_remove_paranoia_effect = yes 
+					SOV_remove_paranoia_effect = yes
+					if = {
+						limit = {
+							has_idea = SOV_anti_soviet_military_thinking_banned_army
+						}
+						remove_ideas = SOV_anti_soviet_military_thinking_banned_army
+					}
 					country_event = {
 						id = NSB_soviet_communist_civil_war.002
 						hours = 1
@@ -13507,18 +13534,28 @@ ai_will_do = {
 				set_country_flag = { flag = EAI_SOV_take_finland value = 1 days = 31 }
 			}
 			add_state_claim = 146 # Karjala
-			146 = {
-				controller = {
-					set_country_flag = SOV_ultimatum_sent_flag #Add it for AI strats reasons
-					add_timed_idea = {
-						idea = communist_pressure
-						days = 365
+
+			if= {
+				limit = {
+					146 = {
+						controller = {
+							NOT = { has_war_with = ROOT }
+						}
 					}
-					country_event = { id = finland.1 hours = 16 random_hours = 8 }
 				}
+				146 = {
+					controller = {
+						set_country_flag = SOV_ultimatum_sent_flag #Add it for AI strats reasons
+						add_timed_idea = {
+							idea = communist_pressure
+							days = 365
+						}
+						country_event = { id = finland.1 hours = 16 random_hours = 8 }
+					}
+				}
+				custom_effect_tooltip = if_they_accept_tt
+				event_option_tooltip = soviet.12.a
 			}
-			custom_effect_tooltip = if_they_accept_tt
-			event_option_tooltip = soviet.12.a
 		}
 	}
 
