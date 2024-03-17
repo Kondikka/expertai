@@ -446,9 +446,11 @@ EAI_DIFFICULTY_custom_bonus_right_click = {
 
 ### country variable localization issue fix
 
+@NUM_CUSTOM_BONUSES = 33
+
 EAI_DIFFICULTY_get_custom_bonus_settings = {
 
-	set_temp_variable = { custom_bonus_settings = 32 }
+	set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
 	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { var:EAI_configuration_target = { set_variable = { Root.EAI_custom_bonus_[x]_temp = This.EAI_custom_bonus_[x] } } }
@@ -459,7 +461,7 @@ EAI_DIFFICULTY_get_custom_bonus_settings = {
 }
 EAI_DIFFICULTY_set_custom_bonus_settings = {
 
-	set_temp_variable = { custom_bonus_settings = 32 }
+	set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
 	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { 
@@ -473,13 +475,65 @@ EAI_DIFFICULTY_set_custom_bonus_settings = {
 }
 EAI_DIFFICULTY_clear_custom_bonus_settings = {
 
-	set_temp_variable = { custom_bonus_settings = 32 }
+	set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
 	while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
 		meta_effect = {
 			text = { clear_variable = Root.EAI_custom_bonus_[x]_temp }
 			x = "[?custom_bonus_settings]"
 		}
 		subtract_from_temp_variable = { custom_bonus_settings = 1 }
+	}
+}
+
+###
+
+EAI_config_CUSTOM_BONUS_copy_settings = {
+	if = { limit = { has_country_flag = EAI_config_COUNTRY }
+
+		set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
+		while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
+			meta_effect = {
+				text = { set_variable = { Root.EAI_custom_bonus_[x]_saved = Root.EAI_custom_bonus_[x]_temp } }
+				x = "[?custom_bonus_settings]"
+			}
+			subtract_from_temp_variable = { custom_bonus_settings = 1 }
+		}
+	}
+	else = {
+
+		set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
+		while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
+			meta_effect = {
+				text = { set_variable = { Root.EAI_custom_bonus_[x]_saved = global.EAI_custom_bonus_[x] } }
+				x = "[?custom_bonus_settings]"
+			}
+			subtract_from_temp_variable = { custom_bonus_settings = 1 }
+		}
+	}
+}
+
+EAI_config_CUSTOM_BONUS_paste_settings = {
+	if = { limit = { has_country_flag = EAI_config_COUNTRY }
+
+		set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
+		while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
+			meta_effect = {
+				text = { set_variable = { Root.EAI_custom_bonus_[x]_temp = Root.EAI_custom_bonus_[x]_saved } }
+				x = "[?custom_bonus_settings]"
+			}
+			subtract_from_temp_variable = { custom_bonus_settings = 1 }
+		}
+	}
+	else = {
+
+		set_temp_variable = { custom_bonus_settings = @NUM_CUSTOM_BONUSES }
+		while_loop_effect = { limit = { check_variable = { custom_bonus_settings > 0 } }
+			meta_effect = {
+				text = { set_variable = { global.EAI_custom_bonus_[x] = Root.EAI_custom_bonus_[x]_saved } }
+				x = "[?custom_bonus_settings]"
+			}
+			subtract_from_temp_variable = { custom_bonus_settings = 1 }
+		}
 	}
 }
 
@@ -603,6 +657,8 @@ EAI_DIFFICULTY_clear_difficulty_custom_modifiers = {
 			clear_variable = [x]EAI_custom_bonus_31
 			#surrender_limit
 			clear_variable = [x]EAI_custom_bonus_32
+			#army_org_factor
+			clear_variable = [x]EAI_custom_bonus_33
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -678,6 +734,8 @@ EAI_DIFFICULTY_set_hard_difficulty_custom_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_31 = -0.25 }
 			#surrender_limit
 			set_variable = { [x]EAI_custom_bonus_32 = 0 }
+			#army_org_factor
+			set_variable = { [x]EAI_custom_bonus_33 = 0 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -756,6 +814,8 @@ EAI_DIFFICULTY_set_very_hard_difficulty_custom_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_31 = -0.5 }
 			#surrender_limit
 			set_variable = { [x]EAI_custom_bonus_32 = 0 }
+			#army_org_factor
+			set_variable = { [x]EAI_custom_bonus_33 = 0 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
@@ -834,6 +894,8 @@ EAI_DIFFICULTY_set_insane_difficulty_custom_modifiers = {
 			set_variable = { [x]EAI_custom_bonus_31 = -0.75 }
 			#surrender_limit
 			set_variable = { [x]EAI_custom_bonus_32 = 0 }
+			#army_org_factor
+			set_variable = { [x]EAI_custom_bonus_33 = 0 }
 		}
 		x = "[EAI_GetDifficultyBonusMode]"
 	}
