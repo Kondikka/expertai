@@ -79,7 +79,7 @@ NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR = 50 --50					-- Same as above but 
 
 -- EAI: AI delays upgrading the main tank types too much because it wants to create absent types for its templates first
 -- makes sense but I'd rather have it get its most used type upgraded first
-NDefines.NAI.LAND_DESIGN_ALTERNATIVE_ABSENT = 1 --1000000
+NDefines.NAI.LAND_DESIGN_ALTERNATIVE_ABSENT = 10 --1000000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_LESSER_TECH = 1 --10000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_EQUAL_TECH = 1 --100
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 100
@@ -553,7 +553,7 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 -- NDefines.NAI.MIN_INVASION_PLAN_VALUE_TO_EXECUTE = --0.2				-- ai will only activate invasions if it is above this
 -- NDefines.NAI.MIN_INVASION_ORG_FACTOR_TO_EXECUTE = --0.75				-- ai will only activate invasions if average org factor is above this
 
-NDefines.NAI.MAX_INVASION_SIZE = 18 --24									-- max invasion group size
+NDefines.NAI.MAX_INVASION_SIZE = 24 --24									-- max invasion group size
 
 --NDefines.NAI.ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = 0.3
 
@@ -593,7 +593,7 @@ NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = 500 --
 -- AIR AI
 --------------------------------------------------------------------------------------------------------------
 
--- NDefines.NAI.PRODUCTION_CARRIER_PLANE_BUFFER_RATIO = 0.75 --1.5				-- in additiona to total deck size of carriers, we want at list this ratio to buffer it
+NDefines.NAI.PRODUCTION_CARRIER_PLANE_BUFFER_RATIO = 0.25 --1.5				-- in additiona to total deck size of carriers, we want at list this ratio to buffer it
 -- -- NDefines.NAI.PRODUCTION_CARRIER_PLANE_PRODUCTION_BOOST_TO_BUFFER = 4.0  -- production of carrier planes will go up by this ratio if we lack buffers
 -- NDefines.NAI.MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 1
 
@@ -652,7 +652,7 @@ NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 40					-- Amount of bombers requeste
 -- NDefines.NAI.NAVAL_MIN_EXCORT_PLANES = 100 --0						-- Min amount of planes requested to excort operations
 
 -- NDefines.NAI.NAVAL_AIR_SUPERIORITY_IMPORTANCE = 0.10			-- Strategic importance of air superiority ( amount of enemy planes in area )
-NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 10000 --2.0					-- Naval ship air importance
+NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 5 --2.0					-- Naval ship air importance
 -- NDefines.NAI.NAVAL_SHIP_IN_PORT_AIR_IMPORTANCE = 6.0			-- Naval ship in the port air importance
 -- NDefines.NAI.NAVAL_COMBAT_AIR_IMPORTANCE = 8.0					-- Naval combat air importance
 -- NDefines.NAI.NAVAL_TRANSFER_AIR_IMPORTANCE = 0.0				-- Naval transfer air importance

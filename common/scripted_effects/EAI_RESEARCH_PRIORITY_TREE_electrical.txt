@@ -270,25 +270,30 @@ EAI_PR_STRATEGIES_fire_control_system = {
 
 	if = { 
 		limit = { 
-			OR = {
-				EAI_DD_tech_focus = yes 
-				EAI_CL_tech_focus = yes 
-				EAI_CA_tech_focus = yes 
-				EAI_BC_tech_focus = yes 
-				EAI_BB_tech_focus = yes 
-				EAI_SHBB_tech_focus = yes
-			}
-
-			check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 }
+			EAI_fire_control_MODULE_FOCUS = yes
 		}
 
 		set_temp_variable = { prio_cat = @PR_fire_control_system }
+
+		set_temp_variable = { prio_factor = EAI_RESEARCH_naval_research_factor }
+		add_to_temp_variable = { prio_factor = 0.5 }
+		multiply_temp_variable = { prio_cat = prio_factor }
+
+		### electronic_mechanical_engineering
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:electronic_mechanical_engineering } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1936.1.1
+			set_temp_variable = { _prio_val = @PR_fire_control_system }
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
 
 		### computing_machine
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:computing_machine } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1938.1.1
+			set_temp_variable = { _prio_val = @PR_fire_control_system }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -297,6 +302,7 @@ EAI_PR_STRATEGIES_fire_control_system = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:basic_fire_control_system } set_temp_variable = { _prio_val = prio_cat }
 
 			NOT = { has_tech = improved_fire_control_system can_research = improved_fire_control_system is_researching_technology = improved_fire_control_system }
+			set_temp_variable = { _prio_val = @PR_fire_control_system }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 

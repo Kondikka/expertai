@@ -2,7 +2,7 @@
 ###		Artillery technologies
 #######################################################################################
 
-@PR_artillery = 600
+@PR_artillery = 800
 @PR_antiair = 600
 @PR_antitank = 600
 @PR_rocket_artillery = 600
@@ -31,6 +31,12 @@ EAI_PR_STRATEGIES_artillery = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:gw_artillery } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1936.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1938.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1939.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -39,6 +45,12 @@ EAI_PR_STRATEGIES_artillery = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:interwar_artillery } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1939.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1940.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1941.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -47,6 +59,12 @@ EAI_PR_STRATEGIES_artillery = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:artillery1 } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1939.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1940.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1941.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -54,7 +72,14 @@ EAI_PR_STRATEGIES_artillery = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:artillery2 } set_temp_variable = { _prio_val = prio_cat }
 
+			has_war = yes
 			date > 1940.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1941.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1942.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -62,7 +87,14 @@ EAI_PR_STRATEGIES_artillery = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:artillery3 } set_temp_variable = { _prio_val = prio_cat }
 
+			has_war = yes
 			date > 1941.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1942.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1943.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -70,7 +102,14 @@ EAI_PR_STRATEGIES_artillery = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:artillery4 } set_temp_variable = { _prio_val = prio_cat }
 
+			has_war = yes
 			date > 1942.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1943.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1944.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -78,7 +117,14 @@ EAI_PR_STRATEGIES_artillery = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:artillery5 } set_temp_variable = { _prio_val = prio_cat }
 
+			has_war = yes
 			date > 1943.1.1
+
+			if = { limit = { has_war = yes }
+			
+				if = { limit = { date > 1944.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				if = { limit = { date > 1945.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 	}
@@ -91,20 +137,38 @@ EAI_PR_STRATEGIES_antiair = {
 			OR = {
 				EAI_aa_tech_focus = yes
 
-				AND = {
-					check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 }
-					EAI_wants_to_build_surface_ships = yes
-				}
+				EAI_naval_aa_MODULE_FOCUS = yes
 			}
 		}
 
 		set_temp_variable = { prio_cat = @PR_antiair }
 
+		if = { limit = { EAI_naval_aa_MODULE_FOCUS = yes }
+		
+			set_temp_variable = { prio_factor = EAI_RESEARCH_naval_research_factor }
+			add_to_temp_variable = { prio_factor = 0.5 }
+			multiply_temp_variable = { prio_cat = prio_factor }
+		}
+		else = {
+
+			set_temp_variable = { prio_cat = @PR_antiair }
+		}
+
+		### gw_artillery
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:gw_artillery } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1936.6.1
+			add_to_temp_variable = { _prio_val = 200 }
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
 		### interwar_antiair
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:interwar_antiair } set_temp_variable = { _prio_val = prio_cat }
 
-			date > 1939.1.1
+			date > 1936.6.1
+			add_to_temp_variable = { _prio_val = 200 }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 

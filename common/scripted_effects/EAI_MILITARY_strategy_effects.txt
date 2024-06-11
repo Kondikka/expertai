@@ -226,6 +226,10 @@ EAI_MILITARY_monthly_update = {
 	EAI_MILITARY_save_airforce_strategy = yes
 
 	EAI_MILITARY_garrison_state_strategies = yes
+
+	###
+
+	EAI_MILITARY_strategy_allies_invade_GER = yes
 }
 
 ### War trend
@@ -793,6 +797,8 @@ EAI_MILITARY_save_airforce_strategy = {
 						divide_temp_variable = { air_ratio = air_force_size_@THIS }
 					}
 
+					if = { limit = { ROOT = { has_country_flag = EAI_military_strategy_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | air_difference=[?air_difference] air_ratio=[?air_ratio]" }
+
 					if = {
 						limit = {
 							OR = {
@@ -1171,6 +1177,82 @@ EAI_MILITARY_strategy_JAP_push_CHI_north = {
 		}
 		else = {
 			set_variable = { EAI_MILITARY_strategy_JAP_push_CHI_north_days_since_invasion = 0 }
+		}
+	}
+}
+
+###
+
+EAI_MILITARY_strategy_allies_invade_GER = {
+
+	if = {
+		limit = {
+			tag = USA
+
+			NOT = { 
+				has_country_flag = EAI_MILITARY_strategy_allies_invade_GER_cooldown 
+				has_country_flag = EAI_MILITARY_strategy_allies_invade_ITA_cooldown 
+			}
+
+			set_temp_variable = { r = random }
+			check_variable = { r < 0.33 }
+
+			date > 1943.1.1
+
+			is_in_faction_with = USA
+
+			has_war_with = GER
+
+			surrender_progress < 0.05
+
+			alliance_strength_ratio > 0.75
+			
+			alliance_naval_strength_ratio > 0.5
+
+			GER = { has_war_with = SOV }
+
+			OR = {
+				SOV = { surrender_progress > 0.4 }
+				GER = { surrender_progress > 0.1 }
+				date > 1944.1.1
+			}
+		}
+
+		random_list = {
+
+			1 = {
+				set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_GER value = 1 days = 180 }
+				set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_GER_cooldown value = 1 days = 365 }
+
+				every_country = {
+					limit = {
+						is_in_faction_with = PREV
+
+						surrender_progress < 0.05
+					}
+
+					set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_GER value = 1 days = 180 }
+					set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_GER_cooldown value = 1 days = 365 }
+				}
+			}
+
+			1 = {
+				modifier = { factor = 0 NOT = { ITA = { is_in_faction_with = GER } } }
+
+				set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_ITA value = 1 days = 180 }
+				set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_ITA_cooldown value = 1 days = 365 }
+
+				every_country = {
+					limit = {
+						is_in_faction_with = PREV
+
+						surrender_progress < 0.05
+					}
+
+					set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_ITA value = 1 days = 180 }
+					set_country_flag = { flag = EAI_MILITARY_strategy_allies_invade_ITA_cooldown value = 1 days = 365 }
+				}
+			}
 		}
 	}
 }

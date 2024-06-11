@@ -825,7 +825,7 @@
 		id = FRA_defensive_focus
 		icon = GFX_goal_generic_defence
 		mutually_exclusive = { focus = FRA_aggressive_focus }
-		x = -1
+		x = -2
 		y = 1
 		cost = 10
 		prerequisite = { focus = FRA_begin_rearmament }
@@ -842,7 +842,7 @@
 	focus = {
 		id = FRA_firepower_kills
 		icon = GFX_goal_generic_army_artillery
-		x = -4
+		x = -2
 		y = 1
 		
 		prerequisite = { focus = FRA_defensive_focus }
@@ -1123,9 +1123,9 @@
 		x = 2
 		y = 1
 		
-		prerequisite = { focus = FRA_firepower_kills focus = FRA_methodical_battle }
+		prerequisite = { focus = FRA_defensive_focus focus = FRA_aggressive_focus }
 		mutually_exclusive = { }
-		relative_position_id = FRA_firepower_kills
+		relative_position_id = FRA_defensive_focus
 		cost = 10
 
 		ai_will_do = {
@@ -1186,6 +1186,10 @@
 
 		completion_reward = {
 			add_ideas = { special_forces }
+			if = {
+				limit = { has_dlc = "Arms Against Tyranny" }
+				add_potential_special_forces_tree = yes
+			}
 		}
 	}
 	focus = {
@@ -1221,7 +1225,15 @@
 				category = tp_tech
 				category = marine_tech
 				uses = 2
-				bonus = 1
+				bonus = 0.5
+			}
+			if = {
+				limit = { has_dlc = "Arms Against Tyranny" }
+				add_doctrine_cost_reduction = {
+					cost_reduction = 0.5
+					uses = 2
+					category = special_forces_doctrine
+				}
 			}
 		}
 	}
@@ -1230,7 +1242,7 @@
 		id = FRA_aggressive_focus
 		icon = GFX_goal_generic_major_war
 		mutually_exclusive = { focus = FRA_defensive_focus }
-		x = 1
+		x = 2
 		y = 1
 		cost = 10
 		relative_position_id = FRA_begin_rearmament
@@ -7630,6 +7642,8 @@
 		will_lead_to_war_with = ENG
 		will_lead_to_war_with = BEL
 		will_lead_to_war_with = HOL
+		will_lead_to_war_with = LUX
+
 		available = {
 			is_subject = no
 		}
@@ -7653,6 +7667,12 @@
 					is_subject_of = ROOT
 				}
 			}
+			LUX = {
+				OR = {
+					exists = no
+					is_subject_of = ROOT
+				}
+			}
 		}
 
 		cancel_if_invalid = yes
@@ -7662,6 +7682,11 @@
 		completion_reward = {
 			create_wargoal = {
 				target = BEL
+				type = annex_everything
+				expire = 0
+			}
+			create_wargoal = {
+				target = LUX
 				type = annex_everything
 				expire = 0
 			}
@@ -8043,7 +8068,7 @@
 		}
 
 		available = {
-			
+			is_subject = no
 		}
 		
 		bypass = {
