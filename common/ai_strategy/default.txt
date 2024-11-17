@@ -216,3 +216,140 @@ default_market_convoy_purchases = {
 		value = 30  # Consider buying if we have too few (less than 30) convoys
 	}
 }
+
+comintern_avoid_starting_wars_during_endgame = { #Sov should avoid attacking allies while ww2 is still going on
+
+	allowed = {
+		OR = {
+			original_tag = SOV
+			is_in_faction_with = SOV
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+		SOV = { has_government = communism }
+		OR = {
+			USA = {
+				has_capitulated = no
+				has_war_with = JAP
+			}
+			ENG = {
+				has_capitulated = no
+				has_war_with = JAP
+			}
+		}
+		date > 1943.1.1
+		date < 1945.1.1
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = avoid_starting_wars
+		value = -400
+	}
+	ai_strategy = {
+		type = conquer
+		id = POL
+		value = -400 #REALLY dont try and conquer poland
+	}
+	ai_strategy = {
+		type = befriend
+		id = "POL"
+		value = 200
+	}
+	ai_strategy = {
+		type = conquer
+		id = JAP
+		value = 400 #These values offset each other. Basically we won't start wars with anyone except for japan while this strategy is active
+	}
+	ai_strategy = {
+		type = conquer
+		id = FIN
+		value = 400 #These values offset each other. Basically we won't start wars with anyone except for finland while this strategy is active
+	}
+	ai_strategy = {
+		type = conquer
+		id = PER
+		value = 400 #These values offset each other. Basically we won't start wars with anyone except for iran while this strategy is active
+	}
+}
+
+allies_avoid_starting_wars_during_endgame = { #Allies should avoid attacking.. well, anyone while ww2 is in endgame
+	allowed = {
+		OR = {
+			tag = ENG
+			is_in_faction_with = ENG
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+		ENG = { has_government = democratic }
+		OR = {
+			tag = ENG
+			is_in_faction_with = ENG
+		}
+		has_war_with = JAP
+		JAP = {
+			has_government = fascism #Just to make sure we're not looking at a puppet or sth
+		}
+		date > 1943.1.1
+		date < 1945.1.1
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = avoid_starting_wars
+		value = -400
+	}
+}
+
+# Build some rockets (simple strats to have a minimum production at least )
+if_we_can_build_v1_rockets_we_want_rockets = {
+	enable = {
+		is_special_project_completed = sp:sp_rockets_flying_bomb
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = equipment_production_min_factories_archetype 
+		id = guided_missile_equipment
+		value = 1
+	}
+}
+
+if_we_can_build_v2_rockets_we_want_v2_rockets = {
+	enable = {
+		is_special_project_completed = sp:sp_rockets_ballistic_missile
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = equipment_production_min_factories_archetype 
+		id = ballistic_missile_equipment
+		value = 1
+	}
+}
+if_we_can_build_sams_we_want_sams = {
+	enable = {
+		is_special_project_completed = sp:sp_rockets_ground_to_air_missile
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = equipment_production_min_factories_archetype 
+		id = sam_missile_equipment
+		value = 1
+	}
+}
+if_we_can_build_nuclear_missiles_we_want_nuclear_missiles = {
+	enable = {
+		is_special_project_completed = sp:sp_nuclear_warheads
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = equipment_production_min_factories_archetype 
+		id = nuclear_missile_equipment
+		value = 1
+	}
+}

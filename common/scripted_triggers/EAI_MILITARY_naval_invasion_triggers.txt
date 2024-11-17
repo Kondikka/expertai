@@ -120,17 +120,6 @@ EAI_INVASION_exclude_target = { # Stop any invasion against this target
 
 	NOT = { check_variable = { PREV.EAI_naval_invasion_target = THIS.id } }
 
-	# Dont block invasions against any allied country of target or it messes up the AI?
-	set_temp_variable = { tmp_id = PREV.id }
-	NOT = {
-		any_allied_country = {
-			OR = {
-				var:tmp_id = { check_variable = { EAI_naval_invasion_target = PREV.id } }
-				var:tmp_id = { check_variable = { ai_strategy_invade@PREV > 1000 } }
-			}
-		}
-	}
-
 	# has_war_with = PREV
 
 	any_of_scopes = { array = controlled_states
@@ -209,16 +198,22 @@ EAI_INVASION_block_invasion_strategies = {
 				AND = {
 					NOT = { has_war_with = GER }
 					GER = { 
-						focus_progress = { focus = GER_ussr_war_goal progress > 0 } 
-						NOT = { has_completed_focus = GER_ussr_war_goal }
+						focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+						NOT = { has_completed_focus = GER_war_with_the_ussr }
 					}
 				}
 			}
 		}
 
-		# Allies queueing up invasions against SOV while the mod blocks them from other targets?
 		AND = {
-			THIS = { ROOT = { NOT = { has_war_with = PREV } has_war_together_with = PREV } } 
+			ROOT = { 
+				original_tag = SOV 
+				has_war_with = GER
+			}
+
+			THIS = {
+				NOT = { is_neighbor_of = ROOT }
+			}
 		}
 
 		# stop norway invasion setting
@@ -249,26 +244,19 @@ EAI_INVASION_block_invasion_strategies = {
 
 		# Early allied invasions vs JAP
 		AND = { 
-			ROOT = { ENG = { EAI_PREV_on_same_side_with_THIS = yes } } 
+			ROOT = { 
+				is_historical_focus_on = yes
+				has_global_flag = { flag = EAI_JAP_blitz_pacific_1000d value = 1 days < 180 }
+				ENG = { EAI_PREV_on_same_side_with_THIS = yes } 
+			} 
 			
-			THIS = { JAP = { EAI_PREV_on_same_side_with_THIS = yes } } 
-
-			JAP = { 
-				OR = {
-					AND = {
-						has_country_flag = { flag = EAI_invasion_blitz_JAP days < 270 }
-						is_ai = yes
-					}
-					AND = {
-						has_country_flag = { flag = EAI_invasion_blitz_JAP days < 180 }
-						is_ai = no
-					}
-				}
-			}
-
-			is_historical_focus_on = yes
+			THIS = { 
+				JAP = { is_ai = yes }
+				JAP = { EAI_PREV_on_same_side_with_THIS = yes } 
+			} 
 		}
 
+		# Axis invasions vs SOV
 		AND = {
 			ROOT = { GER = { EAI_PREV_on_same_side_with_THIS = yes } } 
 			
@@ -294,58 +282,88 @@ EAI_INVASION_block_invasion_strategies = {
 			
 			THIS = { OR = { original_tag = BUL original_tag = ROM original_tag = HUN original_tag = FIN } is_in_faction_with = GER } 
 		}
-		
-		# JAP
-		AND = { 
-			ROOT = { original_tag = JAP }
-			
-			THIS = { 
-				OR = { 
-					original_tag = MAL 
-					AND = { original_tag = GXC ROOT = { has_war_with = CHI } } 
-				}
-			}
-		}
-		
-		# axis invasions in UK
+
+		# Allied invasions vs GER - handled by military strategy
 		AND = { 
 			ROOT = { 
+				is_historical_focus_on = yes
+				ENG = { EAI_PREV_on_same_side_with_THIS = yes }
+			}
+			
+			THIS = { 
+				is_in_faction_with = GER
+			}
+		}
+
+		# Allied invasions vs ITA - handled by military strategy
+		AND = { 
+			ROOT = { 
+				is_historical_focus_on = yes
+				ENG = { EAI_PREV_on_same_side_with_THIS = yes }
+			}
+			
+			THIS = { 
+				is_in_faction_with = ITA
+			}
+		}
+
+		# Allied invasions vs VIC - handled by military strategy
+		AND = { 
+			ROOT = { 
+				is_historical_focus_on = yes
+				ENG = { EAI_PREV_on_same_side_with_THIS = yes }
+			}
+			
+			THIS = { 
+				is_in_faction_with = VIC
+			}
+		}
+
+		# Axis invasions vs ENG - handled by military strategy
+		AND = { 
+			ROOT = { 
+				is_historical_focus_on = yes
 				GER = { EAI_PREV_on_same_side_with_THIS = yes }
-				
-				OR = {
-					AND = {
-						has_war_with = SOV
-						SOV = { has_capitulated = no }
-						strength_ratio = { tag = SOV ratio < 4 }
-					}
-					AND = {
-						alliance_naval_strength_ratio < 1.0
-						date < 1944.1.1
-					}
-				}
 			}
 			
 			THIS = { 
 				is_in_faction_with = ENG
-				OR = {
-					is_major = yes
-					is_subject_of = ENG
-				}
 			}
 		}
 
-		# USA invasions vs JAP
+		# Axis invasions vs USA - handled by military strategy
 		AND = { 
 			ROOT = { 
-				tag = USA
-				
-				has_war_with = JAP
-				JAP = { has_capitulated = no }
+				is_historical_focus_on = yes
+				GER = { EAI_PREV_on_same_side_with_THIS = yes }
 			}
 			
 			THIS = { 
-				NOT = { tag = JAP }
+				is_in_faction_with = USA
+			}
+		}
+
+		# USA invasions vs JAP - handled by military strategy
+		AND = { 
+			ROOT = { 
+				is_historical_focus_on = yes
+				USA = { EAI_PREV_on_same_side_with_THIS = yes }
+			}
+			
+			THIS = { 
 				is_in_faction_with = JAP
+			}
+		}
+
+		# JAP invasions vs USA - handled by military strategy
+		AND = { 
+			ROOT = { 
+				is_historical_focus_on = yes
+				JAP = { EAI_PREV_on_same_side_with_THIS = yes }
+			}
+			
+			THIS = { 
+				is_in_faction_with = USA
 			}
 		}
 	}
@@ -364,18 +382,17 @@ EAI_INVASION_invasion_strategies = {
 		# AXIS invasion in norway
 		AND = { 
 			ROOT = { 
-				has_war_with = NOR
-				
-				GER = { EAI_PREV_on_same_side_with_THIS = yes }
-
-				if = { limit = { has_war_with = FRA }
-
-					FRA = { has_capitulated = yes }
+				tag = GER
+				OR = {
+					has_global_flag = { flag = EAI_GER_blitz_denmark_365d days < 90 }
+					AND = { focus_progress = { focus = GER_operation_weserubung progress > 0 } NOT = { has_completed_focus = GER_operation_weserubung } }
 				}
+				NOR = { EAI_PREV_deploy_against_THIS = yes }
 			}
 
 			THIS = { 
 				original_tag = NOR
+				has_capitulated = no
 			} 
 		}
 		
@@ -390,103 +407,6 @@ EAI_INVASION_invasion_strategies = {
 			THIS = { 
 				original_tag = GRE 
 			} 
-		}
-		
-		# JAP invasion in china
-		AND = { 
-			ROOT = { 
-				original_tag = JAP
-				NOT = { has_army_manpower = { size < 650000 } }
-				OR = {
-					has_completed_focus = JAP_intervene_in_china
-					focus_progress = { focus = JAP_intervene_in_china progress > 0 }
-				}
-			} 
-
-			THIS = { 
-				original_tag = CHI
-				has_capitulated = no
-			} 
-		}
-
-		# JAP invasion in pacific
-		AND = { 
-			ROOT = { 
-				original_tag = JAP
-				OR = {
-					has_completed_focus = JAP_secure_the_philippines
-					focus_progress = { focus = JAP_secure_the_philippines progress > 0 }
-				}
-			} 
-
-			THIS = { 
-				original_tag = PHI
-				has_capitulated = no
-			} 
-		}
-
-		# Operation torch
-		AND = { 
-			ROOT = {  
-				has_war_with = GER
-				OR = { 
-					is_in_faction_with = USA 
-					is_in_faction_with = ENG 
-				} 
-				check_variable = { EAI_army_manpower > 60 }
-			} 
-			
-			THIS = { 
-				tag = VIC
-				any_of_scopes = { array = global.EAI_operation_torch_states_array
-
-					is_controlled_by = VIC
-					is_coastal = yes
-				}
-				GER = { EAI_PREV_on_same_side_with_THIS = yes } 
-				OR = {
-					has_army_manpower = { size < 1000000 }
-					date > 1941.1.1
-				}
-				if = { limit = { is_historical_focus_on = yes } 
-				
-					OR = {
-						date > 1942.1.1
-						GER = { surrender_progress > 0.2 }
-						SOV = { surrender_progress > 0.2 }
-					}
-				}
-			} 
-			
-			GER = { has_war_with = SOV }
-		}
-		
-		# ALLIES invasion in axis
-		AND = { 
-			ROOT = { 
-				has_war_with = GER
-				OR = { original_tag = USA original_tag = ENG } 
-				check_variable = { EAI_army_manpower > 60 }
-			} 
-			
-			THIS = { 
-				GER = { EAI_PREV_on_same_side_with_THIS = yes } 
-				is_major = yes
-				OR = {
-					has_army_manpower = { size < 1000000 }
-					date > 1941.1.1
-				}
-				if = { limit = { is_historical_focus_on = yes } 
-				
-					OR = {
-						date > 1943.1.1
-						GER = { surrender_progress > 0.2 }
-						SOV = { surrender_progress > 0.225 }
-					}
-				}
-			} 
-			
-			GER = { has_war_with = SOV }
 		}
 	}
 }

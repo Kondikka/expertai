@@ -18,6 +18,18 @@ JAP_intervene_in_china = {
 
 		fire_only_once = no
 
+		ai_will_do = {
+			factor = 201
+			modifier = {
+				has_war_with = USA
+				factor = 10 #screw it, kill everything
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = JAP_slow_down_in_china
+				#NOT = { has_war_with = USA }
+			}
+		}
 		modifier = {
 
 		}
@@ -142,9 +154,16 @@ JAP_intervene_in_china = {
 }
 
 JAP_interservice_rivalry = {
+
 	JAP_steel_for_guns = {
 
 		icon = generic_tank
+
+		visible = {
+			NOT = {
+				has_country_flag = JAP_steel_for_ships
+			}
+		}
 
 		available = {
 			NOT = {
@@ -154,17 +173,16 @@ JAP_interservice_rivalry = {
 				has_country_flag = JAP_steel_for_ships
 			}
 		}
-		visible = {
-			NOT = {
-				has_country_flag = JAP_steel_for_ships
-			}
-		}
+
 		cost = 30
+
 		fire_only_once = yes
+
 		days_remove = -1
 		ai_will_do = { #EAI
 			base = 10000
 		}
+
 		complete_effect = {
 			random_owned_state = {
 				limit = {
@@ -205,9 +223,16 @@ JAP_interservice_rivalry = {
 			set_country_flag = JAP_steel_for_guns
 		}
 	}
+
 	JAP_steel_for_ships = {
 
 		icon = generic_naval
+
+		visible = {
+			NOT = {
+				has_country_flag = JAP_steel_for_guns
+			}
+		}
 
 		available = {
 			NOT = {
@@ -217,17 +242,16 @@ JAP_interservice_rivalry = {
 				has_country_flag = JAP_steel_for_guns
 			}
 		}
-		visible = {
-			NOT = {
-				has_country_flag = JAP_steel_for_guns
-			}
-		}
+		
 		cost = 30
+
 		fire_only_once = yes
+
 		days_remove = -1
 		ai_will_do = { #EAI
 			base = 0
 		}
+
 		complete_effect = {
 			random_owned_state = {
 				limit = {
@@ -268,6 +292,7 @@ JAP_interservice_rivalry = {
 			set_country_flag = JAP_steel_for_ships
 		}
 	}
+
 	JAP_prioritize_army_aircraft_construction = {
 
 		icon = generic_tank
@@ -579,6 +604,8 @@ JAP_interservice_rivalry = {
 }
 
 foreign_politics = {
+
+	# Offer Surrender Terms to China
 	JAP_sue_for_peace_CHI = {
 
 		allowed = {
@@ -592,7 +619,9 @@ foreign_politics = {
 			custom_trigger_tooltip = {
 				tooltip = JAP_sue_for_peace_TT
 				NOT = {
+					# South Korea
 					controls_state = 525
+					# North Korea
 					controls_state = 527
 				}
 				NOT = {
@@ -698,7 +727,10 @@ foreign_politics = {
 
 		complete_effect = {
 			event_target:WTT_current_china_leader = {
-				country_event = { id = wtt_japan.126 days = 1 }
+				country_event = { 
+					id = wtt_japan.126 
+					days = 1 
+				}
 			}
 		}
 	}
@@ -980,15 +1012,13 @@ JAP_southern_expansion = {
 
 		fire_only_once = yes
 
-
 		modifier = {
-
 		}
 
-		cost = 75
+		cost = 50
 
 		ai_will_do = {
-			factor = 5
+			base = 5
 			modifier = {
 				factor = 0
 				FRA = { has_war = no }
@@ -1004,10 +1034,14 @@ JAP_southern_expansion = {
 					}
 				}
 			}
-			
 		}
 
 		complete_effect = {
+			hidden_effect = {
+				set_global_flag = JAP_pressure_france
+				set_global_flag = { flag = EAI_JAP_transferred_indochina_60d value = 1 days = 60 }
+			}
+
 			if = {
 				limit = {
 					FRA = {
@@ -1565,7 +1599,6 @@ operations = {
 		days_remove = 30
 		war_with_on_remove = SOV
 		complete_effect = {
-			hidden_effect = { set_global_flag = JAP_test_the_soviets }
 			527 = {
 				save_event_target_as = JAP_SOV_attacker_state
 				set_state_flag = border_incident_active
@@ -2105,7 +2138,7 @@ operations = {
 
 		visible = {
 			is_in_faction_with = GER
-			GER = { has_completed_focus = GER_mol_rib_pact }
+			GER = { has_completed_focus = GER_molotov_ribbentrop_pact }
 			GER = { NOT = { has_war_with = SOV } }
 			NOT = { has_war_with = SOV }
 			has_completed_focus = JAP_preemptive_war

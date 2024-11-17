@@ -1,0 +1,68 @@
+############################################################################################################
+#	Expert AI mod - misc triggers
+############################################################################################################
+
+EAI_MATH_TRIGGER_abs = { # var:_val_
+	if = { limit = { check_variable = { _val_ < 0 } }
+	
+		multiply_temp_variable = { _val_ = -1 }
+	}
+}
+
+EAI_MATH_TRIGGER_deviation = { # val:_val_ val:_avg
+	subtract_from_temp_variable = { _val_ = _avg }
+
+	set_temp_variable = { _avg = 0 }
+}
+
+EAI_MATH_TRIGGER_normalize = { # var:_val_ var:_min var:_max
+	set_temp_variable = { tmp = _val_ }
+	subtract_from_temp_variable = { tmp = _min }
+
+	set_temp_variable = { tmp2 = _max }
+	subtract_from_temp_variable = { tmp2 = _min }
+
+	divide_temp_variable = { tmp = tmp2 }
+	set_temp_variable = { _val_ = tmp }
+
+	clamp_temp_variable = { var = _val_ min = 0 max = 1 }
+
+	set_temp_variable = { _min = 0 }
+	set_temp_variable = { _max = 0 }
+}
+
+EAI_MATH_TRIGGER_complement = { # var:_val_
+	if = {
+		limit = {
+			NOT = {
+				check_variable = { _val_ > 1 }
+				check_variable = { _val_ < 0 }
+			}
+		}
+	
+		set_temp_variable = { tmp = 1 }
+		subtract_from_temp_variable = { tmp = _val_ }
+		set_temp_variable = { _val_ = tmp }
+	}
+	else = {
+		log = "EAI_MATH_complement ERROR"
+		log = "_val_=[?_val_]"
+	}
+}
+
+EAI_MATH_TRIGGER_scale = { # var:_val_ var:_scale
+	multiply_temp_variable = { _val_ = _scale }
+
+	set_temp_variable = { _scale = 0 }
+}
+
+EAI_MATH_TRIGGER_square = { # var:_val_
+	multiply_temp_variable = { _val_ = _val_ }
+}
+
+EAI_MATH_TRIGGER_lerp = { # var:_from var:_to var:_amount var:lerp_
+	set_temp_variable = { lerp_ = _to }
+	subtract_from_temp_variable = { lerp_ = _from }
+	multiply_temp_variable = { lerp_ = _amount }
+	add_to_temp_variable = { lerp_ = _from }
+}

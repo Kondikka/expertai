@@ -515,8 +515,19 @@ EAI_armored_car_tech_focus = {
 	}
 }
 
+EAI_light_flamethrower_support_tech_focus = {
+
+	OR = {
+		EAI_LARM_equipment_production = yes
+		EAI_MARM_equipment_production = yes
+		EAI_HARM_equipment_production = yes
+	}
+}
+
 EAI_light_armor_tank_recon_tech_focus = {
 
+	always = no
+	
 	OR = {
 		EAI_LARM_equipment_production = yes
 		EAI_MARM_equipment_production = yes
@@ -687,7 +698,7 @@ EAI_MARM_equipment_production = {
 
 	EAI_MARM_military_focus = yes
 	has_tech = basic_medium_tank_chassis
-	check_variable = { EAI_TEMPLATE_state^global.EAI_TEMPLATE_MEDIUM_ARMOR > 0 }
+	has_country_flag = EAI_marm_template_upgrade
 }
 
 EAI_MARM_tech_focus = {
@@ -748,7 +759,7 @@ EAI_HARM_equipment_production = {
 
 	EAI_HARM_military_focus = yes
 	has_tech = basic_heavy_tank_chassis
-	check_variable = { EAI_TEMPLATE_state^global.EAI_TEMPLATE_HEAVY_ARMOR > 0 }
+	has_country_flag = EAI_harm_template_upgrade
 }
 
 EAI_HARM_tech_focus = {
@@ -805,12 +816,13 @@ EAI_MODARM_equipment_production = {
 
 	EAI_MODARM_military_focus = yes
 	has_tech = main_battle_tank_chassis
-	check_variable = { EAI_TEMPLATE_state^global.EAI_TEMPLATE_MODERN_ARMOR > 0 }
+	OR = {
+		has_country_flag = EAI_marm_template_upgrade
+		has_country_flag = EAI_harm_template_upgrade
+	}
 }
 
 EAI_MODARM_tech_focus = {
-
-	date > 1950.1.1
 
 	OR = {
 		EAI_HARM_tech_focus = yes
@@ -940,8 +952,6 @@ EAI_motart_tech_focus = {
 
 EAI_mech_tech_focus = {
 
-	date > 1950.1.1
-
 	OR = { 
 		EAI_MARM_tech_focus = yes
 		EAI_HARM_tech_focus = yes
@@ -952,18 +962,6 @@ EAI_mech_tech_focus = {
 
 EAI_aa_tech_focus = {
 	date > 1936.7.1
-	
-	OR = {
-		EAI_light_armor_aa_design_focus = yes
-		EAI_medium_armor_aa_design_focus = yes
-		EAI_heavy_armor_aa_design_focus = yes
-		AND = {
-			check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
-			check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_AT_FOCUS }
-			check_variable = { EAI_FOCUS/LAND/antitank_design = global.EAI_LINE_AT_DESIGN }
-		}
-		always = yes
-	}
 }
 
 EAI_get_special_forces_tree = {
@@ -1020,17 +1018,30 @@ EAI_infantry_variant_focus_CHEAP = {
 		AND = {
 			tag = JAP
 			has_war_with = CHI
-			date < 1941.1.1
+			OR = {
+				date < 1941.1.1
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
 		}
 		AND = {
 			tag = CHI
 			has_war_with = JAP
-			date < 1941.1.1
+			OR = {
+				date < 1941.1.1
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
 		}
 		AND = {
 			tag = ITA
 			has_war_with = ETH
 			date < 1938.1.1
+		}
+		AND = {
+			tag = SOV
+			OR = {
+				date < 1944.1.1
+				has_country_flag = EAI_MILITARY_trend_losing_war
+			}
 		}
 	}
 }

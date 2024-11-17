@@ -1,0 +1,208 @@
+###############################################################
+### japan invasions
+###############################################################
+
+### Japan invasions
+
+	@EAI_MILITARY_japan_invasions_INVASION_strategy_id = 5
+	@EAI_MILITARY_japan_invasions_INVASION_strategy_prio = 200
+
+	@EAI_MILITARY_japan_invasions_INVASION_num_operations = 1
+
+	@EAI_MILITARY_japan_invasions_INVASION_operation_target_shift_days = 90
+
+	@EAI_MILITARY_operation_australia_INVASION_operation_id = 0
+	@EAI_MILITARY_operation_australia_INVASION_operation_prio = 10
+	@EAI_MILITARY_operation_australia_INVASION_target_control_pct = 0.75
+	@EAI_MILITARY_operation_australia_INVASION_start_year = 1944
+
+###
+
+EAI_MILITARY_japan_invasions_INVASION_update = {
+
+	if = { limit = { NOT = { has_global_flag = EAI_MILITARY_japan_invasions_INVASION_update } }
+
+		set_temp_variable = { _strategy_id = @EAI_MILITARY_japan_invasions_INVASION_strategy_id }
+		set_temp_variable = { _strategy_prio = @EAI_MILITARY_japan_invasions_INVASION_strategy_prio }
+		set_temp_variable = { _leader_id = 0 }
+		
+		clear_temp_array = countries
+		add_to_temp_array = { countries = JAP.id }
+
+		for_each_scope_loop = { array = countries
+		
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+					date > 1942.1.1
+					is_faction_leader = yes
+					has_war = yes
+				}
+
+				### Has decent control of pacific
+
+				clear_temp_array = _states_
+				for_each_loop = { array = global.EAI_MAP_entire_pacific_theatre add_to_temp_array = { _states_ = v } }
+				set_temp_variable = { _leader_id = THIS.id }
+				EAI_MILITARY_INVASION_define_sides = yes
+				EAI_MAP_get_province_control_pct = yes
+				set_temp_variable = { _leader_id = 0 }
+
+				if = {
+					limit = {
+						check_variable = { our_control_pct_ > 0.5 }
+					}
+				
+					EAI_MILITARY_strategy_priorities = yes
+					if = { limit = { check_variable = { has_priority_ = 1 } }
+						if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_japan_invasions_INVASION_update" }
+						set_temp_variable = { _leader_id = THIS.id }
+						set_temp_variable = { _num_operations = @EAI_MILITARY_japan_invasions_INVASION_num_operations }
+						EAI_MILITARY_japan_invasions_INVASION_init = yes
+						EAI_MILITARY_INVASION_clear_cooldowns = yes
+						EAI_MILITARY_INVASION_progress = yes
+						EAI_MILITARY_japan_invasions_INVASION_selector = yes
+						EAI_MILITARY_japan_invasions_INVASION_get_data = yes
+						EAI_MILITARY_INVASION_assign = yes
+						if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | END EAI_MILITARY_japan_invasions_INVASION_update" }
+					}
+				}
+			}
+		}
+		EAI_MILITARY_INVASION_validate = yes
+		set_global_flag = { flag = EAI_MILITARY_japan_invasions_INVASION_update value = 1 days = 6 }
+	}
+}
+
+EAI_MILITARY_japan_invasions_INVASION_init = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_INVASION_init } }
+
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_japan_invasions_INVASION_init" }
+
+		set_country_flag = EAI_MILITARY_INVASION_init
+		clear_array = EAI_MILITARY_INVASION_operation_start_days
+		add_to_array = { EAI_MILITARY_INVASION_operation_start_days = @EAI_MILITARY_operation_australia_INVASION_start_year }
+		for_each_loop = { array = EAI_MILITARY_INVASION_operation_start_days
+			set_temp_variable = { tmp = v }
+			subtract_from_temp_variable = { tmp = 1936 }
+			multiply_temp_variable = { tmp = 365 }
+			set_variable = { EAI_MILITARY_INVASION_operation_start_days^i = tmp }
+			if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "op_start_day=[?tmp]" }
+		}
+	}
+}
+
+EAI_MILITARY_japan_invasions_INVASION_selector = { # >>> var:_started_special_operation_
+
+	set_temp_variable = { _started_special_operation_ = -1 }
+
+	if = { limit = { check_variable = { EAI_MILITARY_INVASION_objectives^num = 0 } }
+	
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_japan_invasions_INVASION_selector" }
+
+		random_list = {
+			log = yes
+			seed = random
+
+			### Operation Australia
+	
+				1 = {
+					### Trigger
+		
+						modifier = { 
+							factor = 0 
+		
+							NOT = {
+								AND = {
+									### Minimum start date
+		
+										set_temp_variable = { _index = @EAI_MILITARY_operation_australia_INVASION_operation_id }
+										set_temp_variable = { _shift_days = @EAI_MILITARY_japan_invasions_INVASION_operation_target_shift_days }
+										EAI_MILITARY_historical_date_TRIGGER = yes
+		
+									### Enemy controls theatre region
+
+										set_temp_variable = { _target_control_pct = @EAI_MILITARY_operation_australia_INVASION_target_control_pct }
+										clear_temp_array = _states_
+										set_temp_variable = { index = @EAI_MILITARY_operation_australia_INVASION_operation_id }
+										set_temp_variable = { start = global.EAI_MAP_japan_invasion_data_start^index }
+										set_temp_variable = { end = global.EAI_MAP_japan_invasion_data_ST_end^index }
+										all_of = { array = global.EAI_MAP_japan_invasion_theatres 
+											if = { limit = { NOT = { check_variable = { i < start } } check_variable = { i < end } } add_to_temp_array = { _states_ = v } } 
+										}
+										EAI_MILITARY_enemy_presence_TRIGGER = yes
+		
+									### 
+
+										EAI_MILITARY_strength_TRIGGER = yes
+										EAI_MILITARY_not_losing_TRIGGER = yes
+										NOT = { EAI_MILITARY_home_threatened_TRIGGER = yes }
+
+									###
+								}
+							}
+						}
+		
+					### Modifier
+
+						###	Operation prio
+		
+							modifier = {
+								set_temp_variable = { strategy_prio = @EAI_MILITARY_operation_australia_INVASION_operation_prio }
+								factor = strategy_prio
+							}
+
+						### Cooldown
+		
+							modifier = {
+								set_temp_variable = { _index = @EAI_MILITARY_operation_australia_INVASION_operation_id }
+								check_variable = { EAI_MILITARY_INVASION_cooldowns^_index = 1 }
+								factor = 0.1
+							}
+
+						###
+		
+					### Effect
+		
+						set_temp_variable = { _started_special_operation_ = @EAI_MILITARY_operation_australia_INVASION_operation_id }
+		
+					###
+				}
+	
+			###
+
+			1000 = {
+				set_temp_variable = { _started_special_operation_ = -1 }
+			}
+		}
+	}
+}
+
+EAI_MILITARY_japan_invasions_INVASION_get_data = { # var:_operation_id >>> arr:_states_ arr:_sea_regions_ arr:_air_regions_ arr:_objectives_ var:_target_control_pct_
+
+	if = { limit = { NOT = { check_variable = { _started_special_operation_ = -1 } } }
+
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_japan_invasions_INVASION_get_data" }
+
+		clear_temp_array = _states_
+		clear_temp_array = _staging_areas_
+		clear_temp_array = _sea_regions_
+		clear_temp_array = _air_regions_
+		clear_temp_array = _objectives_
+
+		set_temp_variable = { _operation_id = _started_special_operation_ }
+
+		set_temp_variable = { index = global.EAI_MAP_japan_invasion_data_start^_operation_id }
+		while_loop_effect = { limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_end^_operation_id } }
+			if = { 		limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_ST_end^_operation_id } } add_to_temp_array = { _states_ = global.EAI_MAP_japan_invasion_theatres^index } }
+			else_if = { limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_SA_end^_operation_id } } add_to_temp_array = { _staging_areas_ = global.EAI_MAP_japan_invasion_theatres^index } }
+			else_if = { limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_SR_end^_operation_id } } add_to_temp_array = { _sea_regions_ = global.EAI_MAP_japan_invasion_theatres^index } }
+			else_if = { limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_AR_end^_operation_id } } add_to_temp_array = { _air_regions_ = global.EAI_MAP_japan_invasion_theatres^index } }
+			else_if = { limit = { check_variable = { index < global.EAI_MAP_japan_invasion_data_OB_end^_operation_id } } add_to_temp_array = { _objectives_ = global.EAI_MAP_japan_invasion_theatres^index } }
+			add_to_temp_variable = { index = 1 }
+		}
+
+		if = { limit = { check_variable = { _operation_id = @EAI_MILITARY_operation_australia_INVASION_operation_id } } set_temp_variable = { _target_control_pct_ = @EAI_MILITARY_operation_australia_INVASION_target_control_pct } }
+	}
+}

@@ -5,13 +5,14 @@
 @PR_small_airframe = 750
 @PR_medium_airframe = 750
 @PR_large_airframe = 750
+@PR_transport = 500
 @PR_engine_module = 1050
 @PR_bomb_module = 800
 @PR_air_torpedo_module = 800
-@PR_mg_module = 800
-@PR_survivability_studies_module = 800
+@PR_mg_module = 1000
+@PR_survivability_studies_module = 1000
 @PR_aa_cannon_module = 800
-@PR_range_improvements_module = 800
+@PR_range_improvements_module = 1000
 @PR_aircraft_construction_module = 800
 
 EAI_PR_STRATEGIES_aircraft_technologies = {
@@ -19,6 +20,7 @@ EAI_PR_STRATEGIES_aircraft_technologies = {
 	EAI_PR_STRATEGIES_small_airframe = yes
 	EAI_PR_STRATEGIES_medium_airframe = yes
 	EAI_PR_STRATEGIES_large_airframe = yes
+	EAI_PR_STRATEGIES_transport = yes
 	EAI_PR_STRATEGIES_engine_module = yes
 	EAI_PR_STRATEGIES_bomb_module = yes
 	EAI_PR_STRATEGIES_air_torpedo_module = yes
@@ -254,6 +256,50 @@ EAI_PR_STRATEGIES_large_airframe = {
 	}
 }
 
+EAI_PR_STRATEGIES_transport = {
+
+	if = { 
+		limit = { 
+			always = yes
+		}
+
+		set_temp_variable = { prio_cat = @PR_transport }
+
+		if = {
+			limit = {
+				is_major = yes
+				num_of_factories > 150
+			}
+		
+			add_to_temp_variable = { prio_cat = 400 }
+		}
+
+		### bba_early_transport_plane
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:bba_early_transport_plane } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1936.6.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### bba_improved_transport_plane
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:bba_improved_transport_plane } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1940.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### bba_strategic_airlifter
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:bba_strategic_airlifter } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1945.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+	}
+}
+
 EAI_PR_STRATEGIES_engine_module = {
 
 	if = { 
@@ -415,6 +461,7 @@ EAI_PR_STRATEGIES_mg_module = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:aa_lmg } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1936.6.1
+			if = { limit = { date > 1940.1.1 } add_to_temp_variable = { _prio_val = 200 } }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -423,6 +470,7 @@ EAI_PR_STRATEGIES_mg_module = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:aa_hmg } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1939.1.1
+			if = { limit = { date > 1940.1.1 } add_to_temp_variable = { _prio_val = 200 } }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 	}

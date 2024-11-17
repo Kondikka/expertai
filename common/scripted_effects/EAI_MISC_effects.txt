@@ -20,21 +20,6 @@ EAI_save_compatibility = {
 		EAI_set_version = yes
 
 		### Save compatibility effects
-
-		every_country = {
-			
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 112 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 111 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 122 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 121 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 132 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 131 } }
-	
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 212 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 211 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 222 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 221 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 232 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 231 } }
-	
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 312 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 311 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 322 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 321 } }
-			if = { limit = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 332 } } set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 331 } }
-		}
 	}
 }
 
@@ -70,106 +55,6 @@ EAI_track_calendar_month = {
 		else_if = { limit = { check_variable = { global.EAI_calendar_month = 11 } } 	set_variable = { global.EAI_calendar_month = 12 }	set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #DEC
 		else = { 																		set_variable = { global.EAI_calendar_month = 1 }		set_global_flag = { flag = EAI_track_calendar_month_update value = 1 days = 31 } } #JAN
 	}
-}
-
-###
-
-EAI_sqrt = { # _sqrt_input, sqrt_result_
-
-	# log = "_sqrt_input=[?_sqrt_input]"
-
-	if = { limit = { NOT = { check_variable = { _sqrt_input = 0 } } }
-	
-		set_temp_variable = { sqrt_result_ = 0 }
-		set_temp_variable = { accuracy = 0.01 }
-		set_temp_variable = { x1 = _sqrt_input }
-	
-		while_loop_effect = { limit = { check_variable = { EAI_sqrt_b = 0 } } break = EAI_sqrt_b
-	
-			set_temp_variable = { a = _sqrt_input }
-			divide_temp_variable = { a = x1 }
-	
-			set_temp_variable = { x2 = x1 }
-			add_to_temp_variable = { x2 = a }
-	
-			divide_temp_variable = { x2 = 2 }
-	
-			set_temp_variable = { abs_x = x2 }
-			subtract_from_temp_variable = { abs_x = x1 }
-			if = { limit = { check_variable = { abs_x < 0 } } multiply_temp_variable = { abs_x = -1 } }
-	
-			if = { limit = { check_variable = { abs_x < accuracy } }
-			
-				set_temp_variable = { sqrt_result_ = x2 }
-				set_temp_variable = { EAI_sqrt_b = 1 }
-			}
-	
-			set_temp_variable = { x1 = x2 }
-		}
-	
-		set_temp_variable = { EAI_sqrt_b = 0 }
-	}
-
-	# log = "sqrt_result_=[?sqrt_result_]"
-}
-
-EAI_get_distance_between_provinces_a_b = { # _province_id_a, _province_id_b, distance_
-
-	@map_width = 5632
-	@map_width_half = 2816
-
-	set_temp_variable = { dx = global.EAI_province_x_pos^_province_id_a }
-	subtract_from_temp_variable = { dx = global.EAI_province_x_pos^_province_id_b }
-	if = { limit = { check_variable = { dx < 0 } } multiply_temp_variable = { dx = -1 } }
-	if = { limit = { check_variable = { dx > @map_width_half } }
-		set_temp_variable = { dx_wr = @map_width }
-		subtract_from_temp_variable = { dx_wr = dx }
-		set_temp_variable = { dx = dx_wr }
-	}
-
-	set_temp_variable = { dy = global.EAI_province_y_pos^_province_id_a }
-	subtract_from_temp_variable = { dy = global.EAI_province_y_pos^_province_id_b }
-	if = { limit = { check_variable = { dy < 0 } } multiply_temp_variable = { dy = -1 } }
-
-	# log = "_province_id_a=[?_province_id_a] _province_id_b=[?_province_id_b] dx=[?dx] dy=[?dy]"
-
-	multiply_temp_variable = { dx = dx }
-	multiply_temp_variable = { dy = dy }
-	set_temp_variable = { distance_ = dx }
-	add_to_temp_variable = { distance_ = dy }
-
-	set_temp_variable = { _sqrt_input = distance_ }
-	EAI_sqrt = yes
-	set_temp_variable = { distance_ = sqrt_result_ }
-
-	# log = "distance_=[?distance_]"
-}
-
-EAI_get_province_neighbors = { # _get_province_id_neighbors, _get_province_neighbors_TERRAIN_TYPES = LAND, province_neighbors_
-
-	clear_temp_array = province_neighbors_
-	meta_effect = {
-		text = {
-			for_each_loop = { array = global.EAI_province_neighbors_[x] index = pn_i value = pn_v break = pn_b
-			
-				if = {
-					limit = {
-						if = { limit = { check_variable = { _get_province_neighbors_TERRAIN_TYPES^num > 0 } }  
-							is_in_array = { _get_province_neighbors_TERRAIN_TYPES = global.EAI_province_terrain_type^pn_v }
-						}
-						else = {
-							is_in_array = { global.EAI_PROV_TYPE_LAND = global.EAI_province_terrain_type^pn_v }
-						}
-					}
-
-					add_to_temp_array = { province_neighbors_ = pn_v }
-				}
-			}
-		}
-		x = "[?_get_province_id_neighbors]"
-	}
-
-	clear_temp_array = _get_province_neighbors_TERRAIN_TYPES
 }
 
 ### Advisors
@@ -424,13 +309,13 @@ EAI_build_armies_fix = {
 
 	if = {
 		limit = {
-
 			NOT = { has_country_flag = EAI_infantry_division_limit }
 			
 			# Build amount
-			set_temp_variable = { build_manpower = EAI_division_cap }
+			set_temp_variable = { build_manpower = EAI_division_cap_10k }
+			multiply_temp_variable = { build_manpower = 10 }
 			clamp_temp_variable = { var = build_manpower min = 0 max = 350 }
-			check_variable = { EAI_army_manpower < build_manpower }
+			check_variable = { deployed_army_manpower_k < build_manpower }
 
 			# Has enough equipment
 			OR = {
@@ -445,17 +330,19 @@ EAI_build_armies_fix = {
 			}
 
 			# Has 40% of fielded army manpower in reserve manpower
-			set_temp_variable = { manpower_reserve = manpower_k }
-			multiply_temp_variable = { manpower_reserve = 0.1 }
-			divide_temp_variable = { manpower_reserve = EAI_army_manpower }
-			OR = {
-				AND = {
-					has_war = yes
-					check_variable = { manpower_reserve > 0.4 }
-				}
-				AND = {
-					has_war = no
-					check_variable = { manpower_reserve > 0.2 }
+			if = { limit = { check_variable = { deployed_army_manpower_k > 0 } }
+			
+				set_temp_variable = { manpower_reserve = manpower_k }
+				divide_temp_variable = { manpower_reserve = deployed_army_manpower_k }
+				OR = {
+					AND = {
+						has_war = yes
+						check_variable = { manpower_reserve > 0.4 }
+					}
+					AND = {
+						has_war = no
+						check_variable = { manpower_reserve > 0.2 }
+					}
 				}
 			}
 		}
@@ -465,269 +352,12 @@ EAI_build_armies_fix = {
 	else = { clr_country_flag = EAI_build_armies_fix }
 }
 
-EAI_calculate_army_manpower = {
-
-	set_variable = { EAI_army_manpower = 1 }
-	while_loop_effect = { limit = { always = yes }
-
-		if = {
-			limit = { 
-				meta_trigger = {
-					text = {
-						has_army_manpower = { size > [a][b] }
-					}
-					a = "[?EAI_army_manpower]"
-					b = "0000"
-				}
-			}
-
-			if = { limit = { check_variable = { EAI_army_manpower < 100 } } add_to_variable = { EAI_army_manpower = 1 } }
-			else_if = { limit = { check_variable = { EAI_army_manpower < 1000 } } add_to_variable = { EAI_army_manpower = 5 } }
-			else = { add_to_variable = { EAI_army_manpower = 10 } }
-		}
-		else = { set_temp_variable = { break = 1 } }
-	}
-}
-
 ###
 
 EAI_refresh_gui = {
 
 	if = { limit = { check_variable = { ROOT.EAI_refresh_gui = 0 } } set_variable = { ROOT.EAI_refresh_gui = 1 } }
 	else = { set_variable = { ROOT.EAI_refresh_gui = 0 } }
-}
-
-###
-
-EAI_get_random_index_in_array_len = { # _array_len, random_index_
-
-	set_temp_variable = { random_index_ = _array_len }
-	multiply_temp_variable = { random_index_ = random }
-	meta_effect = {
-		text = { set_temp_variable = { random_index_ = [x] } }
-		x = "[?random_index_|0]"
-	}
-	if = { limit = { check_variable = { random_index_ = _array_len } } subtract_from_temp_variable = { random_index_ = 1 } }
-}
-
-###
-
-EAI_create_state_arrays = {
-
-	EAI_create_operation_torch_states_array = yes
-
-	EAI_create_japanese_home_states_array = yes
-
-	EAI_create_spanish_civil_war_states_array = yes
-
-	EAI_create_north_african_states_array = yes
-
-	EAI_SOV_garrison_strategy_states_arrays = yes
-
-	EAI_capital_defense_states_arrays = yes
-
-	EAI_island_states = yes
-
-	every_state = {
-		limit = {
-			OR = {
-				region = 164
-				region = 165
-				region = 189
-				region = 200
-				region = 143
-			}
-		}
-
-		add_to_array = { global.EAI_chinese_states = THIS.id }
-	}
-}
-
-EAI_SOV_garrison_strategy_states_arrays = {
-
-	@sov_defense_radius = 75
-
-	217 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_217 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_217 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_217 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_217 = THIS.id } } }
-	219 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_219 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_219 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_219 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_219 = THIS.id } } }
-	195 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_195 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_195 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_195 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_195 = THIS.id } } }
-	137 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_137 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_137 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_137 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_137 = THIS.id } } }
-	241 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_241 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_241 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_241 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_241 = THIS.id } } }
-	808 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_808 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_808 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_808 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_808 = THIS.id } } }
-	810 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_810 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_810 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_810 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_810 = THIS.id } } }
-	193 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_193 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_193 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_193 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_193 = THIS.id } } }
-	196 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_196 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_196 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_196 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_196 = THIS.id } } }
-	200 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_200 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_200 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_200 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_200 = THIS.id } } }
-	208 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_208 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_208 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_208 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_208 = THIS.id } } }
-	209 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_209 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_209 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_209 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_209 = THIS.id } } }
-	210 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_210 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_210 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_210 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_210 = THIS.id } } }
-	265 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_265 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_265 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_265 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_265 = THIS.id } } }
-	238 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_238 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_238 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_238 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_238 = THIS.id } } }
-	220 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_220 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_220 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_220 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_220 = THIS.id } } }
-	221 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_221 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_221 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_221 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_221 = THIS.id } } }
-	218 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_218 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_218 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_218 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_218 = THIS.id } } }
-	263 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_263 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_263 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_263 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_263 = THIS.id } } }
-	242 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_242 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_242 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_242 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_242 = THIS.id } } }
-	224 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_224 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_224 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_224 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_224 = THIS.id } } }
-	260 = { add_to_array = { global.EAI_SOV_garrison_strategy_states_260 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_SOV_garrison_strategy_states_260 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_SOV_garrison_strategy_states_260 = THIS.id } } } add_to_array = { global.EAI_SOV_garrison_strategy_states_260 = THIS.id } } }
-}
-
-EAI_capital_defense_states_arrays = {
-
-	@capital_defense_radius = 100
-
-	37 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_37 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_37 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_37 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_37 = THIS.id } } }
-	16 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_16 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_16 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_16 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_16 = THIS.id } } }
-	64 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_64 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_64 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_64 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_64 = THIS.id } } }
-	6 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_6 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_6 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_6 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_6 = THIS.id } } }
-	7 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_7 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_7 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_7 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_7 = THIS.id } } }
-	126 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_126 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_126 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_126 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_126 = THIS.id } } }
-	113 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_113 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_113 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_113 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_113 = THIS.id } } }
-	41 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_41 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_41 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_41 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_41 = THIS.id } } }
-	2 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_2 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_2 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_2 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_2 = THIS.id } } }
-	107 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_107 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_107 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_107 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_107 = THIS.id } } }
-	43 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_43 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_43 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_43 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_43 = THIS.id } } }
-	46 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_46 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_46 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_46 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_46 = THIS.id } } }
-	42 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_42 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_42 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_42 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_42 = THIS.id } } }
-	47 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_47 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_47 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_47 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_47 = THIS.id } } }
-	44 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_44 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_44 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_44 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_44 = THIS.id } } }
-	49 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_49 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_49 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_49 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_49 = THIS.id } } }
-	797 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_797 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_797 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_797 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_797 = THIS.id } } }
-	110 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_110 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_110 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_110 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_110 = THIS.id } } }
-	141 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_141 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_141 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_141 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_141 = THIS.id } } }
-	111 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_111 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_111 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_111 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_111 = THIS.id } } }
-	812 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_812 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_812 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_812 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_812 = THIS.id } } }
-	808 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_808 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_808 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_808 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_808 = THIS.id } } }
-	11 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_11 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_11 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_11 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_11 = THIS.id } } }
-	10 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_10 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_10 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_10 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_10 = THIS.id } } }
-	9 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_9 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_9 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_9 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_9 = THIS.id } } }
-	439 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_439 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_439 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_439 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_439 = THIS.id } } }
-	282 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_282 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_282 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_282 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_282 = THIS.id } } }
-	285 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_285 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_285 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_285 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_285 = THIS.id } } }
-	284 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_284 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_284 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_284 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_284 = THIS.id } } }
-	361 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_361 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_361 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_361 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_361 = THIS.id } } }
-	219 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_219 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_219 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_219 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_219 = THIS.id } } }
-	907 = { add_to_array = { global.EAI_MILITARY_AREA_capital_defense_907 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_907 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_AREA_capital_defense_907 = THIS.id } } } add_to_array = { global.EAI_MILITARY_AREA_capital_defense_907 = THIS.id } } }
-}
-
-EAI_create_operation_torch_states_array = {
-
-	clear_array = global.EAI_operation_torch_states_array
-
-	every_state = {
-		limit = {
-			OR = {
-				region = 182
-				region = 126
-				region = 225
-			}
-			NOT = {
-				state = 699
-			}
-		}
-
-		add_to_array = { global.EAI_operation_torch_states_array = THIS.id }
-	}
-}
-
-EAI_create_spanish_civil_war_states_array = {
-
-	clear_array = global.EAI_spanish_civil_war_states_array
-
-	every_state = {
-		limit = {
-			is_owned_and_controlled_by = SPR
-
-			OR = {
-				region = 209
-				region = 210
-				region = 41
-			}
-		}
-
-		add_to_array = { global.EAI_spanish_civil_war_states_array = THIS.id }
-	}
-}
-
-EAI_create_north_african_states_array = {
-
-	clear_array = global.EAI_north_african_states
-
-	every_state = {
-		limit = {
-			OR = {
-				state = 448
-				state = 661
-				state = 449
-				state = 662
-				state = 450
-				state = 451
-				state = 663
-				state = 452
-				state = 447
-				state = 446
-			}
-		}
-
-		add_to_array = { global.EAI_north_african_states = THIS.id }
-	}
-}
-
-EAI_create_japanese_home_states_array = {
-
-	clear_array = global.EAI_japanese_home_states
-
-	every_state = {
-		limit = {
-			OR = {
-				region = 154
-				state = 645
-				state = 526
-				state = 525
-			}
-		}
-
-		add_to_array = { global.EAI_japanese_home_states = THIS.id }
-	}
-}
-
-EAI_set_state_region_id = {
-
-	every_state = {
-		set_temp_variable = { region_id = 1 }
-		while_loop_effect = { 
-			limit = {
-				NOT = {
-					meta_trigger = {
-						text = { region = [x] }
-						x = "[?region_id]"
-					}
-				}
-			}
-
-			add_to_temp_variable = { region_id = 1 }
-		}
-		set_variable = { EAI_region_id = region_id }
-	}
-}
-
-EAI_island_states = {
-
-	every_state = {
-		limit = {
-			OR = {
-				is_island_state = yes
-				AND = {
-					set_temp_variable = { tmp_neighbors = 0 }
-					all_neighbor_state = {
-						add_to_temp_variable = { tmp_neighbors = 1 }
-					}
-					check_variable = { tmp_neighbors = 0 }
-				}
-			}
-		}
-
-		add_to_array = { global.EAI_island_states = THIS.id }
-	}
 }
 
 ###
@@ -849,31 +479,87 @@ EAI_num_fighters_deployed = { # num_deployed_planes_with_type@fighter does not w
 
 EAI_calculate_fielded_eq_ratio = {
 
-	set_temp_variable = { equipment_count = 0 }
-	set_temp_variable = { tot_fielded_eq_ratio = 0 }
+	### Infantry
 
-	### Good enough indicator of the enemy eq. strength
+		set_temp_variable = { equipment_count = 0 }
+		set_temp_variable = { tot_fielded_eq_ratio = 0 }
 
-	set_temp_variable = { fielded_eq_ratio = num_equipment_in_armies_k@infantry_equipment }
-	divide_temp_variable = { fielded_eq_ratio = num_target_equipment_in_armies_k@infantry_equipment }
-	add_to_temp_variable = { tot_fielded_eq_ratio = fielded_eq_ratio }
-	add_to_temp_variable = { equipment_count = 1 }
+		### Good enough indicator of the enemy eq. strength
 
-	# if = { limit = { check_variable = { num_target_equipment_in_armies_k@artillery_equipment > 1 } }
+		set_temp_variable = { fielded_eq_ratio = num_equipment_in_armies_k@infantry_equipment }
+		divide_temp_variable = { fielded_eq_ratio = num_target_equipment_in_armies_k@infantry_equipment }
+		add_to_temp_variable = { tot_fielded_eq_ratio = fielded_eq_ratio }
+		add_to_temp_variable = { equipment_count = 1 }
 
-	# 	set_temp_variable = { fielded_eq_ratio = num_equipment_in_armies_k@artillery_equipment }
-	# 	divide_temp_variable = { fielded_eq_ratio = num_target_equipment_in_armies_k@artillery_equipment }
-	# 	add_to_temp_variable = { tot_fielded_eq_ratio = fielded_eq_ratio }
-	# 	add_to_temp_variable = { equipment_count = 1 }
-	# }
+		# if = { limit = { check_variable = { num_target_equipment_in_armies_k@artillery_equipment > 1 } }
 
+		# 	set_temp_variable = { fielded_eq_ratio = num_equipment_in_armies_k@artillery_equipment }
+		# 	divide_temp_variable = { fielded_eq_ratio = num_target_equipment_in_armies_k@artillery_equipment }
+		# 	add_to_temp_variable = { tot_fielded_eq_ratio = fielded_eq_ratio }
+		# 	add_to_temp_variable = { equipment_count = 1 }
+		# }
+
+		###
+
+		divide_temp_variable = { tot_fielded_eq_ratio = equipment_count }
+
+		set_variable = { EAI_fielded_eq_ratio = tot_fielded_eq_ratio }
+
+		if = { limit = { has_country_flag = EAI_equipment_logging} log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EQUIPMENT: EAI_fielded_eq_ratio = [?EAI_fielded_eq_ratio|%0]" }
+
+	### Artillery
+		
+		if = { limit = { check_variable = { deployed_army_manpower_k > 0 } }
+			set_temp_variable = { tmp = num_target_equipment_in_armies_k@artillery_equipment }
+			multiply_temp_variable = { tmp = 1000 }
+			divide_temp_variable = { tmp = deployed_army_manpower_k }
+			if = { limit = { check_variable = { tmp > 0.8 } check_variable = { num_equipment@artillery_equipment < 1000 } }
+				set_country_flag = EAI_fielded_eq_ratio_artillery_wanted
+			}
+			else = { clr_country_flag = EAI_fielded_eq_ratio_artillery_wanted }
+		}
+
+		if = { limit = { check_variable = { num_target_equipment_in_armies_k@artillery_equipment > 0 } }
+			set_variable = { EAI_fielded_eq_ratio_artillery = num_equipment_in_armies_k@artillery_equipment }
+			divide_variable = { EAI_fielded_eq_ratio_artillery = num_target_equipment_in_armies_k@artillery_equipment }
+		}
+		else = { set_variable = { EAI_fielded_eq_ratio_artillery = 1 } }
+
+	### Support
+
+		if = { limit = { check_variable = { deployed_army_manpower_k > 0 } }
+			set_temp_variable = { tmp = num_target_equipment_in_armies_k@support_equipment }
+			multiply_temp_variable = { tmp = 1000 }
+			divide_temp_variable = { tmp = deployed_army_manpower_k }
+			if = { limit = { check_variable = { tmp > 1.0 } check_variable = { num_equipment@support_equipment < 1000 } }
+				set_country_flag = EAI_fielded_eq_ratio_support_wanted
+			}
+			else = { clr_country_flag = EAI_fielded_eq_ratio_support_wanted }
+		}
+
+		if = { limit = { check_variable = { num_target_equipment_in_armies_k@support_equipment > 0 } }
+			set_variable = { EAI_fielded_eq_ratio_support = num_equipment_in_armies_k@support_equipment }
+			divide_variable = { EAI_fielded_eq_ratio_support = num_target_equipment_in_armies_k@support_equipment }
+		}
+		else = { set_variable = { EAI_fielded_eq_ratio_support = 1 } }
+	
+	### Mechanized
+
+		if = { limit = { check_variable = { num_target_equipment_in_armies_k@mechanized_equipment > 0 } }
+			set_variable = { EAI_fielded_eq_ratio_mechanized = num_equipment_in_armies_k@mechanized_equipment }
+			divide_variable = { EAI_fielded_eq_ratio_mechanized = num_target_equipment_in_armies_k@mechanized_equipment }
+		}
+		else = { set_variable = { EAI_fielded_eq_ratio_mechanized = 1 } }
+	
+	### Modern
+
+		if = { limit = { check_variable = { num_target_equipment_in_armies_k@modern_tank_chassis > 0 } }
+			set_variable = { EAI_fielded_eq_ratio_modern = num_equipment_in_armies_k@modern_tank_chassis }
+			divide_variable = { EAI_fielded_eq_ratio_modern = num_target_equipment_in_armies_k@modern_tank_chassis }
+		}
+		else = { set_variable = { EAI_fielded_eq_ratio_modern = 1 } }
+	
 	###
-
-	divide_temp_variable = { tot_fielded_eq_ratio = equipment_count }
-
-	set_variable = { EAI_fielded_eq_ratio = tot_fielded_eq_ratio }
-
-	if = { limit = { has_country_flag = EAI_equipment_logging} log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EQUIPMENT: EAI_fielded_eq_ratio = [?EAI_fielded_eq_ratio|%0]" }
 }
 
 EAI_calculate_reserve_eq_ratio = {
@@ -893,14 +579,10 @@ EAI_calculate_reserve_eq_ratio = {
 EAI_calculate_reserve_mp_ratio = {
 
 	set_temp_variable = { reserve_mp_ratio = manpower_k }
-	divide_temp_variable = { reserve_mp_ratio = 10 }
-
-	if = { limit = { check_variable = { EAI_army_manpower > 0 } }
-
-		divide_temp_variable = { reserve_mp_ratio = EAI_army_manpower }
+	if = { limit = { check_variable = { deployed_army_manpower_k > 0 } }
+		divide_temp_variable = { reserve_mp_ratio = deployed_army_manpower_k }
 	}
 	else = {
-
 		set_temp_variable = { reserve_mp_ratio = 1 }
 	}
 
@@ -1463,34 +1145,6 @@ EAI_armor_intel_startup_targets = {
 
 ###
 
-EAI_GER_swap_in_himmler = {
-
-	if = {
-		limit = {
-			has_political_power > 250
-
-			set_temp_variable = { _pp_cost = 150 }
-
-			original_tag = GER
-			is_ai = yes
-
-			set_temp_variable = { _check_pp = _pp_cost }
-			EAI_PP_has_check_pp = yes
-
-			has_idea = walther_funk
-			NOT = { has_idea = heinrich_himmler }
-			has_available_idea_with_traits = { idea = prince_of_terror limit = 1 } 
-			num_occupied_states > 5
-		}
-
-		remove_ideas = walther_funk
-		add_ideas = heinrich_himmler
-		EAI_PP_pay_pp_cost = yes
-		
-		if = { limit = { has_country_flag = EAI_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | GER advisor event" } 
-	}
-}
-
 EAI_mobile_warfare_doctrine_tech_switch_to_manpower_branch = {
 
 	if = {
@@ -1573,18 +1227,5 @@ EAI_remove_research_slots_from_minors_setting = {
 		if = { limit = { original_research_slots > 1 original_research_slots < 3 } add_research_slot = -1 set_country_flag = EAI_slots_reduced_1 }
 
 		if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | GAME | [Root.GetName] | reducing research slots" } 
-	}
-}
-
-EAI_save_original_capital_location = {
-
-	if = {
-		limit = {
-			NOT = { has_country_flag = EAI_capital_saved }
-			NOT = { any_state = { has_state_flag = EAI_original_capital_@ROOT } }
-		}
-
-		set_country_flag = EAI_capital_saved
-		capital_scope = { set_state_flag = EAI_original_capital_@ROOT }
 	}
 }

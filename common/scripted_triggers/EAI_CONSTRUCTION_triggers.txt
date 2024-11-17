@@ -10,6 +10,13 @@ EAI_has_free_shared_slot = { if = { limit = { PREV = { has_country_flag = EAI_PC
 	if = { limit = { is_coastal = yes } free_building_slots = { building = dockyard size > 0 include_locked = no } }
 	if = { limit = { PREV = { has_tech = synth_oil_experiments } check_variable = { building_level@synthetic_refinery < 3 } } free_building_slots = { building = synthetic_refinery size > 0 include_locked = no } }
 	if = { limit = { PREV = { has_tech = fuel_silos } } free_building_slots = { building = fuel_silo size > 0 include_locked = no } }
+
+	if = { limit = { check_variable = { _num_available_shared_slots > 0 } }
+
+		free_building_slots = { building = arms_factory size > 1 include_locked = no }
+		free_building_slots = { building = industrial_complex size > 1 include_locked = no }
+		if = { limit = { is_coastal = yes } free_building_slots = { building = dockyard size > 1 include_locked = no } }
+	}
 }
 
 # THIS = STATE, PREV = BUILDER
@@ -53,12 +60,14 @@ EAI_has_unreserved_shared_slot = { if = { limit = { PREV = { has_country_flag = 
 	}
 }
 
-# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id
+# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id, _match_project_type_id
 EAI_PC_has_same_type_project_here = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_has_same_type_project_here > THIS=[this.getname] PREV=[prev.getname] _project_building_type=[?_project_building_type] _project_province_id=[?_project_province_id]" }
 
 	any_of = { array = EAI_PC_projects_in_state_of_@PREV value = v_23423
 
 		check_variable = { PREV.EAI_PC_building_type^v_23423 = _project_building_type }
+
+		if = { limit = { check_variable = { _match_project_type_id > 0 } } check_variable = { PREV.EAI_PC_type_id^v_23423 = _match_project_type_id } }
 
 		if = { limit = { is_in_array = { global.EAI_PC_BUILDING_PROVINCIAL = _project_building_type } }
 		
@@ -76,25 +85,14 @@ EAI_PC_get_total_queued_num = { if = { limit = { has_country_flag = EAI_PC_trace
 
 		set_temp_variable = { add_to_queued_num = 0 }
 
-		if = { 
-			limit = { 
-				check_variable = { _get_queued_num_building_type > 0 } 
-				check_variable = { EAI_PC_building_type^queued_type_value = _get_queued_num_building_type } 
-			}  
-
-			set_temp_variable = { add_to_queued_num = 1 }
-		}
-
 		if = {
 			limit = {
-				check_variable = { _get_queued_num_type_id > 0 }
-				check_variable = { EAI_PC_type_id^queued_type_value = _get_queued_num_type_id }
+				if = { limit = { check_variable = { _get_queued_num_building_type > 0 } } check_variable = { EAI_PC_building_type^queued_type_value = _get_queued_num_building_type } }
+				if = { limit = { check_variable = { _get_queued_num_type_id > 0 } } check_variable = { EAI_PC_type_id^queued_type_value = _get_queued_num_type_id } }
 			}
-		
-			set_temp_variable = { add_to_queued_num = 1 }
-		}
 
-		if = { limit = { check_variable = { add_to_queued_num = 1 } } add_to_temp_variable = { queued_type_num_ = 1 }  }
+			add_to_temp_variable = { queued_type_num_ = 1 } 
+		}
 	}
 
 	set_temp_variable = { _get_queued_num_type = 0 }
@@ -102,6 +100,80 @@ EAI_PC_get_total_queued_num = { if = { limit = { has_country_flag = EAI_PC_trace
 }
 
 ### available construction slots
+
+EAI_has_unlocked_building = {
+	if = { limit = { check_variable = { _project_building_type = global.EAI_PC_INF } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_AIR } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_AA } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RADAR } }
+
+		PREV = { has_tech = radio_detection }
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_MIC } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_CIC } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_NIC } }
+
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_REF } }
+
+		PREV = { has_tech = synth_oil_experiments }
+	}
+	
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_SILO } }
+
+		PREV = { has_tech = fuel_silos }
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_MTC } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_LFACILITY } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_NFACILITY } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_AFACILITY } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_BFACILITY } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RSITE } }
+
+		PREV = { has_tech = experimental_rockets }
+	}
+}
 
 EAI_available_AIR = {
 	PREV = { has_full_control_of_state = PREV }
@@ -134,7 +206,7 @@ EAI_available_AA = {
 EAI_available_SHARED = {
 	PREV = { has_full_control_of_state = PREV }
 
-	# EAI_has_free_shared_slot = yes
+	EAI_has_free_shared_slot = yes
 	impassable = no
 }
 
@@ -153,12 +225,59 @@ EAI_available_SILO = {
 	impassable = no
 }
 
+EAI_available_RSITE = {
+	EAI_has_free_shared_slot = yes
+	impassable = no
+}
+
+EAI_available_LFACILITY = {
+	can_construct_building = land_facility
+	EAI_facility_available_for_new_project = yes
+}
+
+EAI_available_NFACILITY = {
+	can_construct_building = naval_facility
+	EAI_facility_available_for_new_project = yes
+}
+
+EAI_available_AFACILITY = {
+	can_construct_building = air_facility
+	EAI_facility_available_for_new_project = yes
+}
+
+EAI_available_BFACILITY = {
+	can_construct_building = nuclear_facility
+	EAI_facility_available_for_new_project = yes
+}
+
+EAI_facility_available_for_new_project = {
+
+	set_temp_variable = { num_queued = 0 }
+	OR = {
+		any_of = { array = EAI_PC_projects_in_state_of_@PREV index = EAI_facility_available_for_new_project_i value = EAI_facility_available_for_new_project_v
+			set_temp_variable = { tmp = PREV.EAI_PC_building_type^EAI_facility_available_for_new_project_v }
+			if = { limit = { is_in_array = { global.EAI_PC_BUILDING_FACILITY = tmp } } add_to_temp_variable = { num_queued = 1 } }
+			always = no
+		}
+		always = yes
+	}
+	check_variable = { num_queued < 1 }
+}
+
 ### priority construction AI
 
 # THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id
 EAI_PC_can_build_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_can_build_project > THIS=[this.getname] PREV=[prev.getname] _project_building_type=[?_project_building_type] _project_province_id=[?_project_province_id]" } 
 
-	EAI_PC_controls_location = yes
+	OR = {
+		AND = {
+			EAI_PC_controls_location = yes
+		}
+		AND = {
+			check_variable = { PREV.EAI_PC_project_build_for_ally^_project_id = 1 }
+			CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+		}
+	}
 
 	EAI_PC_building_slot_available = yes
 }
@@ -276,6 +395,64 @@ EAI_PC_building_slot_available = { if = { limit = { PREV = { has_country_flag = 
 			x = "[?_project_province_id]"
 		}
 	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_LFACILITY } }
+
+		EAI_PC_facility_slot_available = yes
+		can_construct_building = land_facility
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_NFACILITY } }
+
+		EAI_PC_facility_slot_available = yes
+		can_construct_building = naval_facility
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_AFACILITY } }
+
+		EAI_PC_facility_slot_available = yes
+		can_construct_building = air_facility
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_BFACILITY } }
+
+		EAI_PC_facility_slot_available = yes
+		can_construct_building = nuclear_facility
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RSITE } }
+
+		free_building_slots = { building = rocket_site size > 0 include_locked = no }
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_NBASE } }
+
+		meta_trigger = {
+			text = {
+				free_building_slots = { 
+					building = naval_base
+					size > 0
+					include_locked = no 
+					province = [x]
+				}
+			}
+			x = "[?_project_province_id]"
+		}
+	}
+}
+
+EAI_PC_facility_slot_available = {
+
+	set_temp_variable = { num_queued = 0 }
+	OR = {
+		any_of = { array = EAI_PC_projects_in_state_of_@PREV index = EAI_PC_facility_slot_available_i value = EAI_PC_facility_slot_available_v
+			set_temp_variable = { tmp = PREV.EAI_PC_building_type^EAI_PC_facility_slot_available_v }
+			if = { limit = { is_in_array = { global.EAI_PC_BUILDING_FACILITY = tmp } } add_to_temp_variable = { num_queued = 1 } }
+			always = no
+		}
+		always = yes
+	}
+	check_variable = { num_queued < 2 }
 }
 
 ### forts
@@ -311,13 +488,27 @@ EAI_has_city = {
 }
 
 EAI_no_border = {
-	set_temp_variable = { tmp_controller_id = CONTROLLER.id }
-	NOT = { any_neighbor_state = { CONTROLLER = { NOT = { var:tmp_controller_id = { EAI_PREV_on_same_side_with_THIS = yes } } } } }
+	CONTROLLER = { set_temp_variable = { tmp_controller_id = THIS.id } }
+	NOT = { 
+		any_neighbor_state = { 
+			CONTROLLER = { 
+				NOT = { 
+					var:tmp_controller_id = { EAI_PREV_on_same_side_with_THIS = yes } 
+				} 
+			} 
+		} 
+	}
 }
 
 EAI_no_enemy_border = {
-	set_temp_variable = { tmp_controller_id = CONTROLLER.id }
-	NOT = { any_neighbor_state = { CONTROLLER = { has_war_with = var:tmp_controller_id } } }
+	CONTROLLER = { set_temp_variable = { tmp_controller_id = THIS.id } }
+	NOT = { 
+		any_neighbor_state = { 
+			CONTROLLER = { 
+				has_war_with = var:tmp_controller_id 
+			} 
+		} 
+	}
 }
 
 # THIS = STATE, PREV = BUILDER, _get_province_type_id
@@ -395,7 +586,7 @@ EAI_PC_province_is_border = { if = { limit = { PREV = { has_country_flag = EAI_P
 # THIS = STATE, PREV = BUILDER, _get_province_type_id
 EAI_PC_province_is_passable = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_province_is_passable > THIS=[this.getname] PREV=[prev.getname] _get_province_type_id=[?_get_province_type_id]" }
 	
-	is_in_array = { global.EAI_PROV_TYPE_LAND = global.EAI_province_terrain_type^_get_province_type_id }
+	is_in_array = { global.EAI_MAP_PROV_LAND_TYPES = global.EAI_MAP_province_terrain_type^_get_province_type_id }
 }
 
 ### air base

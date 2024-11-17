@@ -1832,8 +1832,15 @@ country_event = {
 					value = 0.75
 					compare = greater_than_or_equals 
 				}
+				NOT = { has_country_flag = SOV_mig_design_bureau_dissolved_flag }
 			}
-			remove_ideas = SOV_mig_design_bureau
+			if = { # If no AAT -> Then remove designer (in case it was hired etc)
+				limit = {
+					NOT = { has_dlc = "Arms Against Tyranny" }
+				}
+				remove_ideas = SOV_mig_design_bureau
+			}
+
 			set_country_flag = SOV_mig_design_bureau_dissolved_flag
 			unlock_decision_tooltip = SOV_reinstate_mig_design_bureau
 		}
@@ -1844,8 +1851,15 @@ country_event = {
 					value = 0.5
 					compare = greater_than_or_equals 
 				}
+				NOT = { has_country_flag = SOV_ilyushin_design_bureau_dissolved_flag }
 			}
-			remove_ideas = SOV_ilyushin_design_bureau
+			if = { # If no AAT -> Then remove designer (in case it was hired etc)
+				limit = {
+					NOT = { has_dlc = "Arms Against Tyranny" }
+				}
+				remove_ideas = SOV_ilyushin_design_bureau
+			}
+
 			set_country_flag = SOV_ilyushin_design_bureau_dissolved_flag
 			unlock_decision_tooltip = SOV_reinstate_ilyushin_design_bureau
 		}
@@ -1856,15 +1870,86 @@ country_event = {
 					value = 0.25
 					compare = greater_than_or_equals 
 				}
+				NOT = { has_country_flag = SOV_tupolev_design_bureau_dissolved_flag }
 			}
-			remove_ideas = SOV_tupolev_design_bureau
+			if = { # If no AAT -> Then remove designer (in case it was hired etc)
+				limit = {
+					NOT = { has_dlc = "Arms Against Tyranny" }
+				}
+				remove_ideas = SOV_tupolev_design_bureau
+			}
+
 			set_country_flag = SOV_tupolev_design_bureau_dissolved_flag
 			unlock_decision_tooltip = SOV_reinstate_tupolev_design_bureau
 		}
-		else= { #YAKOVLEV
-			remove_ideas = SOV_yakovlev_design_bureau
+		else_if = {
+			limit = { #YAKOVLEV
+				NOT = { has_country_flag = SOV_yakovlev_design_bureau_dissolved_flag }
+			}
+			if = { # If no AAT -> Then remove designer (in case it was hired etc)
+				limit = {
+					NOT = { has_dlc = "Arms Against Tyranny" }
+				}
+				remove_ideas = SOV_yakovlev_design_bureau
+			}
+
 			set_country_flag = SOV_yakovlev_design_bureau_dissolved_flag
 			unlock_decision_tooltip = SOV_reinstate_yakovlev_design_bureau
+		}
+		else = { #RANDOMIZED VALUE FOR BUREAU HAS ALREADY BEEN DISSOLVED - Fallback to first non-dissolved bureau
+			if = { # MIG
+				limit = {
+					NOT = { has_country_flag = SOV_mig_design_bureau_dissolved_flag }
+				}
+				if = { # If no AAT -> Then remove designer (in case it was hired etc)
+					limit = {
+						NOT = { has_dlc = "Arms Against Tyranny" }
+					}
+					remove_ideas = SOV_mig_design_bureau
+				}
+
+				set_country_flag = SOV_mig_design_bureau_dissolved_flag
+				unlock_decision_tooltip = SOV_reinstate_mig_design_bureau
+			}
+			else_if = {
+				limit = { # ILYUSHIN
+					NOT = { has_country_flag = SOV_ilyushin_design_bureau_dissolved_flag }
+				}
+				if = { # If no AAT -> Then remove designer (in case it was hired etc)
+					limit = {
+						NOT = { has_dlc = "Arms Against Tyranny" }
+					}
+					remove_ideas = SOV_ilyushin_design_bureau
+				}
+
+				set_country_flag = SOV_ilyushin_design_bureau_dissolved_flag
+				unlock_decision_tooltip = SOV_reinstate_ilyushin_design_bureau
+			}
+			else_if = {
+				limit = { # TUPOLEV
+					NOT = { has_country_flag = SOV_tupolev_design_bureau_dissolved_flag }
+				}
+				if = { # If no AAT -> Then remove designer (in case it was hired etc)
+					limit = {
+						NOT = { has_dlc = "Arms Against Tyranny" }
+					}
+					remove_ideas = SOV_tupolev_design_bureau
+				}
+
+				set_country_flag = SOV_tupolev_design_bureau_dissolved_flag
+				unlock_decision_tooltip = SOV_reinstate_tupolev_design_bureau
+			}
+			else = { #YAKOVLEV
+				if = { # If no AAT -> Then remove designer (in case it was hired etc)
+					limit = {
+						NOT = { has_dlc = "Arms Against Tyranny" }
+					}
+					remove_ideas = SOV_yakovlev_design_bureau
+				}
+
+				set_country_flag = SOV_yakovlev_design_bureau_dissolved_flag
+				unlock_decision_tooltip = SOV_reinstate_yakovlev_design_bureau
+			}
 		}
 
 		#Update purged portraits in UI
@@ -6137,7 +6222,7 @@ country_event = {
 					date > 1942.7.1
 					surrender_progress > 0.1
 					has_country_flag = EAI_MILITARY_trend_losing_war
-					check_variable = { EAI_MILITARY_trend_losing_war_percentage > 0.01 }
+					check_variable = { EAI_MILITARY_trend_value > 0.02 }
 				}
 			}
 		}
@@ -6594,15 +6679,15 @@ country_event = {
 			}
 			modifier = {
 				factor = 10
-				has_completed_focus = GER_mol_rib_pact
+				has_completed_focus = GER_molotov_ribbentrop_pact
 			}
 			modifier = {
 				factor = 10
-				has_completed_focus = GER_soviet_ally
+				has_completed_focus = GER_alliance_with_the_ussr
 			}
 			modifier = {
 				factor = 0.1
-				has_completed_focus = GER_anti_comitern_pact
+				has_completed_focus = GER_anti_comintern_pact
 			}
 			modifier = {
 				factor = 0
@@ -6610,16 +6695,12 @@ country_event = {
 					has_war_with = FROM
 					is_justifying_wargoal_against = FROM
 					has_completed_focus = GER_anti_soviet_pact
-					has_completed_focus = GER_ussr_war_goal
+					has_completed_focus = GER_war_with_the_ussr
 				}
 			}
 		}
 
-		add_timed_idea = { idea = SOV_soviet_german_trade_agreement days = 545 } #Technically 1 year but really 18 months for Soviet payment 
-		set_variable = { SOV_capital_for_soviet_imports = ROOT.capital } #Store capital where the dynamic modifier is set so that it can be removed easily later
-		capital_scope = {
-			add_dynamic_modifier = { modifier = SOV_soviet_imports }
-		}
+		add_timed_idea = { idea = SOV_soviet_german_trade_agreement days = 800 } #Technically 1 year but really 18 months for Soviet payment 
 
 		#Effects to Soviets
 		effect_tooltip = {
@@ -6938,6 +7019,47 @@ country_event = {
 				category = dd_tech
 			}
 		}
+		IF = {
+			limit = {
+				has_dlc = "No Step Back"
+			}
+			create_equipment_variant = {
+				name = "A-20"
+				type = medium_tank_chassis_1
+				parent_version = 0
+				allow_without_tech = no
+				modules = {
+					main_armament_slot = tank_small_cannon_2
+					turret_type_slot = tank_medium_two_man_tank_turret
+					suspension_type_slot = tank_christie_suspension
+					armor_type_slot = tank_welded_armor
+					engine_type_slot = tank_diesel_engine
+					special_type_slot_1 = sloped_armor
+				}
+				upgrades = {
+					tank_nsb_engine_upgrade = 8
+					tank_nsb_armor_upgrade = 2
+				}
+				icon = "GFX_SOV_basic_medium_tank_medium"
+			}
+			create_equipment_variant = {
+				name = "KV-1"
+				type = heavy_tank_chassis_1
+				parent_version = 0
+				modules = {
+					main_armament_slot = tank_medium_cannon
+					turret_type_slot = tank_heavy_three_man_tank_turret
+					suspension_type_slot = tank_torsion_bar_suspension
+					armor_type_slot = tank_welded_armor
+					engine_type_slot = tank_diesel_engine		
+				}
+				upgrades = {
+					tank_nsb_engine_upgrade = 10
+					tank_nsb_armor_upgrade = 9
+				}
+				icon = "GFX_SOV_improved_heavy_tank_medium"
+			}
+		}
 
 		add_tech_bonus = {
 			name = NSB_soviet_soviet_german_trade_agreement.1.t
@@ -6946,13 +7068,30 @@ country_event = {
 			category = air_equipment
 		}
 
+		random_owned_controlled_state = {
+			limit = {
+				is_core_of = ROOT
+				free_building_slots = {
+					building = industrial_complex
+					size > 1
+					include_locked = yes
+				}	
+			}
+			prioritize = { 217 202 195 }
+			add_extra_state_shared_building_slots = 2
+			add_building_construction = {
+				type = industrial_complex
+				level = 2
+				instant_build = yes
+			}	
+		}	
+
+		custom_effect_tooltip = generic_skip_one_line_tt
+
 		#Effects to Germans
 		effect_tooltip = {
 			FROM = {
-				add_timed_idea = { idea = SOV_soviet_german_trade_agreement days = 545 } #Technically 1 year but really 18 months for Soviet payment 
-				capital_scope = {
-					add_dynamic_modifier = { modifier = SOV_soviet_imports }
-				}
+				add_timed_idea = { idea = SOV_soviet_german_trade_agreement days = 800 } 
 			}
 
 			add_opinion_modifier = {
@@ -7654,11 +7793,9 @@ country_event = {
 			limit = {
 				NOT = { has_tech = nukes }
 			}
-			add_tech_bonus = {
-				name = SOV_soviet_atomic_bomb_project
-				bonus = 1
-				uses = 1
-				category = nuclear
+			add_breakthrough_progress = {
+				specialization = specialization_nuclear
+				value = 0.4
 			}
 		}
 		else = {
@@ -13039,7 +13176,7 @@ country_event = {
 
 	# Sounds good!
 	option = {
-		name = NSB_soviet_fascist_tsarist.7.a
+		name = NSB_soviet_fascist_tsarist.5.a
 		FROM = {
 			add_to_faction = ROOT
 			hidden_effect = {
@@ -13050,7 +13187,7 @@ country_event = {
 
 	# No thanks!
 	option = {
-		name = NSB_soviet_fascist_tsarist.7.b
+		name = NSB_soviet_fascist_tsarist.5.b
 		hidden_effect = {
 			country_event = { id = NSB_soviet_fascist_tsarist.10 }
 		}
@@ -13216,9 +13353,7 @@ country_event = {
 	# And there was much rejoicing!
 	option = {
 		name = NSB_soviet_fascist_tsarist.15.a
-		effect_tooltip = {
-			promote_character = SOV_patriarch_meletius
-		}
+		
 		news_event = { id = nsb_news.404 hours = 12 }
 	}
 }
@@ -13601,7 +13736,16 @@ country_event = {
 		has_war_with = SOV
 		SOV = {
 			has_government = communism
-			has_country_leader = { character = SOV_iosif_stalin ruling_only = yes }
+			OR = {
+				has_country_leader = { 
+					character = SOV_iosif_stalin 
+					ruling_only = yes 
+				}
+				has_country_leader = { 
+					character = SOV_lev_trotsky 
+					ruling_only = yes 
+				}
+			}
 			surrender_progress > 0.25
 		}
 		has_dlc = "No Step Back"

@@ -1,0 +1,399 @@
+##############################################################################################################################
+### Invasion operations
+##############################################################################################################################
+
+# EAI_invasion_operations_logging
+
+### Invasion operations
+
+	@EAI_MILITARY_INVASION_min_duration_days = 120
+	@EAI_MILITARY_INVASION_planning_phase_days = 90
+	@EAI_MILITARY_INVASION_execution_phase_days = 160
+	@EAI_MILITARY_INVASION_rapid_phase_days = 115
+	@EAI_MILITARY_INVASION_max_failure_weeks = 16
+	@EAI_MILITARY_INVASION_max_failure_grace_control_pct = 0.25
+	@EAI_MILITARY_INVASION_max_failure_grace_period_weeks = 20
+	@EAI_MILITARY_INVASION_cooldown_days = 90
+	@EAI_MILITARY_INVASION_synchronize_days = 7
+	@EAI_MILITARY_INVASION_expected_progress = 0.03
+
+###	Variables:
+
+	#		var:EAI_MILITARY_strategy_id
+	#		var:EAI_MILITARY_strategy_prio
+	#
+	#		var:EAI_MILITARY_INVASION_leader
+	#		var:EAI_MILITARY_INVASION_operation_id
+	#		var:EAI_MILITARY_INVASION_target_control_pct
+	#		var:EAI_MILITARY_INVASION_failed_progress_weeks
+	#		var:EAI_MILITARY_INVASION_prev_our_control_pct
+	#
+	#		arr:EAI_MILITARY_INVASION_allied_countries
+	#		arr:EAI_MILITARY_INVASION_target_countries
+	#		arr:EAI_MILITARY_INVASION_states
+	#		arr:EAI_MILITARY_INVASION_sea_regions
+	#		arr:EAI_MILITARY_INVASION_air_regions
+	#		arr:EAI_MILITARY_INVASION_objectives
+	#
+	#		arr:EAI_MILITARY_INVASION_operation_start_days
+	#		arr:EAI_MILITARY_INVASION_cooldowns
+	
+### Flags:
+
+	#		EAI_MILITARY_INVASION_min_duration
+	#		EAI_MILITARY_INVASION_planning_phase
+	#		EAI_MILITARY_INVASION_execution_phase
+	#		EAI_MILITARY_INVASION_rapid_phase
+	#		EAI_MILITARY_INVASION_cooldown_init
+	#		EAI_MILITARY_allied_invasions_INVASION_init
+	#		EAI_MILITARY_axis_invasions_INVASION_init
+	#		EAI_MILITARY_INVASION_synchronize
+	#		EAI_MILITARY_INVASION_cooldown_[x]
+
+###
+
+###############################################################
+### Generic functions
+###############################################################
+
+EAI_MILITARY_INVASION_update = {
+
+	EAI_MILITARY_allied_invasions_INVASION_update = yes	
+	EAI_MILITARY_axis_invasions_INVASION_update = yes
+	EAI_MILITARY_japan_invasions_INVASION_update = yes
+}
+
+EAI_MILITARY_INVASION_validate = { # var:_strategy_id var:_leader_id
+
+	if = { limit = { check_variable = { global.EAI_MILITARY_INVASION_active_countries^num > 0 } }
+		clear_temp_array = invalid_countries
+		for_each_scope_loop = { array = global.EAI_MILITARY_INVASION_active_countries
+			if = {
+				limit = { 
+					OR = {
+						AND = { # Has this strategy assigned
+							check_variable = { EAI_MILITARY_strategy_id = _strategy_id }
+							OR = {
+								AND = { # but no valid leader exists
+									check_variable = { _leader_id = 0 }
+									if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed [this.getname], no valid leader exists" }
+								}
+								AND = { # but has the wrong leader
+									NOT = { check_variable = { EAI_MILITARY_INVASION_leader = _leader_id } } 
+									if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed [this.getname], has the wrong leader" }
+								}
+								AND = { # but leader cancelled operation
+									var:_leader_id = { NOT = { check_variable = { EAI_MILITARY_strategy_id = _strategy_id } } }
+									if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed [this.getname], leader cancelled operation" }
+								}
+								AND = { # but no longer an ally of leader
+									NOT = {
+										tag = var:EAI_MILITARY_INVASION_leader
+										is_in_faction_with = var:EAI_MILITARY_INVASION_leader
+										is_subject_of = var:EAI_MILITARY_INVASION_leader
+									}
+									if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed [this.getname], no longer an ally of leader" }
+								}
+							}
+						}
+						AND = { # Strategy was cancelled
+							is_in_array = { EAI_MILITARY_cancel_strategies = _strategy_id }
+							if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed [this.getname], strategy was cancelled" }
+						}
+					}
+				}
+				EAI_MILITARY_INVASION_clear_operation = yes
+				add_to_temp_array = { invalid_countries = THIS.id }
+			}
+		}
+		for_each_loop = { array = invalid_countries remove_from_array = { global.EAI_MILITARY_INVASION_active_countries = v } }
+	}
+}
+
+EAI_MILITARY_INVASION_clear_cooldowns = { # var:_num_operations
+
+	if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_clear_cooldowns" }
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_INVASION_cooldown_init } }
+		set_country_flag = EAI_MILITARY_INVASION_cooldown_init
+		resize_array = { EAI_MILITARY_INVASION_cooldowns = _num_operations }
+	}
+
+	if = { limit = { any_of = { array = EAI_MILITARY_INVASION_cooldowns check_variable = { v = 1 } } }
+		for_each_loop = { array = EAI_MILITARY_INVASION_cooldowns
+			if = { limit = { check_variable = { v = 1 } }
+				meta_effect = {
+					text = {
+						if = { limit = { NOT = { has_country_flag = EAI_MILITARY_INVASION_cooldown_[x] } }
+							set_variable = { EAI_MILITARY_INVASION_cooldowns^i = 0 }
+						}
+					}
+					x = "[?EAI_MILITARY_INVASION_operation_id]"
+				}
+			}
+		}
+	}
+}
+
+EAI_MILITARY_INVASION_progress = {
+
+	if = { 
+		limit = { 
+			check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } 
+			NOT = { has_country_flag = EAI_MILITARY_INVASION_min_duration }
+		}
+
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_progress" }
+
+		### Count num objectives completed
+
+			clear_temp_array = _our_side_
+			clear_temp_array = _their_side_
+			clear_temp_array = _states_
+			for_each_loop = { array = EAI_MILITARY_INVASION_allied_countries add_to_temp_array = { _our_side_ = v } }
+			for_each_loop = { array = EAI_MILITARY_INVASION_target_countries add_to_temp_array = { _their_side_ = v } }
+			for_each_loop = { array = EAI_MILITARY_INVASION_states add_to_temp_array = { _states_ = v } }
+			EAI_MAP_get_province_control_pct = yes
+			if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "our_control_pct_=[?our_control_pct_] completed=[?total_our_side_] remaining=[?total_their_side_]" }
+			
+		### Finished operation
+
+			if = { limit = { NOT = { check_variable = { our_control_pct_ < EAI_MILITARY_INVASION_target_control_pct } } }
+				if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "finished operation" }
+				EAI_MILITARY_INVASION_set_cooldown = yes
+				EAI_MILITARY_INVASION_reset_operation = yes
+			}
+
+		### Track progress
+
+			else = {
+				set_temp_variable = { progress = total_our_side_ }
+				subtract_from_temp_variable = { progress = EAI_MILITARY_INVASION_prev_total_our_side }
+				divide_temp_variable = { progress = total_ }
+				set_variable = { EAI_MILITARY_INVASION_prev_total_our_side = total_our_side_ }
+				if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "progress=[?progress]" }
+
+				if = { limit = { check_variable = { progress < @EAI_MILITARY_INVASION_expected_progress } }
+					add_to_variable = { EAI_MILITARY_INVASION_failed_progress_weeks = 1 }
+					if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "progress failure _failed_progress_weeks=[?EAI_MILITARY_INVASION_failed_progress_weeks]" }
+				}
+				else = {
+					set_variable = { EAI_MILITARY_INVASION_failed_progress_weeks = 0 }
+					if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "progress success" }
+				}
+
+				### Failed operation
+
+					if = { 
+						limit = { 
+							NOT = { check_variable = { EAI_MILITARY_INVASION_failed_progress_weeks < @EAI_MILITARY_INVASION_max_failure_weeks } } 
+							if = { limit = { NOT = { check_variable = { our_control_pct_ < @EAI_MILITARY_INVASION_max_failure_grace_control_pct } } } 
+								NOT = { check_variable = { EAI_MILITARY_INVASION_failed_progress_weeks < @EAI_MILITARY_INVASION_max_failure_grace_period_weeks } } 
+							}
+						}
+						if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "failed operation due to lack of progress" }
+						EAI_MILITARY_INVASION_set_cooldown = yes
+						EAI_MILITARY_INVASION_reset_operation = yes
+					}
+
+				###
+			}
+
+		###
+	}
+}
+
+EAI_MILITARY_INVASION_set_cooldown = {
+
+	if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_set_cooldown" }
+	
+	set_temp_variable = { cooldown = @EAI_MILITARY_INVASION_cooldown_days }
+	meta_effect = {
+		text = { set_country_flag = { flag = EAI_MILITARY_INVASION_cooldown_[x] value = 1 days = [y] } }
+		x = "[?EAI_MILITARY_INVASION_operation_id]"
+		y = "[?cooldown]"
+	}
+	set_variable = { EAI_MILITARY_INVASION_cooldowns^EAI_MILITARY_INVASION_operation_id = 1 }
+}
+
+EAI_MILITARY_INVASION_assign = {
+
+	if = { limit = { NOT = { check_variable = { _started_special_operation_ = -1 } } }
+
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_assign" }
+
+		set_temp_variable = { _operation_id = _started_special_operation_ }
+
+		###
+
+			EAI_MILITARY_INVASION_define_sides = yes
+
+		### Log
+
+			if = { limit = { has_country_flag = EAI_invasion_operations_logging }
+				log = "_states_:"
+				for_each_scope_loop = { array = _states_ log = "[this.getname]" }
+				log = "_staging_areas_:"
+				for_each_scope_loop = { array = _staging_areas_ log = "[this.getname]" }
+				log = "_sea_regions_:"
+				for_each_loop = { array = _sea_regions_ log = "[?v]" }
+				log = "_air_regions_:"
+				for_each_loop = { array = _air_regions_ log = "[?v]" }
+				log = "_objectives_:"
+				for_each_scope_loop = { array = _objectives_ log = "[this.getname]" }
+				for_each_scope_loop = { array = _our_side_ log = "ally = [this.getname]" }
+				for_each_scope_loop = { array = _their_side_ log = "enemy = [this.getname]" }
+			}
+	
+		###
+
+			for_each_scope_loop = { array = _our_side_
+				EAI_MILITARY_INVASION_reset_operation = yes
+				EAI_MILITARY_INVASION_assign_country = yes
+			}
+
+		###
+	}
+}
+
+EAI_MILITARY_INVASION_define_sides = { # arr:_states_ >>> arr:_our_side_ arr:_their_side_
+
+	if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_define_sides" }
+
+	clear_temp_array = _our_side_
+	clear_temp_array = _their_side_
+
+	THIS = {
+		if = { limit = { NOT = { is_in_array = { _our_side_ = THIS.id } } } add_to_temp_array = { _our_side_ = THIS.id } }
+		for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+		for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+	}
+
+	for_each_scope_loop = { array = _states_
+		CONTROLLER = {
+			if = { limit = { has_war_with = var:_leader_id }
+				if = { limit = { NOT = { is_in_array = { _their_side_ = THIS.id } } } add_to_temp_array = { _their_side_ = THIS.id } }
+			}
+		}
+	}
+}
+
+EAI_MILITARY_INVASION_reset_operation = {
+
+	if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_reset_operation" }
+
+	EAI_MILITARY_clear_this_strategy = yes
+
+	clr_country_flag = EAI_MILITARY_INVASION_min_duration
+	clr_country_flag = EAI_MILITARY_INVASION_planning_phase
+	clr_country_flag = EAI_MILITARY_INVASION_execution_phase
+	clr_country_flag = EAI_MILITARY_INVASION_rapid_phase
+	# clr_country_flag = EAI_MILITARY_INVASION_init
+	# clr_country_flag = EAI_MILITARY_INVASION_cooldown_init
+	
+	clear_variable = EAI_MILITARY_INVASION_leader
+	clear_variable = EAI_MILITARY_INVASION_operation_id
+	clear_variable = EAI_MILITARY_INVASION_target_control_pct
+	clear_variable = EAI_MILITARY_INVASION_failed_progress_weeks
+	clear_variable = EAI_MILITARY_INVASION_prev_our_control_pct
+
+	clear_array = EAI_MILITARY_INVASION_allied_countries
+	clear_array = EAI_MILITARY_INVASION_target_countries
+	clear_array = EAI_MILITARY_INVASION_states
+	clear_array = EAI_MILITARY_INVASION_staging_areas
+	clear_array = EAI_MILITARY_INVASION_sea_regions
+	clear_array = EAI_MILITARY_INVASION_air_regions
+	clear_array = EAI_MILITARY_INVASION_objectives
+	# clear_array = EAI_MILITARY_INVASION_operation_start_days
+	# clear_array = EAI_MILITARY_INVASION_cooldowns
+}
+
+EAI_MILITARY_INVASION_clear_operation = {
+
+	if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_clear_operation" }
+
+	EAI_MILITARY_clear_this_strategy = yes
+
+	clr_country_flag = EAI_MILITARY_INVASION_min_duration
+	clr_country_flag = EAI_MILITARY_INVASION_planning_phase
+	clr_country_flag = EAI_MILITARY_INVASION_execution_phase
+	clr_country_flag = EAI_MILITARY_INVASION_rapid_phase
+	clr_country_flag = EAI_MILITARY_INVASION_init
+	clr_country_flag = EAI_MILITARY_INVASION_cooldown_init
+
+	clear_variable = EAI_MILITARY_INVASION_leader
+	clear_variable = EAI_MILITARY_INVASION_operation_id
+	clear_variable = EAI_MILITARY_INVASION_target_control_pct
+	clear_variable = EAI_MILITARY_INVASION_failed_progress_weeks
+	clear_variable = EAI_MILITARY_INVASION_prev_our_control_pct
+
+	clear_array = EAI_MILITARY_INVASION_allied_countries
+	clear_array = EAI_MILITARY_INVASION_target_countries
+	clear_array = EAI_MILITARY_INVASION_states
+	clear_array = EAI_MILITARY_INVASION_staging_areas
+	clear_array = EAI_MILITARY_INVASION_sea_regions
+	clear_array = EAI_MILITARY_INVASION_air_regions
+	clear_array = EAI_MILITARY_INVASION_objectives
+	clear_array = EAI_MILITARY_INVASION_operation_start_days
+	clear_array = EAI_MILITARY_INVASION_cooldowns
+}
+
+EAI_MILITARY_INVASION_assign_country = {
+
+	EAI_MILITARY_strategy_priorities = yes
+	if = { limit = { check_variable = { has_priority_ = 1 } }
+		EAI_MILITARY_assign_strategy = yes
+
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_INVASION_assign_country" }
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | _operation_id=[?_operation_id]" }
+		if = { limit = { has_country_flag = EAI_invasion_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | _leader_id=[?_leader_id]" }
+
+		###
+
+			set_variable = { EAI_MILITARY_INVASION_leader = _leader_id }
+			set_variable = { EAI_MILITARY_INVASION_operation_id = _operation_id }
+			set_variable = { EAI_MILITARY_INVASION_target_control_pct = _target_control_pct_ }
+
+			for_each_loop = { array = _states_ add_to_array = { EAI_MILITARY_INVASION_states = v } }
+			for_each_loop = { array = _staging_areas_ add_to_array = { EAI_MILITARY_INVASION_staging_areas = v } }
+			for_each_loop = { array = _air_regions_ add_to_array = { EAI_MILITARY_INVASION_air_regions = v } }
+			for_each_loop = { array = _sea_regions_ add_to_array = { EAI_MILITARY_INVASION_air_regions = v } }
+			for_each_loop = { array = _sea_regions_ add_to_array = { EAI_MILITARY_INVASION_sea_regions = v } }
+			for_each_loop = { array = _objectives_ add_to_array = { EAI_MILITARY_INVASION_objectives = v } }
+
+			for_each_loop = { array = _our_side_ add_to_array = { EAI_MILITARY_INVASION_allied_countries = v } }
+			for_each_loop = { array = _their_side_ add_to_array = { EAI_MILITARY_INVASION_target_countries = v } }
+
+			if = { limit = { NOT = { is_in_array = { global.EAI_MILITARY_INVASION_active_countries = THIS.id } } } 
+				add_to_array = { global.EAI_MILITARY_INVASION_active_countries = THIS.id }
+			}
+
+		###
+
+			set_country_flag = { flag = EAI_MILITARY_INVASION_min_duration value = 1 days = @EAI_MILITARY_INVASION_min_duration_days }
+			set_country_flag = { flag = EAI_MILITARY_INVASION_planning_phase value = 1 days = @EAI_MILITARY_INVASION_planning_phase_days }
+			set_country_flag = { flag = EAI_MILITARY_INVASION_execution_phase value = 1 days = @EAI_MILITARY_INVASION_execution_phase_days }
+			set_country_flag = { flag = EAI_MILITARY_INVASION_rapid_phase value = 1 days = @EAI_MILITARY_INVASION_rapid_phase_days }
+			set_country_flag = { flag = EAI_MILITARY_INVASION_synchronize value = 1 days = @EAI_MILITARY_INVASION_synchronize_days }
+
+		###
+	}
+}
+
+EAI_MILITARY_INVASION_print = {
+
+	log = "EAI_MILITARY_INVASION_print"
+
+	log = "EAI_MILITARY_INVASION_leader=[?EAI_MILITARY_INVASION_leader]"
+	log = "EAI_MILITARY_INVASION_operation_id=[?EAI_MILITARY_INVASION_operation_id]"
+	log = "EAI_MILITARY_INVASION_target_control_pct=[?EAI_MILITARY_INVASION_target_control_pct]"
+
+	for_each_loop = { array = EAI_MILITARY_INVASION_states var:v = { log = "ST=[this.getname]" } }
+	for_each_loop = { array = EAI_MILITARY_INVASION_staging_areas var:v = { log = "SA=[this.getname]" } }
+	for_each_loop = { array = EAI_MILITARY_INVASION_air_regions log = "AR=[?v]" }
+	for_each_loop = { array = EAI_MILITARY_INVASION_sea_regions log = "SR=[?v]" }
+	for_each_loop = { array = EAI_MILITARY_INVASION_objectives var:v = { log = "OB=[this.getname]" } }
+
+	for_each_loop = { array = EAI_MILITARY_INVASION_allied_countries var:v = { log = "ally=[this.getname]" } }
+	for_each_loop = { array = EAI_MILITARY_INVASION_target_countries var:v = { log = "enemy=[this.getname]" } }
+}

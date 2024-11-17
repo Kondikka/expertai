@@ -1,0 +1,490 @@
+###############################################################
+### Pacific war
+###############################################################
+
+### Pacific war
+
+	@EAI_MILITARY_pacific_war_COMBINED_strategy_id = 2
+	@EAI_MILITARY_pacific_war_COMBINED_strategy_prio = 100
+	@EAI_MILITARY_pacific_war_COMBINED_target_control_pct = 0.8
+	@EAI_MILITARY_pacific_war_COMBINED_expected_progress = 0.02
+
+###
+
+EAI_MILITARY_pacific_war_COMBINED_update = {
+
+	if = {
+		limit = {
+			OR = {
+				tag = JAP
+				tag = USA
+			}
+		}
+
+		set_temp_variable = { _strategy_id = @EAI_MILITARY_pacific_war_COMBINED_strategy_id }
+		set_temp_variable = { _strategy_prio = @EAI_MILITARY_pacific_war_COMBINED_strategy_prio }
+	
+		if = {
+			limit = {
+				OR = {
+	
+					### USA
+	
+						AND = {
+							tag = USA
+							has_war_with = JAP
+							if = { limit = { JAP = { is_ai = yes } }
+								NOT = { has_global_flag = { flag = EAI_JAP_blitz_pacific_1000d value = 1 days < 180 } }
+							}
+						}
+	
+					### JAP
+	
+						AND = {
+							tag = JAP
+							OR = {
+								has_war_with = USA
+								has_global_flag = { flag = EAI_JAP_blitz_pacific_1000d value = 1 days < 90 }
+								AND = { focus_progress = { focus = JAP_secure_the_philippines progress > 0 } NOT = { has_completed_focus = JAP_secure_the_philippines } }
+							}
+						}
+
+					###
+				}
+			}
+
+			EAI_MILITARY_strategy_priorities = yes
+			if = { limit = { check_variable = { has_priority_ = 1 } }
+				if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_pacific_war_COMBINED_update" }
+				EAI_MILITARY_assign_strategy = yes
+				EAI_MILITARY_pacific_war_COMBINED_init = yes
+				EAI_MILITARY_pacific_war_COMBINED_get_data = yes
+				EAI_MILITARY_pacific_war_COMBINED_define_sides = yes
+				EAI_MILITARY_pacific_war_COMBINED_preparation = yes
+				EAI_MILITARY_COMBINED_progress = yes
+				EAI_MILITARY_COMBINED_select = yes
+				EAI_MILITARY_COMBINED_assign = yes
+				if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | END EAI_MILITARY_pacific_war_COMBINED_update" }
+			}
+			else = {
+				EAI_MILITARY_COMBINED_clear = yes
+			}
+		}
+		else_if = { limit = { check_variable = { EAI_MILITARY_strategy_id = _strategy_id } }
+			EAI_MILITARY_COMBINED_clear = yes
+		}
+	}
+}
+
+EAI_MILITARY_pacific_war_COMBINED_get_data = {
+	
+	set_temp_variable = { _target_control_pct = @EAI_MILITARY_pacific_war_COMBINED_target_control_pct }
+	set_temp_variable = { _expected_progress = @EAI_MILITARY_pacific_war_COMBINED_expected_progress }
+}
+
+EAI_MILITARY_pacific_war_COMBINED_init = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_pacific_war_COMBINED_init } }
+
+		if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_pacific_war_COMBINED_init" }
+
+		set_country_flag = EAI_MILITARY_pacific_war_COMBINED_init
+	
+		clear_array = EAI_MILITARY_COMBINED_id
+		clear_array = EAI_MILITARY_COMBINED_prio
+
+		if = { limit = { tag = USA }
+			set_temp_variable = { prio = 1000 }
+			set_temp_variable = { step = -100 }
+		}
+		if = { limit = { tag = JAP }
+			set_temp_variable = { prio = 0 }
+			set_temp_variable = { step = 100 }
+		}
+
+		### Sector
+
+			add_to_temp_variable = { prio = step }
+
+			every_state = { # america
+				limit = {
+					OR = {
+						region = 218
+						region = 118
+					}
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 79 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 106 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 218 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 118 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+		### Sector
+	
+			add_to_temp_variable = { prio = step }
+
+			add_to_array = { EAI_MILITARY_COMBINED_id = 629.id } # hawaii
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 727.id } # line
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 105 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 172 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+		
+		### Sector
+		
+			add_to_temp_variable = { prio = step }
+
+			add_to_array = { EAI_MILITARY_COMBINED_id = 631.id } # midway
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 630.id } # johnston
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 642.id } # phoenix
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 726.id } # samoa
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 641.id } # tahiti
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 95 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 180 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 97 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 178 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 179 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+		
+		### Sector
+		
+			add_to_temp_variable = { prio = step }
+
+			add_to_array = { EAI_MILITARY_COMBINED_id = 633.id } # marshall
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 639.id } # gilbert
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 643.id } # ellice
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 636.id } # fiji
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 725.id } # nauru
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 97 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 178 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+	
+		### Sector
+		
+			add_to_temp_variable = { prio = step }
+
+			add_to_array = { EAI_MILITARY_COMBINED_id = 632.id } # wake
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 684.id } # caroline
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 648.id } # marcus
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 737.id } # bismarck
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 634.id } # solomon
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+
+			every_state = { # new guinea
+				limit = {
+					OR = {
+						region = 167
+					}
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 97 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 84 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 94 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 83 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 167 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+	
+		### Sector
+		
+			add_to_temp_variable = { prio = step }
+
+			add_to_array = { EAI_MILITARY_COMBINED_id = 645.id } # iwo
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 646.id } # saipan
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 638.id } # guam
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_id = 647.id } # palau
+			add_to_array = { EAI_MILITARY_COMBINED_prio = prio }
+
+			every_state = { # java
+				limit = {
+					OR = {
+						region = 158
+					}
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+			
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 94 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 83 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 78 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 158 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+		### Sector
+
+			add_to_temp_variable = { prio = step }
+
+			# every_state = { # malaya
+			# 	limit = {
+			# 		OR = {
+			# 			region = 188
+			# 		}
+			# 		is_coastal = yes
+			# 	}
+
+			# 	add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+			# 	add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			# }
+
+			# Regions
+			# add_to_array = { EAI_MILITARY_COMBINED_region_id = 188 }
+			# add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			# add_to_array = { EAI_MILITARY_COMBINED_region_id = 73 }
+			# add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			# add_to_array = { EAI_MILITARY_COMBINED_region_id = 72 }
+			# add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+			every_state = { # sumatra
+				limit = {
+					OR = {
+						region = 187
+					}
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 75 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 187 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+			every_state = { # borneo
+				limit = {
+					OR = {
+						region = 159
+					}
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 159 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+			every_state = {# philippines
+				limit = {
+					region = 160
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 75 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 78 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 80 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 160 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+		### Sector
+
+			add_to_temp_variable = { prio = step }
+
+			every_state = { # japan
+				limit = {
+					region = 154
+					is_coastal = yes
+				}
+
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_id = THIS.id }
+				add_to_array = { PREV.EAI_MILITARY_COMBINED_prio = prio }
+			}
+
+			# Regions
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 154 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 90 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+			add_to_array = { EAI_MILITARY_COMBINED_region_id = 79 }
+			add_to_array = { EAI_MILITARY_COMBINED_region_prio = prio }
+
+		###
+
+		for_each_loop = { array = EAI_MILITARY_COMBINED_id
+			add_to_temp_array = { _items_ = EAI_MILITARY_COMBINED_id^i }
+			add_to_temp_array = { _values_ = EAI_MILITARY_COMBINED_prio^i }
+		}
+		EAI_MATH_sort_array = yes
+		for_each_loop = { array = _items_
+			set_variable = { EAI_MILITARY_COMBINED_id^i = _items_^i }
+			set_variable = { EAI_MILITARY_COMBINED_prio^i = _values_^i }
+		}
+	}
+}
+
+EAI_MILITARY_pacific_war_COMBINED_define_sides = { # >>> arr:_our_side_ arr:_their_side_
+
+	if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_pacific_war_COMBINED_define_sides" }
+
+	clear_temp_array = _our_side_
+	clear_temp_array = _their_side_
+
+	### JAP
+
+		if = { limit = { tag = JAP }
+
+			every_country = { limit = { OR = { tag = JAP } }
+				add_to_temp_array = { _our_side_ = THIS.id }
+				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+			}
+
+			every_country = { 
+				limit = { 
+					OR = { tag = ENG tag = USA } 
+					if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+				}
+				add_to_temp_array = { _their_side_ = THIS.id }
+				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+			}
+		}
+
+	### USA
+
+		if = { limit = { tag = USA }
+
+			every_country = { limit = { OR = { tag = ENG tag = USA } }
+				add_to_temp_array = { _our_side_ = THIS.id }
+				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+			}
+
+			every_country = { 
+				limit = { 
+					OR = { tag = JAP } 
+					if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+				}
+				add_to_temp_array = { _their_side_ = THIS.id }
+				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+			}
+		}
+
+	###
+}
+
+EAI_MILITARY_pacific_war_COMBINED_preparation = {
+
+	### Clear
+	
+		if = { limit = { has_country_flag = EAI_MILITARY_COMBINED_preparation }
+
+			### JAP
+
+				if = {
+					limit = { 
+						tag = JAP
+
+						NOT = {
+							AND = {
+								NOT = { has_war_with = USA }
+								OR = {
+									has_global_flag = { flag = EAI_JAP_blitz_pacific_1000d value = 1 days < 90 }
+									AND = { focus_progress = { focus = JAP_secure_the_philippines progress > 0 } NOT = { has_completed_focus = JAP_secure_the_philippines } }
+								}
+							}
+						}
+					}
+		
+					EAI_MILITARY_COMBINED_clear_preparation = yes
+				}
+
+			### 
+		}
+
+	### Set
+
+		else = {
+
+			### JAP
+
+				if = {
+					limit = { 
+						tag = JAP
+
+						AND = {
+							NOT = { has_war_with = USA }
+							OR = {
+								has_global_flag = { flag = EAI_JAP_blitz_pacific_1000d value = 1 days < 90 }
+								AND = { focus_progress = { focus = JAP_secure_the_philippines progress > 0 } NOT = { has_completed_focus = JAP_secure_the_philippines } }
+							}
+						}
+					}
+		
+					EAI_MILITARY_COMBINED_set_preparation = yes
+				}
+
+			### 
+		}
+
+	###
+}

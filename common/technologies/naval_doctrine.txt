@@ -1,7 +1,12 @@
 technologies = {
 
-	fleet_in_being = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+	fleet_in_being = {
 		doctrine_name = "TITLE_FLEET_IN_BEING"
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } }
+		}
 		
 		#Fleet in being is mainly focused on Battleships (and Battlecrusiers/Heavy cruisers) and ASW with carriers and submarines being used to a lesser extent. The fleet may not have to do anything at all to be useful - simply having a powerful fleet in a protected port forces your enemies to keep a fleet of their own nearby in order you fight you if you emerge
 		#Bonus org for BB/BC/CA
@@ -25,7 +30,16 @@ technologies = {
 		}
 		mines_planting_by_fleets_factor = 0.1
 		#####
-
+		on_research_complete = {
+			add_to_variable = { EAI_naval_doctrines_researched = 1 }
+			if = {
+				limit = { has_dlc = "Gotterdammerung"}
+				custom_effect_tooltip = {
+					localization_key = SP_UNLOCK_PROJECT
+					PROJECT = sp_naval_underway_replenishment	
+				}
+			}
+		}
 
 		xor = { trade_interdiction base_strike } 
 		
@@ -61,16 +75,20 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 10000
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
+			base = 1
 		}
 		
 		
 	}
 	
 	battlefleet_concentration = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_capital_priority = yes EAI_NAVAL_DOCTRINE_carrier_priority = yes } }
+		}
+
 		# EFFECT #############
 		battleship = {
 			max_organisation = 5
@@ -107,28 +125,15 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	subsidiary_carrier_role = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		#Carriers support the Battleships
 		
 		# EFFECT #############
@@ -161,30 +166,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	hunter_killer_groups = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Groups of Destroyers (and CVEs should those ever be added) formed to hunt down enemy subs
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT #############
 		destroyer = {
 			max_organisation = 5
@@ -221,30 +212,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	floating_fortress = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Large, powerful gun armed ships are clearly the best ships
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT #############
 		battleship = {
 			max_organisation = 20
@@ -274,25 +251,9 @@ technologies = {
 			name = naval_doctrine_folder
 			position = { x = -2 y = 8 }
 		}
-
+		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
@@ -300,6 +261,11 @@ technologies = {
 	
 	floating_airfield = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Non base strike trees get a late CV booster
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_carrier_priority = yes EAI_NAVAL_DOCTRINE_capital_priority = yes } }
+		}
 		
 		# EFFECT #############
 		carrier = {
@@ -331,28 +297,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	grand_battlefleet = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Top tech for the Battlefleet tree. 
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT #############
 		battleship = {
 			max_organisation = 20
@@ -388,25 +342,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	convoy_sailing = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_screen_priority = yes } }
+		}
+
 		#Convoy escort/ ASW branch
 		
 		# EFFECT #############
@@ -441,27 +387,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	convoy_escorts = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Assigning dedicated convoy escorts to keep them safe
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT #############
 		destroyer = {
 			max_organisation = 5
@@ -494,26 +429,15 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	escort_carriers = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Small carriers/converted merchant ships sail with convoys for increased defense against subs and raiders
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# EFFECT #############
 		carrier = {
@@ -546,27 +470,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	integrated_convoy_defence = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#The top convoy tech, basically now all the earlier concepts are working well with each other for maximum effect
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT #############
 		destroyer = {
 			max_organisation = 5
@@ -606,25 +519,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	submarine_operations = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_submarine_priority = yes } }
+		}
+
 		# Basic sub-boosting tree, not as good as Trade Interdiction's 
 				
 		# EFFECT ##############
@@ -659,18 +564,6 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 		
 		
@@ -678,6 +571,10 @@ technologies = {
 	
 	undersea_blockade = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# Sub boost
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# EFFECT ##############
 		submarine = {
@@ -711,24 +608,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 		
 		
 	}
 	
 	convoy_interdiction = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# Sub boost
 		# EFFECT ##############
 		submarine = {
@@ -763,24 +653,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 		
 		
 	}
 	
 	submarine_offensive = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# Sub boost
 		# EFFECT ##############
 		submarine = {
@@ -809,24 +692,18 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 		
 		
 	}
 	
 	trade_interdiction = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } }
+		}
+
 		doctrine_name = "TITLE_TRADE_INTERDICTION"
 		
 		# This tree is focused on sinking convoys, and boosting Subs and all types of Cruiser. It has some boosts for CVs and Battleships, but the CVs should be a bit worse and the BBs a lot worse than Fleet in being's.
@@ -887,14 +764,17 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 10000
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
+			base = 1
 		}
 	}
 	
 	convoy_interdiction_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_submarine_priority = yes } }
+		}
 
 		# same as convoy interdiction
 		# EFFECT ##############
@@ -930,24 +810,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	unrestricted_submarine_warfare = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Nice bonus for subs vs convoys
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		submarine = {
 			surface_detection = 0.1
@@ -980,24 +852,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	wolfpacks = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# More sub bonuses - subs operate in groups to sink convoys
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		submarine = {
 			max_organisation = 10
@@ -1032,24 +896,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	advanced_submarine_warfare = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# More sub bonuses - subs are deployed in numbers and the navy is better at putting them in the right places
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		submarine = {
 			max_organisation = 10
@@ -1082,24 +938,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	combined_operations_raiding = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#top raiding idea - subs and surface raiders act in harmony to destroy convoys
 		# EFFECT ##############
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		submarine = {
 			max_organisation = 10
 			convoy_raiding_coordination = 0.05
@@ -1143,22 +992,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	raider_patrols = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_screen_priority = yes } }
+		}
+
 		#Surface raiding Branch + some boosts for Battleships
 		
 		# EFFECT ##############		
@@ -1199,22 +1043,6 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
@@ -1222,6 +1050,10 @@ technologies = {
 	
 	capital_ship_raiders = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Battleships/Battlecrusiers are used as raiders rather than in the line of battle in a fleet
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# EFFECT ##############		
 		battle_cruiser = {
@@ -1262,26 +1094,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	battlefleet_concentration_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as battlefleet_concentration
 		# EFFECT #############
@@ -1320,28 +1140,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
 	}
 	
 	floating_fortress_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as floating_fortress
 		# EFFECT #############
@@ -1374,28 +1182,17 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
 	}
 	
 	floating_airfield_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_carrier_priority = yes } }
+		}
 
 		#same as floating_airfield
 		# EFFECT #############
@@ -1423,23 +1220,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	carrier_operations = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_carrier_priority = yes } }
+		}
+
 		# Carrier/Convoy defense branch - not great at either of them, should have worse CVs than Fleet in Being
 
 		# EFFECT #############
@@ -1474,25 +1264,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
 	}
 	
 	convoy_sailing_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as convoy_sailing
 		# EFFECT #############
@@ -1527,25 +1308,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
 	}
 	
 	subsidiary_carrier_role_ti = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as subsidiary_carrier_role
 		# EFFECT #############
@@ -1578,19 +1350,6 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
@@ -1598,6 +1357,10 @@ technologies = {
 	
 	naval_air_operations = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# slightly improved CV operation
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# EFFECT #############
 		carrier = {
@@ -1631,27 +1394,19 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		
 	}
 	
-	base_strike = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+	base_strike = {
 		doctrine_name = "TITLE_BASE_STRIKE"
 		#This tree is primarily focused on Carriers. It should have the best Carriers, Battleships that are better than Trade interdiction but worse than Fleet in being, and has the same Sub tree as FiB. Convoy defense is better than TI but worse than FiB
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } }
+		}
 		
 		xp_research_type = navy
 		
@@ -1678,7 +1433,16 @@ technologies = {
 			leads_to_tech =  convoy_escorts_bs
 			research_cost_coeff = 1
 		}
-		
+		on_research_complete = {
+			add_to_variable = { EAI_naval_doctrines_researched = 1 }
+			if = {
+				limit = { has_dlc = "Gotterdammerung"}
+				custom_effect_tooltip = {
+					localization_key = SP_UNLOCK_PROJECT
+					PROJECT = sp_naval_underway_replenishment	
+				}
+			}
+		}		
 		xp_research_type = navy
 		xp_unlock_cost = 100
 		doctrine = yes	
@@ -1695,14 +1459,18 @@ technologies = {
 		}
 		
 		ai_will_do = { #EAI
-			factor = 10000
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
+			base = 1
 		}
 	}
 	
 	carrier_primacy = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_carrier_priority = yes EAI_NAVAL_DOCTRINE_capital_priority = yes } }
+		}
+
 		#The idea that the carrier is the primary naval weapon and that other ships, even the BB, exist to support them
 		# EFFECT ##############
 		carrier = {
@@ -1738,24 +1506,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	carrier_task_forces = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Task forces are based around carrier flagship 
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		carrier = {
 			max_organisation = 20
@@ -1791,23 +1551,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	floating_airfield_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as floating_airfield
 		# EFFECT #############
@@ -1840,23 +1591,15 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	massed_strikes = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		#CAGs are larger and more effort is made to have all planes arrive at the target at the same time, even when launched from multiple CVs
 		# EFFECT #############
 		carrier = {
@@ -1894,23 +1637,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	floating_fortress_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as floating_fortress
 		# EFFECT #############
@@ -1943,25 +1677,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	carrier_battlegroups = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		#Larger carrier-lead fleets
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		carrier = {
 			max_organisation = 20
@@ -1992,23 +1717,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	submarine_operations_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_submarine_priority = yes } }
+		}
 
 		# same as submarine_operations
 		# EFFECT ##############
@@ -2041,22 +1759,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	undersea_blockade_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# same as undersea_blockade
 		# EFFECT ##############
@@ -2088,22 +1798,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	convoy_interdiction_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		# same as convoy_interdiction
 		# EFFECT ##############
@@ -2137,23 +1839,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	submarine_offensive_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# same as submarine_offensive
+		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		submarine = {
 			max_organisation = 10
@@ -2179,22 +1874,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } 
-					}
-				}
-			}
 		}
 	}
 	
 	convoy_escorts_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+			if = { limit = { is_ai = yes } check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } }
+			if = { limit = { is_ai = yes } OR = { EAI_NAVAL_DOCTRINE_screen_priority = yes } }
+		}
 
 		#same as convoy_escorts
 		# EFFECT #############
@@ -2228,27 +1917,16 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	escort_patrols = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
 		# Lesser version of hunter-killer groups
 		
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
+
 		# EFFECT ##############
 		destroyer = {
 			max_organisation = 5
@@ -2285,25 +1963,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	convoy_sailing_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as convoy_sailing
 		# EFFECT #############
@@ -2337,25 +2004,14 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 	}
 	
 	integrated_convoy_defence_bs = { on_research_complete = { add_to_variable = { EAI_naval_doctrines_researched = 1 } }
+
+		allow = { #EAI
+			if = { limit = { is_ai = yes } NOT = { EAI_naval_doctrine_progress_limit = yes } }
+		}
 
 		#same as integrated_convoy_defence
 		# EFFECT #############
@@ -2391,21 +2047,6 @@ technologies = {
 		
 		ai_will_do = { #EAI
 			base = 1
-			
-			#RESTRICTIONS
-			modifier = { factor = 0 NOT = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } } }
-			modifier = { 
-				add = 10000
-
-				NOT = {
-					AND = {
-						check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/ASW_destroyer = global.EAI_OFF } 
-						check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
-					}
-				}
-			}
-			modifier = { factor = 0 EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 		}
 		
 		

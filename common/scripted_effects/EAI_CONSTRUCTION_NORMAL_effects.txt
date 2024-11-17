@@ -631,7 +631,7 @@ EAI_clear_construction_scores = {
 }
 
 # shared slots
-EAI_get_shared_slot_scores = {
+EAI_get_shared_slot_scores = { # var:_num_available_shared_slots
 
 	set_temp_variable = { EAI_has_shared_slot_scores = 1 }
 
@@ -668,6 +668,8 @@ EAI_get_shared_slot_scores = {
 		}
 		log = "==============================================="
 	}
+
+	set_temp_variable = { _num_available_shared_slots = 0 }
 }
 EAI_get_shared_slot_score = {
 
@@ -1078,6 +1080,214 @@ EAI_get_mil_to_civ_conversion_slot_score = {
 	if = { limit = { is_core_of = ROOT } multiply_variable = { EAI_mil_to_civ_conversion_slot_score = 4 } }
 }
 
+# land facility
+EAI_get_land_facility_scores = {
+
+	set_temp_variable = { EAI_has_land_facility_scores = 1 }
+
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_LFACILITY = yes }
+
+			EAI_get_land_facility_score = yes
+
+			for_each_loop = { array = EAI_land_facility_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_land_facility_score > EAI_land_facility_score } }
+
+						add_to_temp_array = { array = EAI_land_facility_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_temp_array = { array = EAI_land_facility_scores value = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
+		}
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
+
+		log = "======= PRINTING EAI_land_facility_scores ======="
+		for_each_scope_loop = { array = EAI_land_facility_scores
+			log = "[?EAI_land_facility_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_land_facility_score = {
+
+	set_variable = { EAI_land_facility_score = 1 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_land_facility_score = 5 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_land_facility_score = 5 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_land_facility_score = 4 } }
+
+	if = { limit = { is_core_of = PREV } multiply_variable = { EAI_land_facility_score = 4 } }
+}
+
+# naval facility
+EAI_get_naval_facility_scores = {
+
+	set_temp_variable = { EAI_has_naval_facility_scores = 1 }
+
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_LFACILITY = yes }
+
+			EAI_get_naval_facility_score = yes
+
+			for_each_loop = { array = EAI_naval_facility_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_naval_facility_score > EAI_naval_facility_score } }
+
+						add_to_temp_array = { array = EAI_naval_facility_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_temp_array = { array = EAI_naval_facility_scores value = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
+		}
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
+
+		log = "======= PRINTING EAI_naval_facility_scores ======="
+		for_each_scope_loop = { array = EAI_naval_facility_scores
+			log = "[?EAI_naval_facility_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_naval_facility_score = {
+
+	set_variable = { EAI_naval_facility_score = 1 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_naval_facility_score = 5 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_naval_facility_score = 5 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_naval_facility_score = 4 } }
+
+	if = { limit = { is_core_of = PREV } multiply_variable = { EAI_naval_facility_score = 4 } }
+}
+
+# air facility
+EAI_get_air_facility_scores = {
+
+	set_temp_variable = { EAI_has_air_facility_scores = 1 }
+
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_LFACILITY = yes }
+
+			EAI_get_air_facility_score = yes
+
+			for_each_loop = { array = EAI_air_facility_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_air_facility_score > EAI_air_facility_score } }
+
+						add_to_temp_array = { array = EAI_air_facility_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_temp_array = { array = EAI_air_facility_scores value = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
+		}
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
+
+		log = "======= PRINTING EAI_air_facility_scores ======="
+		for_each_scope_loop = { array = EAI_air_facility_scores
+			log = "[?EAI_air_facility_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_air_facility_score = {
+
+	set_variable = { EAI_air_facility_score = 1 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_air_facility_score = 5 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_air_facility_score = 5 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_air_facility_score = 4 } }
+
+	if = { limit = { is_core_of = PREV } multiply_variable = { EAI_air_facility_score = 4 } }
+}
+
+# nuclear facility
+EAI_get_nuclear_facility_scores = {
+
+	set_temp_variable = { EAI_has_nuclear_facility_scores = 1 }
+
+	for_each_scope_loop = { array = controlled_states
+		
+		if = { limit = { EAI_available_LFACILITY = yes }
+
+			EAI_get_nuclear_facility_score = yes
+
+			for_each_loop = { array = EAI_nuclear_facility_scores
+
+				var:v = {
+					if = { limit = { check_variable = { PREV.EAI_nuclear_facility_score > EAI_nuclear_facility_score } }
+
+						add_to_temp_array = { array = EAI_nuclear_facility_scores index = i value = PREV.id }
+						set_temp_variable = { break = 1 }
+					}
+				}
+			}
+
+			if = { limit = { check_variable = { break = 0 } }
+				
+				add_to_temp_array = { array = EAI_nuclear_facility_scores value = THIS.id }
+			}
+			else = { set_temp_variable = { break = 0 } }
+		}
+	}
+
+	if = { limit = { has_country_flag = EAI_construction_score_logging }
+
+		log = "======= PRINTING EAI_nuclear_facility_scores ======="
+		for_each_scope_loop = { array = EAI_nuclear_facility_scores
+			log = "[?EAI_nuclear_facility_score] - [This.GetName]"
+		}
+		log = "==============================================="
+	}
+}
+EAI_get_nuclear_facility_score = {
+
+	set_variable = { EAI_nuclear_facility_score = 1 }
+
+	if = { limit = { EAI_no_border = yes } multiply_variable = { EAI_nuclear_facility_score = 5 } }
+
+	if = { limit = { EAI_no_enemy_border = yes } multiply_variable = { EAI_nuclear_facility_score = 5 } }
+
+	if = { limit = { EAI_region_priority = yes } multiply_variable = { EAI_nuclear_facility_score = 4 } }
+
+	if = { limit = { is_core_of = PREV } multiply_variable = { EAI_nuclear_facility_score = 4 } }
+}
+
 ######################################################
 
 ### functions for AI construction
@@ -1470,7 +1680,7 @@ EAI_queue_AA = {
 }
 
 # mil to civ conversion # THIS = STATE
-EAI_STATE_convert_MIC_to_CIC = {
+EAI_state_convert_MIC_to_CIC = {
 
 	set_temp_variable = { _project_building_type = global.EAI_PC_MTC }
 	if = { limit = { EAI_PC_can_build_project = yes NOT = { EAI_PC_has_same_type_project_here = yes } }

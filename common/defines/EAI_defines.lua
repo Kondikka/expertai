@@ -77,12 +77,10 @@ NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR = 50 --50					-- Same as above but 
 -- Weight is calculated as AlternativeFactor * DemandFactor.
 -- An "alternative" is a producible design of the same archetype (each specialized type is its own archetype).
 
--- EAI: AI delays upgrading the main tank types too much because it wants to create absent types for its templates first
--- makes sense but I'd rather have it get its most used type upgraded first
-NDefines.NAI.LAND_DESIGN_ALTERNATIVE_ABSENT = 10 --1000000
+NDefines.NAI.LAND_DESIGN_ALTERNATIVE_ABSENT = 10 --30000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_LESSER_TECH = 1 --10000
 NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_EQUAL_TECH = 1 --100
-NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 100
+NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 1 --1
 
 -- If a template may be reinforced with the archetype it's considered to be "demanded". If multiple conditions
 -- are met, e.g. it's both in the field and in training, the largest value is used.
@@ -92,6 +90,9 @@ NDefines.NAI.LAND_DESIGN_DEMAND_TRAINING_DIVISION = 50
 NDefines.NAI.LAND_DESIGN_DEMAND_GARRISON_DIVISION = 10
 NDefines.NAI.LAND_DESIGN_DEMAND_UNUSED_TEMPLATE = 10 --1
 NDefines.NAI.LAND_DESIGN_DEMAND_ABSENT = 10 --0
+-- If a design with a weight when divided by the largest weight falls below this value it's excluded from the
+-- selection. Valid values are in the range [0, 1] inclusive.
+NDefines.NAI.LAND_DESIGN_CUTOFF_AS_PERCENTAGE_OF_MAX = 0.25
 
 -- NDefines.NAI.AIR_DESIGN_ALTERNATIVE_ABSENT = 1
 -- NDefines.NAI.AIR_DESIGN_ALTERNATIVE_OF_LESSER_TECH = 1
@@ -136,18 +137,14 @@ NDefines.NAI.GARRISON_TEMPLATE_SCORE_MANPOWER_FACTOR = 0.05 -- formula is (templ
 
 -- NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
 
--- NDefines.NAI.DIVISION_DESIGN_MANPOWER_WEIGHT = 0 --0.005
--- NDefines.NAI.DIVISION_DESIGN_STOCKPILE_WEIGHT = 0 --0.01
---NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_WEIGHT = 0 -- -1.0			            -- This score is reduced the higher width is when comparing pure changes with no target
--- NDefines.NAI.DIVISION_DESIGN_COMBAT_WIDTH_TARGET_WEIGHT = -10000 -- -200	        -- This score is reduced the farther the width is from the target width (if set)
 --NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 0 --60					            -- max days we keep track of since failure of a design update
 
 --NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0 --200
 --NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0 --100
 --NDefines.NAI.BUILD_ARMOR_ORGANIZATION_MULTIPLIER_WEIGHT = 0 --500
 
-NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 1 
-NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.01
+-- NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 -- 7					-- How often to consider upgrading to new templates for units in the field
+-- NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.01 -- 0.03				-- How big part of the army that should be considered for upgrading
 -- NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 50                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
@@ -271,8 +268,8 @@ NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_OWNED_CORE = 2.00                         
 NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_REPAIRING = 0.30                                  -- factor prio with this if building is being repaired
 -- <end> construction prioritization
 
-NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 0.8
---NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.6
+NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 0.8   -- Will at most trade away this fraction of factories.
+NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.8   -- AI will cancel trade deals that are not able to deliver more than this fraction of the agreed amount
 
 NDefines.NAI.ESTIMATED_CONVOYS_PER_DIVISION = 6
 
@@ -477,85 +474,87 @@ NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = 10 				-- optimum sub count for sub 
 -- NDefines.NAI.CAPITALS_TO_CARRIER_RATIO = 4				-- capital to carrier count in carrier taskfoces
 -- NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 4					-- screens to capital/carrier count in carrier & capital taskforces
 
-NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
-	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	200, -- PATROL		
-	200, -- STRIKE FORCE 
-	200, -- CONVOY RAIDING
-	100, -- CONVOY ESCORT
-	200, -- MINES PLANTING	
-	100, -- MINES SWEEPING	
-	0, -- TRAIN
-	0, -- RESERVE_FLEET
-	100, -- NAVAL INVASION SUPPORT
-}
+-- NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to get assigned to a mission
+-- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
+-- 	200, -- PATROL		
+-- 	200, -- STRIKE FORCE 
+-- 	200, -- CONVOY RAIDING
+-- 	100, -- CONVOY ESCORT
+-- 	200, -- MINES PLANTING	
+-- 	100, -- MINES SWEEPING	
+-- 	0, -- TRAIN
+-- 	0, -- RESERVE_FLEET
+-- 	100, -- NAVAL INVASION SUPPORT
+-- }
 
-NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to get assigned to a mission
-	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	100000, -- PATROL 	
-	1000, -- STRIKE FORCE 
-	1500, -- CONVOY RAIDING
-	1000, -- CONVOY ESCORT
-	-1, -- MINES PLANTING	
-	300, -- MINES SWEEPING	
-	0, -- TRAIN
-	0, -- RESERVE_FLEET
-	1000, -- NAVAL INVASION SUPPORT
-}
+-- NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to get assigned to a mission
+-- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
+-- 	100000, -- PATROL 	
+-- 	1000, -- STRIKE FORCE 
+-- 	1500, -- CONVOY RAIDING
+-- 	1000, -- CONVOY ESCORT
+-- 	-1, -- MINES PLANTING	
+-- 	300, -- MINES SWEEPING	
+-- 	0, -- TRAIN
+-- 	0, -- RESERVE_FLEET
+-- 	1000, -- NAVAL INVASION SUPPORT
+-- }
 
-NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce ratio
-	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	1.5, -- PATROL
-	4, -- STRIKE FORCE
-	1.5, -- CONVOY RAIDING
-	4, -- CONVOY ESCORT
-	2, -- MINES PLANTING
-	2, -- MINES SWEEPING
-	0, -- TRAIN
-	0, -- RESERVE_FLEET
-	10, -- NAVAL INVASION SUPPORT
-}
+-- NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce ratio
+-- 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
+-- 	1.5, -- PATROL
+-- 	4, -- STRIKE FORCE
+-- 	1.5, -- CONVOY RAIDING
+-- 	4, -- CONVOY ESCORT
+-- 	2, -- MINES PLANTING
+-- 	2, -- MINES SWEEPING
+-- 	0, -- TRAIN
+-- 	0, -- RESERVE_FLEET
+-- 	10, -- NAVAL INVASION SUPPORT
+-- }
 
 -------------------------
 -- naval invasions
 -------------------------
 
---ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = --0.3 -- if we are fighting against an enemy home area from our home area and if the enemy area is larger than this ratio, non strategy invasions are disabled
+ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = 10 --0.3 -- if we are fighting against an enemy home area from our home area and if the enemy area is larger than this ratio, non strategy invasions are disabled
 
--- NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000							-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
--- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 --0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
--- NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
+NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000							-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
+NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 --0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
+NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
 
--- NDefines.NAI.MAX_SCREEN_FORCES_FOR_INVASION_SUPPORT = 0.0 -- max ratio of screens forces to be used in naval invasion missions
--- NDefines.NAI.MAX_CAPITAL_FORCES_FOR_INVASION_SUPPORT = 0.05 -- max ratio of capital forces to be used in naval invasion missions
+-- NDefines.NAI.MAX_UNIT_RATIO_FOR_INVASIONS = -- 0.4                         -- countries won't use armies more than this ratio of total units for invasions
+-- NDefines.NAI.MIN_UNIT_RATIO_FOR_INVASIONS = -- 0.1                         -- don't allocate more divisions than this for naval invasions
+-- NDefines.NAI.MAX_INVASION_FRONT_SCORE = -- 1000                            -- max score for naval invasion front scores
+-- NDefines.NAI.MIN_FRONT_SCORE_FOR_AFTER_INVASION_AREAS = -- 1500			-- min score for army fronts that are created on recently invaded regions
 
--- NDefines.NAI.NAVAL_MISSION_INVASION_BASE = 1000									-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
+-- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_DURATION = -- 90								-- after successful invasion AI will prio the enemy area for this number of days
+-- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_MULT = -- 1.2									-- fronts that belongs to recent invasions gets more prio
+-- NDefines.NAI.MIN_NUM_CONQUERED_PROVINCES_TO_DEPRIO_NAVAL_INVADED_FRONTS = -- 20	-- if you conquer this amount of provinces after a naval invasion it will lose its prio status and will act as a regular front
 
--- NDefines.NAI.MAX_UNITS_FACTOR_INVASION_ORDER = 1.0				-- Factor for max number of units to assign to naval invasion orders
--- NDefines.NAI.DESIRED_UNITS_FACTOR_INVASION_ORDER = 1.0			-- Factor for desired number of units to assign to naval invasion orders
--- NDefines.NAI.MIN_UNITS_FACTOR_INVASION_ORDER = 1.0				-- Factor for min number of units to assign to naval invasion orders
+-- NDefines.NAI.INVASION_TARGET_DISTANCE_DENOMINATOR = -- 1000            -- When selecting invasion target divide this with (pixel) distance to get distance score factor. (Doesn't really affect the relative scoring but it affects the linearity of the score function.)
+-- NDefines.NAI.INVASION_TARGET_NO_PORT_FACTOR = -- 0.3                   -- When selecting invasion target multiply score with this if the target has no port
+-- NDefines.NAI.INVASION_TARGET_TRUNCATION_SELECT_THRESHOLD = -- 0.6      -- When selecting invasion target use this threshold for truncation selection. (1.0 means select highest scored target 0.0 means select randomly from all possible target 0.5 means select randomly from all targets with more than 50 % of highest score)
+-- NDefines.NAI.INVASION_TARGET_PRIO_NOT_ENEMY_FACTOR = -- 0.17           -- When calculating priority for an invasion factor the score with this if the target is not an actual enemy.
+-- NDefines.NAI.FAILED_INVASION_AVOID_DURATION = -- 60                    -- after a failed invasion AI will down-prioritize invading the same area again for this number of days
+-- NDefines.NAI.FAILED_INVASION_AREA_PRIO_FACTOR = -- 0.5                 -- for every failed invasion on an area factor that area's invasion prio with this value
+-- NDefines.NAI.FAILED_INVASION_PORT_PRIO_FACTOR = -- 0.66                -- for every failed invasion on a target port (province) factor the chance that we try to invade that same port again (relative to other ports)
 
--- NDefines.NAI.INVASION_DISTANCE_RANDOMNESS = 300									-- This higher the value the more unpredictable the invasions. Compares to actual map distance in pixels.
--- NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12 --24								-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+-- NDefines.NAI.MIN_INVASION_PLAN_VALUE_TO_EXECUTE = -- 0.3               -- ai will only activate invasions if plan value is above this
+-- NDefines.NAI.MIN_INVASION_ORG_FACTOR_TO_EXECUTE = -- 0.9               -- ai will only activate invasions if average org factor is above this
+-- NDefines.NAI.MIN_INVASION_UNITS_READY_TO_EXECUTE = -- 0.9              -- ai will only activate invasions if this ratio of assigned units are ready
+NDefines.NAI.MAX_INVASION_SIZE = 12 -- 24                                 -- max invasion group size
+NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = 10
 
---NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = --15   -- AI will consider using floating harbors for naval invasion if invasion area is larger than this many provinces
--- NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 600.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
+NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 5000.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
 
--- NDefines.NAI.MAX_UNIT_RATIO_FOR_INVASIONS = --0.4                         -- countries won't use armies more than this ratio of total units for invasions
--- NDefines.NAI.MIN_UNIT_RATIO_FOR_INVASIONS = --0.1                         -- don't allocate more divisions than this for naval invasions
--- NDefines.NAI.MAX_INVASION_FRONT_SCORE = --1000                            -- max score for naval invasion front scores
--- NDefines.NAI.MIN_FRONT_SCORE_FOR_AFTER_INVASION_AREAS = --1500			-- min score for army fronts that are created on recently invaded regions
-
--- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_DURATION = --90								-- after successful invasion, AI will prio the enemy area for this number of days
--- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_MULT = --1.2									-- fronts that belongs to recent invasions gets more prio
--- NDefines.NAI.MIN_NUM_CONQUERED_PROVINCES_TO_DEPRIO_NAVAL_INVADED_FRONTS = 30	-- if you conquer this amount of provinces after a naval invasion, it will lose its prio status and will act as a regular front
-
--- NDefines.NAI.MIN_INVASION_PLAN_VALUE_TO_EXECUTE = --0.2				-- ai will only activate invasions if it is above this
--- NDefines.NAI.MIN_INVASION_ORG_FACTOR_TO_EXECUTE = --0.75				-- ai will only activate invasions if average org factor is above this
-
-NDefines.NAI.MAX_INVASION_SIZE = 24 --24									-- max invasion group size
-
---NDefines.NAI.ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = 0.3
+NDefines.NAI.INVASION_TARGET_DISTANCE_DENOMINATOR = 1 -- 1000            -- When selecting invasion target, divide this with (pixel) distance to get distance score factor. (Doesn't really affect the relative scoring, but it affects the linearity of the score function.)
+NDefines.NAI.INVASION_TARGET_NO_PORT_FACTOR = 0.5 -- 0.3                   -- When selecting invasion target, multiply score with this if the target has no port
+NDefines.NAI.INVASION_TARGET_TRUNCATION_SELECT_THRESHOLD = 0.3 -- 0.6      -- When selecting invasion target, use this threshold for truncation selection. (1.0 means select highest scored target, 0.0 means select randomly from all possible target, 0.5 means select randomly from all targets with more than 50 % of highest score)
+-- NDefines.NAI.INVASION_TARGET_PRIO_NOT_ENEMY_FACTOR =  -- 0.17           -- When calculating priority for an invasion, factor the score with this if the target is not an actual enemy.
+NDefines.NAI.FAILED_INVASION_AVOID_DURATION = 15 -- 60                    -- after a failed invasion, AI will down-prioritize invading the same area again for this number of days
+-- NDefines.NAI.FAILED_INVASION_AREA_PRIO_FACTOR =  -- 0.5                 -- for every failed invasion on an area, factor that area's invasion prio with this value
+-- NDefines.NAI.FAILED_INVASION_PORT_PRIO_FACTOR =  -- 0.66                -- for every failed invasion on a target port (province), factor the chance that we try to invade that same port again (relative to other ports)
 
 -------------------------
 -- convoy escorts
@@ -618,8 +617,8 @@ NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 1000		-- Strategic importa
 -- Defense
 -------------------------
 
-NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 1				-- Amount of air superiority planes requested per enemy plane
-NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_BOMBERS = 1		-- Amount of air interceptor planes requested per enemy bomber
+-- NDefines.NAI.LAND_DEFENSE_FIGHERS_PER_PLANE = 1 -- 1.8				-- Amount of air superiority planes requested per enemy plane
+-- NDefines.NAI.LAND_DEFENSE_INTERCEPTORS_PER_BOMBERS = -- 0.8		-- Amount of air interceptor planes requested per enemy bomber
 -- NDefines.NAI.LAND_DEFENSE_INTERSEPTORS_PER_PLANE = 0.1				-- Amount of air interceptor planes requested per enemy plane (non bomber)
 
 -- NDefines.NAI.LAND_DEFENSE_AIR_SUPERIORITY_IMPORTANCE = 1.0		-- Strategic importance of air superiority ( amount of enemy planes in area )

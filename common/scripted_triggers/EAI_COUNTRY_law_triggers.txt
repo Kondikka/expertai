@@ -126,6 +126,7 @@ EAI_LAW_wants_low_economic_mobilisation = {
 				EAI_LAW_get_partial_economic_mobilisation = yes has_idea = partial_economic_mobilisation
 				EAI_LAW_get_war_economy = yes has_idea = war_economy
 				EAI_LAW_get_tot_economic_mobilisation = yes has_idea = tot_economic_mobilisation
+				has_idea = totaler_krieg_economy
 			}
 		}
 
@@ -168,13 +169,62 @@ EAI_LAW_available_low_economic_mobilisation = {
 	################################################
 	
 	has_war_support > 0.15
-	if = {
+				
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		NOT = { has_idea = HUN_treaty_of_triannon }
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			NOT = { has_idea = HUN_treaty_of_triannon_aat }
+		}
+		ELSE = {
+			NOT = { has_idea = HUN_treaty_of_triannon }
+		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			has_completed_focus = USA_limited_intervention
@@ -182,6 +232,19 @@ EAI_LAW_available_low_economic_mobilisation = {
 		}
 		has_war_support > 0.3
 		congress_high_support_trigger = yes
+	}
+	if = {
+		limit = {
+			original_tag = TUR
+			has_dlc = "Battle for the Bosporus"
+		}
+		NOT = {
+			OR = {
+				has_active_mission = TUR_etatism_crisis_2
+				has_active_mission = TUR_etatism_crisis_3
+				has_active_mission = TUR_etatism_crisis_4
+			}
+		}
 	}
 }
 
@@ -205,6 +268,7 @@ EAI_LAW_wants_partial_economic_mobilisation = {
 			NOT = {
 				EAI_LAW_get_war_economy = yes has_idea = war_economy
 				EAI_LAW_get_tot_economic_mobilisation = yes has_idea = tot_economic_mobilisation
+				has_idea = totaler_krieg_economy
 			}
 		}
 	
@@ -276,16 +340,48 @@ EAI_LAW_available_partial_economic_mobilisation = {
 	
 	has_war_support > 0.25
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		OR = {
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			OR = {
+				has_completed_focus = HUN_secret_rearmament
+				NOT = { has_idea = HUN_treaty_of_triannon_aat }
+			}
+		}
+		ELSE = {
 			has_completed_focus = HUN_secret_rearmament
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			OR = {
+				has_completed_focus = wuw_HUN_secret_rearmament
+				NOT = { has_idea = HUN_treaty_of_triannon_aat_wuw }
+			}
+		}
+		ELSE = {
+			has_completed_focus = wuw_HUN_secret_rearmament
+			NOT = { has_idea = HUN_treaty_of_triannon_wuw }
+		}
+	}
+
 	if = {
 		limit = {
 			has_completed_focus = USA_limited_intervention
@@ -293,6 +389,19 @@ EAI_LAW_available_partial_economic_mobilisation = {
 		}
 		has_war_support > 0.5
 		congress_high_support_trigger = yes
+	}
+	if = {
+		limit = {
+			original_tag = TUR
+			has_dlc = "Battle for the Bosporus"
+		}
+		NOT = {
+			OR = {
+				has_active_mission = TUR_etatism_crisis_1
+				has_active_mission = TUR_etatism_crisis_3
+				has_active_mission = TUR_etatism_crisis_4
+			}
+		}
 	}
 }
 
@@ -315,6 +424,7 @@ EAI_LAW_wants_war_economy = {
 
 			NOT = {
 				EAI_LAW_get_tot_economic_mobilisation = yes has_idea = tot_economic_mobilisation
+				has_idea = totaler_krieg_economy
 			}
 		}
 
@@ -406,9 +516,64 @@ EAI_LAW_available_war_economy = {
 		AND = {
 			has_war = yes
 			any_enemy_country = {
-				ic_ratio = { 
-					tag = ROOT 
+				ic_ratio = {
+					tag = ROOT
 					ratio > 0.4
+				}
+			}
+		}
+	}
+
+	IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			NOT = { has_idea = HUN_treaty_of_triannon_aat }
+		}
+		ELSE = {
+			NOT = { has_idea = HUN_treaty_of_triannon }
+		}
+	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
 				}
 			}
 		}
@@ -416,21 +581,31 @@ EAI_LAW_available_war_economy = {
 
 	if = {
 		limit = {
-			original_tag = HUN
-			has_dlc = "Death or Dishonor"
-		}
-		NOT = { has_idea = HUN_treaty_of_triannon }
-	}
-	if = {
-		limit = {
 			has_completed_focus = USA_limited_intervention
 			has_defensive_war = no
 		}
 		has_war_support > 0.75
 		congress_high_support_trigger = yes
-	}	
+	}
+	if = {
+		limit = {
+			original_tag = TUR
+			has_dlc = "Battle for the Bosporus"
+		}
+		NOT = {
+			OR = {
+				has_active_mission = TUR_etatism_crisis_1
+				has_active_mission = TUR_etatism_crisis_2
+				has_active_mission = TUR_etatism_crisis_4
+			}
+		}
+	}
 }
 
+# Very convoluted:
+# -do not get this unless can also get witwf and has PP for both immediately
+# -if available and does want this but is missing WS for witwf, get propaganda decision for WS
+# -if available and does want this and can get witwf, save PP for both at the same time and then get both immediately
 EAI_LAW_get_tot_economic_mobilisation = {
 
 	EAI_LAW_wants_tot_economic_mobilisation = yes
@@ -448,7 +623,9 @@ EAI_LAW_wants_tot_economic_mobilisation = {
 
 			### Priorities over other economy laws
 
-			always = yes
+			NOT = {
+				has_idea = totaler_krieg_economy
+			}
 		}
 		
 		### Strategies
@@ -472,39 +649,10 @@ EAI_LAW_wants_tot_economic_mobilisation = {
 			has_idea = scraping_the_barrel
 		}
 
-		# Upgrade only when
-		OR = {
-			# Manpower level
-			check_variable = { EAI_reserve_mp_ratio > 0.75 }
-
-			# Women in the workforce can be taken
-			AND = {
-				NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
-				has_war = yes
-				# has_idea = tot_economic_mobilisation
-				OR = {
-					AND = {
-						has_government = democratic
-						has_war_support > 0.79
-					}
-					AND = {
-						has_government = communism
-						has_war_support > 0.79
-					}
-					AND = {
-						has_government = fascism
-						OR = {
-							has_war_support > 0.89
-							surrender_progress > 0
-						}
-					}
-					AND = {
-						has_government = neutrality
-						has_war_support > 0.84
-						has_stability > 0.7
-					}
-				}
-			}
+		# Women in the workforce can be taken
+		if = { limit = { check_variable = { ignore_witwf = 0 } } 
+			EAI_LAW_potential_women_in_the_workforce = yes 
+			NOT = { check_variable = { EAI_PP_stored_pp < EAI_PP_max_stored_pp } }
 		}
 
 		# Avoid triggering draft events
@@ -529,22 +677,77 @@ EAI_LAW_available_tot_economic_mobilisation = {
 	### Copy available trigger from the idea file here
 	################################################
 	
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_totaler_krieg }
+	}
+
 	has_war = yes
 	has_war_support > 0.8
 	any_enemy_country = {
-		ic_ratio = { 
-			tag = ROOT 
+		ic_ratio = {
+			tag = ROOT
 			ratio > 0.5
 		}
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		NOT = { has_idea = HUN_treaty_of_triannon }
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			NOT = { has_idea = HUN_treaty_of_triannon_aat }
+		}
+		ELSE = {
+			NOT = { has_idea = HUN_treaty_of_triannon }
+		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+	
 	if = {
 		limit = {
 			has_completed_focus = USA_limited_intervention
@@ -552,6 +755,19 @@ EAI_LAW_available_tot_economic_mobilisation = {
 		}
 		has_war_support > 0.9
 		congress_high_support_trigger = yes
+	}
+	if = {
+		limit = {
+			original_tag = TUR
+			has_dlc = "Battle for the Bosporus"
+		}
+		NOT = {
+			OR = {
+				has_active_mission = TUR_etatism_crisis_1
+				has_active_mission = TUR_etatism_crisis_2
+				has_active_mission = TUR_etatism_crisis_3
+			}
+		}
 	}
 }
 
@@ -706,21 +922,61 @@ EAI_LAW_available_volunteer_only = {
 	################################################
 	
 	#has_manpower_for_recruit_change_to =  { value = 0.015 group = mobilization_laws }
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			DEN_aat_is_subject = yes
@@ -768,6 +1024,13 @@ EAI_LAW_wants_limited_conscription = {
 		OR = {
 			check_variable = { EAI_reserve_mp_ratio < 0.50 }
 			has_manpower < 50000
+			any_neighbor_country = {
+				has_war_with = ROOT
+				strength_ratio = {
+					tag = ROOT 
+					ratio > 2
+				}
+			}
 
 			### Strategies
 
@@ -866,21 +1129,61 @@ EAI_LAW_available_limited_conscription = {
 		is_subject = no
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			original_tag = ENG
@@ -921,6 +1224,14 @@ EAI_LAW_available_limited_conscription = {
 		}
 		NOT = { has_country_flag = DEN_cannot_increase_conscription_law }
 	}
+	if = {
+		limit = {
+			original_tag = AUS
+		}
+		NOT = {
+			has_idea = AUS_treaty_of_saint_germain_en_laye
+		}
+	}
 }
 
 EAI_LAW_get_extensive_conscription = {
@@ -954,6 +1265,13 @@ EAI_LAW_wants_extensive_conscription = {
 		OR = {
 			check_variable = { EAI_reserve_mp_ratio < 0.50 }
 			has_manpower < 50000
+			any_neighbor_country = {
+				has_war_with = ROOT
+				strength_ratio = {
+					tag = ROOT 
+					ratio > 2
+				}
+			}
 
 			### Strategies
 
@@ -1118,21 +1436,61 @@ EAI_LAW_available_extensive_conscription = {
 		is_subject = no
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			original_tag = ENG
@@ -1173,6 +1531,14 @@ EAI_LAW_available_extensive_conscription = {
 		}
 		NOT = { has_country_flag = DEN_cannot_increase_conscription_law }
 	}
+	if = {
+		limit = {
+			original_tag = AUS
+		}
+		NOT = {
+			has_idea = AUS_treaty_of_saint_germain_en_laye
+		}
+	}
 }
 
 EAI_LAW_get_service_by_requirement = {
@@ -1206,6 +1572,13 @@ EAI_LAW_wants_service_by_requirement = {
 		OR = {
 			check_variable = { EAI_reserve_mp_ratio < 0.30 }
 			has_manpower < 50000
+			any_neighbor_country = {
+				has_war_with = ROOT
+				strength_ratio = {
+					tag = ROOT 
+					ratio > 2
+				}
+			}
 		}
 
 		OR = {
@@ -1335,21 +1708,61 @@ EAI_LAW_available_service_by_requirement = {
 		is_subject = no
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			original_tag = ENG
@@ -1390,6 +1803,14 @@ EAI_LAW_available_service_by_requirement = {
 		}
 		NOT = { has_country_flag = DEN_cannot_increase_conscription_law }
 	}
+	if = {
+		limit = {
+			original_tag = AUS
+		}
+		NOT = {
+			has_idea = AUS_treaty_of_saint_germain_en_laye
+		}
+	}
 }
 
 EAI_LAW_get_all_adults_serve = {
@@ -1423,6 +1844,13 @@ EAI_LAW_wants_all_adults_serve = {
 		OR = {
 			check_variable = { EAI_reserve_mp_ratio < 0.05 }
 			has_manpower < 50000
+			any_neighbor_country = {
+				has_war_with = ROOT
+				strength_ratio = {
+					tag = ROOT 
+					ratio > 2
+				}
+			}
 		}
 
 		OR = {
@@ -1529,21 +1957,61 @@ EAI_LAW_available_all_adults_serve = {
 		is_subject = no
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+
 	if = {
 		limit = {
 			original_tag = ENG
@@ -1584,6 +2052,14 @@ EAI_LAW_available_all_adults_serve = {
 		}
 		NOT = { has_country_flag = DEN_cannot_increase_conscription_law }
 	}
+	if = {
+		limit = {
+			original_tag = AUS
+		}
+		NOT = {
+			has_idea = AUS_treaty_of_saint_germain_en_laye
+		}
+	}
 }
 
 EAI_LAW_get_scraping_the_barrel = {
@@ -1617,6 +2093,13 @@ EAI_LAW_wants_scraping_the_barrel = {
 		OR = {
 			check_variable = { EAI_reserve_mp_ratio < 0.10 }
 			has_manpower < 50000
+			any_neighbor_country = {
+				has_war_with = ROOT
+				strength_ratio = {
+					tag = ROOT 
+					ratio > 2
+				}
+			}
 		}
 
 		OR = {
@@ -1747,21 +2230,61 @@ EAI_LAW_available_scraping_the_barrel = {
 		is_subject = no
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = HUN
 			has_dlc = "Death or Dishonor"
+			NOT = {
+				has_dlc = "Gotterdammerung"
+			}
 		}
-		if = {
+		IF = {
 			limit = {
 				has_dlc = "Arms Against Tyranny"
 			}
 			NOT = { has_idea = HUN_treaty_of_triannon_aat }
 		}
-		else = {
+		ELSE = {
 			NOT = { has_idea = HUN_treaty_of_triannon }
 		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = HUN
+			has_dlc = "Gotterdammerung"
+		}
+		IF = {
+			limit = {
+				has_dlc = "Arms Against Tyranny"
+			}
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_aat_wuw 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_aat_wuw_no_air_or_army_debuff 
+					}
+				}
+				
+			}		
+		}
+		ELSE = {
+			custom_trigger_tooltip = {
+				tooltip = wuw_HUN_not_has_trianon_for_laws_tt
+				NOT = { 
+					OR = {
+						has_idea = HUN_treaty_of_triannon_wuw 
+						has_idea = HUN_treaty_of_triannon_wuw_no_army_exp_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_debuff 
+						has_idea = HUN_treaty_of_triannon_wuw_no_air_or_army_debuff 
+					}
+				}
+			}
+		}
+	}
+	
 	if = {
 		limit = {
 			original_tag = ENG
@@ -1802,6 +2325,14 @@ EAI_LAW_available_scraping_the_barrel = {
 		}
 		NOT = { has_country_flag = DEN_cannot_increase_conscription_law }
 	}
+	if = {
+		limit = {
+			original_tag = AUS
+		}
+		NOT = {
+			has_idea = AUS_treaty_of_saint_germain_en_laye
+		}
+	}
 }
 
 ### Law requirements copied from common\ideas
@@ -1839,13 +2370,6 @@ EAI_LAW_allowed_to_remove_conscription_law = {
 ### 	Trade laws
 ##############################################################################
 
-@EAI_FREE_TRADE_RESOURCES_TO_MARKET = 0.8
-@EAI_FREE_TRADE_RESOURCES = 0.2
-@EAI_EXPORT_FOCUS_RESOURCES_TO_MARKET = 0.5
-@EAI_EXPORT_FOCUS_RESOURCES = 0.5
-@EAI_LIMITED_EXPORTS_RESOURCES_TO_MARKET = 0.25
-@EAI_LIMITED_EXPORTS_RESOURCES = 0.75
-
 ### Laws
 
 EAI_LAW_get_free_trade = { # 80% resources to market
@@ -1873,6 +2397,24 @@ EAI_LAW_get_free_trade = { # 80% resources to market
 		OR = {
 			date > 1937.6.1
 			has_idea = war_economy
+		}
+	}
+
+	if = { limit = { original_tag = GER }
+	
+		NOT = { 
+			has_idea = autarkic_economy 
+			has_idea = autarkic_economy_improved 
+		}
+	}
+
+	# Closed economy for JAP
+	if = { limit = { original_tag = JAP }
+	
+		NOT = {
+			tag = JAP
+			has_war = yes
+			date > 1940.1.1
 		}
 	}
 
@@ -1918,6 +2460,12 @@ EAI_LAW_available_free_trade = {
 			has_dlc = "La Resistance"
 		}
 		NOT = { has_completed_focus = SPR_all_must_bear_the_torch }
+	}
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_autarky_efforts }
 	}
 }
 
@@ -1977,6 +2525,24 @@ EAI_LAW_get_export_focus = { # 50% resources to market
 				EAI_get_traded_factories = yes
 				check_variable = { traded_factories > 20 }
 			}
+		}
+	}
+
+	if = { limit = { original_tag = GER }
+	
+		NOT = { 
+			has_idea = autarkic_economy 
+			has_idea = autarkic_economy_improved 
+		}
+	}
+
+	# Closed economy for JAP
+	if = { limit = { original_tag = JAP }
+	
+		NOT = {
+			tag = JAP
+			has_war = yes
+			date > 1940.1.1
 		}
 	}
 
@@ -2078,6 +2644,12 @@ EAI_LAW_available_export_focus = {
 		}
 		NOT = { has_completed_focus = SPR_all_must_bear_the_torch }
 	}
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_autarky_efforts }
+	}
 }
 
 EAI_LAW_get_limited_exports = { # 25% resources to market
@@ -2117,6 +2689,24 @@ EAI_LAW_get_limited_exports = { # 25% resources to market
 	if = { limit = { original_tag = GER }
 
 		NOT = { check_variable = { EAI_average_resource_need < 0.8 } }
+	}
+
+	if = { limit = { original_tag = GER }
+	
+		NOT = { 
+			has_idea = autarkic_economy 
+			has_idea = autarkic_economy_improved 
+		}
+	}
+
+	# Closed economy for JAP
+	if = { limit = { original_tag = JAP }
+	
+		NOT = {
+			tag = JAP
+			has_war = yes
+			date > 1940.1.1
+		}
 	}
 
 	###### Resource needs
@@ -2194,6 +2784,15 @@ EAI_LAW_available_limited_exports = {
 				has_idea = partial_economic_mobilisation
 				has_idea = war_economy
 				has_idea = tot_economic_mobilisation
+				if = {
+					limit = {
+						original_tag = GER
+					}
+					has_idea = totaler_krieg_economy
+				}
+				else = {
+					hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+				}
 			}
 		}
 	}
@@ -2217,7 +2816,12 @@ EAI_LAW_available_limited_exports = {
 
 EAI_LAW_get_closed_economy = { # 0% resources to market
 
-	always = no
+	AND = {
+		tag = JAP
+		has_war = yes
+		date > 1940.1.1
+		USA = { EAI_THIS_is_threat_to_PREV = yes }
+	}
 
 	###### Requirements for this law
 
@@ -2239,6 +2843,15 @@ EAI_LAW_available_closed_economy = {
 	OR = {
 		has_idea = war_economy
 		has_idea = tot_economic_mobilisation
+		if = {
+			limit = {
+				original_tag = GER
+			}
+			has_idea = totaler_krieg_economy
+		}
+		else = {
+			hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+		}
 	}
 	OR = {
 		NOT = {	tag = SOV }
@@ -2395,41 +3008,23 @@ EAI_needs_war_support = {
 		##############################################################################
 
 		### EAI_LAW_wants_women_in_the_workforce
+		# total eco is available, witwf is available but missing WS
 
 		AND = {
-			EAI_LAW_wants_women_in_the_workforce = yes
-
-			### Requirements
-
-			NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
-			has_war = yes
-			has_idea = tot_economic_mobilisation
 			OR = {
 				AND = {
-					has_government = democratic
-					NOT = { has_war_support > 0.79 } # Need
-					set_temp_variable = { needs_ws = 0.79 }
+					set_temp_variable = { ignore_witwf = 1 }
+					EAI_LAW_wants_tot_economic_mobilisation = yes
+					set_temp_variable = { ignore_witwf = 0 }
 				}
 				AND = {
-					has_government = communism
-					NOT = { has_war_support > 0.79 } # Need
-					set_temp_variable = { needs_ws = 0.79 }
-				}
-				AND = {
-					has_government = fascism
 					OR = {
-						NOT = { has_war_support > 0.89 } # Need
-						set_temp_variable = { needs_ws = 0.89 }
-						surrender_progress > 0
+						has_idea = tot_economic_mobilisation
+						has_idea = totaler_krieg_economy
 					}
 				}
-				AND = {
-					has_government = neutrality
-					NOT = { has_war_support > 0.84 } # Need
-					set_temp_variable = { needs_ws = 0.84 }
-					has_stability > 0.7
-				}
 			}
+			EAI_LAW_missing_ws_women_in_the_workforce = yes
 		}
 
 		##############################################################################
@@ -2444,7 +3039,7 @@ EAI_needs_war_support = {
 			### Requirements
 
 			AND = {
-				NOT = { has_war_support > 0.5 } # Need
+				NOT = { has_war_support > 0.55 } # 0.5 # Need
 				OR = {
 					has_government = fascism
 					has_government = communism
@@ -2479,7 +3074,7 @@ EAI_needs_war_support = {
 
 			###
 
-			if = { limit = { check_variable = { needs_ws < 0.5 } } set_temp_variable = { needs_ws = 0.5 } }
+			if = { limit = { check_variable = { needs_ws < 0.55 } } set_temp_variable = { needs_ws = 0.55 } }
 		}
 
 		### EAI_LAW_wants_tot_economic_mobilisation
@@ -2491,7 +3086,7 @@ EAI_needs_war_support = {
 
 			AND = {
 				has_war = yes
-				NOT = { has_war_support > 0.8 } # Need
+				NOT = { has_war_support > 0.85 } # 0.8 # Need
 				any_enemy_country = {
 					ic_ratio = { 
 						tag = ROOT 
@@ -2518,7 +3113,7 @@ EAI_needs_war_support = {
 
 			###
 
-			if = { limit = { check_variable = { needs_ws < 0.81 } } set_temp_variable = { needs_ws = 0.81 } }
+			if = { limit = { check_variable = { needs_ws < 0.85 } } set_temp_variable = { needs_ws = 0.85 } }
 		}
 
 		##############################################################################
@@ -2550,7 +3145,7 @@ EAI_needs_war_support = {
 					}
 				}
 				NOT = {
-					has_war_support > 0.6 # Need
+					has_war_support > 0.65 # 0.6 # Need
 					surrender_progress > 0
 				}
 
@@ -2638,7 +3233,7 @@ EAI_needs_war_support = {
 				}
 			}
 
-			if = { limit = { check_variable = { needs_ws < 0.6 } } set_temp_variable = { needs_ws = 0.6 } }
+			if = { limit = { check_variable = { needs_ws < 0.65 } } set_temp_variable = { needs_ws = 0.65 } }
 		}
 
 		### EAI_LAW_wants_all_adults_serve
@@ -2652,7 +3247,7 @@ EAI_needs_war_support = {
 				#has_manpower_for_recruit_change_to =  { value = 0.2 group = mobilization_laws }
 				has_war = yes
 				NOT = {
-					has_war_support > 0.7 # Need
+					has_war_support > 0.75 # 0.7 # Need
 					surrender_progress > 0
 				}
 				enemies_strength_ratio > 0.75
@@ -2749,7 +3344,7 @@ EAI_needs_war_support = {
 
 			###
 
-			if = { limit = { check_variable = { needs_ws < 0.7 } } set_temp_variable = { needs_ws = 0.7 } }
+			if = { limit = { check_variable = { needs_ws < 0.75 } } set_temp_variable = { needs_ws = 0.75 } }
 		}
 
 		### EAI_LAW_wants_scraping_the_barrel
@@ -2763,7 +3358,7 @@ EAI_needs_war_support = {
 				#has_manpower_for_recruit_change_to =  { value = 0.25 group = mobilization_laws }
 				has_war = yes
 				NOT = {
-					has_war_support > 0.85 # Need
+					has_war_support > 0.9 # 0.85 # Need
 					surrender_progress > 0.25
 				}
 				enemies_strength_ratio > 1
@@ -2859,7 +3454,7 @@ EAI_needs_war_support = {
 
 			###
 
-			if = { limit = { check_variable = { needs_ws < 0.85 } } set_temp_variable = { needs_ws = 0.85 } }
+			if = { limit = { check_variable = { needs_ws < 0.90 } } set_temp_variable = { needs_ws = 0.90 } }
 		}
 	}
 
@@ -2889,11 +3484,29 @@ EAI_LAW_get_women_in_the_workforce = {
 
 	EAI_LAW_available_women_in_the_workforce = yes
 }
-EAI_LAW_available_women_in_the_workforce = {
+EAI_LAW_available_women_in_the_workforce = { # Actual decision requirements
 
 	NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
+
+	### Copied from decision
+
 	has_war = yes
-	has_idea = tot_economic_mobilisation
+	if = {
+		limit = {
+			NOT = { original_tag = GER }
+		}
+		has_idea = tot_economic_mobilisation
+	}
+	else_if = {
+		limit = {
+			original_tag = GER
+		}
+		OR = {
+			has_idea = tot_economic_mobilisation
+			has_idea = totaler_krieg_economy
+		}
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
 	OR = {
 		AND = {
 			has_government = democratic
@@ -2916,6 +3529,124 @@ EAI_LAW_available_women_in_the_workforce = {
 			has_stability > 0.7
 		}
 	}
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+}
+EAI_LAW_potential_women_in_the_workforce = { # Can get after switch to total mob
+
+	NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
+
+	### Copied from decision
+
+	has_war = yes
+	if = {
+		limit = {
+			NOT = { original_tag = GER }
+		}
+		# has_idea = tot_economic_mobilisation
+	}
+	else_if = {
+		limit = {
+			original_tag = GER
+		}
+		# OR = {
+		# 	has_idea = tot_economic_mobilisation
+		# 	has_idea = totaler_krieg_economy
+		# }
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+	OR = {
+		AND = {
+			has_government = democratic
+			has_war_support > 0.79
+		}
+		AND = {
+			has_government = communism
+			has_war_support > 0.79
+		}
+		AND = {
+			has_government = fascism
+			OR = {
+				has_war_support > 0.89
+				surrender_progress > 0
+			}
+		}
+		AND = {
+			has_government = neutrality
+			has_war_support > 0.84
+			has_stability > 0.7
+		}
+	}
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+}
+EAI_LAW_missing_ws_women_in_the_workforce = { # Missing only WS
+
+	NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
+
+	### Copied from decision
+	
+	has_war = yes
+	if = {
+		limit = {
+			NOT = { original_tag = GER }
+		}
+		# has_idea = tot_economic_mobilisation
+	}
+	else_if = {
+		limit = {
+			original_tag = GER
+		}
+		# OR = {
+		# 	has_idea = tot_economic_mobilisation
+		# 	has_idea = totaler_krieg_economy
+		# }
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+	OR = {
+		AND = {
+			has_government = democratic
+			NOT = { has_war_support > 0.79 }
+			set_temp_variable = { witwf_ws = 0.79 } #EAI
+		}
+		AND = {
+			has_government = communism
+			NOT = { has_war_support > 0.79 }
+			set_temp_variable = { witwf_ws = 0.79 } #EAI
+		}
+		AND = {
+			has_government = fascism
+			OR = {
+				AND = { #EAI
+					NOT = { has_war_support > 0.89 }
+					set_temp_variable = { witwf_ws = 0.89 }
+				}
+				surrender_progress > 0
+			}
+		}
+		AND = {
+			has_government = neutrality
+			NOT = { has_war_support > 0.84 }
+			set_temp_variable = { witwf_ws = 0.84 } #EAI
+			has_stability > 0.7
+		}
+	}
+	if = {
+		limit = {
+			original_tag = GER
+		}
+		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+
+	if = { limit = { check_variable = { witwf_ws > 0 } } set_temp_variable = { needs_ws = witwf_ws } } #EAI
 }
 
 ##############################################################################

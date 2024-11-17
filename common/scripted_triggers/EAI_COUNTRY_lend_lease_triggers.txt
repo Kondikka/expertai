@@ -324,23 +324,22 @@ EAI_LEND_LEASE_THIS_is_valid_target_of_ROOT = {
 		}
 
 		# If target is an enemy of another country of sender's ideology, do not send LL
-		if = {
-			limit = {
-				any_enemy_country = {
-
-					if = { limit = { var:lend_lease_sender_id = { is_in_faction = yes } }
-					
-						var:lend_lease_sender_id.faction_leader = { EAI_PREV_has_same_ideology_with_THIS = yes }
+		NOT = {
+			any_enemy_country = {
+				set_temp_variable = { enemy_id = THIS.id }
+				var:lend_lease_sender_id = { 
+					if = { limit = { is_in_faction = yes }
+						var:faction_leader = {
+							var:enemy_id = {
+								EAI_PREV_has_same_ideology_with_THIS = yes 
+							}
+						}
 					}
 					else = {
-						var:lend_lease_sender_id = { EAI_PREV_has_same_ideology_with_THIS = yes }
+						EAI_PREV_has_same_ideology_with_THIS = yes
 					}
-
-					NOT = { has_war_with = var:lend_lease_sender_id }
 				}
 			}
-
-			always = no
 		}
 
 		### 
@@ -419,35 +418,6 @@ EAI_LEND_LEASE_THIS_is_valid_target_of_ROOT = {
 					}
 				}
 			}
-		}
-
-		### If a land route isnt available, check that the target has convoys
-
-		if = {
-			limit = {
-				NOT = { has_country_flag = EAI_lend_lease_from_@ROOT } # Only check when starting lend-lease
-
-				NOT = { 
-					any_home_area_neighbor_country = { 
-						NOT = { has_war_with = ROOT has_war_with = var:lend_lease_target_id tag = var:lend_lease_target_id }
-						
-						OR = {
-							tag = var:lend_lease_sender_id
-
-							any_home_area_neighbor_country = { 
-								NOT = { has_war_with = ROOT has_war_with = var:lend_lease_target_id tag = var:lend_lease_target_id }
-
-								OR = {
-									tag = var:lend_lease_sender_id
-									any_home_area_neighbor_country = { tag = var:lend_lease_sender_id } 
-								}
-							} 
-						}
-					} 
-				}
-			}
-
-			stockpile_ratio = { archetype = convoy ratio > 50 }
 		}
 	}
 }
@@ -592,8 +562,9 @@ EAI_LEND_LEASE_target_strategies = {
 		limit = { 
 			var:lend_lease_target_id = { 
 				has_war_with = JAP 
-				OR = { original_tag = CHI original_tag = PRC original_tag = XSM original_tag = GXC original_tag = YUN original_tag = SHX }
+				is_literally_china = yes
 			}
+			check_variable = { global.EAI_sino_japanese_war = 0 }
 			JAP = { is_ai = yes }
 			NOT = { var:lend_lease_target_id = { has_war_together_with = var:lend_lease_sender_id } }
 		}

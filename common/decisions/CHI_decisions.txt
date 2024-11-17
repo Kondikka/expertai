@@ -50,14 +50,7 @@ CHI_army_reform = {
 		icon = generic_prepare_civil_war
 
 		available = {
-			if = { limit = { is_ai = no } #EAI
-				has_army_experience > 99
-			}
-			else = {
-				set_temp_variable = { temp = army_experience }
-				add_to_temp_variable = { temp = EAI_XP_stored_army_xp }
-				check_variable = { temp > 99 }
-			}
+			has_army_experience > 99
 			has_completed_focus = CHI_army_reform
 		}
 
@@ -95,29 +88,14 @@ CHI_army_reform = {
 			}
 		}
 		complete_effect = {
-			if = { limit = { is_ai = yes } #EAI
-				army_experience = EAI_XP_stored_army_xp
-				army_experience = -100
-				set_variable = { EAI_XP_stored_army_xp = 0 }
-			}
-			else = {
-				army_experience = -100
-			}				
+			army_experience = -100						
 		}		
 	}
 
 	CHI_lessons_of_war = {
 		icon = generic_army_support
 		available = {
-			if = { limit = { is_ai = no } #EAI
-				has_army_experience > 199
-			}
-			else = {
-				set_temp_variable = { temp = army_experience }
-				add_to_temp_variable = { temp = EAI_XP_stored_army_xp }
-				check_variable = { temp > 199 }
-			}
-
+			has_army_experience > 199
 			has_idea = CHI_incompetent_officers
 			if = {
 				limit = { has_idea = CHI_army_corruption_1 }
@@ -156,14 +134,7 @@ CHI_army_reform = {
 		}
 
 		complete_effect = {
-			if = { limit = { is_ai = yes } #EAI
-				army_experience = EAI_XP_stored_army_xp
-				army_experience = -200
-				set_variable = { EAI_XP_stored_army_xp = 0 }
-			}
-			else = {
-				army_experience = -200
-			}
+			army_experience = -200
 			remove_ideas = CHI_incompetent_officers
 			set_country_flag = CHI_lessons_of_war_completed
 		}		
@@ -6136,7 +6107,7 @@ foreign_support = {
 		}
 		days_re_enable = 360
 		ai_will_do = {
-			factor = 1
+			base = 1
 		}
 		cost = 25
 		days_remove = 60
@@ -6251,7 +6222,7 @@ foreign_support = {
 		}
 		days_re_enable = 360
 		ai_will_do = {
-			factor = 1
+			base = 1
 		}
 		cost = 25
 		days_remove = 60
@@ -6331,7 +6302,7 @@ foreign_support = {
 		cost = 25
 		days_re_enable = 360
 		ai_will_do = {
-			factor = 1
+			base = 1
 		}
 		days_remove = 60
 		modifier = {
@@ -6431,6 +6402,15 @@ political_actions = {
 	}
 
 	CHI_join_united_front = {
+
+		visible = {
+			is_literally_china = yes
+			CHI = {
+				is_in_faction_with = PRC
+			}
+			is_in_faction = no
+		}
+
 		available = {
 			is_literally_china = yes
 			CHI = {
@@ -6461,24 +6441,20 @@ political_actions = {
 				}
 			}
 		}
-		visible = {
-			is_literally_china = yes
-			CHI = {
-				is_in_faction_with = PRC
-			}
-			is_in_faction = no
-		}
+		
 		cost = 25
+
 		ai_will_do = {
-			factor = 1
-			modifier = {
+			base = 1
+			modifier = { #EAI
+				is_historical_focus_on = yes
 				JAP = {
 					OR = {
 						has_war_with = CHI
 						has_war_with = PRC
 					}
 				}
-				factor = 10000
+				factor = 600000
 			}
 			
 			modifier = { #EAI
@@ -6486,7 +6462,15 @@ political_actions = {
 				
 				OR = { tag = SIK }
 			}
+			# Sheng Shicai doesn't want to join until he has dealt with Tunganistan and the KMT general Ma Hushan
+			modifier = {
+				original_tag = SIK
+				is_subject = no
+				date < 1937.10.15
+				factor = 0
+			}
 		}
+
 		complete_effect = {
 			If = {
 				limit = {
@@ -6520,6 +6504,7 @@ political_actions = {
 			}
 		}
 	}
+
 	CHI_move_the_capital = {
 		allowed = {
 			is_literally_china = yes
@@ -6567,6 +6552,7 @@ political_actions = {
 }
 
 CHI_xian_incident = {
+
 	CHI_instigate_xian_incident = {
 		icon = generic_political_discourse
 		available = {			
@@ -6628,14 +6614,18 @@ CHI_xian_incident = {
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 1
+			modifier = { #EAI
+				is_historical_focus_on = yes
+				factor = 1000
+			}
 			modifier = {
 				threat > 0.1
 				factor = 2
 			}
-			modifier = { #If influenced by Soviets, Sinkiang has no interest in this.
+			modifier = { # If influenced by Soviets, Sinkiang has no interest in this.
 				factor = 0
 				original_tag = SIK
-				is_in_faction_with = SOV
+				has_government = communism
 			}
 			modifier = {
 				NOT = { 	

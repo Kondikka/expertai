@@ -1,0 +1,552 @@
+##############################################################################################################################
+### Sector offensives
+##############################################################################################################################
+
+# EAI_sector_operations_logging
+
+### Sector
+
+	@EAI_MILITARY_SECTOR_num_datapoints = 18
+	@EAI_MILITARY_SECTOR_offensive_min_duration_days = 80
+	@EAI_MILITARY_SECTOR_force_reselection_days = 30
+	@EAI_MILITARY_SECTOR_select_sector_min_score = 500
+	@EAI_MILITARY_SECTOR_select_sector_min_score_reduce_over_time = 400
+	@EAI_MILITARY_SECTOR_reassess_sector_max_score_to_cancel = 100
+	@EAI_MILITARY_SECTOR_reassess_sector_min_difference_to_cancel = 250
+
+###
+
+###############################################################
+### Generic functions
+###############################################################
+
+EAI_MILITARY_SECTOR_update = { # var:_num_sectors arr:_data_start arr:_data_ST_end arr:_data_OB_end arr:_data_AR_end arr:_sector_data
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_update" }
+
+	EAI_MILITARY_SECTOR_init = yes
+	EAI_MILITARY_SECTOR_get_control_pct = yes
+	EAI_MILITARY_SECTOR_clear_cooldown = yes
+
+	### Select a sector
+
+		if = { limit = { NOT = { has_variable = EAI_MILITARY_SECTOR_id } }
+		
+			EAI_MILITARY_SECTOR_score_sectors = yes
+			EAI_MILITARY_SECTOR_select_sector = yes
+			if = { limit = { check_variable = { selected_sector_ = 1 } }
+				EAI_MILITARY_SECTOR_assign_sector = yes
+			}
+		}
+
+	### Reasses a sector
+
+		else_if = {
+			limit = {
+				NOT = {
+					has_country_flag = EAI_MILITARY_SECTOR_offensive_min_duration_days 
+					has_country_flag = EAI_MILITARY_SECTOR_preparation
+				} 
+			}
+
+			EAI_MILITARY_SECTOR_score_sectors = yes
+			EAI_MILITARY_SECTOR_reassess_sector = yes
+			if = { limit = { check_variable = { cancelled_sector_ = 1 } }
+				EAI_MILITARY_SECTOR_cancel_sector = yes
+			}
+		}
+
+	###
+}
+
+EAI_MILITARY_SECTOR_init = { # var:_num_sectors
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_SECTOR_init } }
+
+		set_country_flag = EAI_MILITARY_SECTOR_init
+		resize_array = { array = EAI_MILITARY_SECTOR_cooldown value = 0 size = _num_sectors }
+	}
+}
+
+EAI_MILITARY_SECTOR_clear = {
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_clear" }
+
+	EAI_MILITARY_clear_this_strategy = yes
+
+	clear_variable = EAI_MILITARY_SECTOR_id
+
+	clr_country_flag = EAI_MILITARY_SECTOR_preparation
+	clr_country_flag = EAI_MILITARY_SECTOR_offensive_min_duration_days
+	
+	clear_array = EAI_MILITARY_SECTOR_cooldown
+
+	clr_country_flag = EAI_MILITARY_SECTOR_weekly_provinces_controlled_init
+	clear_array = EAI_MILITARY_SECTOR_weekly_control_pct
+
+	clear_array = EAI_MILITARY_SECTOR_control_pct_adjust
+
+	clear_variable = EAI_MILITARY_SECTOR_select_sector_num_failed_select
+}
+
+EAI_MILITARY_SECTOR_clear_cooldown = {
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_SECTOR_cooldown } }
+
+		if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_clear_cooldown" }
+		
+		for_each_loop = { array = EAI_MILITARY_SECTOR_cooldown
+			if = { limit = { check_variable = { v = 1 } }
+				set_variable = { EAI_MILITARY_SECTOR_cooldown^i = 0 }
+			}
+		}
+	}
+}
+
+EAI_MILITARY_SECTOR_clear_preparation = {
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_clear_preparation" }
+
+	clr_country_flag = EAI_MILITARY_SECTOR_preparation
+	set_country_flag = { flag = EAI_MILITARY_SECTOR_offensive_min_duration_days value = 1 days = @EAI_MILITARY_SECTOR_offensive_min_duration_days }
+}
+
+EAI_MILITARY_SECTOR_set_preparation = {
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_set_preparation" }
+
+	set_country_flag = EAI_MILITARY_SECTOR_preparation
+}
+
+### Data
+
+EAI_MILITARY_SECTOR_get_control_pct = { # var:_num_sectors
+
+	### Init
+	
+		if = { limit = { NOT = { has_country_flag = EAI_MILITARY_SECTOR_weekly_control_pct_init } }
+			set_temp_variable = { arr_size = _num_sectors }
+			multiply_temp_variable = { arr_size = @EAI_MILITARY_SECTOR_num_datapoints }
+			resize_array = { array = EAI_MILITARY_SECTOR_weekly_control_pct value = -1 size = arr_size }
+		}
+
+	### Get sector data
+
+		resize_temp_array = { sectors = _num_sectors }
+		for_each_loop = { array = sectors index = _sector_id value = _sector_v
+			EAI_MILITARY_SECTOR_get_sector_control_pct = yes
+		}
+
+	###
+
+	if = { limit = { NOT = { has_country_flag = EAI_MILITARY_SECTOR_weekly_control_pct_init } }
+		set_country_flag = EAI_MILITARY_SECTOR_weekly_control_pct_init
+	}
+}
+
+EAI_MILITARY_SECTOR_get_sector_control_pct = { # var:_sector_id arr:_our_side_ arr:_their_side_ arr:_sector_data arr:_data_start arr:_data_ST_end
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_get_sector_control_pct" }
+
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					check_variable = { _our_side_^num > 0 }
+					check_variable = { _their_side_^num > 0 }
+					check_variable = { _sector_data^num > 0 }
+					check_variable = { _data_start^num > 0 }
+					check_variable = { _data_ST_end^num > 0 }
+				}
+			}
+		}
+		log = "EAI_MILITARY_SECTOR_get_sector_control_pct ERROR"
+		log = "_our_side_^num=[?_our_side_^num]"
+		log = "_their_side_^num=[?_their_side_^num]"
+		log = "_sector_data^num=[?_sector_data^num]"
+		log = "_data_start^num=[?_data_start^num]"
+		log = "_data_ST_end^num=[?_data_ST_end^num]"
+	}
+
+	### Get sector states
+
+		clear_temp_array = _states_
+		set_temp_variable = { index = _data_start^_sector_id }
+		while_loop_effect = { limit = { check_variable = { index < _data_ST_end^_sector_id } }
+			add_to_temp_array = { _states_ = _sector_data^index }
+			add_to_temp_variable = { index = 1 }
+		}
+
+	### Get control pct for sector
+	
+		EAI_MAP_get_province_control_pct = yes
+
+	### Insert value
+
+		set_temp_variable = { insert_value = our_control_pct_ }
+		set_temp_variable = { first = 1 }
+		set_temp_variable = { datapoint_index = 0 }
+		set_temp_variable = { index = _sector_id }
+		multiply_temp_variable = { index = @EAI_MILITARY_SECTOR_num_datapoints }
+		while_loop_effect = { limit = { check_variable = { datapoint_index < @EAI_MILITARY_SECTOR_num_datapoints } }
+			if = { limit = { check_variable = { EAI_MILITARY_SECTOR_weekly_control_pct^index = -1 } } 
+				set_variable = { EAI_MILITARY_SECTOR_weekly_control_pct^index = insert_value }
+			}
+			set_temp_variable = { prev_val = EAI_MILITARY_SECTOR_weekly_control_pct^index }
+			if = { limit = { check_variable = { first = 1 } } 
+				set_temp_variable = { first = 0 }
+				set_variable = { EAI_MILITARY_SECTOR_weekly_control_pct^index = insert_value } 
+			}
+			else = { set_variable = { EAI_MILITARY_SECTOR_weekly_control_pct^index = prev_val } }
+			add_to_temp_variable = { datapoint_index = 1 }
+			add_to_temp_variable = { index = 1 }
+		}
+
+	### The initial front configuration is treated as the 50% balanced front for scoring
+
+		if = { limit = { NOT = { has_country_flag = EAI_MILITARY_SECTOR_weekly_control_pct_init } }
+			set_temp_variable = { tmp = 0.5 }
+			subtract_from_temp_variable = { tmp = our_control_pct_ }
+			set_variable = { EAI_MILITARY_SECTOR_control_pct_adjust^_sector_id = tmp }
+		}
+
+	###
+}
+
+### Select
+
+EAI_MILITARY_SECTOR_select_sector = { # var:_num_sectors arr:_sector_trend_scores_ arr:_sector_control_scores_ >>> var:selected_sector_ var:_assign_sector_
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_select_sector" }
+
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					check_variable = { _num_sectors > 0 }
+					check_variable = { _sector_trend_scores_^num > 0 }
+					check_variable = { _sector_control_scores_^num > 0 }
+				}
+			}
+		}
+		log = "EAI_MILITARY_SECTOR_select_sector ERROR"
+		log = "_num_sectors=[?_num_sectors]"
+		log = "_sector_trend_scores_^num=[?_sector_trend_scores_^num]"
+		log = "_sector_control_scores_^num=[?_sector_control_scores_^num]"
+	}
+
+	### Best score
+
+		resize_temp_array = { sector_scores = _num_sectors }
+		set_temp_variable = { best_sector_id = 0 }
+		set_temp_variable = { best_sector_score = 0 }
+		for_each_loop = { array = sector_scores
+			if = { limit = { check_variable = { EAI_MILITARY_SECTOR_cooldown^i = 0 } }
+				set_temp_variable = { sector_score = _sector_trend_scores_^i }
+				add_to_temp_variable = { sector_score = _sector_control_scores_^i }
+				set_temp_variable = { sector_scores^i = sector_score }
+				if = { limit = { check_variable = { sector_score > best_sector_score } }
+					set_temp_variable = { best_sector_id = i }
+					set_temp_variable = { best_sector_score = sector_score }
+				}
+			}
+		}
+		if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "best_sector_id=[?best_sector_id] best_sector_score=[?best_sector_score]" }
+
+	### Top scores to consider
+
+		set_temp_variable = { _val_ = 0.15 }
+		EAI_MATH_complement = yes
+		set_temp_variable = { _scale = best_sector_score }
+		EAI_MATH_scale = yes
+		set_temp_variable = { select_top_min_score = _val_ }
+
+	### Reduce min score over time
+
+		set_temp_variable = { min_score = @EAI_MILITARY_SECTOR_select_sector_min_score }
+		set_temp_variable = { _min = 0 }
+		set_temp_variable = { _max = 10 } # Weeks
+		set_temp_variable = { _val_ = EAI_MILITARY_SECTOR_select_sector_num_failed_select }
+		EAI_MATH_normalize = yes
+		set_temp_variable = { _scale = @EAI_MILITARY_SECTOR_select_sector_min_score_reduce_over_time }
+		EAI_MATH_scale = yes
+		subtract_from_temp_variable = { min_score = _val_ }
+		if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "select_top_min_score=[?select_top_min_score] min_score=[?min_score]" }
+
+	### Candidates
+	
+		clear_temp_array = candidates
+		for_each_loop = { array = sector_scores
+			if = { 
+				limit = {
+					NOT = { check_variable = { v < select_top_min_score } } 
+					NOT = { check_variable = { v < min_score } }
+				}
+				add_to_temp_array = { candidates = i }
+			}
+		}
+
+	### Selection
+
+		set_temp_variable = { selected_sector_ = 0 }
+		if = { limit = { check_variable = { candidates^num > 0 } }
+			set_temp_variable = { _array_len = candidates^num }
+			EAI_MATH_get_random_index_in_array_len = yes
+			set_temp_variable = { _assign_sector_ = candidates^random_index_ }
+			set_temp_variable = { selected_sector_ = 1 }
+			set_variable = { EAI_MILITARY_SECTOR_select_sector_num_failed_select = 0 }
+		}
+		else = {
+			add_to_variable = { EAI_MILITARY_SECTOR_select_sector_num_failed_select = 1 }
+		}
+
+	###
+}
+
+EAI_MILITARY_SECTOR_assign_sector = { # var: _assign_sector_ arr:_sector_data arr:_data_start arr:_data_ST_end arr:_data_OB_end arr:_data_AR_end
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_assign_sector=[?_assign_sector_]" }
+
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					check_variable = { _num_sectors > 0 }
+					check_variable = { _sector_data^num > 0 }
+					check_variable = { _data_start^num > 0 }
+					check_variable = { _data_ST_end^num > 0 }
+					check_variable = { _data_OB_end^num > 0 }
+					check_variable = { _data_AR_end^num > 0 }
+				}
+			}
+		}
+		log = "EAI_MILITARY_SECTOR_assign_sector ERROR"
+		log = "_num_sectors=[?_num_sectors]"
+		log = "_sector_data^num=[?_sector_data^num]"
+		log = "_data_start^num=[?_data_start^num]"
+		log = "_data_ST_end^num=[?_data_ST_end^num]"
+		log = "_data_OB_end^num=[?_data_OB_end^num]"
+		log = "_data_AR_end^num=[?_data_AR_end^num]"
+	}
+
+	### Copy sector data
+
+		clear_array = EAI_MILITARY_SECTOR_target_states
+		clear_array = EAI_MILITARY_SECTOR_target_objectives
+		clear_array = EAI_MILITARY_SECTOR_target_regions
+
+		set_temp_variable = { index = _data_start^_assign_sector_ }
+		while_loop_effect = { limit = { check_variable = { index < _data_end^_assign_sector_ } }
+			if = { 		limit = { check_variable = { index < _data_ST_end^_assign_sector_ } } add_to_array = { EAI_MILITARY_SECTOR_target_states = _sector_data^index } }
+			else_if = { limit = { check_variable = { index < _data_OB_end^_assign_sector_ } } add_to_array = { EAI_MILITARY_SECTOR_target_objectives = _sector_data^index } }
+			else_if = { limit = { check_variable = { index < _data_AR_end^_assign_sector_ } } add_to_array = { EAI_MILITARY_SECTOR_target_regions = _sector_data^index } }
+			add_to_temp_variable = { index = 1 }
+		}
+
+	### Start
+
+		set_variable = { EAI_MILITARY_SECTOR_id = _assign_sector_ }
+		set_country_flag = { flag = EAI_MILITARY_SECTOR_offensive_min_duration_days value = 1 days = @EAI_MILITARY_SECTOR_offensive_min_duration_days }
+		set_country_flag = { flag = EAI_MILITARY_SECTOR_force_reselection value = 1 days = @EAI_MILITARY_SECTOR_force_reselection_days }
+
+	###
+}
+
+### Cancel
+
+EAI_MILITARY_SECTOR_reassess_sector = { # var:_num_sectors arr:_sector_trend_scores_ arr:_sector_control_scores_ >>> var:cancelled_sector_
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_reassess_sector=[?EAI_MILITARY_SECTOR_id]" }
+
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					check_variable = { _num_sectors > 0 }
+					check_variable = { _sector_trend_scores_^num > 0 }
+					check_variable = { _sector_control_scores_^num > 0 }
+				}
+			}
+		}
+		log = "EAI_MILITARY_SECTOR_reassess_sector ERROR"
+		log = "_num_sectors=[?_num_sectors]"
+		log = "_sector_trend_scores_^num=[?_sector_trend_scores_^num]"
+		log = "_sector_control_scores_^num=[?_sector_control_scores_^num]"
+	}
+
+	### Biggest score difference
+
+		resize_temp_array = { sector_differences = _num_sectors }
+		for_each_loop = { array = sector_differences index = diff_i value = diff_v
+			if = { limit = { check_variable = { diff_i = EAI_MILITARY_SECTOR_id } }
+				set_temp_variable = { sector_score = _sector_trend_scores_^diff_i }
+				add_to_temp_variable = { sector_score = _sector_control_scores_^diff_i }
+				if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "sector=[?diff_i] sector_score=[?sector_score]" }
+				set_temp_variable = { biggest_diff = 0 }
+				for_each_loop = { array = sector_differences index = sector_i value = sector_v
+					if = { 
+						limit = { 
+							NOT = { 
+								check_variable = { diff_i = sector_i } 
+								check_variable = { EAI_MILITARY_SECTOR_cooldown^sector_i = 1 }
+							} 
+						}
+						set_temp_variable = { diff_score = _sector_trend_scores_^sector_i }
+						add_to_temp_variable = { diff_score = _sector_control_scores_^sector_i }
+						subtract_from_temp_variable = { diff_score = sector_score }
+						if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "diff_score=[?diff_score]" }
+						if = { limit = { check_variable = { diff_score > biggest_diff } }
+							set_temp_variable = { biggest_diff = diff_score }
+						}
+					}
+				}
+			}
+		}
+		if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "biggest_diff=[?biggest_diff]" }
+
+	### Sector trend scores
+
+		resize_temp_array = { sector_scores = _num_sectors }
+		for_each_loop = { array = sector_scores index = sector_i value = sector_v
+			if = { limit = { check_variable = { sector_i = EAI_MILITARY_SECTOR_id } }
+				set_temp_variable = { sector_score = _sector_trend_scores_^sector_i }
+			}
+		}
+		if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "sector_score=[?sector_score]" }
+
+	### Cancel
+
+		set_temp_variable = { cancelled_sector_ = 0 }
+		if = {
+			limit = {
+				OR = {
+					check_variable = { biggest_diff > @EAI_MILITARY_SECTOR_reassess_sector_min_difference_to_cancel }
+					check_variable = { sector_score < @EAI_MILITARY_SECTOR_reassess_sector_max_score_to_cancel }
+				}
+			}
+			set_temp_variable = { cancelled_sector_ = 1 }
+		}
+
+	###
+}
+
+EAI_MILITARY_SECTOR_cancel_sector = {
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_cancel_sector=[?EAI_MILITARY_SECTOR_id]" }
+
+	set_country_flag = { flag = EAI_MILITARY_SECTOR_cooldown value = 1 days = 90 }
+	set_variable = { EAI_MILITARY_SECTOR_cooldown^EAI_MILITARY_SECTOR_id = 1 }
+	clear_variable = EAI_MILITARY_SECTOR_id
+}
+
+### Scoring
+
+EAI_MILITARY_SECTOR_score_sectors = { # var:_num_sectors >>> arr:_sector_trend_scores_ arr:_sector_control_scores_
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_SECTOR_score_sectors" }
+
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					check_variable = { _num_sectors > 0 }
+				}
+			}
+		}
+		log = "EAI_MILITARY_SECTOR_score_sectors ERROR"
+		log = "_num_sectors=[?_num_sectors]"
+	}
+
+	resize_temp_array = { _sector_trend_scores_ = _num_sectors }
+	resize_temp_array = { _sector_control_scores_ = _num_sectors }
+
+	### Sector control pcts
+
+		clear_temp_array = _set
+		resize_temp_array = { sector_control_pcts = _num_sectors }
+		for_each_loop = { array = sector_control_pcts index = sector_i value = sector_v
+			set_temp_variable = { index = sector_i }
+			multiply_temp_variable = { index = @EAI_MILITARY_SECTOR_num_datapoints }
+			set_temp_variable = { tmp = EAI_MILITARY_SECTOR_weekly_control_pct^index }
+			add_to_temp_variable = { tmp = EAI_MILITARY_SECTOR_control_pct_adjust^sector_i }
+			set_temp_variable = { sector_control_pcts^sector_i = tmp }
+			add_to_temp_array = { _set = tmp }
+		}
+		EAI_MATH_average = yes
+		set_temp_variable = { sectors_control_pct_avg = average_ }
+
+	### Sector trends
+
+		resize_temp_array = { sector_trends = _num_sectors }
+		for_each_loop = { array = sector_trends index = sector_i value = sector_v
+			set_temp_variable = { _long = @EAI_MILITARY_SECTOR_num_datapoints }
+			set_temp_variable = { _short = 6 }
+			set_temp_variable = { datapoint_index = 0 }
+			set_temp_variable = { index = sector_i }
+			multiply_temp_variable = { index = @EAI_MILITARY_SECTOR_num_datapoints }
+			clear_temp_array = _data
+			while_loop_effect = { limit = { check_variable = { datapoint_index < @EAI_MILITARY_SECTOR_num_datapoints } }
+				add_to_temp_array = { _data = EAI_MILITARY_SECTOR_weekly_control_pct^index }
+				add_to_temp_variable = { datapoint_index = 1 }
+				add_to_temp_variable = { index = 1 }
+			}
+			EAI_MATH_trend = yes
+			set_temp_variable = { sector_trends^sector_i = trend_ }
+		}
+
+	### Score sectors
+
+		resize_temp_array = { sectors = _num_sectors }
+		for_each_loop = { array = sectors index = sector_i value = sector_v
+			if = { limit = { check_variable = { EAI_MILITARY_SECTOR_cooldown^sector_i = 0 } }
+			
+				### Trend score 
+			
+					set_temp_variable = { _score_trend = sector_trends^sector_i }
+					set_temp_variable = { _score_scale = 500 }
+					EAI_MILITARY_SECTOR_score_trend = yes
+					set_temp_variable = { _sector_trend_scores_^sector_i = score_ }
+		
+				### Control balance score
+		
+					set_temp_variable = { _score_pct = sector_control_pcts^sector_i }
+					set_temp_variable = { _score_avg = sectors_control_pct_avg }
+					set_temp_variable = { _score_scale = 500 }
+					EAI_MILITARY_SECTOR_score_control = yes
+					set_temp_variable = { _sector_control_scores_^sector_i = score_ }
+
+				###
+			}
+		}
+
+	###
+}
+
+EAI_MILITARY_SECTOR_score_trend = { # var:_score_trend var:_score_scale >>> var:score_
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "EAI_MILITARY_SECTOR_score_trend _trend=[?_score_trend]" }
+	set_temp_variable = { _val_ = _score_trend }
+	EAI_MATH_abs = yes
+	set_temp_variable = { _min = 0 }
+	set_temp_variable = { _max = 0.1 }
+	EAI_MATH_normalize = yes
+	set_temp_variable = { _scale = _score_scale }
+	EAI_MATH_scale = yes
+	set_temp_variable = { score_ = _val_ }
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "EAI_MILITARY_SECTOR_score_trend score_=[?score_]" }
+}
+
+EAI_MILITARY_SECTOR_score_control = { # var:_score_pct var:_score_avg var:_score_scale >>> var:score_
+	
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "EAI_MILITARY_SECTOR_score_control _score_pct=[?_score_pct] _score_avg=[?_score_avg]" }
+	set_temp_variable = { _val_ = _score_pct }
+	set_temp_variable = { _avg = _score_avg }
+	EAI_MATH_deviation = yes
+	set_temp_variable = { _min = 0 }
+	set_temp_variable = { _max = -0.15 }
+	EAI_MATH_normalize = yes
+	set_temp_variable = { _scale = _score_scale }
+	EAI_MATH_scale = yes
+	set_temp_variable = { score_ = _val_ }
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "EAI_MILITARY_SECTOR_score_control score_=[?score_]" }
+}

@@ -1,0 +1,197 @@
+##############################################################################################################################
+### Combined operations
+##############################################################################################################################
+
+# EAI_combined_operations_logging
+
+### Combined operations
+
+	@EAI_MILITARY_COMBINED_min_duration_days = 90
+	@EAI_MILITARY_COMBINED_max_failure_weeks = 12
+	@EAI_MILITARY_COMBINED_reselection_days = 7
+
+###
+
+EAI_MILITARY_COMBINED_progress = { # arr:_our_side_ arr:_their_side_
+
+	if = { 
+		limit = { 
+			check_variable = { EAI_MILITARY_COMBINED_objectives^num > 0 } 
+			NOT = { 
+				has_country_flag = EAI_MILITARY_COMBINED_preparation
+				has_country_flag = EAI_MILITARY_COMBINED_min_duration
+			}
+		}
+
+		if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_progress" }
+
+		### Count num objectives completed
+
+			clear_temp_array = _states_
+			for_each_loop = { array = EAI_MILITARY_COMBINED_objectives add_to_temp_array = { _states_ = v } }
+			EAI_MAP_get_province_control_pct = yes
+			if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "our_control_pct_=[?our_control_pct_] completed=[?total_our_side_] remaining=[?total_their_side_]" }
+	
+		### All objectives completed
+
+			if = { limit = { NOT = { check_variable = { our_control_pct_ < _target_control_pct } } }
+				clr_country_flag = EAI_MILITARY_COMBINED_min_duration
+				clear_array = EAI_MILITARY_COMBINED_objectives
+				clear_variable = EAI_MILITARY_COMBINED_failed_progress_weeks
+				clear_variable = EAI_MILITARY_COMBINED_prev_total_our_side
+				if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "objectives completed" }
+			}
+
+		### Track progress
+
+			else = {
+				set_temp_variable = { progress = total_our_side_ }
+				subtract_from_temp_variable = { progress = EAI_MILITARY_COMBINED_prev_total_our_side }
+				divide_temp_variable = { progress = total_ }
+				set_variable = { EAI_MILITARY_COMBINED_prev_total_our_side = total_our_side_ }
+				if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "progress=[?progress]" }
+
+				if = { limit = { check_variable = { progress < _expected_progress } }
+					add_to_variable = { EAI_MILITARY_COMBINED_failed_progress_weeks = 1 }
+					if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "progress failure _failed_progress_weeks=[?EAI_MILITARY_COMBINED_failed_progress_weeks]" }
+				}
+				else = {
+					set_variable = { EAI_MILITARY_COMBINED_failed_progress_weeks = 0 }
+					if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "progress success" }
+				}
+
+				### Failed objectives - ignore this prio group in the next selection (will return to this after completing or failing the next objectives)
+
+					set_temp_variable = { _failed_objective_prio_ = 0 }
+					if = { limit = { NOT = { check_variable = { EAI_MILITARY_COMBINED_failed_progress_weeks < @EAI_MILITARY_COMBINED_max_failure_weeks } } }
+						if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "reached max failures"   }
+						if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "_failed_progress_weeks=[?EAI_MILITARY_COMBINED_failed_progress_weeks]" }
+						if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "_failed_objective_prio_=[?_failed_objective_prio_]" }
+						set_temp_variable = { _failed_objective_prio_ = EAI_MILITARY_COMBINED_current_prio }
+						EAI_MILITARY_COMBINED_clear = yes
+					}
+
+				###
+			}
+
+		###
+	}
+}
+
+EAI_MILITARY_COMBINED_select = { # arr:_our_side_ arr:_their_side_
+
+	if = { 
+		limit = { 
+			NOT = { 
+				has_country_flag = EAI_MILITARY_COMBINED_min_duration 
+				AND = {
+					has_country_flag = EAI_MILITARY_COMBINED_preparation
+					has_country_flag = EAI_MILITARY_COMBINED_preparation_selected
+				}
+			}
+			OR = {
+				NOT = { check_variable = { _failed_objective_prio_ = 0 } }
+				check_variable = { EAI_MILITARY_COMBINED_objectives^num = 0 }
+			}
+		}
+
+		if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_set_objectives" }
+		if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "_failed_objective_prio_=[?_failed_objective_prio_]" }
+
+		### Get the highest valid prio group
+
+			if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation_selected } } set_country_flag = EAI_MILITARY_COMBINED_preparation_selected }
+			clear_temp_array = _new_objectives_
+			set_temp_variable = { target_prio = 0 }
+			set_temp_variable = { current_prio_group = EAI_MILITARY_COMBINED_prio^0 }
+			clear_temp_array = _states_
+			set_temp_variable = { arr_size = EAI_MILITARY_COMBINED_id^num }
+			add_to_temp_variable = { arr_size = 1 }
+			resize_temp_array = { targets = arr_size }
+			for_each_loop = { array = targets index = id_i value = id_v
+				if = { 
+					limit = { 
+						OR = {
+							NOT = { check_variable = { current_prio_group = EAI_MILITARY_COMBINED_prio^id_i } } 
+							NOT = { check_variable = { id_i < EAI_MILITARY_COMBINED_id^num } }
+						}
+					}
+					if = { limit = { NOT = { check_variable = { current_prio_group = _failed_objective_prio_ } } }
+						EAI_MAP_get_province_control_pct = yes
+						if = { limit = { check_variable = { our_control_pct_ < _target_control_pct } }
+							set_temp_variable = { target_prio = current_prio_group }
+							for_each_loop = { array = _states_ add_to_temp_array = { _new_objectives_ = v } }
+							if = { limit = { has_country_flag = EAI_combined_operations_logging }
+								for_each_scope_loop = { array = _new_objectives_
+									log = "new obj = [this.getname]"
+								}
+							}
+							set_temp_variable = { break = 1 }
+						}
+					}
+					set_temp_variable = { current_prio_group = EAI_MILITARY_COMBINED_prio^id_i }
+					clear_temp_array = _states_
+				}
+				add_to_temp_array = { _states_ = EAI_MILITARY_COMBINED_id^id_i }
+			}
+			set_temp_variable = { _failed_objective_prio_ = 0 }
+
+		### Regions from this prio group
+
+			clear_temp_array = _new_regions_
+			for_each_loop = { array = EAI_MILITARY_COMBINED_region_id index = id_i value = id_v
+				if = { limit = { check_variable = { EAI_MILITARY_COMBINED_region_prio^id_i = target_prio } }
+					add_to_temp_array = { _new_regions_ = id_v }
+					if = { limit = { has_country_flag = EAI_combined_operations_logging } var:id_v = { log = "new region = [?id_v]" } }
+				}
+			}
+
+		###
+	}
+}
+
+EAI_MILITARY_COMBINED_assign = {
+
+	if = { limit = { check_variable = { _new_objectives_^num > 0 } }
+
+		if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_assign" }
+
+		EAI_MILITARY_assign_strategy = yes
+
+		set_variable = { EAI_MILITARY_COMBINED_current_prio = 0 }
+		clear_array = EAI_MILITARY_COMBINED_objectives
+		clear_array = EAI_MILITARY_COMBINED_regions
+
+		set_variable = { EAI_MILITARY_COMBINED_current_prio = target_prio }
+		for_each_loop = { array = _new_objectives_ add_to_array = { EAI_MILITARY_COMBINED_objectives = v } }
+		for_each_loop = { array = _new_regions_ add_to_array = { EAI_MILITARY_COMBINED_regions = v } }
+
+		set_country_flag = { flag = EAI_MILITARY_COMBINED_min_duration value = 1 days = @EAI_MILITARY_COMBINED_min_duration_days }
+		set_country_flag = { flag = EAI_MILITARY_NAVAL_invasion_force_reselection value = 1 days = @EAI_MILITARY_COMBINED_reselection_days }
+	}
+}
+
+EAI_MILITARY_COMBINED_clear = {
+
+	if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_clear" }
+
+	EAI_MILITARY_clear_this_strategy = yes
+
+	clear_array = EAI_MILITARY_COMBINED_objectives
+	clear_array = EAI_MILITARY_COMBINED_regions
+	clr_country_flag = EAI_MILITARY_COMBINED_min_duration
+	clr_country_flag = EAI_MILITARY_COMBINED_preparation
+	clear_variable = EAI_MILITARY_COMBINED_failed_progress_weeks
+	clear_variable = EAI_MILITARY_COMBINED_prev_total_our_side
+}
+
+EAI_MILITARY_COMBINED_clear_preparation = {
+	clr_country_flag = EAI_MILITARY_COMBINED_preparation
+	set_country_flag = { flag = EAI_MILITARY_COMBINED_min_duration value = 1 days = @EAI_MILITARY_COMBINED_min_duration_days }
+	if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_clear_preparation" }
+}
+
+EAI_MILITARY_COMBINED_set_preparation = {
+	set_country_flag = EAI_MILITARY_COMBINED_preparation
+	if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_COMBINED_set_preparation" }
+}

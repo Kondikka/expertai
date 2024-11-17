@@ -5,6 +5,8 @@
 @PR_light_tank = 850
 @PR_medium_tank = 850
 @PR_heavy_tank = 850
+@PR_light_tank_recon = 900
+@PR_light_flamethrower_support = 900
 @PR_tank_armor = 800
 @PR_tank_engine = 800
 @PR_amphibious = 900
@@ -17,6 +19,8 @@ EAI_PR_STRATEGIES_armor_technologies = {
 	EAI_PR_STRATEGIES_tank_armor = yes
 	EAI_PR_STRATEGIES_tank_engine = yes
 	EAI_PR_STRATEGIES_amphibious = yes
+	EAI_PR_STRATEGIES_light_tank_recon = yes
+	EAI_PR_STRATEGIES_light_flamethrower_support = yes
 }
 
 ###
@@ -25,10 +29,7 @@ EAI_PR_STRATEGIES_light_tank = {
 
 	if = { 
 		limit = { 
-			OR = {
-				EAI_LARM_tech_focus = yes
-				EAI_light_armor_tank_recon_tech_focus = yes
-			}
+			EAI_LARM_tech_focus = yes
 			is_major = yes
 		}
 
@@ -39,10 +40,7 @@ EAI_PR_STRATEGIES_light_tank = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:gwtank_chassis } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1936.6.1
-			OR = {
-				EAI_LARM_tech_focus = yes
-				EAI_light_armor_tank_recon_tech_focus = yes
-			}
+			EAI_LARM_tech_focus = yes
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -50,16 +48,8 @@ EAI_PR_STRATEGIES_light_tank = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:basic_light_tank_chassis } set_temp_variable = { _prio_val = prio_cat }
 
-			OR = {
-				AND = {
-					date > 1936.6.1
-					EAI_LARM_tech_focus = yes
-				}
-				AND = {
-					date > 1938.6.1
-					EAI_light_armor_tank_recon_tech_focus = yes
-				}
-			}
+			date > 1936.6.1
+			EAI_LARM_tech_focus = yes
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -191,6 +181,91 @@ EAI_PR_STRATEGIES_heavy_tank = {
 	}
 }
 
+EAI_PR_STRATEGIES_light_tank_recon = {
+
+	if = { 
+		limit = { 
+			EAI_light_armor_tank_recon_tech_focus = yes
+		}
+
+		set_temp_variable = { prio_cat = @PR_light_tank_recon }
+
+		### gwtank_chassis
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:gwtank_chassis } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1937.6.1
+			EAI_light_armor_tank_recon_tech_focus = yes
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### basic_light_tank_chassis
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:basic_light_tank_chassis } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1938.6.1
+			EAI_light_armor_tank_recon_tech_focus = yes
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+	}
+}
+
+EAI_PR_STRATEGIES_light_flamethrower_support = {
+
+	if = { 
+		limit = { 
+			EAI_light_flamethrower_support_tech_focus = yes
+		}
+
+		set_temp_variable = { prio_cat = @PR_light_flamethrower_support }
+
+		### gwtank_chassis
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:gwtank_chassis } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1937.6.1
+			EAI_light_armor_tank_recon_tech_focus = yes
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### basic_light_tank_chassis
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:basic_light_tank_chassis } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1938.6.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### tech_support
+	
+		if = { limit = { set_temp_variable = { _prio_tech = token:tech_support } set_temp_variable = { _prio_val = prio_cat }
+
+			OR = {
+				date > 1938.1.1
+			}
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### tech_engineers
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:tech_engineers } set_temp_variable = { _prio_val = prio_cat }
+
+			OR = {
+				date > 1938.1.1
+			}
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### tech_engineers2
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:tech_engineers2 } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1939.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+	}
+}
+
 EAI_PR_STRATEGIES_tank_armor = {
 
 	if = { 
@@ -206,6 +281,17 @@ EAI_PR_STRATEGIES_tank_armor = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:armor_tech_1 } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1937.6.1
+			if = {
+				limit = {
+					OR = {
+						has_tech = improved_light_tank_chassis
+						has_tech = basic_medium_tank_chassis
+						has_tech = basic_heavy_tank_chassis
+					}
+				}
+			
+				add_to_temp_variable = { _prio_val = 200 }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
@@ -252,6 +338,17 @@ EAI_PR_STRATEGIES_tank_engine = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:engine_tech_1 } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1937.6.1
+			if = {
+				limit = {
+					OR = {
+						has_tech = improved_light_tank_chassis
+						has_tech = basic_medium_tank_chassis
+						has_tech = basic_heavy_tank_chassis
+					}
+				}
+			
+				add_to_temp_variable = { _prio_val = 200 }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 

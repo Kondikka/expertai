@@ -1,18 +1,46 @@
-# befriend
-# conquer
-# antagonize
-# build_ship
-# build_army
-# unit_ratio
-# build_building
-# research_tech
-# garrison
-# protect
-# influence
-
 #########################################################
 #	Production Strategies
 #########################################################
+
+EAI_SOV_focus_on_infantry_equipment_over_armor = {
+	allowed = { tag = SOV }
+	enable = {
+		check_variable = { deployed_army_manpower_k < 3000 }
+	}
+	abort = {
+		NOT = {
+			AND = {
+				check_variable = { deployed_army_manpower_k < 4000 }
+			}
+		}
+	}
+
+	ai_strategy = { type = build_army id = infantry value = 500 }
+	ai_strategy = { type = equipment_production_factor id = armor value = -10 }
+	ai_strategy = { type = role_ratio id = armor value = -20 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = infantry_equipment value = 10 }
+}
+
+EAI_SOV_focus_on_infantry_equipment_min_production = {
+	allowed = { tag = SOV }
+	enable = {
+		check_variable = { deployed_army_manpower_k < 3000 }
+		num_of_military_factories > 50
+	}
+	abort = {
+		NOT = {
+			AND = {
+				check_variable = { deployed_army_manpower_k < 4000 }
+				num_of_military_factories > 40
+			}
+		}
+	}
+
+	ai_strategy = { type = equipment_production_min_factories_archetype id = artillery_equipment value = 3 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = support_equipment value = 4 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = motorized_equipment value = 2 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = anti_air_equipment value = 2 }
+}
 
 EAI_SOV_air_production = {
 	allowed = { tag = SOV }
@@ -38,6 +66,61 @@ EAI_SOV_reduce_air_production = {
 	ai_strategy = { type = air_factory_balance value = -50 }
 }
 
+EAI_SOV_emergency_increase_air_production_over_armor = {
+	allowed = { tag = SOV }
+	enable = {
+		surrender_progress > 0
+		has_deployed_air_force_size = { size < 1500 type = fighter }
+	}
+	abort = {
+		NOT = {
+			AND = {
+				has_deployed_air_force_size = { size < 3000 type = fighter }
+			}
+		}
+	}
+	
+	ai_strategy = { type = air_factory_balance value = 25 }
+	ai_strategy = { type = equipment_production_factor id = armor value = -10 }
+	ai_strategy = { type = role_ratio id = armor value = -20 }
+}
+
+EAI_SOV_emergency_increase_infantry_production_over_armor = {
+	allowed = { tag = SOV }
+	enable = {
+		surrender_progress > 0
+		OR = {
+			AND = {
+				has_country_flag = EAI_fielded_eq_ratio_artillery_wanted
+				check_variable = { EAI_fielded_eq_ratio_artillery < 0.8 }
+			}
+			AND = {
+				has_country_flag = EAI_fielded_eq_ratio_support_wanted
+				check_variable = { EAI_fielded_eq_ratio_support < 0.8 }
+			}
+		}
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = {
+					AND = {
+						has_country_flag = EAI_fielded_eq_ratio_artillery_wanted
+						check_variable = { EAI_fielded_eq_ratio_artillery < 0.95 }
+					}
+					AND = {
+						has_country_flag = EAI_fielded_eq_ratio_support_wanted
+						check_variable = { EAI_fielded_eq_ratio_support < 0.95 }
+					}
+				}
+			}
+		}
+	}
+	
+	ai_strategy = { type = equipment_production_factor id = armor value = -25 }
+	ai_strategy = { type = role_ratio id = armor value = -20 }
+}
+
 EAI_SOV_focus_on_convoys = {
 	allowed = { tag = SOV }
 	enable = {
@@ -61,6 +144,16 @@ EAI_SOV_naval_bombers = {
 	abort_when_not_enabled = yes
 
 	ai_strategy = { type = unit_ratio id = naval_bomber value = -200 }
+}
+
+EAI_SOV_less_light_tanks = {
+	allowed = { tag = SOV }
+	enable = {
+		NOT = { EAI_light_armor_production = yes }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_variant_production_factor id = light_tank_chassis value = -75 }
 }
 
 # Part of SOV industry build strategy
@@ -153,28 +246,8 @@ EAI_SOV_ignore_fin_2 = {
 	abort_when_not_enabled = yes
 
 	ai_strategy = {
-		type = ignore
-		id = "FIN"			
-		value = 5000
-	}	
-	ai_strategy = {
 		type = ignore_claim
 		id = "FIN"			
-		value = 5000
-	}
-	ai_strategy = {
-		type = antagonize
-		id = "FIN"			
-		value = -5000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "SWE"			
-		value = 5000
-	}
-	ai_strategy = {
-		type = ignore
-		id = "NOR"			
 		value = 5000
 	}
 }
@@ -231,18 +304,18 @@ EAI_SOV_ignore_baltic = {
 	}
 	
 	ai_strategy = {
-		type = ignore
-		id = "LIT"			
+		type = ignore_claim
+		id = LIT			
 		value = 1000
 	}	
 	ai_strategy = {
-		type = ignore
-		id = "LAT"			
+		type = ignore_claim
+		id = LAT			
 		value = 1000
 	}
 	ai_strategy = {
-		type = ignore
-		id = "EST"			
+		type = ignore_claim
+		id = EST			
 		value = 1000
 	}	
 }
@@ -272,28 +345,28 @@ EAI_SOV_stop_early_conquest = {
 	}
 	
  	ai_strategy = {
- 		type = ignore
- 		id = "FIN"			
+ 		type = ignore_claim
+ 		id = FIN			
  		value = 1000
  	}	
  	ai_strategy = {
- 		type = ignore
- 		id = "EST"			
+ 		type = ignore_claim
+ 		id = EST			
  		value = 1000
  	}
  	ai_strategy = {
- 		type = ignore
- 		id = "LAT"			
+ 		type = ignore_claim
+ 		id = LAT			
  		value = 1000
  	}
  	ai_strategy = {
- 		type = ignore
- 		id = "LIT"			
+ 		type = ignore_claim
+ 		id = LIT			
  		value = 1000
  	}
  	ai_strategy = {
- 		type = ignore
- 		id = "ROM"			
+ 		type = ignore_claim
+ 		id = ROM			
  		value = 1000
  	}
 }
@@ -338,21 +411,6 @@ EAI_SIK_avoid_factions = {
 			tag = PRC
 		}
 	}
-	abort_when_not_enabled = yes
-	ai_strategy = { type = alliance id = "SIK" value = -1000 }
-	ai_strategy = { type = diplo_action_acceptance id = SIK target = offer_join_faction value = -1000 }
-	ai_strategy = { type = diplo_action_desire id = SIK target = offer_join_faction value = -1000 }
-}
-EAI_SIK_avoid_factions = {
-	enable = {
-		is_historical_focus_on = yes 
-		is_faction_leader = yes
-		NOT = { 
-			tag = CHI
-			tag = PRC
-		}
-	}
-	reversed = yes
 	abort_when_not_enabled = yes
 	ai_strategy = { type = alliance id = "SIK" value = -1000 }
 	ai_strategy = { type = diplo_action_acceptance id = SIK target = offer_join_faction value = -1000 }
@@ -415,17 +473,7 @@ EAI_SIK_no_access_to_allies = {
 #	Unit Strategies
 #########################################################
 
-EAI_SOV_garrison = {
-	allowed = { tag = SOV }
-	enable = {
-		has_war_with = GER
-	}
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = garrison value = -50 }
-}
-
-EAI_SOV_take_finland = {
+EAI_SOV_winter_war_OFFENSIVE_push = {
 	allowed = { original_tag = SOV }
 	enable = {
 		NOT = {
@@ -443,12 +491,17 @@ EAI_SOV_take_finland = {
 			has_country_flag = EAI_SOV_take_finland
 		}
 		FIN = { is_in_faction = no }
-		check_variable = { EAI_fielded_eq_ratio > 0.8 }
-		EAI_reserve_manpower_more_than_25p = yes
+		EAI_MILITARY_army_readiness_MEDIUM = yes
 	}
 	abort = {
 		NOT = {
 			AND = {
+				NOT = {
+					any_enemy_country = {
+						NOT = { tag = FIN }
+						exists = yes
+					}
+				}
 				OR = {
 					has_war_with = FIN
 					AND = {
@@ -458,8 +511,7 @@ EAI_SOV_take_finland = {
 					has_country_flag = EAI_SOV_take_finland
 				}
 				FIN = { is_in_faction = no }
-				check_variable = { EAI_fielded_eq_ratio > 0.7 }
-				EAI_reserve_manpower_more_than_20p = yes
+				EAI_MILITARY_army_readiness_MEDIUM_abort = yes
 			}
 		}
 	}
@@ -467,21 +519,156 @@ EAI_SOV_take_finland = {
 
 	ai_strategy = {
 		type = front_control
-		country_trigger = {
-			tag = FIN
-		}
 		ordertype = front
+		ratio = 0.5
+		priority = 900
 		execute_order = yes
 		execution_type = rush
+
+		tag = FIN
 	}
 	ai_strategy = {
 		type = front_unit_request
-		tag = FIN
 		value = 100
+		
+		tag = FIN
 	}
 }
 
-EAI_SOV_eastern_garrison = {
+###########################
+# 	Operation Barbarossa
+###########################
+
+## Defense in depth
+
+EAI_SOV_defense_in_depth_217 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_217 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 217 states = { 217 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_219 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_219 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 219 states = { 219 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_137 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_137 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 137 states = { 137 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_241 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_241 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 241 states = { 241 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_808 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_808 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 808 states = { 808 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_810 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_810 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 810 states = { 810 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_193 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_193 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 193 states = { 193 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_196 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_196 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 196 states = { 196 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_200 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_200 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 200 states = { 200 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_208 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_208 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 208 states = { 208 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_209 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_209 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 209 states = { 209 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_210 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_210 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 210 states = { 210 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_265 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_265 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 265 states = { 265 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_238 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_238 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 238 states = { 238 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_220 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_220 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 220 states = { 220 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_221 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_221 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 221 states = { 221 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_218 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_218 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 218 states = { 218 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_263 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_263 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 263 states = { 263 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_242 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_242 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 242 states = { 242 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_224 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_224 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 224 states = { 224 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_260 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_260 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 260 states = { 260 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_217 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_217 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 217 states = { 217 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_220 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_220 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 220 states = { 220 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_242 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_242 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 242 states = { 242 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_137 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_137 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 137 states = { 137 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_221 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_221 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 221 states = { 221 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_202 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_202 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 202 states = { 202 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_195 = { # Leningrad
+	allowed = { tag = SOV } 
+	enable = { 
+		OR = {
+			any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_195 CONTROLLER = { has_war_with = ROOT } } 
+			AND = {
+				has_war_with = GER
+				has_country_flag = { flag = EAI_barbarossa_defensive days < 135 }
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				OR = {
+					has_global_flag = { flag = EAI_GER_blitz_russia_365d days < 135 }
+					GER = { 
+						focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+						NOT = { has_completed_focus = GER_war_with_the_ussr }
+					}
+				}
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				GER = { has_country_flag = EAI_barbarossa_blitz }
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				GER = { is_justifying_wargoal_against = SOV }
+			}
+		}
+	} 
+	abort_when_not_enabled = yes 
+	ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 195 states = { 195 } subtract_invasions_from_need = no subtract_fronts_from_need = no } 
+}
+
+### Prepare
+
+### Deploy
+
+EAI_SOV_barbarossa_DEPLOY = {
+	allowed = { tag = SOV }
+	enable = {
+		GER = {
+			is_major = yes
+			EAI_THIS_is_threat_to_PREV = yes
+		}
+		OR = {
+			AND = {
+				is_historical_focus_on = yes
+				date > 1941.1.1
+				date < 1942.6.1
+			}
+			NOT = { GER = { EAI_PREV_defeated_THIS = yes } }
+		}
+		OR = {
+			has_war_with = GER
+			GER = { has_wargoal_against = SOV }
+			GER = { SOV = { EAI_PREV_imminent_war_against_THIS = yes } }
+		}
+	}
+	abort_when_not_enabled = yes
+
+	### Deploy
+
+	ai_strategy = { type = front_armor_score id = GER value = 50000 }
+
+	ai_strategy = {
+		type = force_concentration_factor
+		value = 10
+	}
+
+	### Avoid
+
+	ai_strategy = { type = garrison value = -50 }
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		ratio = 0.25
+		value = -50
+		
+		country_trigger = {
+			NOT = { tag = GER }
+		}
+	}
+
+	ai_strategy = {
+	    type = front_unit_request
+	    value = -50
+		
+	    country_trigger = {
+			NOT = { is_in_faction_with = GER }
+		}
+	}
+
+	ai_strategy = {
+	    type = invasion_unit_request
+	    value = -2000
+		
+	    country_trigger = { always = yes }
+	}
+}
+
+EAI_SOV_barbarossa_DEPLOY_dumb = {
 	allowed = { tag = SOV }
 	enable = {
 		OR = {
@@ -532,81 +719,31 @@ EAI_SOV_eastern_garrison = {
 	}
 	ai_strategy = {
 		type = front_unit_request
-		tag = MAN
 		value = 450
+		
+		tag = MAN
 	}
 	ai_strategy = {
 		type = front_unit_request
+		value = -60
+		
 		tag = GER
-		value = -60
 	}
 	ai_strategy = {
 		type = front_unit_request
+		value = -60
+		
 		tag = ROM
-		value = -60
 	}
 	ai_strategy = {
 		type = front_unit_request
-		tag = HUN
 		value = -60
+		
+		tag = HUN
 	}
 }
 
-###########################
-# 	Operation Barbarossa
-###########################
-
-## Defense in depth
-
-EAI_SOV_defense_in_depth_217 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_217 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.01 order_id = 187 states = { 217 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_219 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_219 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.01 order_id = 187 states = { 219 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-EAI_SOV_defense_in_depth_195 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_195 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.01 order_id = 187 states = { 195 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_137 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_137 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 137 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_241 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_241 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 241 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_808 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_808 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 808 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_810 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_810 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 810 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_193 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_193 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 193 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_196 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_196 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 196 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_200 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_200 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 200 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_208 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_208 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 208 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_209 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_209 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 209 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_210 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_210 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 210 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_265 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_265 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 265 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_238 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_238 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 238 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_220 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_220 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 220 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_221 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_221 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 221 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_218 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_218 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 218 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_263 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_263 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 263 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_242 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_242 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 242 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_224 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_224 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 224 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-# EAI_SOV_defense_in_depth_260 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_SOV_garrison_strategy_states_260 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 187 states = { 260 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
-
-###
-
-EAI_SOV_dont_naval_invade_FIN = {
-	allowed = { tag = SOV }
-	enable = {
-		OR = {
-			AND = {
-				has_war_with = GER
-				has_country_flag = EAI_barbarossa_defensive
-			}
-			AND = {
-				NOT = { has_war_with = GER }
-				GER = { 
-					focus_progress = { focus = GER_ussr_war_goal progress > 0 } 
-					NOT = { has_completed_focus = GER_ussr_war_goal }
-				}
-			}
-		}
-	}
-
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = invade id = "FIN" value = -15000 } 
-}
-
-EAI_SOV_border_garrison_FIN = {
+EAI_SOV_barbarossa_DEPLOY_FIN = {
 	allowed = { tag = SOV }
 	enable = {
 		FIN = { EAI_THIS_is_threat_to_PREV = yes }
@@ -619,9 +756,12 @@ EAI_SOV_border_garrison_FIN = {
 			}
 			AND = {
 				NOT = { has_war_with = GER }
-				GER = { 
-					focus_progress = { focus = GER_ussr_war_goal progress > 0 } 
-					NOT = { has_completed_focus = GER_ussr_war_goal }
+				OR = {
+					has_global_flag = { flag = EAI_GER_blitz_russia_365d days < 135 }
+					GER = { 
+						focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+						NOT = { has_completed_focus = GER_war_with_the_ussr }
+					}
 				}
 			}
 			AND = {
@@ -639,8 +779,9 @@ EAI_SOV_border_garrison_FIN = {
 
 	ai_strategy = {
 		type = front_unit_request
+		value = 15
+
 		tag = FIN
-		value = -50
 	}
 	ai_strategy = {
 		type = prepare_for_war # Careful, makes the AI stop using air volunteers
@@ -649,8 +790,9 @@ EAI_SOV_border_garrison_FIN = {
 	}
 }
 
-# Send less units here while fighting a major unless FIN is pushing
-EAI_SOV_defensive_FIN_careful = {
+### Defensive
+
+EAI_SOV_barbarossa_DEFENSIVE_FIN = {
 	allowed = { tag = SOV }
 	enable = {
 		has_war_with = FIN
@@ -667,38 +809,45 @@ EAI_SOV_defensive_FIN_careful = {
 
 	abort_when_not_enabled = yes
 
-	# ai_strategy = {
-	# 	type = front_unit_request
-	# 	state_trigger = { 
-	# 		OR = {
-	# 			region = 13
-	# 			region = 265
-	# 			region = 12
-	# 			region = 277
-	# 		}
-	# 	}
-	# 	value = -100
-	# }
-
 	ai_strategy = {
 		type = front_control
-		state_trigger = {
-			OR = {
-				region = 13
-				region = 265
-				region = 12
-				region = 277
-			}
-		}
+		ordertype = front
 		ratio > 0.75
-		priority = 100
+		priority = 500
 		ordertype = front
 		execution_type = careful
+
+		strategic_region = 13
+		strategic_region = 265
+		strategic_region = 12
+		strategic_region = 277
 	}
 }
 
-# be extra careful unless swimming in equipment
-EAI_SOV_defensive_vs_GER_careful = {
+EAI_SOV_barbarossa_DEFENSIVE_dont_naval_invade_FIN = {
+	allowed = { tag = SOV }
+	enable = {
+		OR = {
+			AND = {
+				has_war_with = GER
+				has_country_flag = EAI_barbarossa_defensive
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				GER = { 
+					focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+					NOT = { has_completed_focus = GER_war_with_the_ussr }
+				}
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = invade id = "FIN" value = -3000 } 
+}
+
+EAI_SOV_barbarossa_DEFENSIVE_losing_war = {
 	allowed = { tag = SOV }
 	enable = {
 		has_war_with = GER
@@ -706,10 +855,7 @@ EAI_SOV_defensive_vs_GER_careful = {
 		surrender_progress > 0
 		has_country_flag = EAI_MILITARY_trend_losing_war
 
-		OR = {
-			check_variable = { EAI_fielded_eq_ratio < 0.9 }
-			EAI_reserve_manpower_less_than_20p = yes
-		}
+		EAI_MILITARY_army_shortage_MINOR = yes
 
 		if = { # only when losing badly vs AI ger
 			limit = { 
@@ -720,24 +866,45 @@ EAI_SOV_defensive_vs_GER_careful = {
 			surrender_progress > 0.30
 		}
 	}
+	abort = {
+		NOT = {
+			AND = {
+				has_war_with = GER
+				has_defensive_war = yes
+				surrender_progress > 0
+				has_country_flag = EAI_MILITARY_trend_losing_war
 
-	abort_when_not_enabled = yes
+				EAI_MILITARY_army_shortage_MINOR_abort = yes
+
+				if = { # only when losing badly vs AI ger
+					limit = { 
+						NOT = { any_enemy_country = { is_ai = no is_major = yes } }
+						check_variable = { global.EAI_eastern_front = 0 } # favor ger
+					} 
+
+					surrender_progress > 0.30
+				}
+			}
+		}
+	}
 
 	ai_strategy = {
 		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 500
+		execution_type = careful
+		
 		country_trigger = {
 			OR = {
 				tag = GER
 				is_in_faction_with = GER
 			}
 		}
-		ordertype = front
-		execution_type = careful
 	}
 }
 
-# hold attacks at the start of the defensive war
-EAI_SOV_initial_defensive_vs_GER_careful = {
+EAI_SOV_barbarossa_DEFENSIVE_initial_defense_careful = {
 	allowed = { tag = SOV }
 	enable = {
 		has_country_flag = { flag = EAI_barbarossa_defensive days < 35 }
@@ -749,27 +916,25 @@ EAI_SOV_initial_defensive_vs_GER_careful = {
 				}
 			}
 		}
-
-		OR = {
-			# check_variable = { global.EAI_eastern_front = 1 } # favor ussr
-			any_enemy_country = { is_ai = no is_major = yes }
-		}
+		any_enemy_country = { is_ai = no is_major = yes }
 	}
 
 	abort_when_not_enabled = yes
 
 	ai_strategy = {
 		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 1000
+		execute_order = no
+		
 		country_trigger = {
 			is_in_faction_with = GER
 		}
-		ordertype = front
-		execute_order = no
 	}
 }
 
-# hold attacks at the start of the defensive war
-EAI_SOV_initial_defensive_vs_GER_hold = {
+EAI_SOV_barbarossa_DEFENSIVE_initial_defense_hold = {
 	allowed = { tag = SOV }
 	enable = {
 		OR = {
@@ -779,9 +944,12 @@ EAI_SOV_initial_defensive_vs_GER_hold = {
 			}
 			AND = {
 				NOT = { has_war_with = GER }
-				GER = { 
-					focus_progress = { focus = GER_ussr_war_goal progress > 0 } 
-					NOT = { has_completed_focus = GER_ussr_war_goal }
+				OR = {
+					has_global_flag = { flag = EAI_GER_blitz_russia_365d days < 135 }
+					GER = { 
+						focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+						NOT = { has_completed_focus = GER_war_with_the_ussr }
+					}
 				}
 			}
 			AND = {
@@ -793,11 +961,8 @@ EAI_SOV_initial_defensive_vs_GER_hold = {
 				GER = { is_justifying_wargoal_against = SOV }
 			}
 		}
-		
 		NOT = { GER = { surrender_progress > 0.2 } }
-
 		OR = {
-			# check_variable = { global.EAI_eastern_front = 1 } # favor ussr
 			any_enemy_country = { is_ai = no is_major = yes }
 			NOT = { has_war_with = GER }
 			has_country_flag = { flag = EAI_barbarossa_defensive days < 30 }
@@ -808,237 +973,391 @@ EAI_SOV_initial_defensive_vs_GER_hold = {
 
 	ai_strategy = {
 		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 1100
+		execute_order = no
+		manual_attack = no
+		
 		country_trigger = {
 			is_in_faction_with = GER
 		}
+	}
+}
+
+EAI_SOV_barbarossa_DEFENSIVE_initial_fc = {
+	allowed = { tag = SOV }
+	enable = {
+		OR = {
+			AND = {
+				has_war_with = GER
+				has_country_flag = { flag = EAI_barbarossa_defensive days < 135 }
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				OR = {
+					has_global_flag = { flag = EAI_GER_blitz_russia_365d days < 135 }
+					GER = { 
+						focus_progress = { focus = GER_war_with_the_ussr progress > 0 } 
+						NOT = { has_completed_focus = GER_war_with_the_ussr }
+					}
+				}
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				GER = { has_country_flag = EAI_barbarossa_blitz }
+			}
+			AND = {
+				NOT = { has_war_with = GER }
+				GER = { is_justifying_wargoal_against = SOV }
+			}
+		}
+		NOT = { GER = { surrender_progress > 0.2 } }
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = force_concentration_factor
+		value = -100
+	}
+}
+
+EAI_SOV_barbarossa_DEFENSIVE_major_shortage = {
+	enable = {
+		is_in_faction_with = SOV
+		has_war_with = GER
+		EAI_MILITARY_army_shortage_CRITICAL = yes
+	}
+	abort = {
+		NOT = { 
+			AND = {
+				has_war_with = GER
+				is_in_faction_with = SOV
+				EAI_MILITARY_army_shortage_CRITICAL_abort = yes
+			}
+		}
+	} 	
+
+	ai_strategy = {
+		type = front_control
 		ordertype = front
+		ratio > 0.75
+		priority = 900
+		execution_type = careful
 		execute_order = no
+		
+		country_trigger = { is_in_faction_with = GER }
 	}
 }
 
-### Pause operations
-
-EAI_SOV_offensive_vs_GER_critical_shortage_pause = { # Prio 10
+EAI_SOV_barbarossa_DEFENSIVE_minor_shortage = {
 	enable = {
-		has_war_with = GER
-
 		is_in_faction_with = SOV
-
-		OR = {
-			check_variable = { EAI_fielded_eq_ratio < 0.7 }
-			EAI_reserve_manpower_less_than_5p = yes
-		}
+		has_war_with = GER
+		EAI_MILITARY_army_shortage_MAJOR = yes
 	}
 	abort = {
 		NOT = { 
 			AND = {
 				has_war_with = GER
-
 				is_in_faction_with = SOV
-
-				OR = {
-					check_variable = { EAI_fielded_eq_ratio < 0.8 }
-					EAI_reserve_manpower_less_than_10p = yes
-				}
+				EAI_MILITARY_army_shortage_MAJOR_abort = yes
 			}
 		}
 	} 	
 
 	ai_strategy = {
 		type = front_control
-		priority = 10
-		country_trigger = { is_in_faction_with = GER }
+		ordertype = front
 		ratio > 0.75
+		priority = 600
 		execution_type = careful
-		execute_order = no
+		
+		country_trigger = { is_in_faction_with = GER }
 	}
 }
 
-EAI_SOV_offensive_vs_GER_shortage_limit_offensive = { # Prio 6
+EAI_SOV_barbarossa_DEFENSIVE_operational_pause = {
 	enable = {
-		has_war_with = GER
-
 		is_in_faction_with = SOV
-
-		OR = {
-			check_variable = { EAI_fielded_eq_ratio < 0.8 }
-			EAI_reserve_manpower_less_than_10p = yes
-		}
-	}
-	abort = {
-		NOT = { 
-			AND = {
-				has_war_with = GER
-
-				is_in_faction_with = SOV
-
-				OR = {
-					check_variable = { EAI_fielded_eq_ratio < 0.9 }
-					EAI_reserve_manpower_less_than_15p = yes
-				}
-			}
-		}
-	} 	
-
-	ai_strategy = {
-		type = front_control
-		priority = 6
-		country_trigger = { is_in_faction_with = GER }
-		ratio > 0.75
-		execution_type = careful
-	}
-}
-
-EAI_SOV_offensive_vs_GER_operational_pause = { # Prio 7
-	enable = {
 		has_war_with = GER
-
-		is_in_faction_with = SOV
-
 		has_country_flag = EAI_MILITARY_operational_pause_timer
 	}
 	abort_when_not_enabled = yes	
 
 	ai_strategy = {
 		type = front_control
-		priority = 7
-		country_trigger = { is_in_faction_with = GER }
+		ordertype = front
 		ratio > 0.75
+		priority = 700
 		execution_type = careful
 		execute_order = no
+		
+		country_trigger = { is_in_faction_with = GER }
 	}
 }
 
-EAI_GER_offensive_vs_SOV_operational_pause_resume_push = { # Prio 9
+EAI_SOV_barbarossa_DEFENSIVE_avoid_states = {
+	allowed = { tag = SOV }
 	enable = {
-		has_war_with = GER
+		has_country_flag = EAI_MILITARY_SECTOR_force_reselection
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -200
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_barbarossa_SECTOR_avoid_states = THIS.id }
+		}
+	}
+}
+
+### Offensive
+
+EAI_SOV_barbarossa_OFFENSIVE_operational_resume = {
+	enable = {
 		is_in_faction_with = SOV
+		has_war_with = GER
 		has_country_flag = EAI_operational_initial_resume_timer
 		NOT = { has_country_flag = EAI_MILITARY_operational_pause_timer }
+		EAI_MILITARY_army_readiness_HIGH = yes
+		NOT = { EAI_MILITARY_north_mud_season = yes }
 	}
-	abort_when_not_enabled = yes
+	abort = {
+		NOT = {
+			AND = {
+				is_in_faction_with = SOV
+				has_war_with = GER
+				has_country_flag = EAI_operational_initial_resume_timer
+				NOT = { has_country_flag = EAI_MILITARY_operational_pause_timer }
+				EAI_MILITARY_army_readiness_HIGH_abort = yes
+				NOT = { EAI_MILITARY_north_mud_season = yes }
+			}
+		}
+	}
 
 	ai_strategy = {
 		type = front_control
-		priority = 9
-		country_trigger = { is_in_faction_with = GER }
+		ordertype = front
 		ratio > 0.75
+		priority = 800
 		execution_type = rush_weak
 		execute_order = yes
+		
+		country_trigger = { is_in_faction_with = GER }
 	}
 }
 
-### Seasonal offensives
-
-EAI_SOV_offensive_vs_GER_mud_season = { # Prio 5
+EAI_SOV_barbarossa_OFFENSIVE_sector = {
+	allowed = { tag = SOV }
 	enable = {
-		has_war_with = GER
-
-		is_in_faction_with = SOV
-
-		OR = {
-			check_variable = { global.EAI_calendar_month = 10 }
-			check_variable = { global.EAI_calendar_month = 11 }
-			check_variable = { global.EAI_calendar_month = 4 }
+		NOT = { has_country_flag = { flag = EAI_barbarossa_defensive days < 135 } }
+		has_variable = EAI_MILITARY_SECTOR_id
+	}
+	abort = {
+		NOT = {
+			AND = {
+				NOT = { has_country_flag = { flag = EAI_barbarossa_defensive days < 135 } }
+				has_variable = EAI_MILITARY_SECTOR_id
+			}
 		}
 	}
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		ratio = 0.5
+		value = 50
+		
+		state_trigger = { is_in_array = { FROM.FROM.EAI_MILITARY_SECTOR_target_states = THIS.id } }
+	}
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = 50
+		
+		state_trigger = { is_in_array = { FROM.FROM.EAI_MILITARY_SECTOR_target_objectives = THIS.id } }
+	}
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -99
+		
+		state_trigger = { NOT = { is_in_array = { FROM.FROM.EAI_MILITARY_SECTOR_target_states = THIS.id } } }
+	}
+}
+
+EAI_SOV_barbarossa_OFFENSIVE_sector_NORTH_DEBUG = {
+	allowed = { tag = SOV }
+	enable = {
+		NOT = { has_country_flag = { flag = EAI_barbarossa_defensive days < 135 } }
+		has_variable = EAI_MILITARY_SECTOR_id
+		check_variable = { EAI_MILITARY_SECTOR_id = 0 }
+	}
 	abort_when_not_enabled = yes
+}
+
+EAI_SOV_barbarossa_OFFENSIVE_sector_CENTER_DEBUG = {
+	allowed = { tag = SOV }
+	enable = {
+		NOT = { has_country_flag = { flag = EAI_barbarossa_defensive days < 135 } }
+		has_variable = EAI_MILITARY_SECTOR_id
+		check_variable = { EAI_MILITARY_SECTOR_id = 1 }
+	}
+	abort_when_not_enabled = yes
+}
+
+EAI_SOV_barbarossa_OFFENSIVE_sector_SOUTH_DEBUG = {
+	allowed = { tag = SOV }
+	enable = {
+		NOT = { has_country_flag = { flag = EAI_barbarossa_defensive days < 135 } }
+		has_variable = EAI_MILITARY_SECTOR_id
+		check_variable = { EAI_MILITARY_SECTOR_id = 2 }
+	}
+	abort_when_not_enabled = yes
+}
+
+### Seasonal behavior
+
+EAI_SOV_barbarossa_SEASONAL_mud = {
+	enable = {
+		is_in_faction_with = SOV
+		has_war_with = GER
+		EAI_MILITARY_north_mud_season = yes
+		EAI_MILITARY_army_shortage_MINOR = yes
+	}
+	abort = {
+		NOT = {
+			AND = {
+				is_in_faction_with = SOV
+				has_war_with = GER
+				EAI_MILITARY_north_mud_season = yes
+				EAI_MILITARY_army_shortage_MINOR_abort = yes
+			}
+		}
+	}
 
 	ai_strategy = {
 		type = front_control
-		priority = 5
-		area = EAI_russia_plains
+		ordertype = front
 		ratio > 0.75
+		priority = 500
 		execution_type = careful
+
+		area = EAI_russia_plains
 	}
 }
 
-EAI_SOV_offensive_vs_GER_winter_season = { # Prio 4
+EAI_SOV_barbarossa_SEASONAL_winter = {
 	enable = {
-		has_war_with = GER
-
 		is_in_faction_with = SOV
-
-		OR = {
-			check_variable = { global.EAI_calendar_month = 12 }
-			check_variable = { global.EAI_calendar_month = 1 }
-			check_variable = { global.EAI_calendar_month = 2 }
-			check_variable = { global.EAI_calendar_month = 3 }
-		}
+		has_war_with = GER
+		EAI_MILITARY_north_winter_season = yes
 	}
 	abort_when_not_enabled = yes	
 
 	ai_strategy = {
 		type = front_control
-		priority = 5
+		ordertype = front
 		ratio > 0.75
-		country_trigger = { is_in_faction_with = GER }
+		priority = 500
 		execution_type = balanced
+
+		area = EAI_russia_plains
 	}
 }
 
-EAI_SOV_offensive_vs_GER_summer_season = { # Prio 3
+EAI_SOV_barbarossa_SEASONAL_summer = {
 	enable = {
-		has_war_with = GER
-
 		is_in_faction_with = SOV
-
-		OR = {
-			check_variable = { global.EAI_calendar_month = 5 }
-			check_variable = { global.EAI_calendar_month = 6 }
-			check_variable = { global.EAI_calendar_month = 7 }
-			check_variable = { global.EAI_calendar_month = 8 }
-			check_variable = { global.EAI_calendar_month = 9 }
+		has_war_with = GER
+		EAI_MILITARY_north_summer_season = yes
+		EAI_MILITARY_army_readiness_HIGH = yes
+	}
+	abort = {
+		NOT = {
+			AND = {
+				is_in_faction_with = SOV
+				has_war_with = GER
+				EAI_MILITARY_north_summer_season = yes
+				EAI_MILITARY_army_readiness_HIGH_abort = yes
+			}
 		}
 	}
-	abort_when_not_enabled = yes	
 
 	ai_strategy = {
 		type = front_control
-		priority = 5
+		ordertype = front
 		ratio > 0.75
-		country_trigger = { is_in_faction_with = GER }
+		priority = 500
 		execution_type = rush_weak
+
+		area = EAI_russia_plains
 	}
 }
 
-### Opportunistic offensives
+### Misc
 
-EAI_MILITARY_strategy_SOV_offensive_vs_GER_is_weak = { # Prio 8
-	enable = { has_country_flag = EAI_MILITARY_strategy_SOV_offensive_vs_GER_is_weak }
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = front_control
-		priority = 8
-		country_trigger = { is_in_faction_with = GER }
-		ratio > 0.75
-		execution_type = rush_weak
-		execute_order = yes
-	}
-}
-
-### Assignments
-
-EAI_SOV_offensive_assignments = {
+EAI_SOV_barbarossa_HISTORICAL_careful_limiter = {
 	enable = {
 		has_war_with = GER
-
+		GER = { is_ai = yes }
 		is_in_faction_with = SOV
+		SOV = { check_variable = { EAI_MILITARY_barbarossa_LIMITER = 1 } }
+		check_variable = { global.EAI_eastern_front = 2 }
 	}
 	abort_when_not_enabled = yes	
 
-	ai_strategy = { type = strategic_air_importance id = 38 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 39 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 37 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 130 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 131 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 132 value = 50000 }
-	ai_strategy = { type = strategic_air_importance id = 133 value = 50000 }
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 1200
+		execution_type = careful
+		manual_attack = no
+		
+		tag = GER
+	}
+}
+
+EAI_SOV_barbarossa_HISTORICAL_hold_limiter = {
+	enable = {
+		has_war_with = GER
+		GER = { is_ai = yes }
+		is_in_faction_with = SOV
+		SOV = { check_variable = { EAI_MILITARY_barbarossa_LIMITER = 2 } }
+		check_variable = { global.EAI_eastern_front = 2 }
+	}
+	abort_when_not_enabled = yes	
 
 	ai_strategy = {
-		type = front_armor_score
-		id = "GER"
-		value = 50000
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 1200
+		execution_type = careful
+		manual_attack = no
+		execute_order = no
+		
+		tag = GER
+	}
+	ai_strategy = {
+		type = force_concentration_front_factor
+		ratio = 0.5
+		value = -100
+		
+		state_trigger = {
+			CONTROLLER = { is_in_faction_with = GER }
+			is_in_array = { global.EAI_MAP_barbarossa_theatre = THIS.id }
+		}
+	}
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -100
+		
+		state_trigger = {
+			CONTROLLER = { is_in_faction_with = GER }
+			is_in_array = { global.EAI_MAP_barbarossa_theatre = THIS.id }
+		}
 	}
 }

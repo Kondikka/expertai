@@ -6,17 +6,29 @@
 
 EAI_land_doctrine_progress_limit = {
 
-	surrender_progress < 0.05
-	
 	OR = {
-		EAI_land_doctrine_cost_reduction_advisor_priority = yes
+		AND = {
+			has_war = no
+			set_temp_variable = { _check_xp = 200 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
 
-		EAI_land_doctrine_cost_reduction_spirit_priority = yes
+		AND = {
+			has_war = yes
+			NOT = { surrender_progress > 0.1 }
+			set_temp_variable = { _check_xp = 150 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
 
-		EAI_land_doctrine_armor_design_priority = yes
+		AND = {
+			has_war = yes
+			surrender_progress > 0.1
+			set_temp_variable = { _check_xp = 50 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
+
+		### Strategies
 	}
-
-	set_temp_variable = { _check_xp = 400 } NOT = { EAI_XP_has_army_check_xp = yes }
 }
 
 EAI_land_doctrine_priority = {
@@ -40,154 +52,42 @@ EAI_land_doctrine_mass_assault_priority = {
 	}
 }
 
-EAI_land_doctrine_cost_reduction_advisor_priority = {
-
-	always = no
-
-	set_temp_variable = { _check_xp = 200 } NOT = { EAI_XP_has_army_check_xp = yes }
-
-	OR = {
-
-		###
-
-		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MW_DOCTRINE }
-
-			OR = {
-				has_available_idea_with_traits = { idea = mobile_warfare_expert limit = 1 }
-				has_available_idea_with_traits = { idea = blitzkrieg_theorist limit = 1 }
-				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
-			}
-			NOT = {
-				has_idea_with_trait = mobile_warfare_expert
-				has_idea_with_trait = blitzkrieg_theorist
-				has_idea_with_trait = military_theorist
-			}
-		}
-
-		###
-
-		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_SF_DOCTRINE }
-
-			OR = {
-				has_available_idea_with_traits = { idea = superior_firepower_expert limit = 1 }
-				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
-			}
-			NOT = {
-				has_idea_with_trait = superior_firepower_expert
-				has_idea_with_trait = military_theorist
-			}
-		}
-
-		###
-
-		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_GB_DOCTRINE }
-
-			OR = {
-				has_available_idea_with_traits = { idea = grand_battle_plan_expert limit = 1 }
-				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
-			}
-			NOT = {
-				has_idea_with_trait = grand_battle_plan_expert
-				has_idea_with_trait = military_theorist
-			}
-		}
-
-		###
-
-		AND = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MA_DOCTRINE }
-
-			OR = {
-				has_available_idea_with_traits = { idea = mass_assault_expert limit = 1 }
-				has_available_idea_with_traits = { idea = military_theorist limit = 1 }
-			}
-			NOT = {
-				has_idea_with_trait = mass_assault_expert
-				has_idea_with_trait = military_theorist
-			}
-		}
-	}
-}
-
-EAI_land_doctrine_cost_reduction_spirit_priority = {
-
-	always = no
-
-	NOT = { has_idea = professional_officer_corps_spirit }
-}
-
-EAI_land_doctrine_armor_design_priority = {
-
-	OR = {
-
-		### MARM
-
-		AND = { # Copied from design files
-			EAI_medium_armor_tank_design_focus = yes
-			NOT = { EAI_medium_armor_design_priority = yes }
-			NOT = { has_design_based_on = medium_tank_chassis }
-		}
-
-		AND = {
-			EAI_medium_armor_td_design_focus = yes
-			NOT = { EAI_medium_armor_design_priority = yes EAI_medium_armor_tank_design_priority = yes }
-			NOT = { has_design_based_on = medium_tank_destroyer_chassis }
-		}
-
-		### HARM
-
-		AND = {			
-			EAI_heavy_armor_tank_design_focus = yes
-			NOT = { EAI_heavy_armor_design_priority = yes }
-			NOT = { has_design_based_on = heavy_tank_chassis }
-		}
-
-		AND = {
-			EAI_heavy_armor_td_design_focus = yes
-			NOT = { EAI_heavy_armor_design_priority = yes EAI_heavy_armor_tank_design_priority = yes }
-			NOT = { has_design_based_on = heavy_tank_destroyer_chassis }
-		}
-	}
-}
-
 ### Naval Doctrines
 
 EAI_naval_doctrine_progress_limit = {
-	
-	check_variable = { var = EAI_naval_doctrines_researched value = global.EAI_years_elapsed compare = greater_than_or_equals }
 
-	set_temp_variable = { total_xp = navy_experience }
-	add_to_temp_variable = { total_xp = EAI_XP_stored_navy_xp }
-	check_variable = { total_xp < 200 }
+	OR = {
+		# Reserve 200 xp for designs unless facing an enemy with a big navy
+		AND = {
+			set_temp_variable = { _check_xp = 200 }
+			NOT = { EAI_XP_has_navy_check_xp = yes }
+			if = { limit = { has_war = yes } alliance_naval_strength_ratio > 2 }
+		}
+
+		### Strategies
+	}
 }
 
 ### Air Doctrines
 
 EAI_air_doctrine_progress_limit = {
 
-	set_temp_variable = { total_xp = air_experience }
-	add_to_temp_variable = { total_xp = EAI_XP_stored_air_xp }
-	check_variable = { total_xp < 400 }
-
 	OR = {
-
+		# Reserve 200 xp for designs during peace
 		AND = {
-			set_temp_variable = { temp = global.EAI_years_elapsed }
-			multiply_temp_variable = { temp = 2 }
-			check_variable = { var = EAI_air_doctrines_researched value = temp compare = greater_than_or_equals }
+			has_war = no
+			set_temp_variable = { _check_xp = 200 }
+			NOT = { EAI_XP_has_air_check_xp = yes }
 		}
 
+		# Reserve 200 xp for designs during war
 		AND = {
-			NOT = { EAI_fighter_developed = yes }
+			has_war = yes
+			set_temp_variable = { _check_xp = 100 }
+			NOT = { EAI_XP_has_air_check_xp = yes }
 		}
 
-		AND = { EAI_FTR_aircraft_production = yes NOT = { has_design_based_on = small_plane_airframe } }
-		AND = { EAI_HFTR_aircraft_production = yes NOT = { has_design_based_on = medium_plane_fighter_airframe } }
-		AND = { EAI_CAS_aircraft_production = yes NOT = { has_design_based_on = small_plane_cas_airframe } }
-		AND = { EAI_TAC_aircraft_production = yes NOT = { has_design_based_on = medium_plane_airframe } }
-		AND = { EAI_NAV_aircraft_production = yes NOT = { has_design_based_on = small_plane_naval_bomber_airframe } }
-		AND = { EAI_MAR_aircraft_production = yes NOT = { has_design_based_on = large_plane_maritime_patrol_plane_airframe } }
-		AND = { EAI_STR_aircraft_production = yes NOT = { has_design_based_on = large_plane_airframe } }
-		AND = { EAI_CV_aircraft_production = yes NOT = { has_design_based_on = cv_small_plane_airframe has_design_based_on = cv_small_plane_naval_bomber_airframe } }
+		### Strategies
 	}
 }
 
@@ -217,13 +117,42 @@ EAI_air_doctrine_OI_priority = {
 	}
 }
 
+EAI_specops_doctrine_progress_limit = {
+
+	OR = {
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			set_temp_variable = { _check_xp = 400 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+
+			NOT = {
+				has_tech = modern_blitzkrieg
+				has_tech = werwolf_guerillas
+				has_tech = air_land_battle
+				has_tech = shock_and_awe
+				has_tech = c3i_theory
+				has_tech = infiltration_in_depth
+				has_tech = continuous_offensive
+				has_tech = guerilla_warfare
+			}
+		}
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+			set_temp_variable = { _check_xp = 200 }
+			NOT = { EAI_XP_has_navy_check_xp = yes }
+		}
+	}
+}
+
+###
+
 ### special tech bonus checks
 
 EAI_armor_tech_bonus = {
 	OR = {
 		AND = {
 			original_tag = GER
-			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = GER_army_innovation_2 }
+			OR = { has_opinion_modifier = sov_ger_treaty_trade }
 		}
 		AND = {
 			original_tag = SOV
@@ -254,7 +183,7 @@ EAI_armor_tech_bonus_2 = {
 	OR = {
 		AND = {
 			original_tag = GER
-			has_completed_focus = GER_army_innovation_2
+			has_opinion_modifier = sov_ger_treaty_trade
 		}
 	}
 }
@@ -263,7 +192,7 @@ EAI_GER_SOV_armor_tech_bonus = {
 	OR = {
 		AND = {
 			original_tag = GER
-			OR = { has_opinion_modifier = sov_ger_treaty_trade has_completed_focus = GER_army_innovation_2 }
+			OR = { has_opinion_modifier = sov_ger_treaty_trade }
 		}
 		AND = {
 			original_tag = SOV

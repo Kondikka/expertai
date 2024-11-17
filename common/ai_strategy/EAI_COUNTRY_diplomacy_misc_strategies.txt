@@ -61,11 +61,13 @@ EAI_DIPLO_operation_countenance = {
 	ai_strategy = { type = prepare_for_war id = "PER" value = 200 }
 	ai_strategy = {
 		type = front_control
+		ordertype = front
+		ratio = 0.5
 		priority = 1000
-		tag = PER
-
 		execution_type = rush
 		execute_order = yes
+		
+		tag = PER
 	}
 }
 
@@ -79,13 +81,15 @@ EAI_DIPLO_operation_countenance_PER = {
 
 	ai_strategy = {
 		type = front_unit_request
+		value = -200	
+
 		tag = SOV 				
-		value = -200				
 	}
 	ai_strategy = {
 		type = front_unit_request
+		value = -200	
+					
 		tag = RAJ 				
-		value = -200				
 	}
 }
 
@@ -98,84 +102,6 @@ EAI_DIPLO_PER_dont_join_JAP = {
 
 	ai_strategy = { type = diplo_action_desire id = JAP target = join_faction value = -5000 }
 	ai_strategy = { type = diplo_action_acceptance id = JAP target = offer_join_faction value = -5000 }
-}
-
-### NAP between GER and SOV
-
-EAI_DIPLO_GER_SOV_non_aggression_pact = { 
-	allowed = { tag = GER }
-	enable = {
-		is_historical_focus_on = yes
-
-		date < 1941.1.1
-		
-		GER = { has_government = fascism }
-		SOV = { has_government = communism }
-		
-		GER = { has_completed_focus = GER_mol_rib_pact }
-		
-		NOT = {
-			GER = { has_completed_focus = GER_ussr_war_goal }
-		}
-		
-		NOT = {
-			GER = { has_war_with = SOV }
-			GER = { has_capitulated = yes is_subject = yes }
-			SOV = { has_capitulated = yes is_subject = yes }
-			GER = { is_in_faction_with = SOV }
-		}
-	}
-	
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = diplo_action_desire id = SOV target = non_aggression_pact value = 500 }
-	ai_strategy = { type = diplo_action_acceptance id = SOV target = non_aggression_pact value = 500 }
-}
-EAI_DIPLO_SOV_GER_non_aggression_pact = {
-	allowed = { tag = SOV }
-	enable = {
-		is_historical_focus_on = yes
-
-		date < 1941.1.1
-
-		GER = { has_government = fascism }
-		SOV = { has_government = communism }
-		
-		GER = { has_completed_focus = GER_mol_rib_pact }
-		
-		NOT = {
-			GER = { has_war_with = SOV }
-			GER = { has_capitulated = yes is_subject = yes }
-			SOV = { has_capitulated = yes is_subject = yes }
-			GER = { is_in_faction_with = SOV }
-		}
-
-		if = { limit = { GER = { is_ai = yes } } GER = { NOT = { has_completed_focus = GER_ussr_war_goal } } }
-	}
-	
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = diplo_action_desire id = GER target = non_aggression_pact value = 500 }
-	ai_strategy = { type = diplo_action_acceptance id = GER target = non_aggression_pact value = 500 }
-}
-EAI_DIPLO_break_non_aggression_pact = {
-	allowed = { tag = SOV }
-	enable = {
-		is_historical_focus_on = yes
-
-		GER = { EAI_is_threat = yes }
-
-		GER = { is_ai = yes }
-
-		GER = { has_completed_focus = GER_ussr_war_goal }
-
-		has_non_aggression_pact_with = GER
-	}
-	
-	abort_when_not_enabled = yes
-
-	ai_strategy = { type = diplo_action_desire id = GER target = non_aggression_pact value = -1000 }
-	ai_strategy = { type = diplo_action_acceptance id = GER target = non_aggression_pact value = -1000 }
 }
 
 ### NAP between JAP and comintern
@@ -478,7 +404,6 @@ EAI_DIPLO_ROM_joins_axis_1 = {
 		
 			OR = {
 				ROM = { has_completed_focus = ROM_join_axis }
-				GER = { has_completed_focus = GER_align_romania }
 			}
 		}
 		else = {
@@ -532,7 +457,6 @@ EAI_DIPLO_HUN_joins_axis_1 = {
 		
 			OR = {
 				HUN = { has_completed_focus = HUN_join_axis }
-				GER = { has_completed_focus = GER_align_hungary }
 			}
 		}
 		else = {
@@ -674,4 +598,31 @@ EAI_DIPLO_ROM_ignore_BUL = {
 
 	ai_strategy = { type = ignore_claim id = "BUL" value = 1 }
 	ai_strategy = { type = ignore     	id = "BUL" value = 1000 }
+}
+
+EAI_DIPLO_china_dont_join_comintern = {
+	allowed = { 
+		OR = {
+			original_tag = CHI
+			original_tag = PRC
+			original_tag = GXC
+			original_tag = YUN
+			original_tag = SHX
+			original_tag = XSM
+			# original_tag = SIK
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_desire id = SOV target = join_faction value = -5000 }
+	ai_strategy = { type = diplo_action_acceptance id = SOV target = offer_join_faction value = -5000 }
+
+	ai_strategy = { type = diplo_action_desire id = ENG target = join_faction value = -5000 }
+	ai_strategy = { type = diplo_action_acceptance id = ENG target = offer_join_faction value = -5000 }
+
+	ai_strategy = { type = diplo_action_desire id = USA target = join_faction value = -5000 }
+	ai_strategy = { type = diplo_action_acceptance id = USA target = offer_join_faction value = -5000 }
 }

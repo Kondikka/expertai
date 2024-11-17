@@ -17,7 +17,7 @@ EAI_check_division_limits = {
 			set_temp_variable = { division_production_was_adjusted = 1 }
 		
 			set_country_flag = EAI_infantry_division_limit 
-			if = { limit = { has_country_flag = EAI_division_limit_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: infantry, [?EAI_division_cap]0000" }  
+			if = { limit = { has_country_flag = EAI_division_limit_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | DIVISION LIMIT: infantry, [?EAI_division_cap_10k]0000" }  
 		}
 	}
 	else_if = { limit = { has_country_flag = EAI_infantry_division_limit }
@@ -117,7 +117,7 @@ EAI_calculate_division_cap = {
 
 	### infantry division cap
 
-	set_variable = { EAI_division_cap = 0 }
+	set_variable = { EAI_division_cap_10k = 0 }
 
 	set_temp_variable = { EAI_core_states_slots = 0 }
 	set_temp_variable = { EAI_noncore_states_slots = 0 }
@@ -138,12 +138,12 @@ EAI_calculate_division_cap = {
 	add_to_temp_variable = { EAI_slots_factor = 1 }
 	multiply_temp_variable = { EAI_core_states_slots = EAI_slots_factor }
 
-	add_to_variable = { EAI_division_cap = EAI_core_states_slots }
+	add_to_variable = { EAI_division_cap_10k = EAI_core_states_slots }
 
 	# building slot score from noncores
 	multiply_temp_variable = { EAI_noncore_states_slots = 0.2 }
 
-	add_to_variable = { EAI_division_cap = EAI_noncore_states_slots }
+	add_to_variable = { EAI_division_cap_10k = EAI_noncore_states_slots }
 
 	### armor division cap
 
@@ -163,7 +163,7 @@ EAI_calculate_division_cap = {
 	
 	### limits
 
-	clamp_variable = { var = EAI_division_cap min = 20 max = 600 } # 1 = 10 battalions
+	clamp_variable = { var = EAI_division_cap_10k min = 20 max = 600 } # 1 = 10 battalions
 	clamp_variable = { var = EAI_armor_division_cap min = 15 max = 1000 } # 1 = 1 battalions
 
 	# special adjustments
@@ -191,7 +191,24 @@ EAI_special_infantry_division_limits = {
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 90 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 90 }
+	}
+
+	else_if = { # GER: needs to be able to do Anschluss on time
+		limit = { 
+			original_tag = AUS
+
+			threat < 0.75
+			has_war = no
+		}
+
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 4 }
+
+		# To be safe
+		if = { limit = { GER = { is_ai = yes } is_historical_focus_on = yes } 
+
+			clamp_variable = { var = EAI_division_cap_10k min = 0 max = 3 } 
+		}
 	}
 
 	else_if = { # low countries: limit ai
@@ -213,7 +230,7 @@ EAI_special_infantry_division_limits = {
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		set_variable = { EAI_division_cap = 0 }
+		# set_variable = { EAI_division_cap_10k = 0 }
 	}
 
 	else_if = { # norway: limit ai
@@ -229,7 +246,7 @@ EAI_special_infantry_division_limits = {
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		set_variable = { EAI_division_cap = 0 }
+		set_variable = { EAI_division_cap_10k = 0 }
 	}
 
 	else_if = { # poland: limit ai
@@ -246,7 +263,7 @@ EAI_special_infantry_division_limits = {
 			date < 1941.1.1
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 30 }
+		# clamp_variable = { var = EAI_division_cap_10k min = 0 max = 30 }
 	}
 
 	else_if = { # greece: limit ai
@@ -264,124 +281,84 @@ EAI_special_infantry_division_limits = {
 			date < 1942.1.1
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 10 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 10 }
 	}
 
 	#############################################
 	#	japan/pacific
 	#############################################
 
-	else_if = { # china: limit ai
+	else_if = { # China: limit AI army size of entire faction
 		limit = { 
-			original_tag = CHI
-
-			JAP = { is_ai = yes }
-
 			is_historical_focus_on = yes
-
-			OR = {
-				check_variable = { global.EAI_sino_japanese_war = 0 } # favor japan
-				
-				AND = {
-					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-					CHI = { surrender_progress < 0.5 }
+			is_literally_china = yes
+			if = { limit = { CHI = { has_war = yes } }
+				OR = {
+					has_war_together_with = CHI
+					tag = CHI
 				}
 			}
-
-			NOT = { EAI_DIFFICULTY_has_difficulty_bonus = yes }
-			NOT = { EAI_player_intervening = yes }
-		}
-
-		if = {
-			limit = { 
-				NOT = { has_dlc = "Waking the Tiger" }
-			}
-
-			clamp_variable = { var = EAI_division_cap min = 0 max = 25 }
-		}
-		else_if = { 
-			limit = {
-				has_dlc = "Waking the Tiger"
-				date < 1943.1.1
-				surrender_progress < 0.7
-				is_subject = no
-			}
-
-			clamp_variable = { var = EAI_division_cap min = 0 max = 50 }
-		}
-
-		if = {
-			limit = {
-				check_variable = { global.EAI_sino_japanese_war = 0 } # favor japan
-			}
-		
-			clamp_variable = { var = EAI_division_cap min = 0 max = 25 }
-		}
-	}
-
-	else_if = { # warlords: limit ai
-		limit = { 
-			OR = { 
-				original_tag = XSM 
-				original_tag = PRC 
-				original_tag = YUN 
-				original_tag = GXC 
-				original_tag = SHX 
-			}
-
 			JAP = { is_ai = yes }
-
-			OR = {
-				check_variable = { global.EAI_sino_japanese_war = 0 } # favor japan
-
-				AND = {
-					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-					CHI = { surrender_progress < 0.5 }
-				}
-			}
-
 			NOT = { EAI_DIFFICULTY_has_difficulty_bonus = yes }
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		if = { 
-			limit = { 
-				NOT = { has_dlc = "Waking the Tiger" }
+		# Favor Japan
+		if = { limit = { check_variable = { global.EAI_sino_japanese_war = 0 } } 
+		
+			if = { limit = { check_variable = { global.EAI_MILITARY_china_war_LIMITER_total_army_size_k > 400 } }
+			
+				clamp_variable = { var = EAI_division_cap_10k min = 0 max = 1 }
 			}
-
-			set_variable = { EAI_division_cap = 0 }
+			else = {
+			
+				clamp_variable = { var = EAI_division_cap_10k min = 100 max = 500 }
+			}
 		}
-		else_if = { 
-			limit = {
-				has_dlc = "Waking the Tiger"
-			}
 
-			set_variable = { EAI_division_cap = 3 }
+		# Favor China
+		else_if = { limit = { check_variable = { global.EAI_sino_japanese_war = 1 } } 
+		
+			clamp_variable = { var = EAI_division_cap_10k min = 100 max = 500 }
+		}
+
+		# Stalemate
+		else_if = { limit = { check_variable = { global.EAI_sino_japanese_war = 2 } } 
+		
+			if = { 
+				limit = { 
+					check_variable = { global.EAI_MILITARY_china_war_LIMITER_total_army_size_k > global.EAI_MILITARY_china_war_LIMITER_total_army_size_limit_k } 
+					date < 1944.1.1
+					NOT = {
+						any_enemy_country = {
+							is_major = yes
+							NOT = { tag = JAP }
+						}
+					}
+				}
+			
+				clamp_variable = { var = EAI_division_cap_10k min = 0 max = 1 }
+			}
+			else = {
+			
+				clamp_variable = { var = EAI_division_cap_10k min = 100 max = 500 }
+			}
 		}
 	}
 
-	else_if = { # china: more divisions
+	else_if = { # China: more divisions against player JAP
 		limit = {
+			is_historical_focus_on = yes
 			original_tag = CHI
-
 			is_subject = no
-
 			OR = {
 				JAP = { is_ai = no }
-
-				check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
-
-				AND = {
-					check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-					CHI = { surrender_progress > 0.5 }
-				}
-
 				EAI_DIFFICULTY_has_difficulty_bonus = yes
 				EAI_player_intervening = yes
 			}
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 100 max = 500 }
+		clamp_variable = { var = EAI_division_cap_10k min = 100 max = 500 }
 	}
 
 	else_if = { # pacific: limit ai 
@@ -398,7 +375,7 @@ EAI_special_infantry_division_limits = {
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 2 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 2 }
 	}
 
 	#############################################
@@ -421,7 +398,7 @@ EAI_special_infantry_division_limits = {
 			has_government = neutrality
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 7 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 7 }
 	}
 
 	else_if = { # iraq: limit ai
@@ -438,7 +415,7 @@ EAI_special_infantry_division_limits = {
 			has_government = neutrality
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 1 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 1 }
 	}
 
 	#############################################
@@ -452,7 +429,7 @@ EAI_special_infantry_division_limits = {
 			num_of_military_factories < 350
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 200 max = 400 }
+		clamp_variable = { var = EAI_division_cap_10k min = 200 max = 400 }
 	}
 
 	else_if = { # RAJ has limited MP
@@ -462,7 +439,7 @@ EAI_special_infantry_division_limits = {
 			NOT = { is_subject = no has_tech = volkssturm has_tech = human_wave_offensive }
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 60 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 60 }
 	}
 
 	else_if = { # limit USA to a more historical army size
@@ -492,7 +469,7 @@ EAI_special_infantry_division_limits = {
 			}
 		}
 
-		clamp_variable = { var = EAI_division_cap min = 0 max = 80 }
+		clamp_variable = { var = EAI_division_cap_10k min = 0 max = 80 }
 	}
 
 	#############################################
@@ -513,6 +490,6 @@ EAI_special_infantry_division_limits = {
 			NOT = { EAI_player_intervening = yes }
 		}
 
-		set_variable = { EAI_division_cap = 0 }
+		set_variable = { EAI_division_cap_10k = 0 }
 	}
 }

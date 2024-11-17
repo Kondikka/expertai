@@ -1,0 +1,121 @@
+############################################################################################################
+#	Expert AI mod - triggers
+############################################################################################################
+
+EAI_MILITARY_historical_date_TRIGGER = { # var:_index var:_shift_days
+	set_temp_variable = { operation_start_day = EAI_MILITARY_INVASION_operation_start_days^_index }
+	subtract_from_temp_variable = { operation_start_day = _shift_days }
+	check_variable = { global.EAI_days_elapsed > operation_start_day }
+}
+
+EAI_MILITARY_enemy_presence_TRIGGER = { # arr:_states_ var:_leader_id var:_target_control_pct
+	set_temp_variable = { our_states = 0 }
+	set_temp_variable = { their_states = 0 }
+	all_of_scopes = { array = _states_
+		if = { 
+			limit = { 
+				OR = {
+					CONTROLLER = { is_in_faction_with = var:_leader_id } 
+					CONTROLLER = { is_subject_of = var:_leader_id } 
+				}
+			}
+			add_to_temp_variable = { our_states = 1 }
+		}
+		if = { limit = { CONTROLLER = { has_war_with = var:_leader_id } }
+			add_to_temp_variable = { their_states = 1 } 
+			CONTROLLER = { add_to_temp_array = { target_countries = THIS.id } }
+		}
+	}
+	set_temp_variable = { total_states = our_states }
+	add_to_temp_variable = { total_states = their_states }
+	check_variable = { total_states > 0 }
+	divide_temp_variable = { our_states = total_states }
+	check_variable = { our_states < _target_control_pct }
+}
+
+EAI_MILITARY_strength_TRIGGER = { # arr:_states_ var:_leader_id 
+	clear_temp_array = target_countries
+	all_of_scopes = { array = _states_
+		if = { limit = { CONTROLLER = { has_war_with = var:_leader_id } }
+			CONTROLLER = { add_to_temp_array = { target_countries = THIS.id } }
+		}
+	}
+
+	# Economy
+
+	# Army
+
+	# Air
+
+	# Naval
+	any_of_scopes = { array = target_countries
+		enemies_naval_strength_ratio > 2
+	}
+}
+
+EAI_MILITARY_not_losing_TRIGGER = {
+	NOT = { surrender_progress > 0.1 }
+	NOT = {
+		AND = {
+			has_country_flag = EAI_MILITARY_trend_losing_war
+			check_variable = { EAI_MILITARY_trend_value > 0.05 }
+		}
+	}
+}
+
+EAI_MILITARY_home_threatened_TRIGGER = {
+	any_home_area_neighbor_country = {
+		has_war_with = ROOT
+	}
+}
+
+EAI_MILITARY_time_FACTOR = { # var:_index var:_shift_days
+	set_temp_variable = { start = EAI_MILITARY_INVASION_operation_start_days^_index }
+	subtract_from_temp_variable = { start = _shift_days }
+	set_temp_variable = { _val_ = global.EAI_days_elapsed }
+	subtract_from_temp_variable = { _val_ = start }
+	set_temp_variable = { _min = 0 }
+	set_temp_variable = { _max = _shift_days }
+	EAI_MATH_TRIGGER_normalize = yes
+	set_temp_variable = { time_factor_ = _val_ }
+}
+
+EAI_MILITARY_country_losing_FACTOR = { # var:_country_id arr:_states_ var:_leader_id
+	any_of_scopes = { array = _states_
+		CONTROLLER = { has_war_with = var:_country_id }
+	}
+	NOT = { var:_country_id = { has_war_with = var:_leader_id } }
+	var:_country_id = { set_temp_variable = { _val_ = surrender_progress } }
+	EAI_MATH_TRIGGER_square = yes
+	set_temp_variable = { _scale = 3 }
+	EAI_MATH_TRIGGER_scale = yes
+	add_to_temp_variable = { _val_ = 1 }
+	set_temp_variable = { country_losing_factor_ = _val_ }
+}
+
+EAI_MILITARY_north_mud_season = {
+	OR = {
+		check_variable = { global.EAI_calendar_month = 10 }
+		check_variable = { global.EAI_calendar_month = 11 }
+		check_variable = { global.EAI_calendar_month = 4 }
+	}
+}
+
+EAI_MILITARY_north_winter_season = {
+	OR = {
+		check_variable = { global.EAI_calendar_month = 12 }
+		check_variable = { global.EAI_calendar_month = 1 }
+		check_variable = { global.EAI_calendar_month = 2 }
+		check_variable = { global.EAI_calendar_month = 3 }
+	}
+}
+
+EAI_MILITARY_north_summer_season = {
+	OR = {
+		check_variable = { global.EAI_calendar_month = 5 }
+		check_variable = { global.EAI_calendar_month = 6 }
+		check_variable = { global.EAI_calendar_month = 7 }
+		check_variable = { global.EAI_calendar_month = 8 }
+		check_variable = { global.EAI_calendar_month = 9 }
+	}
+}

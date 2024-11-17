@@ -61,61 +61,6 @@ EAI_CHI_no_coastal_garrison = {
 	ai_strategy = { type = garrison value = -2000 }
 }
 
-# EAI_CHI_garrison_coast = {
-# 	allowed = { 
-# 		OR = {
-# 			tag = CHI
-# 			tag = XSM 
-# 			tag = PRC 
-# 			tag = YUN 
-# 			tag = GXC 
-# 			tag = SHX 
-# 		}
-# 	}
-# 	enable = {
-# 		OR = {
-# 			JAP = { is_ai = no }
-			
-# 			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
-			
-# 			AND = {
-# 				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-# 				CHI = { surrender_progress > 0.5 }
-# 			}
-# 		}
-
-# 		surrender_progress < 0.4
-
-# 		any_owned_state = { is_coastal = yes }
-
-# 		if = { limit = { NOT = { tag = CHI } }
-
-# 			NOT = { surrender_progress > 0 }
-# 		}
-# 	}
-
-# 	abort_when_not_enabled = yes
-
-# 	ai_strategy = {
-# 		type = put_unit_buffers
-# 		ratio = 0.35
-# 		states = { 
-# 			597
-# 			598
-# 			613
-# 			596
-# 			595
-# 			593
-# 			592
-# 			591
-# 			594
-# 			743
-# 		}
-# 		subtract_invasions_from_need = no
-# 		subtract_fronts_from_need = no
-# 	}
-# }
-
 ###########################
 # 	Japanese invasion
 ###########################
@@ -139,6 +84,7 @@ EAI_CHI_ignore_warlords = {
 
 	ai_strategy = {
 		type = front_unit_request
+		value = -200
 
 		country_trigger = {
 			is_ai = yes
@@ -152,8 +98,6 @@ EAI_CHI_ignore_warlords = {
 				tag = SHX 
 			}
 		}
-
-		value = -200
 	}
 }
 
@@ -178,18 +122,81 @@ EAI_CHI_ignore_other_countries = {
 
 	ai_strategy = {
 		type = front_unit_request
+		value = -200
 
 		country_trigger = {
 			is_ai = yes
 
 			NOT = { has_war_with = FROM }
 		}
-
-		value = -200
 	}
 }
 
-EAI_CHI_defensive_vs_JAP_careful_north = {
+### Misc
+
+EAI_CHI_china_MISC_dont_rush_indochina = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		has_global_flag = EAI_JAP_transferred_indochina_60d
+		JAP = { is_ai = yes }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 800
+		ordertype = front
+		execute_order = no
+		manual_attack = no
+
+		strategic_region = 142
+	}
+}
+
+### Prepare
+
+EAI_CHI_china_PREPARE_JAP = {
+	allowed = { original_tag = CHI }
+	enable = {
+		original_tag = CHI
+		
+		date < 1939.1.1
+		
+		has_war = no
+		
+		OR = {
+			JAP = { is_justifying_wargoal_against = CHI }
+			JAP = { has_wargoal_against = CHI }
+			JAP = { focus_progress = { focus = JAP_intervene_in_china progress > 0 }  }
+		}
+	}
+	abort = {
+		OR = {
+			has_war = yes
+			
+			NOT = { date < 1939.1.1 }
+		}
+	}
+	
+	ai_strategy = { type = prepare_for_war id = "JAP" value = 200 }
+	ai_strategy = { type = prepare_for_war id = "MEN" value = 200 }
+	ai_strategy = { type = prepare_for_war id = "MAN" value = 200 }
+}
+
+### Defensive
+
+EAI_CHI_china_DEFENSIVE_dont_push_north = {
 	allowed = {
 		OR = {
 			tag = CHI
@@ -219,17 +226,42 @@ EAI_CHI_defensive_vs_JAP_careful_north = {
 		}
 		NOT = { JAP = { has_country_flag = EAI_MILITARY_trend_losing_war } }
 		
-		OR = {
-			check_variable = { EAI_fielded_eq_ratio < 0.95 }
-			EAI_reserve_manpower_less_than_25p = yes
+		EAI_MILITARY_army_shortage_MINOR = yes
+	}
+	abort = {
+		NOT = {
+			AND = {
+				has_war_with = JAP
+
+				OR = {
+					JAP = { is_ai = no }
+					check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+					AND = {
+						check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+						CHI = { surrender_progress > 0.5 }
+					}
+				}
+
+				has_defensive_war = yes
+				OR = {
+					has_country_flag = EAI_MILITARY_trend_losing_war
+					has_country_flag = EAI_japanese_war_defense
+				}
+				NOT = { JAP = { has_country_flag = EAI_MILITARY_trend_losing_war } }
+				
+				EAI_MILITARY_army_shortage_MINOR_abort = yes
+			}
 		}
 	}
 
-	abort_when_not_enabled = yes
-
 	ai_strategy = {
 		type = front_control
-		priority = 6
+		ordertype = front
+		ratio = 0.5
+		priority = 800
+		ordertype = front
+		execute_order = no
+
 		state_trigger = {
 			NOT = { is_coastal = yes }
 			CONTROLLER = {
@@ -239,12 +271,10 @@ EAI_CHI_defensive_vs_JAP_careful_north = {
 				}
 			}
 		}
-		ordertype = front
-		execute_order = no
 	}
 }
 
-EAI_CHI_defensive_vs_JAP_coastal = {
+EAI_CHI_china_DEFENSIVE_initial_defense = {
 	allowed = {
 		OR = {
 			tag = CHI
@@ -256,49 +286,7 @@ EAI_CHI_defensive_vs_JAP_coastal = {
 		}
 	}
 	enable = {
-		has_war = yes
-
-		OR = {
-			JAP = { is_ai = no }
-			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
-			AND = {
-				check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
-				CHI = { surrender_progress > 0.5 }
-			}
-		}
-
-		check_variable = { EAI_fielded_eq_ratio > 0.8 }
-		EAI_reserve_manpower_more_than_25p = yes
-	}
-
-	abort_when_not_enabled = yes
-
-	ai_strategy = {
-		type = front_control
-		priority = 4
-		state_trigger = {
-			is_coastal = yes
-		}
-		ratio = 0.75
-		ordertype = front
-		execution_type = rush
-		execute_order = yes
-	}
-}
-
-EAI_CHI_defensive_vs_JAP_initial_defense = {
-	allowed = {
-		OR = {
-			tag = CHI
-			tag = XSM 
-			tag = PRC 
-			tag = YUN 
-			tag = GXC 
-			tag = SHX 
-		}
-	}
-	enable = {
-		has_country_flag = EAI_japanese_war_defense
+		has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
 		
 		OR = {
 			JAP = { is_ai = no }
@@ -317,6 +305,11 @@ EAI_CHI_defensive_vs_JAP_initial_defense = {
 
 	ai_strategy = {
 		type = front_control
+		ordertype = front
+		ratio = 0.1
+		priority = 900
+		execute_order = no
+		
 		state_trigger = {
 			NOT = { is_coastal = yes }
 			CONTROLLER = {
@@ -326,39 +319,189 @@ EAI_CHI_defensive_vs_JAP_initial_defense = {
 				}
 			}
 		}
-		ordertype = front
-		execute_order = no
 	}
 }
 
-EAI_CHI_defend_against_JAP = {
-	allowed = { original_tag = CHI }
+### Offensive
+
+EAI_CHI_china_OFFENSIVE_operational_resume = {
 	enable = {
-		original_tag = CHI
-		
-		date < 1939.1.1
-		
-		has_war = no
-		
-		OR = {
-			JAP = { is_justifying_wargoal_against = CHI }
-			JAP = { has_wargoal_against = CHI }
-			JAP = { focus_progress = { focus = JAP_intervene_in_china progress > 0 }  }
-		}
+		is_in_faction_with = CHI
+		has_war_with = JAP
+		has_country_flag = EAI_operational_initial_resume_timer
+		NOT = { has_country_flag = EAI_MILITARY_operational_pause_timer }
+		EAI_MILITARY_army_readiness_HIGH = yes
 	}
 	abort = {
-		OR = {
-			has_war = yes
-			
-			NOT = { date < 1939.1.1 }
+		NOT = {
+			AND = {
+				is_in_faction_with = CHI
+		has_war_with = JAP
+				has_country_flag = EAI_operational_initial_resume_timer
+				NOT = { has_country_flag = EAI_MILITARY_operational_pause_timer }
+				EAI_MILITARY_army_readiness_HIGH_abort = yes
+			}
 		}
 	}
-	
-	ai_strategy = { type = prepare_for_war id = "JAP" value = 200 }
-	ai_strategy = { type = prepare_for_war id = "MEN" value = 200 }
-	ai_strategy = { type = prepare_for_war id = "MAN" value = 200 }
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.75
+		priority = 800
+		execution_type = rush_weak
+		execute_order = yes
+		
+		country_trigger = { 
+			OR = { 
+				tag = CHI 
+				has_war_together_with = CHI 
+			} 
+		}
+	}
 }
 
-###########################
-###########################
-###########################
+EAI_CHI_china_OFFENSIVE_protect_coast = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		has_war_with = JAP
+		EAI_MILITARY_army_readiness_MEDIUM = yes
+	}
+	abort = {
+		NOT = {
+			AND = {
+				has_war_with = JAP
+				EAI_MILITARY_army_readiness_MEDIUM_abort = yes
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		ratio = 0.5
+		value = 50
+		
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = 50
+		
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 900
+		execution_type = rush_weak
+
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+}
+
+### EAI settings
+
+EAI_CHI_china_DEFENSIVE_stalemate = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+		check_variable = { global.EAI_sino_japanese_war = 2 } # stalemate
+		has_war_with = JAP
+		JAP = { is_ai = yes }
+		
+		### Conditions
+
+		date < 1946.1.1
+		if = { limit = { NOT = { has_global_flag = EAI_JAP_blitz_pacific_1000d } }
+			alliance_strength_ratio < 3
+		}
+		NOT = { JAP = { surrender_progress > 0.1 } }
+		CHI = { surrender_progress < 0.5 }
+		NOT = { 
+			any_enemy_country = { 
+				NOT = { tag = JAP } 
+				is_neighbor_of = ROOT
+				is_major = yes 
+			} 
+		}
+		NOT = { has_country_flag = EAI_operational_initial_resume_timer }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 1000
+		execution_type = careful
+		
+		tag = JAP
+		tag = MAN
+		tag = MEN
+	}
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		ratio = 0.5
+		value = -100
+		
+		tag = JAP
+		tag = MAN
+		tag = MEN
+	}
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -100
+		
+		tag = JAP
+		tag = MAN
+		tag = MEN
+	}
+}

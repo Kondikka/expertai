@@ -424,10 +424,7 @@
 		cost = 10
 		
 		historical_ai = { #EAI
-			OR = {
-				date > 1940.10.1
-				NOT = { GER = { FRA = { EAI_THIS_is_threat_to_PREV = yes } } }
-			}
+			date > 1940.9.23
 
 			GER = {
 				NOT = {
@@ -1663,6 +1660,7 @@
 			is_subject = no
 			BUL = {
 				exists = yes
+				is_subject = no
 				NOT = { has_war_with = ROM }
 			}
 			strength_ratio = { tag = BUL ratio > 1.5 }
@@ -1672,7 +1670,7 @@
 		bypass = {
 			BUL = {
 				OR = {
-					is_puppet_of = ROM
+					is_subject = yes
 					exists = no 
 					AND = {
 						has_war_with = ROM
@@ -1692,7 +1690,12 @@
 		available_if_capitulated = no
 
 		completion_reward = {
-			BUL = { country_event = DOD_romania.40 }
+			BUL = { 
+				country_event = {
+					id = DOD_romania.40
+					hours = 12
+				}	
+			}
 		}
 	}
 
@@ -1739,7 +1742,12 @@
 		available_if_capitulated = no
 
 		completion_reward = {
-			HUN = { country_event = DOD_romania.50 }
+			HUN = { 
+				country_event = {
+					id = DOD_romania.50
+					hours = 4
+				}	
+			}
 		}
 	}
 
@@ -1852,6 +1860,33 @@
 			else = {
 				unlock_decision_category_tooltip = ROM_dividing_yugo
 				set_country_flag = invited_to_split_yugo
+			}
+
+			hidden_effect = {
+				IF = {
+					limit = {
+						YUG = {
+							capital_scope = {
+								NOT = {
+									is_in_array = {
+										array = AUS.expansion_targets
+										value = THIS
+									}
+								}
+							} 
+						}
+					}
+					YUG = {
+						capital_scope = {
+							remove_from_array = {
+								array = AUS.expansion_targets
+								value = THIS
+							}
+							log = "[THIS.GetName] was removed from the array"
+						}
+					}
+					
+				}
 			}
 		}
 	}
@@ -2055,6 +2090,8 @@
 						owns_state = 155
 						owns_state = 154
 						owns_state = 43
+						owns_state = 973
+						owns_state = 974
 					}
 				}
 			}
@@ -2264,7 +2301,7 @@
 						expire = "1965.1.1"
 						ideology = fascism_ideology
 						traits = {
-							prince_of_terror
+							ROM_conductor
 						}
 					}
 					promote_leader = yes
@@ -2678,6 +2715,13 @@
 				relation = guarantee
 				active = no
 			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			764 = {
+				add_claim_by = ROOT
+			}
+
 		}
 	}
 
@@ -3836,12 +3880,19 @@
 		available_if_capitulated = no
 		search_filters = { FOCUS_FILTER_RESEARCH }
 		completion_reward = {
+
+			add_breakthrough_progress = {
+				specialization = specialization_nuclear
+				value = 0.75
+			}
+
 			add_tech_bonus = {
 				name = ROM_nuclear_bomb_project
 				bonus = 1.0
 				uses = 1
 				category = nuclear
 			}
+
 		}
 	}
 
@@ -4586,7 +4637,7 @@
 		completion_reward = {
 			navy_experience = 25
 			random_owned_controlled_state = {
-				prioritize = { 46 }
+				prioritize = { 971 }
 				limit = {
 					ROOT = { has_full_control_of_state = PREV }
 					free_building_slots = {

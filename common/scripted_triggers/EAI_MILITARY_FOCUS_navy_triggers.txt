@@ -579,38 +579,125 @@ EAI_mine_sweeper_tech_focus = {
 	check_variable = { EAI_num_surface_ships > 50 }
 }
 
-EAI_NAVAL_DOCTRINE_submarine_priority = {
+EAI_NAVAL_DOCTRINE_screen_priority = {
+
+	NOT = { 
+		AND = {
+			check_variable = { EAI_FOCUS/NAVY/destroyer = global.EAI_OFF } 
+			check_variable = { EAI_FOCUS/NAVY/light_cruiser = global.EAI_OFF } 
+		}
+	}
+
+	if = { limit = { has_tech = fleet_in_being } NOT = { has_tech = integrated_convoy_defence } }
+	if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = convoy_sailing_ti } }
+	if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = raider_patrols } }
+	if = { limit = { has_tech = base_strike } NOT = { has_tech = integrated_convoy_defence_bs } }
+
+	### Strategies
 
 	if = {
 		limit = {
-			
-			### Strategies
-
-			OR = {
-				AND = {
-					tag = GER
-
-					check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE }
-					NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
-				}
-
-				AND = {
-					check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF }
-					check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF }
-					check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF }
-					check_variable = { EAI_FOCUS/NAVY/heavy_cruiser = global.EAI_OFF }
-
-					NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
-				}
+			AND = {
+				tag = GER
+				check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE }
+				NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
 			}
 		}
 	
-		if = { limit = { has_tech = fleet_in_being } NOT = { has_tech = submarine_offensive } }
-		if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = combined_operations_raiding } }
-		if = { limit = { has_tech = base_strike } NOT = { has_tech = submarine_offensive_bs } }
+		NOT = { EAI_NAVAL_DOCTRINE_submarine_priority = yes }
 	}
+	else = {
 	
-	else = { always = no }
+		
+	}
+}
+
+EAI_NAVAL_DOCTRINE_submarine_priority = {
+
+	NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
+
+	if = { limit = { has_tech = fleet_in_being } NOT = { has_tech = submarine_offensive } }
+	if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = combined_operations_raiding } }
+	if = { limit = { has_tech = base_strike } NOT = { has_tech = submarine_offensive_bs } }
+
+	### Strategies
+	
+	if = {
+		limit = {
+			AND = {
+				tag = GER
+				check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE }
+				NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
+			}
+		}
+
+		
+	}
+	else = {
+	
+		NOT = { EAI_NAVAL_DOCTRINE_screen_priority = yes }
+		NOT = { EAI_NAVAL_DOCTRINE_capital_priority = yes }
+		NOT = { EAI_NAVAL_DOCTRINE_carrier_priority = yes }
+	}
+}
+
+EAI_NAVAL_DOCTRINE_capital_priority = {
+
+	NOT = { 
+		AND = {
+			check_variable = { EAI_FOCUS/NAVY/battleship = global.EAI_OFF } 
+			check_variable = { EAI_FOCUS/NAVY/battlecruiser = global.EAI_OFF } 
+		}
+	}
+
+	if = { limit = { has_tech = fleet_in_being } NOT = { has_tech = grand_battlefleet } }
+	if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = floating_fortress_ti } }
+	if = { limit = { has_tech = base_strike } NOT = { has_tech = floating_fortress_bs } }
+
+	### Strategies
+
+	if = {
+		limit = {
+			AND = {
+				tag = GER
+				check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE }
+				NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
+			}
+		}
+	
+		NOT = { EAI_NAVAL_DOCTRINE_submarine_priority = yes }
+	}
+	else = {
+	
+		NOT = { EAI_NAVAL_DOCTRINE_screen_priority = yes }
+	}
+}
+
+EAI_NAVAL_DOCTRINE_carrier_priority = {
+
+	NOT = { check_variable = { EAI_FOCUS/NAVY/carrier = global.EAI_OFF } }
+
+	if = { limit = { has_tech = fleet_in_being } NOT = { has_tech = floating_airfield } }
+	if = { limit = { has_tech = trade_interdiction } NOT = { has_tech = floating_airfield_ti } }
+	if = { limit = { has_tech = base_strike } NOT = { has_tech = carrier_battlegroups } }
+
+	### Strategies
+
+	if = {
+		limit = {
+			AND = {
+				tag = GER
+				check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE }
+				NOT = { check_variable = { EAI_FOCUS/NAVY/submarine = global.EAI_OFF } }
+			}
+		}
+	
+		NOT = { EAI_NAVAL_DOCTRINE_submarine_priority = yes }
+	}
+	else = {
+	
+		NOT = { EAI_NAVAL_DOCTRINE_screen_priority = yes }
+	}
 }
 
 ### Capital
@@ -738,7 +825,7 @@ EAI_BB_navy_production = {
 		}
 		AND = {
 			EAI_SHBB_tech_focus = yes 
-			OR = { has_tech = ship_hull_super_heavy has_tech = ship_hull_super_heavy }
+			is_special_project_completed = sp:sp_naval_super_heavy_battleship
 		}
 	}
 
@@ -861,4 +948,20 @@ EAI_wants_to_build_screen_ships = {
 		EAI_DD_navy_production = yes
 		EAI_CL_navy_production = yes
 	}
+}
+
+EAI_FOCUS_submarine_focus = {
+
+}
+
+EAI_FOCUS_screen_focus = {
+	
+}
+
+EAI_FOCUS_carrier_focus = {
+	
+}
+
+EAI_FOCUS_capital_focus = {
+	
 }

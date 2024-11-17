@@ -126,7 +126,14 @@ country_event = {
 				set_country_flag = peter_is_of_age
 			}
 		}
-		GER = { country_event = DOD_yugoslavia.2 }
+		GER = { 
+			country_event = {
+				id = DOD_yugoslavia.2
+				hours = 4
+				random_hours = 6
+			}	
+		}
+		custom_effect_tooltip = generic_skip_one_line_tt
 		if = {
 			limit = {
 				is_in_faction_with = GER
@@ -148,22 +155,41 @@ country_event = {
 			limit = {
 				has_government = fascism
 			}
-			set_politics = { ruling_party = neutrality elections_allowed = no }
-			add_popularity = { ideology = neutrality popularity = 0.5 }
-			set_party_name = { ideology = neutrality long_name = YUG_royal_party name = YUG_royal_party }
+			set_politics = { 
+				ruling_party = neutrality 
+				elections_allowed = no 
+			}
+			add_popularity = { 
+				ideology = neutrality 
+				popularity = 0.5 
+			}
+			set_party_name = { 
+				ideology = neutrality 
+				long_name = YUG_royal_party 
+				name = YUG_royal_party 
+			}
 		}
+
 	}
 	option = { #resistance to the coup, call on Germans for support
 		name = DOD_yugoslavia.1.b
 		ai_chance = {
 			factor = 30
 		}	
-		GER = { country_event = DOD_yugoslavia.3 }
+
+		GER = { 
+			country_event = {
+				id = DOD_yugoslavia.3
+				hours = 4
+				random_hours = 6
+			}	
+		}
 		YUG_start_peters_coup = yes
+
 	}
 }
 
-#Yugoslavian coup event - Yugoslavia has rolled over, event for Germany to intervene
+# Yugoslavian coup event - Yugoslavia has rolled over, event for Germany to intervene
 country_event = {
 	id = DOD_yugoslavia.2
 	title = DOD_yugoslavia.2.t
@@ -172,26 +198,48 @@ country_event = {
 	
 	is_triggered_only = yes
 	
-	option = { #invasion!
+	option = { # invasion!
 		name = DOD_yugoslavia.2.a	
+
 		create_wargoal = {
 			type = annex_everything
 			target = YUG
 		}
-		if = {
+
+		IF = {
 			limit = {
 				CRO = { 
 					exists = yes 
 					is_subject_of = YUG
 				}
-				YUG = { NOT = { has_completed_focus = YUG_towards_independence } }
+				YUG = { 
+					NOT = { 
+						has_completed_focus = YUG_towards_independence 
+					} 
+				}
 			}
 			puppet = CRO
 		}
+
+		# Claiming German Slovenia
+		102 = {
+			add_claim_by = ROOT
+		}
+
+		custom_effect_tooltip = generic_skip_one_line_tt
+
+		# Claiming Serbia proper for Protection under the Reich 
+		107 = {
+			add_claim_by = ROOT
+		}
+		108 = {
+			add_claim_by = ROOT
+		}
+
 	}
 }
 
-#Yugoslavian coup event - Yugoslavian government resists the coup, Germany comes to the rescue...or not
+# Yugoslavian coup event - Yugoslavian government resists the coup, Germany comes to the rescue...or not
 country_event = {
 	id = DOD_yugoslavia.3
 	title = DOD_yugoslavia.2.t
@@ -204,11 +252,28 @@ country_event = {
 		name = DOD_yugoslavia.3.a
 		ai_chance = {
 			factor = 70
-		}	
+		}
+
 		create_wargoal = {
 			type = annex_everything
 			target = YUG
 		}
+
+		# Claiming German Slovenia
+		102 = {
+			add_claim_by = ROOT
+		}
+
+		custom_effect_tooltip = generic_skip_one_line_tt
+
+		# Claiming Serbia proper for Protection under the Reich 
+		107 = {
+			add_claim_by = ROOT
+		}
+		108 = {
+			add_claim_by = ROOT
+		}
+
 	}
 
 	option = { #rescue
@@ -216,11 +281,13 @@ country_event = {
 		ai_chance = {
 			factor = 30
 		}
+
 		add_to_faction = YUG
+
 	}
 }
 
-#Yugoslavian independence war(s)
+# Yugoslavian independence war(s) - event for YUG
 country_event = {
 	id = DOD_yugoslavia.10
 	title = DOD_yugoslavia.10.t
@@ -228,11 +295,18 @@ country_event = {
 	picture = GFX_report_event_yugoslavia_partisans
 	
 	trigger = {
-		tag = YUG
-		has_idea = YUG_idea_croatian_opposition
-		has_war_with = GER
-		GER = {
+		original_tag = YUG
+		OR = {
+			has_idea = YUG_idea_croatian_opposition
+			AND = {
+				is_ai = yes 
+				has_idea = YUG_idea_croats_suppressed
+			}
+		}
+		any_country = {
+			original_tag = GER
 			has_government = fascism
+			has_war_with = YUG
 		}
 		OR = {
 			AND = {
@@ -240,20 +314,24 @@ country_event = {
 				CRO = { is_subject_of = YUG }
 			}
 			109 = { is_owned_and_controlled_by = YUG }
+			103 = { is_owned_and_controlled_by = YUG }
+			163 = { is_owned_and_controlled_by = YUG }
+			852 = { is_owned_and_controlled_by = YUG }
 		}
 	}
+	
 	mean_time_to_happen = {
-		days = 4
+		days = 2
 	}
 	
 	fire_only_once = yes #would be funny though
 
-	option = { 
+	option = {
 		name = DOD_yugoslavia.10.a
 		ai_chance = {
-			factor = 70
+			base = 100
 		}	
-		if = {
+		IF = {
 			limit = {
 				CRO = {
 					exists = yes
@@ -265,11 +343,10 @@ country_event = {
 				declare_war_on = {
 					target = YUG
 					type = annex_everything
-
 				}
 			}
 		}
-		if = { #if Montenegro exists, they also join
+		IF = { #if Montenegro exists, they also join
 			limit = {
 				MNT = {
 					exists = yes
@@ -284,7 +361,142 @@ country_event = {
 				}
 			}
 		}
-		if = {
+		IF = {
+			limit = {
+				CRO = {
+					exists = no
+				}
+			}
+			if = {
+				limit = { 109 = { is_owned_and_controlled_by = YUG } }
+				CRO = { transfer_state = 109 }
+			}
+			IF = {
+				limit = { 103 = { is_owned_and_controlled_by = YUG } }
+				CRO = { transfer_state = 103 }
+			}
+			IF = {
+				limit = { 163 = { is_owned_and_controlled_by = YUG } }
+				CRO = { transfer_state = 163 }
+			}
+			IF = {
+				limit = { 852 = { is_owned_and_controlled_by = YUG } }
+				CRO = { transfer_state = 852 }
+			}
+			hidden_effect = {
+				104 =  {
+					add_claim_by = CRO
+				}
+				804 =  {
+					add_claim_by = CRO
+				}
+
+				IF = {
+					limit = {
+						CRO = {
+							capital_scope = {
+								NOT = {
+									is_in_array = {
+										array = AUS.expansion_targets
+										value = THIS
+									}
+								}
+							}
+						}
+					}
+
+					CRO = {
+						capital_scope = {
+							add_to_array = {
+								array = AUS.expansion_targets
+								value = THIS
+							}
+						}
+					}
+
+					IF = {
+						limit = {
+							SLV = {
+								capital_scope = {
+									NOT = {
+										is_in_array = {
+											array = AUS.expansion_targets
+											value = THIS
+										}
+									}
+								}
+							}
+						}
+
+						YUG = {
+							capital_scope = {
+								remove_from_array = {
+									array = AUS.expansion_targets
+									value = THIS
+								}
+								set_state_flag = AUS_no_longer_expansion_target
+							} 
+						}
+						
+					}
+				}
+				
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			CRO = {
+				declare_war_on = {
+					target = YUG
+					type = annex_everything
+				}
+				custom_effect_tooltip = YUG_CRO_independence_war_troops_tt
+				hidden_effect = {
+					load_oob = "CRO_YUG_independence"
+				}
+			}
+		}
+	}
+	# Play as Croatia
+	option = { 
+		name = DOD_yugoslavia.10.b
+		ai_chance = {
+			base = 0
+		}	
+		
+		IF = {
+			limit = {
+				CRO = {
+					exists = yes
+					is_subject_of = YUG
+				}
+			}
+			set_autonomy = { target = CRO autonomy_state = autonomy_free }
+			CRO = {
+				declare_war_on = {
+					target = YUG
+					type = annex_everything
+				}
+			}
+		}
+
+		IF = { #if Montenegro exists, they also join
+			limit = {
+				MNT = {
+					exists = yes
+					is_subject_of = YUG
+				}
+			}
+			set_autonomy = { target = MNT autonomy_state = autonomy_free }
+			MNT = {
+				declare_war_on = {
+					target = YUG
+					type = annex_everything
+				}
+			}
+		}
+
+		IF = {
 			limit = {
 				CRO = {
 					exists = no
@@ -292,20 +504,103 @@ country_event = {
 				109 = { is_owned_and_controlled_by = YUG }
 			}
 			CRO = { transfer_state = 109 }
-			if = {
+			IF = {
 				limit = {
 					103 = { is_owned_and_controlled_by = YUG }
 				}
 				CRO = { transfer_state = 103 }
 			}
+			IF = {
+				limit = {
+					163 = { is_owned_and_controlled_by = YUG }
+				}
+				CRO = { transfer_state = 163 }
+			}
+			IF = {
+				limit = {
+					852 = { is_owned_and_controlled_by = YUG }
+				}
+				CRO = { transfer_state = 852 }
+			}
+			hidden_effect = {
+				104 =  {
+					add_claim_by = CRO
+				}
+				804 =  {
+					add_claim_by = CRO
+				}
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			custom_effect_tooltip = warning_we_will_change_to_this_country_tt
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
 			CRO = {
 				declare_war_on = {
 					target = YUG
 					type = annex_everything
 				}
-				load_oob = "CRO_YUG_independence"
+				custom_effect_tooltip = YUG_CRO_independence_war_troops_tt
+				hidden_effect = {
+					load_oob = "CRO_YUG_independence"
+
+					IF = {
+						limit = {
+							CRO = {
+								capital_scope = {
+									NOT = {
+										is_in_array = {
+											array = AUS.expansion_targets
+											value = THIS
+										}
+									}
+								}
+							}
+						}
+
+						CRO = {
+							capital_scope = {
+								add_to_array = {
+									array = AUS.expansion_targets
+									value = THIS
+								}
+							}
+						}
+
+						IF = {
+							limit = {
+								SLV = {
+									capital_scope = {
+										NOT = {
+											is_in_array = {
+												array = AUS.expansion_targets
+												value = THIS
+											}
+										}
+									}
+								}
+							}
+
+							YUG = {
+								capital_scope = {
+									remove_from_array = {
+										array = AUS.expansion_targets
+										value = THIS
+									}
+								}
+							}
+						}
+					}
+				}
+
+				change_tag_from = ROOT
+
 			}
+
 		}
+
 	}
 }
 
@@ -863,11 +1158,11 @@ country_event = {
 			}
 		}
 		add_opinion_modifier = { target = FROM modifier = YUG_sold_planes}	
-	}	
-		
+	}		
 	
 }
-#Yugoslavia pressured by Germany - Anschluss
+
+# Yugoslavia pressured by Germany - after Anschluss - event for GER
 country_event = {
 	id = DOD_yugoslavia.30
 	title = DOD_yugoslavia.30.t
@@ -879,10 +1174,15 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.30.a
 		ai_chance = {
-			factor = 70
+			base = 70
 		}
+
 		YUG = { 
-			country_event = DOD_yugoslavia.31 
+			country_event = {
+				id = DOD_yugoslavia.31 
+				hours = 6
+				random_hours = 12
+			}	
 			set_country_flag = YUG_GER_pressure_1 #for ai_weights in focus tree
 		}
 		
@@ -890,7 +1190,11 @@ country_event = {
 	option = { # not interested
 		name = DOD_yugoslavia.30.b
 		ai_chance = {
-			factor = 30
+			base = 30
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
 		
 	}
@@ -898,7 +1202,7 @@ country_event = {
 	
 }
 
-#Yugoslavia pressured by Germany - First event
+#Yugoslavia pressured by Germany - First event - event for YUG
 country_event = {
 	id = DOD_yugoslavia.31
 	title = DOD_yugoslavia.31.t
@@ -910,15 +1214,46 @@ country_event = {
 	option = { # not that bad yet
 		name = DOD_yugoslavia.31.a
 		ai_chance = {
-			factor = 30
+			base = 50
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
+
+		add_opinion_modifier = {
+			target = FROM
+			modifier = YUG_GER_pressured_us_annoyed_opm
+		}	
+		set_country_flag = YUG_stands_up_to_german_pressure_once_flag
+		
+	}
+
+	option = { # We must keep up good relation with them...
+		name = DOD_yugoslavia.31.b
+		ai_chance = {
+			base = 50
+		}
+		
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = YUG_wavering_to_GER_pressure_opm
+			}
+		}
+		add_opinion_modifier = {
+			target = FROM
+			modifier = YUG_wavering_to_GER_pressure_reverse_opm
+		}
+			
+		set_country_flag = YUG_wavered_to_german_pressure_once_flag
 		
 	}
 		
 	
 }
 
-#Yugoslavia pressured by Germany - Fate of CZE
+# Yugoslavia pressured by Germany - Fate of CZE - event for GER
 country_event = {
 	id = DOD_yugoslavia.32
 	title = DOD_yugoslavia.30.t
@@ -930,10 +1265,15 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.32.a
 		ai_chance = {
-			factor = 80
+			base = 80
 		}
+
 		YUG = { 
-			country_event = DOD_yugoslavia.33 
+			country_event = {
+				id = DOD_yugoslavia.33 
+				hours = 6
+				random_hours = 12
+			}	
 			set_country_flag = YUG_GER_pressure_2 #for ai_weights
 		}
 		
@@ -941,7 +1281,11 @@ country_event = {
 	option = { # not interested
 		name = DOD_yugoslavia.32.b
 		ai_chance = {
-			factor = 20
+			base = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
 		
 	}
@@ -958,13 +1302,70 @@ country_event = {
 	
 	is_triggered_only = yes
 		
-	option = { # not that bad
+	option = { # not that bad 
 		name = DOD_yugoslavia.33.a
+		ai_chance = {
+			base = 50
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
+		}
+
+		IF = {
+			limit = {
+				has_country_flag = YUG_stands_up_to_german_pressure_once_flag
+			}
+			set_country_flag = YUG_stands_up_to_german_pressure_twice_flag
+			clr_country_flag = YUG_stands_up_to_german_pressure_once_flag
+		}		
+		ELSE_IF = {
+			limit = {
+				has_country_flag = YUG_wavered_to_german_pressure_once_flag
+			}
+			set_country_flag = YUG_wavered_to_german_pressure_once_and_stood_up_once_flag
+		}
+		
+	}
+
+	option = { # This is getting serious, we must crack down on anti-German elements immediately!
+		name = DOD_yugoslavia.33.b
+		ai_chance = {
+			base = 50
+		}
+
+		add_stability = -0.03
+
+		IF = {
+			limit = {
+				has_idea = anti_german_military
+			}
+			remove_ideas = anti_german_military
+		}
+
+		add_popularity = {
+			ideology = FROM
+			popularity = 0.05
+		}	
+
+		IF = {
+			limit = {
+				has_country_flag = YUG_wavered_to_german_pressure_once_flag
+			}
+			set_country_flag = YUG_wavered_to_german_pressure_twice_flag
+			clr_country_flag = YUG_wavered_to_german_pressure_once_flag
+		}		
+		ELSE_IF = {
+			limit = {
+				has_country_flag = YUG_stands_up_to_german_pressure_once_flag
+			}
+			set_country_flag = YUG_wavered_to_german_pressure_once_and_stood_up_once_flag
+		}
 		
 	}
 }
 
-#Yugoslavia pressured by Germany - Last Warning - after Fall of France
+# Yugoslavia pressured by Germany - Last Warning - after Fall of France - event for GER
 country_event = {
 	id = DOD_yugoslavia.34
 	title = DOD_yugoslavia.30.t
@@ -974,9 +1375,12 @@ country_event = {
 	mean_time_to_happen = {
 		days = 5
 	}
+
 	fire_only_once = yes
+
 	trigger = {
 		tag = GER
+		has_government = fascism
 		NOT = {
 			has_war_with = YUG
 		}
@@ -994,23 +1398,36 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.34.a
 		ai_chance = {
-			factor = 90
+			base = 90
 		}
-		YUG = { country_event = DOD_yugoslavia.35 }
+
+		YUG = { 
+			country_event = {
+				id = DOD_yugoslavia.35
+				hours = 6
+				random_hours = 12
+			}
+		}
 		
 	}	
 	option = { # not interested
 		name = DOD_yugoslavia.34.b
 		ai_chance = {
-			factor = 10
+			base = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
+
+
 		
 	}
 		
 	
 }
 
-#Yugoslavia pressured by Germany - third event
+# Yugoslavia pressured by Germany - third event - event for YUG
 country_event = {
 	id = DOD_yugoslavia.35
 	title = DOD_yugoslavia.31.t
@@ -1022,7 +1439,46 @@ country_event = {
 	option = { # not that bad
 		name = DOD_yugoslavia.35.a
 		ai_chance = {
-			factor = 30
+			base = 30
+		}
+
+		add_political_power = -25
+
+		add_popularity = {
+			ideology = FROM
+			popularity = 0.05
+		}	
+
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = YUG_wavering_to_GER_pressure_2_opm
+			}
+		}
+		add_opinion_modifier = {
+			target = FROM
+			modifier = YUG_wavering_to_GER_pressure_reverse_2_opm
+		}
+		
+	}
+
+	option = { # No, we must not placate them further!
+		name = DOD_yugoslavia.35.b
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
+		}
+
+		add_war_support = 0.05
+
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = enemy_of_the_reich_opm
+			}	
 		}
 		
 	}
@@ -1032,7 +1488,7 @@ country_event = {
 
 
 
-#Yugoslavia pressured by Britain - Balkan Strategy
+# Yugoslavia pressured by Britain - Balkan Strategy - event for ENG
 country_event = {
 	id = DOD_yugoslavia.40
 	title = DOD_yugoslavia.30.t
@@ -1044,15 +1500,26 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.40.a
 		ai_chance = {
-			factor = 70
+			base = 70
 		}
-		YUG = { country_event = DOD_yugoslavia.41 }
+
+		YUG = { 
+			country_event = {
+				id = DOD_yugoslavia.41 
+				hours = 6
+				random_hours = 12
+			} 
+		}
 		
 	}	
 	option = { # not interested
 		name = DOD_yugoslavia.40.b
 		ai_chance = {
-			factor = 30
+			base = 30
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
 		
 	}
@@ -1060,7 +1527,7 @@ country_event = {
 	
 }
 
-#Yugoslavia pressured by Britain - First event
+# Yugoslavia pressured by Britain - First event - event for YUG
 country_event = {
 	id = DOD_yugoslavia.41
 	title = DOD_yugoslavia.41.t
@@ -1072,13 +1539,18 @@ country_event = {
 	option = { # not that bad yet
 		name = DOD_yugoslavia.41.a
 		ai_chance = {
-			factor = 30
+			base = 30
 		}
+
+		add_popularity = {
+			ideology = FROM
+			popularity = 0.05
+		}	
 		
 	}	
 }
 
-#Yugoslavia pressured by Britain - Munich
+# Yugoslavia pressured by Britain - Munich - event for ENG
 country_event = {
 	id = DOD_yugoslavia.42
 	title = DOD_yugoslavia.30.t
@@ -1090,23 +1562,34 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.42.a
 		ai_chance = {
-			factor = 70
+			base = 70
 		}
-		YUG = { country_event = DOD_yugoslavia.43 }
+		YUG = { 
+			country_event = {
+				id = DOD_yugoslavia.43 
+				hours = 6
+				random_hours = 12
+			} 
+		}
 		
 	}	
 	option = { # not interested
 		name = DOD_yugoslavia.42.b
 		ai_chance = {
-			factor = 30
+			base = 30
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
 		}
+
+
 		
 	}
-		
 	
 }
 
-#Yugoslavia pressured by Britain - Second event
+# Yugoslavia pressured by Britain - Second event - event for YUG
 country_event = {
 	id = DOD_yugoslavia.43
 	title = DOD_yugoslavia.41.t
@@ -1118,13 +1601,15 @@ country_event = {
 	option = { # not that bad yet
 		name = DOD_yugoslavia.43.a
 		ai_chance = {
-			factor = 30
+			base = 30
 		}
+
+
 		
 	}	
 }
 
-#Yugoslavia pressured by Britain - late 1940, last warning
+#Yugoslavia pressured by Britain - late 1940, last warning - event for ENG
 country_event = {
 	id = DOD_yugoslavia.44
 	title = DOD_yugoslavia.30.t
@@ -1150,21 +1635,40 @@ country_event = {
 	option = { # put the squeeze on them
 		name = DOD_yugoslavia.44.a
 		ai_chance = {
-			factor = 90
+			base = 90
 		}
-		YUG = { country_event = DOD_yugoslavia.45 }
-		hidden_effect = { country_event = { id = DOD_yugoslavia.46 days = 180 random = 672 } }
+		YUG = { 
+			country_event = {
+				id = DOD_yugoslavia.45  
+				hours = 6
+				random_hours = 12
+			} 
+		}
+		hidden_effect = { 
+			country_event = { 
+				id = DOD_yugoslavia.46 
+				days = 180 
+				random = 672 
+			} 
+		}
 		
 	}	
 	option = { # not interested
 		name = DOD_yugoslavia.44.b
 		ai_chance = {
-			factor = 10
-		}	
+			base = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes 
+			}
+		}
+
+
+
 	}
 }
 
-#Yugoslavia pressured by Britain - Third event
+#Yugoslavia pressured by Britain - Third event - event for YUG
 country_event = {
 	id = DOD_yugoslavia.45
 	title = DOD_yugoslavia.41.t
@@ -1176,13 +1680,15 @@ country_event = {
 	option = { # not that bad yet
 		name = DOD_yugoslavia.45.a
 		ai_chance = {
-			factor = 30
+			base = 30
 		}
 		
+		custom_effect_tooltip = YUG_if_we_dont_side_with_britain_within_a_year_warning_tt
+
 	}	
 }
 
-#Yugoslavia pressured by Britain - war
+# Yugoslavia pressured by Britain - war - event for ENG
 country_event = {
 	id = DOD_yugoslavia.46
 	title = DOD_yugoslavia.30.t
@@ -1224,6 +1730,7 @@ country_event = {
 				}
 			}
 		}
+
 		declare_war_on = {
 			target = YUG
 			type = puppet_wargoal_focus
@@ -1233,8 +1740,11 @@ country_event = {
 	option = { # not interested
 		name = DOD_yugoslavia.46.b
 		ai_chance = {
-			factor = 10
-		}	
+			base = 10
+		}
+
+
+
 	}
 }
 
@@ -5287,7 +5797,7 @@ country_event = {
 						YUG_peter_ii = {
 							set_portraits = {
 								civilian = {
-							    	large="GFX_portrait_yugoslavia_peter_ii_old"
+							    	large = GFX_portrait_yugoslavia_peter_ii_old
 								}
 							}					
 						}
@@ -5361,9 +5871,15 @@ country_event = {
 		ai_chance = {
 			factor = 0
 		}
-		YUG = { country_event = DOD_yugoslavia.701 }
+		YUG = { 
+			country_event = {
+				id = DOD_yugoslavia.701 
+				hours = 6
+			}	
+		}
 	}
 }
+
 #Yugo is informed of their choice
 country_event = {
 	id = DOD_yugoslavia.701
@@ -5426,15 +5942,27 @@ country_event = {
 						target = YUG
 					}
 				}
+				102 = {
+					add_claim_by = GER
+				}
 			}
-			else = {
-				get_best_alliance_match_fascism_effect = yes
-				var:best_leader = {
+			else_if = {
+				limit = {
+					ITA = {
+						exists = yes
+						has_capitulated = no
+						has_government = fascism
+					}
+				}
+				ITA = {
 					create_wargoal = {
 						type = annex_everything
 						target = YUG
 					}
 				}
+			}
+			ELSE = {
+				add_stability = -0.05
 			}
 		}
 		complete_national_focus = YUG_end_the_regency #switches to the Peter branch so Yugoslavia is not stuck
@@ -5457,7 +5985,8 @@ country_event = {
 		YUG_start_peters_coup = yes
 	}
 }
-#England can demand Paul to step down
+
+# England can demand Paul to step down
 country_event = {
 	id = DOD_yugoslavia.702
 	title = DOD_yugoslavia.702.t
@@ -5519,7 +6048,7 @@ country_event = {
 	}
 }
 
-#Italy recieves Yugo's request to control Zara
+# Italy recieves Yugo's request to control Zara
 country_event = {
 	id = DOD_yugoslavia.80
 	title = DOD_yugoslavia.80.t

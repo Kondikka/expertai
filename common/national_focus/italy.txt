@@ -3560,7 +3560,7 @@ focus_tree = {
 		relative_position_id = ITA_fiocchi_munizioni
 		cost = 5
 		available = {
-			has_tech = radio_detection
+			is_special_project_completed = sp:sp_air_radar
 			has_full_control_of_state = 159
 		}
 
@@ -3731,6 +3731,12 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
+
+			add_breakthrough_progress = {
+				specialization = specialization_air
+				value = 1
+			}
+
 			add_tech_bonus = {
 				name = ITA_thermojet_research
 				bonus = 1
@@ -3744,6 +3750,7 @@ focus_tree = {
 				category = jet_technology
 				category = rocketry
 			}
+
 		}
 	}
 
@@ -4190,6 +4197,7 @@ focus_tree = {
 				if = {
 					limit = {
 						is_ai = yes
+						always = no #EAI huh?
 					}
 					set_technology = {
 						trench_warfare = 0
@@ -4380,12 +4388,15 @@ focus_tree = {
 
 				if = {
 					limit = {
-						has_tech = tech_engineers2
+						is_special_project_completed = sp:sp_land_flamethrower_tank
 					}
 					#L3/35 lf Flamethrower
 					ITA_add_basic_light_flamethrower_template = yes
 				}
 				else = {
+					sp:sp_land_flamethrower_tank = {
+						add_project_progress_ratio = 0.5
+					}
 					custom_effect_tooltip = ITA_italian_tankettes_flamethrower_tt
 					effect_tooltip = {
 						#L3/35 lf Flamethrower
@@ -4950,15 +4961,17 @@ focus_tree = {
 			has_full_control_of_state = 2
 		}
 
-		search_filters = {FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH}
+		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
+
 			add_tech_bonus = {
 				name = ITA_citta_dell_aria
 				bonus = 0.25
-				uses = 4
+				uses = 3 # was 4
 				category = air_equipment
 			}
+			custom_effect_tooltip = generic_skip_one_line_tt
 
 			if = {
 				limit = {
@@ -4978,6 +4991,7 @@ focus_tree = {
 						instant_build = yes
 					}
 				}
+				custom_effect_tooltip = generic_skip_one_line_tt
 			}
 			else = {
 				random_core_state = {
@@ -4997,12 +5011,38 @@ focus_tree = {
 						instant_build = yes
 					}
 				}
+				custom_effect_tooltip = generic_skip_one_line_tt
+			}
+
+			custom_effect_tooltip = ITA_citta_dell_aria_tt
+			hidden_effect = {
+				IF = {
+					limit = { 
+						2 = {
+							is_fully_controlled_by = ROOT
+							air_facility < 1
+							land_facility < 1
+							naval_facility < 1
+							nuclear_facility < 1
+						}
+					}
+
+					2 = {
+						add_building_construction = {
+							type = air_facility
+							level = 1
+							instant_build = yes
+							province = 11751 # North of Rome
+						}
+					}
+				}
 			}
 
 			if = {
 				limit = {
 					has_dlc = "By Blood Alone"
 				}
+				custom_effect_tooltip = generic_skip_one_line_tt
 				ITA_add_citta_dell_aria_templates = yes
 			}
 		}
@@ -6821,55 +6861,15 @@ focus_tree = {
 				uses = 1
 				category = ss_tech
 			}
-
+			
 			if = {
 				limit = {
-					has_dlc = "Man the Guns"
+					NOT = { is_special_project_completed = sp:sp_naval_cruiser_submarine }
 				}
-				set_technology = { cruiser_submarines = 1 }
-
-				create_equipment_variant = {
-					name = "Cagni Class"
-					type = ship_hull_cruiser_submarine
-					allow_without_tech = yes # Display tooltip as if we have the tech.
-					name_group = ITA_SS_HISTORICAL #TODO_Manu: Namelist
-					parent_version = 0
-					allow_without_tech = yes # Display tooltip as if we have the tech.
-					modules = {
-						fixed_ship_torpedo_slot = ship_torpedo_sub_1
-						fixed_ship_engine_slot = sub_ship_engine_2
-						front_1_custom_slot = ship_torpedo_sub_1
-						mid_1_custom_slot = empty
-						rear_1_custom_slot = ship_torpedo_sub_1
-					}
+				complete_special_project = {
+					project = sp:sp_naval_cruiser_submarine
+					scientist = ITA_curio_bernardis
 				}
-				#Line Production
-				add_equipment_production = {
-					equipment = {
-						type = ship_hull_cruiser_submarine
-						creator = "ITA"
-						version_name = "Cagni Class"
-					}
-					name = "Ammiraglio Cagni"
-					requested_factories = 1
-					progress = 0.35
-					amount = 2
-				}
-				add_equipment_production = {
-					equipment = {
-						type = ship_hull_cruiser_submarine
-						creator = "ITA"
-						version_name = "Cagni Class"
-					}
-					name = "Ammiraglio Millo"
-					requested_factories = 1
-					progress = 0.35
-					amount = 2
-				}
-			}
-			else = {
-				custom_effect_tooltip = ITA_modify_regia_marina_dynamic_modifier_ns_intro
-				add_to_variable = { ITA_rm_navy_submarine_attack_factor = 0.05 tooltip = navy_submarine_attack_factor_tt }
 			}
 
 			random_owned_controlled_state = {
@@ -6918,43 +6918,14 @@ focus_tree = {
 				category = ss_tech
 			}
 
-			###########
-			### MTG ###
-			###########
 			if = {
 				limit = {
-					has_dlc = "Man the Guns"
+					NOT = { is_special_project_completed = sp:sp_naval_midget_submarine }
 				}
-				set_technology = { midget_submarines = 1 }
-
-				create_equipment_variant = {
-					name = "CB Class"
-					type = ship_hull_midget_submarine
-					allow_without_tech = yes # Display tooltip as if we have the tech.
-					name_group = ITA_SS_HISTORICAL #TODO_Manu: Namelist
-					parent_version = 0
-					allow_without_tech = yes # Display tooltip as if we have the tech.
-					modules = {
-						fixed_ship_torpedo_slot = ship_torpedo_sub_2
-						fixed_ship_engine_slot = sub_ship_engine_2
-					}
+				complete_special_project = {
+					project = sp:sp_naval_midget_submarine
+					scientist = ITA_curio_bernardis
 				}
-
-				add_equipment_production = {
-					equipment = {
-						type = ship_hull_midget_submarine
-						creator = "ITA"
-						version_name = "CB Class"
-					}
-					name = "Ammiraglio Millo"
-					requested_factories = 1
-					progress = 0.35
-					amount = 2
-				}
-			}
-			else = {
-				custom_effect_tooltip = ITA_modify_regia_marina_dynamic_modifier_ns_intro
-				add_to_variable = { ITA_rm_sub_retreat_speed = 0.05 tooltip = sub_retreat_speed_tt }
 			}
 
 			random_owned_controlled_state = {
@@ -6973,17 +6944,12 @@ focus_tree = {
 
 			if = {
 				limit = {
-					has_dlc = "Man the Guns"
+					has_completed_focus = ITA_cooperation_programs
 				}
-				if = {
-					limit = {
-						has_completed_focus = ITA_cooperation_programs
-					}
-					unlock_decision_tooltip = ITA_export_midget_submarines
-				}
-				else = {
-					custom_effect_tooltip = ITA_midget_submarines_decision_tt
-				}
+				unlock_decision_tooltip = ITA_export_midget_submarines
+			}
+			else = {
+				custom_effect_tooltip = ITA_midget_submarines_decision_tt
 			}
 		}
 	}
@@ -7010,7 +6976,7 @@ focus_tree = {
 			else = {
 				has_tech = improved_destroyer
 			}
-			has_tech = decimetric_radar
+			has_tech = cavity_magnatron
 		}
 
 		search_filters = {FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY_XP FOCUS_FILTER_RESEARCH}
@@ -10126,6 +10092,19 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_WAR_SUPPORT FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH FOCUS_FILTER_BALANCE_OF_POWER}
 
 		completion_reward = {
+
+			IF = {
+				limit = {
+					NOT = {
+						OR = {
+							has_cosmetic_tag = greater_italy
+							has_cosmetic_tag = SPQR_UNIFIED
+						}
+					}
+				}
+				set_cosmetic_tag = ITA_rsi
+			}
+
 			add_war_support = 0.05
 			add_stability = -0.05
 			add_political_power = 75
@@ -10134,6 +10113,8 @@ focus_tree = {
 				ideology = fascism
 				popularity = 0.1
 			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
 
 			add_country_leader_trait = capo_supremo
 
@@ -11263,7 +11244,7 @@ focus_tree = {
 
 		completion_reward = {
 			add_to_variable = { ITA_ra_ground_attack_factor = 0.05 }
-			add_to_variable = { ITA_ra_air_interception = 0.05 }
+			add_to_variable = { ITA_ra_air_intercept_efficiency = 0.05 }
 			custom_effect_tooltip = ITA_compagnie_auto_avio_sahariane_ra_tt
 			add_to_variable = {  ITA_re_org_loss_when_moving = -0.05 }
 			add_to_variable = {  ITA_re_out_of_supply = -0.05 }
@@ -12157,13 +12138,17 @@ focus_tree = {
 				}
 			}
 			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = ITA_enrico_fermi
 			show_ideas_tooltip = ITA_vittorio_emanuele_orlando
 
 			custom_effect_tooltip = available_chief_of_army
 			show_ideas_tooltip = ITA_giovanni_duca
 
 			show_unit_leaders_tooltip = ITA_giovanni_duca
+
+			custom_effect_tooltip = {
+				localization_key = available_scientist_one_line_tt
+				CHARACTER = ITA_enrico_fermi
+			}
 			
 			if = {
 				limit = {
@@ -12171,11 +12156,29 @@ focus_tree = {
 				}
 				ITA_create_edgardo_sogno_operative = yes
 			}
-			add_tech_bonus = {
-				name = ITA_meritocracy
-				bonus = 1
-				uses = 1
-				category = nuclear
+			
+			IF = {
+				limit = {
+					NOT = {
+						has_tech = atomic_research
+					}
+				}
+				add_tech_bonus = {
+					name = ITA_meritocracy
+					bonus = 0.75 # was 1
+					uses = 1
+					category = nuclear
+				}
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.25
+				}
+			}
+			ELSE = {
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.5
+				}
 			}
 			ITA_bop_very_low_increase_grandi_side_effect = yes
 		}
@@ -12935,15 +12938,34 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
+
 			add_timed_idea = {
 				idea = ITA_nuclear_research
 				days = 1095
 			}
-			add_tech_bonus = {
-				name = ITA_new_forms_of_weaponry
-				bonus = 1
-				uses = 1
-				category = nuclear
+			
+			IF = {
+				limit = {
+					NOT = {
+						has_tech = atomic_research
+					}
+				}
+				add_tech_bonus = {
+					name = ITA_new_forms_of_weaponry
+					bonus = 0.5 # was 1
+					uses = 1
+					category = nuclear
+				}
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.75
+				}
+			}
+			ELSE = {
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 1
+				}
 			}
 		}
 	}
@@ -13796,11 +13818,16 @@ focus_tree = {
 				uses = 1
 				category = heavy_air
 			}
-			add_tech_bonus = { #Changed to require the tech to complete this focus, and give template and production line
-				name = ITA_mare_nostrum_bba
-				bonus = 1.0
-				uses = 1
-				technology = ship_hull_super_heavy
+			#add_tech_bonus = { #Changed to require the tech to complete this focus, and give template and production line
+				#name = ITA_mare_nostrum_bba
+				#bonus = 1.0
+				#uses = 1
+				#technology = ship_hull_super_heavy
+			#}
+
+			add_breakthrough_progress = {
+				specialization = specialization_naval
+				value = 0.75
 			}
 
 			if = {
@@ -14007,6 +14034,7 @@ focus_tree = {
 				uses = 1
 				category = heavy_air
 			}
+
 			if = {
 				limit = {
 					has_dlc = "By Blood Alone"
@@ -14017,6 +14045,38 @@ focus_tree = {
 				}
 
 				ITA_add_the_king_of_the_skies_template_production_and_wing = yes
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			add_breakthrough_progress = {
+				specialization = specialization_air
+				value = 0.5
+			}
+
+			if = {
+				limit = {
+					has_dlc = "Gotterdammerung"
+				}
+				custom_effect_tooltip = ITA_modify_regia_aeronautica_dynamic_modifier_ns_intro
+				if = {
+					limit = {
+						NOT = { is_special_project_completed = sp_air_intercontinental_bomber }
+					}
+					add_to_variable = { 
+						ITA_ra_sp_air_intercontinental_bomber_speed_factor = 0.2
+						tooltip = sp_air_intercontinental_bomber_speed_factor_tt
+					}
+				}
+				if = {
+					limit = {
+						NOT = { is_special_project_completed = sp_air_mothership_aircraft }
+					}
+					add_to_variable = { 
+						ITA_ra_sp_air_mothership_aircraft_speed_factor = 0.2
+						tooltip = sp_air_mothership_aircraft_speed_factor_tt
+					}
+				}
 			}
 		}
 	}
@@ -14058,21 +14118,16 @@ focus_tree = {
 					instant_build = yes
 				}
 			}
+
 			if = {
 				limit = {
 					has_dlc = "No Step Back"
 				}
-				#add_tech_bonus = { #Changed to require the tech to complete this focus, and give template and production line
-				#	name = ITA_modern_musculus
-				#	ahead_reduction = 2
-				#	bonus = 1.0
-				#	uses = 1
-				#	technology = super_heavy_tank_chassis
-				#}
 				custom_effect_tooltip = ITA_modern_musculus_military_industry_dm_tt
 				hidden_effect = {
 					add_ideas = ITA_hidden_super_heavy_tank_ns
 				}
+				
 				ITA_add_modern_musculus_sh_tank_template_and_production = yes
 			}
 			else = {
@@ -14085,6 +14140,28 @@ focus_tree = {
 					technology = super_heavy_td
 					technology = super_heavy_art
 					technology = super_heavy_spaa
+				}
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			add_breakthrough_progress = {
+				specialization = specialization_land
+				value = 0.5
+			}
+			if = {
+				limit = {
+					has_dlc = "Gotterdammerung"
+				}
+				if = {
+					limit = {
+						NOT = { is_special_project_completed = sp_land_land_cruiser }
+					}
+					custom_effect_tooltip = ITA_modify_regio_esercito_dynamic_modifier_ns_intro
+					add_to_variable = { 
+						ITA_re_sp_land_land_cruiser_speed_factor = 0.2
+						tooltip = sp_land_land_cruiser_speed_factor_tt
+					}
 				}
 			}
 		}
@@ -14100,15 +14177,16 @@ focus_tree = {
 		relative_position_id = ITA_all_roads_lead_to_rome
 		cost = 5
 		available = {
-			if = {
-				limit = {
-					has_dlc = "Man the Guns"
-				}
-				has_tech = ship_hull_super_heavy
-			}
-			else = {
-				has_tech = heavy_battleship
-			}
+			is_special_project_completed = sp:sp_naval_super_heavy_battleship
+			#if = {
+				#limit = {
+					#has_dlc = "Man the Guns"
+				#}
+				#has_tech = ship_hull_super_heavy
+			#}
+			#else = {
+				#has_tech = heavy_battleship
+			#}
 		}
 
 		search_filters = {FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH}
@@ -14151,7 +14229,7 @@ focus_tree = {
 				create_equipment_variant = {
 					name = "Neptunus Class"
 					type = ship_hull_super_heavy_1
-					name_group = ITA_BB_HISTORICAL #TODO_Manu: Namelist?
+					name_group = ITA_BB_HISTORICAL
 					parent_version = 0
 					allow_without_tech = yes #Makes no difference since focus requires appropriate tech (above), but it improves tooltip
 					modules = {
@@ -14181,7 +14259,7 @@ focus_tree = {
 					}
 					name = "Neptunus"
 					requested_factories = 2
-					progress = 0.6
+					progress = 0.75
 					amount = 1
 				}
 			}
@@ -14222,6 +14300,29 @@ focus_tree = {
 					requested_factories = 2
 					progress = 0.6
 					amount = 1
+				}
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+			
+			add_breakthrough_progress = {
+				specialization = specialization_naval
+				value = 0.5
+			}
+
+			if = {
+				limit = {
+					has_dlc = "Gotterdammerung"
+				}
+				if = {
+					limit = {
+						NOT = { is_special_project_completed = sp_naval_ice_carrier }
+					}
+					custom_effect_tooltip = ITA_modify_regia_marina_dynamic_modifier_ns_intro
+					add_to_variable = { 
+						ITA_rm_sp_naval_ice_carrier_speed_factor = 0.2
+						tooltip = sp_naval_ice_carrier_speed_factor_tt
+					}
 				}
 			}
 		}
@@ -15097,14 +15198,14 @@ focus_tree = {
 
 		completion_reward = {
 			add_state_claim = 802 #KOSOVO
-			add_state_claim = 106 #MACEDONIA
+			add_state_claim = 970 #DEBAR
 			add_state_claim = 185 #EPIRUS
 			add_state_claim = 105 #MONTENEGRO
 
 			hidden_effect = { #Representing the Albanian Irredentism recognized by ITA.
 				ALB = {
 					add_state_claim = 802 #KOSOVO
-					add_state_claim = 106 #MACEDONIA
+					add_state_claim = 970 #DEBAR
 					add_state_claim = 185 #EPIRUS
 					add_state_claim = 105 #MONTENEGRO
 				}
@@ -15243,6 +15344,10 @@ focus_tree = {
 		available = {
 			country_exists = AUS
 			NOT = { has_war_with = AUS }
+		}
+
+		bypass = {
+			has_guaranteed = AUS
 		}		 
 
 		search_filters = {} 
@@ -15274,13 +15379,13 @@ focus_tree = {
 			OR = {
 				ENG = {
 					OR = {
-						country_exists = no
+						exists = no
 						is_subject = yes
 					}
 				}
 				FRA = {
 					OR = {
-						country_exists = no
+						exists = no
 						is_subject = yes
 					}
 				}
@@ -15744,14 +15849,18 @@ focus_tree = {
 		search_filters = {FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
-			add_tech_bonus = {
-				name = ITA_secret_weapons
-				bonus = 0.5
-				uses = 2
-				category = electronics
-				category = rocketry
-				category = nuclear
-			}
+
+			#add_tech_bonus = {
+			#	name = ITA_secret_weapons
+			#	bonus = 0.5
+			#	uses = 2
+			#	category = electronics
+			#	category = rocketry
+			#	category = nuclear
+			#}
+
+			add_ideas = generic_secret_weapons_ns
+			
 		}
 	}
 
@@ -16034,10 +16143,11 @@ focus_tree = {
 			add_state_claim = 269 #BRITISH SOMALILAND
 			add_state_claim = 735 #SAVOY
 			add_state_claim = 856 #VAR
-			add_state_claim = 185 #CORFU
+			#add_state_claim = 185 #CORFU
 			add_state_claim = 1 #CORSICA
 			add_state_claim = 116 #MALTA
 			add_state_claim = 846 #TICINO
+			add_state_claim = 853 #LJUBLJANA
 
 			if = {
 				limit = {
@@ -16251,6 +16361,22 @@ focus_tree = {
 		relative_position_id = ITA_italian_irredentism
 		cost = 5
 
+		select_effect = {
+			every_country = {
+				limit = {
+					NOT = { is_in_faction_with = ROOT }
+					original_tag = GRE
+				}
+				ROOT = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = PREV
+						value = 50
+					}
+				}
+			}
+		}
+
 		bypass = {
 			is_subject = no
 			OR = {
@@ -16291,7 +16417,7 @@ focus_tree = {
 
 		completion_reward = {
 			hidden_effect = { #EAI
-				set_global_flag = { flag = EAI_ITA_greece_blitz value = 1 days = 365 }
+				set_global_flag = { flag = EAI_ITA_blitz_greece_365d value = 1 days = 365 }
 			}
 			GRE = {
 				every_owned_state = {
@@ -20659,9 +20785,18 @@ focus_tree = {
 		completion_reward = {
 			add_political_power = 70
 
+			add_breakthrough_progress = {
+				specialization = specialization_nuclear
+				value = 0.25
+			}
+			add_breakthrough_progress = {
+				specialization = specialization_air
+				value = 0.25
+			}
+
 			add_tech_bonus = {
 				name = ITA_bring_back_exiled_intellectuals
-				bonus = 0.5
+				bonus = 0.25
 				uses = 2
 				category = industry
 				category = electronics
@@ -20669,8 +20804,12 @@ focus_tree = {
 				category = rocketry
 			}
 
-			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = ITA_enrico_fermi
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			custom_effect_tooltip = {
+				localization_key = available_scientist_one_line_tt
+				CHARACTER = ITA_enrico_fermi
+			}
 
 			ITA_bop_low_increase_democratic_side_effect = yes
 		}

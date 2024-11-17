@@ -64,11 +64,24 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { add = 1 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
+				modifier = { 
+					add = 1 
+
+					check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } 
+
+					OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+				}
 
 				modifier = { add = 500 has_political_power > 300 check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
 
-				modifier = { factor = 0 has_political_power < 210 }
+				modifier = { factor = 0 has_political_power < 300 }
 			}
 		}
 
@@ -242,27 +255,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					NOT = { check_variable = { command_power < 20 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					set_temp_variable = { pick_order_rank = 3 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -669,27 +737,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					NOT = { check_variable = { command_power < 20 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					set_temp_variable = { pick_order_rank = 7 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -749,17 +872,19 @@ characters={
 		}
 	}
 
-	JAP_isoroku_yamamoto={
-		name=JAP_isoroku_yamamoto
-		portraits={
-			navy={
-				small="GFX_idea_isoroku_yamamoto"
+	JAP_isoroku_yamamoto = {
+		name = JAP_isoroku_yamamoto
+		portraits = {
+			navy = {
+				large = GFX_portrait_JAP_isoroku_yamamoto
+				small = GFX_idea_isoroku_yamamoto
 			}
-			army={
-				large=GFX_portrait_JAP_isoroku_yamamoto
+			civilian = {
+				large = GFX_portrait_JAP_isoroku_yamamoto_scientist
 			}
 		}
-		advisor={
+
+		advisor = {
 			cost = 150
 			slot = theorist
 			idea_token = isoroku_yamamoto
@@ -780,14 +905,21 @@ characters={
 			}
 		}
 		
-		navy_leader={
-			traits={ bold aviation_enthusiast superior_tactician spotter air_controller flight_deck_manager }
-			skill=5
-			attack_skill=5
-			defense_skill=2
-			maneuvering_skill=3
-			coordination_skill=6
-			legacy_id=0
+		navy_leader = {
+			traits = { bold aviation_enthusiast superior_tactician spotter air_controller flight_deck_manager }
+			skill = 5
+			attack_skill = 5
+			defense_skill = 2
+			maneuvering_skill = 3
+			coordination_skill = 6
+			legacy_id = 0
+		}
+
+		scientist = {
+			traits = { scientist_trait_submarine_specialist }
+			skills = {
+				specialization_naval = 2
+			}
 		}
 	}
 
@@ -1111,69 +1243,6 @@ characters={
 		}
 	}
 
-	JAP_yoshio_nishina={
-		name=JAP_yoshio_nishina
-		portraits={
-			army={
-				small="GFX_idea_yoshio_nishina"
-			}
-		}
-		advisor={
-			cost = 100
-			slot = theorist
-			idea_token = yoshio_nishina
-			ledger = army
-			allowed = {
-				original_tag = JAP
-			}
-			research_bonus = {
-				nuclear = 0.150
-			}
-			traits = {
-				nuclear_scientist
-			}
-			ai_will_do = { #EAI
-				base = 0
-
-				###
-
-				modifier = { add = 1 NOT = { has_game_rule = { rule = JAP_ai_behavior option = DEFAULT } } }
-			}
-		}
-	}
-
-	JAP_hideo_itokawa={
-		name="Hideo Itokawa"
-		portraits={
-			army={
-				small="GFX_idea_hideo_itokawa"
-			}
-		}
-		advisor={
-			cost = 100
-			slot = theorist
-			idea_token = hideo_itokawa
-			ledger = air
-			allowed = {
-				original_tag = JAP
-			}
-			research_bonus = {
-				rocketry = 0.150
-			}
-			traits = {
-				rocket_scientist
-			}
-			ai_will_do = { #EAI
-				base = 0
-
-				###
-
-				modifier = { add = 1 NOT = { has_game_rule = { rule = JAP_ai_behavior option = DEFAULT } } }
-			}
-		}
-	}
-
-
 	### ARMY CHIEFS ###
 
 	JAP_kanin_kotohito={
@@ -1226,28 +1295,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					has_completed_focus = JAP_army_expansion
-					NOT = { check_variable = { command_power < 10 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					# if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-					# 	if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
-					# }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					set_temp_variable = { pick_order_rank = 2 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
+					}
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1362,27 +1485,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					NOT = { check_variable = { command_power < 20 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					set_temp_variable = { pick_order_rank = 4 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1446,27 +1624,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					NOT = { check_variable = { command_power < 30 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					set_temp_variable = { pick_order_rank = 5 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1510,27 +1743,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					### Pick order conditions
+					### Pick order conditions for this character
 
-					NOT = { check_variable = { command_power < 20 } }
+					always = yes
 
-					###
+					### Pick order
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					set_temp_variable = { pick_order_rank = 8 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1811,23 +2099,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					###
+					### Pick order conditions for this character
 
-					# if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					# if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-					# 	if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
-					# }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					# if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					always = yes
+
+					### Pick order
+
+					set_temp_variable = { pick_order_rank = 1 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
+					}
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1910,23 +2257,82 @@ characters={
 			ai_will_do = { #EAI
 				base = 0
 
-				modifier = { # Pick order
+				modifier = {
 					add = 500
-					has_game_rule = { rule = JAP_ai_behavior option = DEFAULT }
+					has_game_rule = { rule = GER_ai_behavior option = DEFAULT }
 
-					###
+					### Pick order conditions for this character
 
-					if = { limit = { has_character = JAP_mitsumasa_yonai JAP_mitsumasa_yonai = { is_advisor = yes } } has_idea = JAP_mitsumasa_yonai }
-					if = { limit = { has_completed_focus = JAP_army_expansion }
-					
-						if = { limit = { NOT = { check_variable = { command_power < 10 } } } if = { limit = { has_character = JAP_hajime_sugiyama JAP_hajime_sugiyama = { is_advisor = yes } } has_idea = hajime_sugiyama } }
+					always = yes
+
+					### Pick order
+
+					set_temp_variable = { pick_order_rank = 6 }
+
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 1 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsumasa_yonai } JAP_mitsumasa_yonai = { is_hired_as_advisor = yes } }
 					}
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_yasuji_okamura JAP_yasuji_okamura = { is_advisor = yes } } has_idea = yasuji_okamura } }
-					if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_shigetaro_shimada JAP_shigetaro_shimada = { is_advisor = yes } } has_idea = shigetaro_shimada } }
-					if = { limit = { NOT = { check_variable = { command_power < 30 } } } if = { limit = { has_character = JAP_korechika_anami JAP_korechika_anami = { is_advisor = yes } } has_idea = korechika_anami } }
-					# if = { limit = { has_character = JAP_takuo_godo JAP_takuo_godo = { is_advisor = yes } } has_idea = takuo_godo }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_hitoshi_imamura JAP_hitoshi_imamura = { is_advisor = yes } } has_idea = hitoshi_imamura } }
-					# if = { limit = { NOT = { check_variable = { command_power < 20 } } } if = { limit = { has_character = JAP_mitsuo_fuchida JAP_mitsuo_fuchida = { is_advisor = yes } } has_idea = mitsuo_fuchida } }
+					# *** Army command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 2 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hajime_sugiyama } JAP_hajime_sugiyama = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 3 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_yasuji_okamura } JAP_yasuji_okamura = { is_hired_as_advisor = yes } }
+					}
+					# *** Navy command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 4 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_shigetaro_shimada } JAP_shigetaro_shimada = { is_hired_as_advisor = yes } }
+					}
+					# *** Air command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 5 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_korechika_anami } JAP_korechika_anami = { is_hired_as_advisor = yes } }
+					}
+					# *** Political ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 6 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_takuo_godo } JAP_takuo_godo = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 7 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_hitoshi_imamura } JAP_hitoshi_imamura = { is_hired_as_advisor = yes } }
+					}
+					# *** High command ***
+					if = { 
+						# Pick order conditions
+						limit = { check_variable = { pick_order_rank > 8 }
+							always = yes
+						}
+						OR = { NOT = { has_character = JAP_mitsuo_fuchida } JAP_mitsuo_fuchida = { is_hired_as_advisor = yes } }
+					}
 				}
 
 				modifier = { add = 1 has_political_power > 300 }
@@ -1939,4 +2345,171 @@ characters={
 	}
 
 	# Illusive Gentleman auto-generated
+
+
+  #####                                                              
+ #     #   ####   #  ######  #    #  #####  #   ####   #####   ####  
+ #        #    #  #  #       ##   #    #    #  #         #    #      
+  #####   #       #  #####   # #  #    #    #   ####     #     ####  
+       #  #       #  #       #  # #    #    #       #    #         # 
+ #     #  #    #  #  #       #   ##    #    #  #    #    #    #    # 
+  #####    ####   #  ######  #    #    #    #   ####     #     ####  
+
+
+	#JAP_isoroku_yamamoto up there
+
+	JAP_yoshio_nishina = {
+		name = JAP_yoshio_nishina
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_yoshio_nishina
+				small = GFX_idea_yoshio_nishina
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_nuclear_specialist }
+			skills = {
+				specialization_nuclear = 2
+			}
+		}
+
+		#advisor = {
+		#	cost = 100
+		#	slot = theorist
+		#	idea_token = yoshio_nishina
+		#	ledger = army
+		#	allowed = {
+		#		original_tag = JAP
+		#	}
+		#	research_bonus = {
+		#		nuclear = 0.150
+		#	}
+		#	traits = {
+		#		nuclear_scientist
+		#	}
+		#}
+	}
+
+	JAP_hideo_itokawa = {
+		name = JAP_hideo_itokawa
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_hideo_itokawa
+				small = GFX_idea_hideo_itokawa
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_rocketry_specialist }
+			skills = {
+				specialization_air = 2
+			}
+		}
+
+		#advisor = {
+		#	cost = 100
+		#	slot = theorist
+		#	idea_token = hideo_itokawa
+		#	ledger = air
+		#	allowed = {
+		#		original_tag = JAP
+		#	}
+		#	research_bonus = {
+		#		rocketry = 0.150
+		#	}
+		#	traits = {
+		#		rocket_scientist
+		#	}
+		#}
+	}
+
+	JAP_kijiro_nambu = {
+		name = JAP_kijiro_nambu
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_kijiro_nambu
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_armored_specialist }
+			skills = {
+				specialization_land = 2
+			}
+		}
+	}
+
+	JAP_keiji_fukuda = {
+		name = JAP_keiji_fukuda
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_keiji_fukuda
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_surface_ship_specialist }
+			skills = {
+				specialization_naval = 2
+			}
+		}
+	}
+
+	JAP_jiro_horikoshi = {
+		name = JAP_jiro_horikoshi
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_jiro_horikoshi
+			}
+		}
+
+		scientist = {
+
+			traits = { scientist_trait_aircraft_specialist }
+
+			skills = {
+				specialization_air = 2
+			}
+
+			visible = {
+				owner = {
+					has_completed_focus = JAP_agility_focus
+				}
+			}
+		}
+	}
+
+	JAP_hideki_yukawa = {
+		name = JAP_hideki_yukawa
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_hideki_yukawa
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_nuclear_power_expert }
+			skills = {
+				specialization_nuclear = 2
+			}
+		}
+	}
+
+	JAP_yoji_ito = {
+		name = JAP_yoji_ito
+		portraits = {
+			army = {
+				large = GFX_portrait_JAP_yoji_ito
+			}
+		}
+
+		scientist = {
+			traits = { scientist_trait_electronics_specialist }
+			skills = {
+				specialization_air = 2
+			}
+		}
+	}
+
 }

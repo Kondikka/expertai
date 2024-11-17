@@ -1,0 +1,1055 @@
+############################################################################################################
+#	Expert AI mod - misc effects
+############################################################################################################
+
+EAI_MAP_startup = {
+
+	EAI_MAP_set_state_province_ids = yes
+	EAI_MAP_set_state_region_id = yes
+	EAI_MAP_set_province_state_ids = yes
+	EAI_MAP_set_province_pos = yes
+	EAI_MAP_set_province_neighbors = yes
+	EAI_MAP_set_province_terrain_types = yes
+	EAI_MAP_set_province_terrain_type = yes
+
+	EAI_MAP_allied_invasion_theatres = yes
+	EAI_MAP_axis_invasion_theatres = yes
+	EAI_MAP_japan_invasion_theatres = yes
+	
+	EAI_MAP_japanese_homeland_theatre = yes
+	EAI_MAP_spanish_cw_theatre = yes
+	EAI_MAP_north_africa_theatre = yes
+	EAI_MAP_china_theatre = yes
+	EAI_MAP_britain_theatre = yes
+	EAI_MAP_barbarossa_theatre = yes
+	EAI_MAP_entire_pacific_theatre = yes
+
+	EAI_MAP_SOV_garrison_strategy_states = yes
+	EAI_MAP_capital_defense_states = yes
+	EAI_MAP_island_states = yes
+
+	EAI_MAP_save_original_capital_location = yes
+}
+
+###
+
+EAI_MAP_get_province_control_pct = { # arr:_our_side_ arr:_their_side_ arr:_states_ >>> var:our_control_pct_ var:total_ var:total_our_side_ var:total_their_side_
+
+	set_temp_variable = { total_our_side_ = 0 }
+	set_temp_variable = { total_their_side_ = 0 }
+	for_each_scope_loop = { array = _states_
+		set_temp_variable = { num_our_side = 0 }
+		set_temp_variable = { num_their_side = 0 }
+		for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS index = i_2 value = v_2
+			if = { limit = { any_of_scopes = { array = _our_side_ controls_province = v_2 } }
+				add_to_temp_variable = { num_our_side = 1 }
+			}
+			if = { limit = { any_of_scopes = { array = _their_side_ controls_province = v_2 } }
+				add_to_temp_variable = { num_their_side = 1 }
+			}
+		}
+		add_to_temp_variable = { total_our_side_ = num_our_side }
+		add_to_temp_variable = { total_their_side_ = num_their_side }
+	}
+
+	set_temp_variable = { total_ = total_our_side_ }
+	add_to_temp_variable = { total_ = total_their_side_ }
+	set_temp_variable = { our_control_pct_ = total_our_side_ }
+	divide_temp_variable = { our_control_pct_ = total_ }
+}
+
+EAI_MAP_get_num_provinces = { # var:num_provinces_
+
+	set_temp_variable = { get_num_provinces_id = THIS.id }
+	set_temp_variable = { num_provinces_ = 0 }
+	clear_temp_array = counted_states
+	every_controlled_state = {
+		if = { limit = { NOT = { is_in_array = { counted_states = THIS.id } } }
+			for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS index = i_2 value = v_2
+				if = { limit = { PREV = { controls_province = v_2 } }
+					add_to_temp_variable = { num_provinces_ = 1 }
+				}
+			}
+		}
+		add_to_temp_array = { counted_states = THIS.id }
+
+		every_neighbor_state = {
+			if = { limit = { NOT = { is_in_array = { counted_states = THIS.id } } }
+				for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS index = i_2 value = v_2
+					if = { limit = { var:get_num_provinces_id = { controls_province = v_2 } }
+						add_to_temp_variable = { num_provinces_ = 1 }
+					}
+				}
+			}
+			add_to_temp_array = { counted_states = THIS.id }
+		}
+	}
+}
+
+EAI_MAP_get_num_provinces_in_states = { # arr:_states_ var:num_provinces_
+
+	set_temp_variable = { num_provinces_ = 0 }
+	clear_temp_array = counted_states
+	for_each_scope_loop = { array = _states_
+		for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS index = i_2 value = v_2
+			if = { limit = { PREV = { controls_province = v_2 } }
+				add_to_temp_variable = { num_provinces_ = 1 }
+			}
+		}
+	}
+}
+
+EAI_MAP_get_province_neighbors = { # _get_province_id_neighbors, _get_province_neighbors_TERRAIN_TYPES = LAND, province_neighbors_
+
+	clear_temp_array = province_neighbors_
+	meta_effect = {
+		text = {
+			for_each_loop = { array = global.EAI_MAP_province_neighbors_[x] index = pn_i value = pn_v break = pn_b
+			
+				if = {
+					limit = {
+						if = { limit = { check_variable = { _get_province_neighbors_TERRAIN_TYPES^num > 0 } }  
+							is_in_array = { _get_province_neighbors_TERRAIN_TYPES = global.EAI_MAP_province_terrain_type^pn_v }
+						}
+						else = {
+							is_in_array = { global.EAI_MAP_PROV_LAND_TYPES = global.EAI_MAP_province_terrain_type^pn_v }
+						}
+					}
+
+					add_to_temp_array = { province_neighbors_ = pn_v }
+				}
+			}
+		}
+		x = "[?_get_province_id_neighbors]"
+	}
+
+	clear_temp_array = _get_province_neighbors_TERRAIN_TYPES
+}
+
+### Allied invasions
+
+EAI_MAP_allied_invasion_theatres = {
+
+	clear_array = global.EAI_MAP_allied_invasion_theatres
+
+	resize_temp_array = { operations = 4 }
+	for_each_loop = { array = operations index = _operation_id value = v
+		set_variable = { global.EAI_MAP_allied_invasion_data_start^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+		if = { limit = { check_variable = { _operation_id = 0 } } EAI_MAP_operation_torch_theatre = yes }
+		if = { limit = { check_variable = { _operation_id = 1 } } EAI_MAP_operation_avalanche_theatre = yes }
+		if = { limit = { check_variable = { _operation_id = 2 } } EAI_MAP_operation_overlord_theatre = yes }
+		if = { limit = { check_variable = { _operation_id = 3 } } EAI_MAP_operation_dragoon_theatre = yes }
+		set_variable = { global.EAI_MAP_allied_invasion_data_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+	}
+}
+
+EAI_MAP_operation_torch_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 182
+					region = 126
+					region = 225
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_ST_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Staging areas
+
+		every_state = {
+			limit = {
+				OR = {
+					state = 118
+					state = 116
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_SA_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 48 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 68 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 29 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 47 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_SR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 182 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 126 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 225 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_AR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 458.id } # tunis
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 461.id } # casablanca
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 448.id } # tripoli
+		set_variable = { global.EAI_MAP_allied_invasion_data_OB_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	###
+}
+
+EAI_MAP_operation_avalanche_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 23
+					region = 169
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_ST_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+		### Staging areas
+
+		every_state = {
+			limit = {
+				OR = {
+					state = 118
+					state = 116
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_SA_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 169 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 29 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 68 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_SR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 23 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_AR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 115.id } # sicilia
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 117.id } # napoli
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 2.id } # roma
+		set_variable = { global.EAI_MAP_allied_invasion_data_OB_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	###
+}
+
+EAI_MAP_operation_overlord_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 208
+					region = 19
+					region = 5
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_ST_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Staging areas
+
+		# every_state = {
+		# 	limit = {
+		# 		OR = {
+		# 			state = 118
+		# 			state = 116
+		# 		}
+		# 	}
+
+		# 	add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		# }
+		set_variable = { global.EAI_MAP_allied_invasion_data_SA_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 18 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 42 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_SR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 208 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 19 }
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 5 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_AR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 16.id } # paris
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 15.id } # normandy
+		set_variable = { global.EAI_MAP_allied_invasion_data_OB_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	###
+}
+
+EAI_MAP_operation_dragoon_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 20
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_ST_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Staging areas
+
+		every_state = {
+			limit = {
+				OR = {
+					state = 118
+					state = 116
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_allied_invasion_data_SA_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 68 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_SR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 20 }
+		set_variable = { global.EAI_MAP_allied_invasion_data_AR_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 21.id } # marseille
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 735.id } # nice
+		add_to_array = { global.EAI_MAP_allied_invasion_theatres = 20.id } # lyon
+		set_variable = { global.EAI_MAP_allied_invasion_data_OB_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
+
+	###
+}
+
+### Axis invasions
+
+EAI_MAP_axis_invasion_theatres = {
+
+	clear_array = global.EAI_MAP_axis_invasion_theatres
+
+	resize_temp_array = { operations = 2 }
+	for_each_loop = { array = operations index = _operation_id value = v
+		set_variable = { global.EAI_MAP_axis_invasion_data_start^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+		if = { limit = { check_variable = { _operation_id = 0 } } EAI_MAP_operation_sealion_theatre = yes }
+		if = { limit = { check_variable = { _operation_id = 1 } } EAI_MAP_operation_america_theatre = yes }
+		set_variable = { global.EAI_MAP_axis_invasion_data_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+	}
+}
+
+EAI_MAP_operation_sealion_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 1
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_axis_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_axis_invasion_data_ST_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Staging areas
+
+		# every_state = {
+		# 	limit = {
+		# 		OR = {
+		# 			state = 118
+		# 			state = 116
+		# 		}
+		# 	}
+
+		# 	add_to_array = { global.EAI_MAP_axis_invasion_theatres = THIS.id }
+		# }
+		set_variable = { global.EAI_MAP_axis_invasion_data_SA_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 18 }
+		set_variable = { global.EAI_MAP_axis_invasion_data_SR_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 1 }
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 2 }
+		set_variable = { global.EAI_MAP_axis_invasion_data_AR_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 126.id } # london
+		set_variable = { global.EAI_MAP_axis_invasion_data_OB_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	###
+}
+
+EAI_MAP_operation_america_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 211
+					region = 117
+					region = 197
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_axis_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_axis_invasion_data_ST_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Staging areas
+
+		# every_state = {
+		# 	limit = {
+		# 		OR = {
+		# 			state = 118
+		# 			state = 116
+		# 		}
+		# 	}
+
+		# 	add_to_array = { global.EAI_MAP_axis_invasion_theatres = THIS.id }
+		# }
+		set_variable = { global.EAI_MAP_axis_invasion_data_SA_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 170 }
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 54 }
+		set_variable = { global.EAI_MAP_axis_invasion_data_SR_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 211 }
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 117 }
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 197 }
+		set_variable = { global.EAI_MAP_axis_invasion_data_AR_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 358.id } # new york
+		add_to_array = { global.EAI_MAP_axis_invasion_theatres = 362.id } # washington
+		set_variable = { global.EAI_MAP_axis_invasion_data_OB_end^_operation_id = global.EAI_MAP_axis_invasion_theatres^num }
+
+	###
+}
+
+### Japan invasions
+
+EAI_MAP_japan_invasion_theatres = {
+
+	clear_array = global.EAI_MAP_japan_invasion_theatres
+
+	resize_temp_array = { operations = 1 }
+	for_each_loop = { array = operations index = _operation_id value = v
+		set_variable = { global.EAI_MAP_japan_invasion_data_start^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+		if = { limit = { check_variable = { _operation_id = 0 } } EAI_MAP_operation_australia_theatre = yes }
+		set_variable = { global.EAI_MAP_japan_invasion_data_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+	}
+}
+
+EAI_MAP_operation_australia_theatre = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 193
+					region = 194
+					region = 156
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_japan_invasion_theatres = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_japan_invasion_data_ST_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+
+	### Staging areas
+
+		# every_state = {
+		# 	limit = {
+		# 		OR = {
+		# 			state = 118
+		# 			state = 116
+		# 		}
+		# 	}
+
+		# 	add_to_array = { global.EAI_MAP_japan_invasion_theatres = THIS.id }
+		# }
+		set_variable = { global.EAI_MAP_japan_invasion_data_SA_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+
+	### Sea regions
+		
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 82 }
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 91 }
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 92 }
+		set_variable = { global.EAI_MAP_japan_invasion_data_SR_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+
+	### Air regions
+
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 193 }
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 194 }
+		set_variable = { global.EAI_MAP_japan_invasion_data_AR_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_japan_invasion_theatres = 520.id } # darwin
+		set_variable = { global.EAI_MAP_japan_invasion_data_OB_end^_operation_id = global.EAI_MAP_japan_invasion_theatres^num }
+
+	###
+}
+
+###
+
+EAI_MAP_entire_pacific_theatre = {
+	clear_array = EAI_MAP_entire_pacific_theatre
+	every_state = {
+		limit = {
+			OR = {
+				state = 629
+				state = 727
+				state = 631
+				state = 630
+				state = 642
+				state = 726
+				state = 641
+				state = 633
+				state = 639
+				state = 643
+				state = 636
+				state = 725
+				state = 632
+				state = 684
+				state = 648
+				state = 645
+				state = 646
+				state = 638
+				state = 647
+				region = 79
+				region = 106
+				region = 218
+				region = 118
+				region = 105
+				region = 172
+				region = 95
+				region = 180
+				region = 97
+				region = 178
+				region = 179
+				region = 84
+				region = 94
+				region = 83
+				region = 167
+				region = 78
+				region = 188
+				region = 73
+				region = 72
+				region = 75
+				region = 187
+				region = 159
+				region = 80
+				region = 160
+				region = 154
+				region = 90
+				region = 158
+				region = 91
+				region = 83
+				is_on_continent = australia
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_entire_pacific_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_pacific_islands_theatre = {
+	clear_array = EAI_MAP_pacific_islands_theatre
+	every_state = {
+		limit = {
+			OR = {
+				region = 79
+				region = 106
+				region = 218
+				region = 118
+				region = 105
+				region = 172
+				region = 95
+				region = 180
+				region = 97
+				region = 178
+				region = 179
+				region = 84
+				region = 94
+				region = 83
+				region = 167
+				region = 78
+				region = 188
+				region = 73
+				region = 72
+				region = 75
+				region = 187
+				region = 159
+				region = 80
+				region = 160
+				region = 154
+				region = 90
+				region = 158
+				region = 91
+				region = 83
+			}
+			NOT = { is_on_continent = australia }
+		}
+
+		add_to_array = { global.EAI_MAP_pacific_islands_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_britain_theatre = {
+	every_state = {
+		limit = {
+			OR = {
+				region = 1
+				region = 2
+				region = 3
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_britain_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_china_theatre = {
+	every_state = {
+		limit = {
+			OR = {
+				region = 164
+				region = 248
+				region = 247
+				region = 143
+				region = 246
+				region = 165
+				region = 245
+				region = 249
+				region = 144
+				region = 200
+				region = 250
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_china_theatre = THIS.id }
+	}
+
+	every_state = {
+		limit = {
+			OR = {
+				region = 164
+				region = 248
+				region = 247
+				region = 143
+				region = 246
+				region = 165
+				region = 245
+				region = 249
+				region = 144
+				region = 200
+				region = 250
+			}
+			is_coastal = yes
+		}
+
+		add_to_array = { global.EAI_MAP_china_coastal_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_SOV_garrison_strategy_states = {
+
+	@sov_defense_radius = 100
+
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_217 217 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_217 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_217 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_217 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_217 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_219 219 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_219 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_219 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_219 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_219 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_195 195 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_195 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_195 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_195 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_195 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_137 137 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_137 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_137 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_137 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_137 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_241 241 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_241 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_241 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_241 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_241 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_808 808 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_808 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_808 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_808 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_808 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_810 810 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_810 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_810 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_810 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_810 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_193 193 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_193 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_193 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_193 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_193 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_196 196 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_196 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_196 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_196 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_196 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_200 200 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_200 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_200 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_200 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_200 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_208 208 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_208 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_208 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_208 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_208 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_209 209 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_209 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_209 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_209 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_209 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_210 210 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_210 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_210 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_210 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_210 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_265 265 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_265 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_265 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_265 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_265 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_238 238 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_238 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_238 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_238 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_238 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_220 220 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_220 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_220 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_220 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_220 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_221 221 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_221 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_221 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_221 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_221 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_218 218 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_218 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_218 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_218 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_218 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_263 263 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_263 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_263 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_263 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_263 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_242 242 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_224 224 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_260 260 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } }
+}
+
+EAI_MAP_capital_defense_states = {
+
+	@capital_defense_radius = 100
+
+	37 = { add_to_array = { global.EAI_MAP_capital_defense_37 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_37 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_37 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_37 = THIS.id } } }
+	16 = { add_to_array = { global.EAI_MAP_capital_defense_16 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_16 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_16 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_16 = THIS.id } } }
+	64 = { add_to_array = { global.EAI_MAP_capital_defense_64 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_64 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_64 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_64 = THIS.id } } }
+	6 = { add_to_array = { global.EAI_MAP_capital_defense_6 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_6 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_6 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_6 = THIS.id } } }
+	7 = { add_to_array = { global.EAI_MAP_capital_defense_7 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_7 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_7 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_7 = THIS.id } } }
+	126 = { add_to_array = { global.EAI_MAP_capital_defense_126 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_126 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_126 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_126 = THIS.id } } }
+	113 = { add_to_array = { global.EAI_MAP_capital_defense_113 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_113 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_113 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_113 = THIS.id } } }
+	41 = { add_to_array = { global.EAI_MAP_capital_defense_41 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_41 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_41 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_41 = THIS.id } } }
+	2 = { add_to_array = { global.EAI_MAP_capital_defense_2 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_2 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_2 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_2 = THIS.id } } }
+	107 = { add_to_array = { global.EAI_MAP_capital_defense_107 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_107 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_107 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_107 = THIS.id } } }
+	43 = { add_to_array = { global.EAI_MAP_capital_defense_43 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_43 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_43 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_43 = THIS.id } } }
+	46 = { add_to_array = { global.EAI_MAP_capital_defense_46 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_46 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_46 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_46 = THIS.id } } }
+	42 = { add_to_array = { global.EAI_MAP_capital_defense_42 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_42 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_42 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_42 = THIS.id } } }
+	47 = { add_to_array = { global.EAI_MAP_capital_defense_47 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_47 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_47 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_47 = THIS.id } } }
+	44 = { add_to_array = { global.EAI_MAP_capital_defense_44 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_44 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_44 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_44 = THIS.id } } }
+	49 = { add_to_array = { global.EAI_MAP_capital_defense_49 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_49 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_49 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_49 = THIS.id } } }
+	797 = { add_to_array = { global.EAI_MAP_capital_defense_797 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_797 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_797 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_797 = THIS.id } } }
+	110 = { add_to_array = { global.EAI_MAP_capital_defense_110 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_110 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_110 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_110 = THIS.id } } }
+	141 = { add_to_array = { global.EAI_MAP_capital_defense_141 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_141 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_141 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_141 = THIS.id } } }
+	111 = { add_to_array = { global.EAI_MAP_capital_defense_111 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_111 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_111 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_111 = THIS.id } } }
+	812 = { add_to_array = { global.EAI_MAP_capital_defense_812 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_812 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_812 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_812 = THIS.id } } }
+	808 = { add_to_array = { global.EAI_MAP_capital_defense_808 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_808 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_808 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_808 = THIS.id } } }
+	11 = { add_to_array = { global.EAI_MAP_capital_defense_11 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_11 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_11 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_11 = THIS.id } } }
+	10 = { add_to_array = { global.EAI_MAP_capital_defense_10 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_10 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_10 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_10 = THIS.id } } }
+	9 = { add_to_array = { global.EAI_MAP_capital_defense_9 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_9 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_9 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_9 = THIS.id } } }
+	439 = { add_to_array = { global.EAI_MAP_capital_defense_439 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_439 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_439 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_439 = THIS.id } } }
+	282 = { add_to_array = { global.EAI_MAP_capital_defense_282 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_282 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_282 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_282 = THIS.id } } }
+	285 = { add_to_array = { global.EAI_MAP_capital_defense_285 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_285 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_285 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_285 = THIS.id } } }
+	284 = { add_to_array = { global.EAI_MAP_capital_defense_284 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_284 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_284 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_284 = THIS.id } } }
+	361 = { add_to_array = { global.EAI_MAP_capital_defense_361 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_361 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_361 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_361 = THIS.id } } }
+	219 = { add_to_array = { global.EAI_MAP_capital_defense_219 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_219 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_219 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_219 = THIS.id } } }
+	907 = { add_to_array = { global.EAI_MAP_capital_defense_907 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_907 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_907 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_907 = THIS.id } } }
+	605 = { add_to_array = { global.EAI_MAP_capital_defense_605 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @capital_defense_radius } } add_to_array = { global.EAI_MAP_capital_defense_605 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_capital_defense_605 = THIS.id } } } add_to_array = { global.EAI_MAP_capital_defense_605 = THIS.id } } }
+}
+
+EAI_MAP_spanish_cw_theatre = {
+
+	clear_array = global.EAI_MAP_spanish_cw_theatre
+
+	every_state = {
+		limit = {
+			is_owned_and_controlled_by = SPR
+
+			OR = {
+				region = 209
+				region = 210
+				region = 41
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_spanish_cw_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_north_africa_theatre = {
+
+	clear_array = global.EAI_MAP_north_africa_theatre
+
+	every_state = {
+		limit = {
+			OR = {
+				state = 448
+				state = 661
+				state = 449
+				state = 662
+				state = 450
+				state = 451
+				state = 663
+				state = 452
+				state = 447
+				state = 446
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_north_africa_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_japanese_homeland_theatre = {
+
+	clear_array = global.EAI_MAP_japanese_homeland_theatre
+
+	every_state = {
+		limit = {
+			OR = {
+				region = 154
+				state = 645
+				state = 526
+				state = 525
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_japanese_homeland_theatre = THIS.id }
+	}
+}
+
+EAI_MAP_barbarossa_theatre = {
+
+	### Theatre
+
+		clear_array = global.EAI_MAP_barbarossa_theatre
+		every_state = {
+			limit = {
+				OR = {
+					region = 132
+					region = 133
+					region = 137
+					region = 37
+					region = 39
+					region = 26
+					region = 131
+					region = 130
+					region = 135
+					region = 26
+					region = 8
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_barbarossa_theatre = THIS.id }
+		}
+
+	### Bad states to push
+
+		clear_array = global.EAI_MAP_barbarossa_SECTOR_avoid_states
+		every_state = {
+			limit = {
+				OR = {
+					# Marsh
+					state = 194
+					state = 94
+					state = 93
+					state = 241
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_barbarossa_SECTOR_avoid_states = THIS.id }
+		}
+
+	###
+
+	clear_array = global.EAI_MAP_barbarossa_sectors
+
+	resize_temp_array = { sectors = 3 }
+	for_each_loop = { array = sectors index = _sector_id value = v
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_start^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+		if = { limit = { check_variable = { _sector_id = 0 } } EAI_MAP_barbarossa_sector_north = yes }
+		if = { limit = { check_variable = { _sector_id = 1 } } EAI_MAP_barbarossa_sector_center = yes }
+		if = { limit = { check_variable = { _sector_id = 2 } } EAI_MAP_barbarossa_sector_south = yes }
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+	}
+}
+
+EAI_MAP_barbarossa_sector_north = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 38
+					region = 37
+					region = 132
+					region = 8
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_barbarossa_sectors = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_ST_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 195.id } #leningrad
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 209.id } #pskov
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 808.id } #riga
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 11.id } #kaunas
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 763.id } #königsberg
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 85.id } #danzig
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 64.id } #berlin
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 10.id } #warsaw
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_OB_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Regions
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 38 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 37 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 132 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 8 }
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_AR_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	###
+}
+
+EAI_MAP_barbarossa_sector_center = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 38
+					region = 39
+					region = 131
+					region = 133
+					region = 8
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_barbarossa_sectors = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_ST_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 219.id } #moscow
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 242.id } #smolensk
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 206.id } #minsk
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 64.id } #berlin
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 10.id } #warsaw
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_OB_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Regions
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 38 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 37 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 132 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 8 }
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_AR_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	###
+}
+
+EAI_MAP_barbarossa_sector_south = {
+
+	### States
+
+		every_state = {
+			limit = {
+				OR = {
+					region = 26
+					region = 130
+					region = 137
+				}
+			}
+
+			add_to_array = { global.EAI_MAP_barbarossa_sectors = THIS.id }
+		}
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_ST_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Objectives
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 217.id } #stalingrad
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 218.id } #rostov
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 221.id } #kharkov
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 137.id } #crimea
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 229.id } #azerbaijan
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 192.id } #odessa
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 46.id } #bucharest
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_OB_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	### Regions
+
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 26 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 130 }
+		add_to_array = { global.EAI_MAP_barbarossa_sectors = 137 }
+		set_variable = { global.EAI_MAP_barbarossa_sector_data_AR_end^_sector_id = global.EAI_MAP_barbarossa_sectors^num }
+
+	###
+}
+
+EAI_MAP_set_state_region_id = {
+
+	every_state = {
+		set_temp_variable = { region_id = 1 }
+		while_loop_effect = { 
+			limit = {
+				NOT = {
+					meta_trigger = {
+						text = { region = [x] }
+						x = "[?region_id]"
+					}
+				}
+			}
+
+			add_to_temp_variable = { region_id = 1 }
+		}
+		set_variable = { EAI_MAP_region_id = region_id }
+	}
+}
+
+EAI_MAP_island_states = {
+
+	every_state = {
+		limit = {
+			OR = {
+				is_island_state = yes
+				AND = {
+					set_temp_variable = { tmp_neighbors = 0 }
+					all_neighbor_state = {
+						add_to_temp_variable = { tmp_neighbors = 1 }
+					}
+					check_variable = { tmp_neighbors = 0 }
+				}
+			}
+		}
+
+		add_to_array = { global.EAI_MAP_island_states = THIS.id }
+	}
+}
+
+###
+
+EAI_MAP_save_original_capital_location = {
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = EAI_capital_saved }
+			NOT = { any_state = { has_state_flag = EAI_original_capital_@ROOT } }
+		}
+
+		set_country_flag = EAI_capital_saved
+		capital_scope = { set_state_flag = EAI_original_capital_@ROOT }
+	}
+}

@@ -82,8 +82,9 @@ EAI_LAW_priority_decisions = {
 	if = { limit = { EAI_needs_war_support = yes }
 	
 		# AI has a critical need for war support so return enough PP to allow it to take those decisions
-		set_temp_variable = { _pp_amount = 150 }
+		set_temp_variable = { _pp_amount = 100 }
 		EAI_PP_give_pp_amount = yes
+		if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: War support" }
 	}
 
 	########################
@@ -178,6 +179,7 @@ EAI_LAW_priority_decisions = {
 
 			add_ideas = SOV_nikolay_voznesensky
 			EAI_PP_pay_pp_cost = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
 		}
 
 		# mikhail_kalinin
@@ -202,6 +204,7 @@ EAI_LAW_priority_decisions = {
 
 			add_ideas = mikhail_kalinin
 			EAI_PP_pay_pp_cost = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
 		}
 
 		# SOV_gosproyektstroy_1
@@ -225,6 +228,7 @@ EAI_LAW_priority_decisions = {
 
 			add_ideas = SOV_gosproyektstroy_1
 			EAI_PP_pay_pp_cost = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
 
 			set_country_flag = SOV_gosproyektstroy_1_taken
 		}
@@ -256,6 +260,7 @@ EAI_LAW_priority_decisions = {
 
 			set_temp_variable = { _pp_amount = _pp_cost }
 			EAI_PP_give_pp_amount = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: SOV_gosproyektstroy_bring_foreign_experts" }
 		}
 
 		# SOV_gosproyektstroy_focus_civ
@@ -327,6 +332,7 @@ EAI_LAW_priority_decisions = {
 
 				set_temp_variable = { _pp_amount = _pp_cost }
 				EAI_PP_give_pp_amount = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: SOV_claims_in_baltic" }
 			}
 		}
 	}
@@ -343,6 +349,129 @@ EAI_LAW_priority_decisions = {
 		
 			set_temp_variable = { _pp_amount = 50 }
 			EAI_PP_give_pp_amount = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: JAP_test_the_soviets" }
+		}
+
+		if = { 
+			limit = { 
+				is_historical_focus_on = yes
+
+				NOT = { has_global_flag = JAP_pressure_france }
+				
+				### JAP_pressure_france trigger
+
+				16 = { NOT = { is_controlled_by = FRA } } #Paris has fallen
+				286 = { 
+					CONTROLLER = { 
+						NOT = {
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+						}
+					} 
+				}
+				670 = { 
+					CONTROLLER = { 
+						NOT = {
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+						}
+					} 
+				}
+				671 = { 
+					CONTROLLER = { 
+						NOT = {
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+						}
+					} 
+				}
+
+				has_completed_focus = JAP_strike_south_doctrine
+			}
+		
+			set_temp_variable = { _pp_amount = 50 }
+			EAI_PP_give_pp_amount = yes
+			if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: JAP_pressure_france" }
+		}
+	}
+
+	# GER
+	if = { limit = { tag = GER }
+
+		if = { 
+			limit = { 
+				is_historical_focus_on = yes
+				date < 1940.1.1
+
+				set_temp_variable = { _pp_cost = 150 }
+
+				set_temp_variable = { _check_pp = _pp_cost }
+				EAI_PP_has_check_pp = yes
+
+				###
+
+				if = { limit = { date < 1938.1.1 }
+					has_idea = war_economy
+				}
+
+				NOT = {
+					has_idea = GER_philipp_holzmann
+					has_idea = GER_philipp_holzmann_improved
+					has_idea = GER_philipp_holzmann_improved_2
+					has_idea = GER_philipp_holzmann_improved_2_no_aat
+				}
+			}
+
+			# if = {
+			# 	limit = {
+			# 		original_tag = GER
+			# 		NOT = {
+			# 			has_completed_focus = GER_employ_philipp_holzmann
+			# 			has_completed_focus = GER_revitalize_the_nation
+			# 		}
+			# 	}
+			
+			# 	add_ideas = GER_philipp_holzmann
+			# 	EAI_PP_pay_pp_cost = yes
+			# }
+			if = {
+				limit = {
+					original_tag = GER
+					OR = {
+						AND = {
+							has_completed_focus = GER_employ_philipp_holzmann
+							NOT = { has_completed_focus = GER_plenipotentiary_of_armaments }
+						}
+						has_completed_focus = GER_revitalize_the_nation
+					}
+				}
+			
+				add_ideas = GER_philipp_holzmann_improved
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
+			}
+			if = {
+				limit = {
+					original_tag = GER
+					has_dlc = "Arms Against Tyranny"
+					has_completed_focus = GER_plenipotentiary_of_armaments
+				}
+			
+				add_ideas = GER_philipp_holzmann_improved_2
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
+			}
+			if = {
+				limit = {
+					original_tag = GER
+					NOT = { has_dlc = "Arms Against Tyranny" }
+					has_completed_focus = GER_plenipotentiary_of_armaments
+				}
+			
+				add_ideas = GER_philipp_holzmann_improved_2_no_aat
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_priority_decisions" }
+			}
 		}
 	}
 }
@@ -387,11 +516,11 @@ EAI_LAW_upgrade_economy_law = {
 
 		if = { limit = { set_temp_variable = { _check_pp = EAI_eco_law_cost } EAI_PP_has_check_pp = yes }
 
-			set_temp_variable = { _pp_cost = EAI_eco_law_cost }
-			EAI_PP_pay_pp_cost = yes
-
 			if = { limit = { EAI_LAW_get_low_economic_mobilisation = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_eco_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_economy_law" }
                 add_ideas = low_economic_mobilisation
 
 				### on_add
@@ -412,6 +541,9 @@ EAI_LAW_upgrade_economy_law = {
 
 			else_if = { limit = { EAI_LAW_get_partial_economic_mobilisation = yes } 
                 
+				set_temp_variable = { _pp_cost = EAI_eco_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_economy_law" }
                 add_ideas = partial_economic_mobilisation
 
 				### on_add
@@ -432,6 +564,9 @@ EAI_LAW_upgrade_economy_law = {
 
 			else_if = { limit = { EAI_LAW_get_war_economy = yes } 
 
+				set_temp_variable = { _pp_cost = EAI_eco_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_economy_law" }
                 add_ideas = war_economy
 
 				### on_add
@@ -452,6 +587,9 @@ EAI_LAW_upgrade_economy_law = {
 
 			else_if = { limit = { EAI_LAW_get_tot_economic_mobilisation = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_eco_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_economy_law" }
                 add_ideas = tot_economic_mobilisation
 
 				### on_add
@@ -501,49 +639,64 @@ EAI_LAW_upgrade_conscription_law = {
 
 		if = { limit = { set_temp_variable = { _check_pp = EAI_man_law_cost } EAI_PP_has_check_pp = yes }
 
-			set_temp_variable = { _pp_cost = EAI_man_law_cost }
-			EAI_PP_pay_pp_cost = yes
-
 			if = { limit = { EAI_LAW_get_volunteer_only = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = volunteer_only
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: volunteer_only (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: volunteer_only (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 
 			else_if = { limit = { EAI_LAW_get_limited_conscription = yes } 
                 
+				set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = limited_conscription
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: limited_conscription (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: limited_conscription (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 
 			else_if = { limit = { EAI_LAW_get_extensive_conscription = yes } 
            
+		   		set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = extensive_conscription
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: extensive_conscription (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: extensive_conscription (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 
 			else_if = { limit = { EAI_LAW_get_service_by_requirement = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = service_by_requirement
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: service_by_requirement (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: service_by_requirement (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 
             else_if = { limit = { EAI_LAW_get_all_adults_serve = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = all_adults_serve
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: all_adults_serve (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: all_adults_serve (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 
             else_if = { limit = { EAI_LAW_get_scraping_the_barrel = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_man_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_conscription_law" }
                 add_ideas = scraping_the_barrel
 
-				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: scraping_the_barrel (script) current mp = [?manpower_k|0]k current army = [?EAI_army_manpower]0k" } 
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSCRIPTION LAW: scraping_the_barrel (script) current mp = [?manpower_k|0]k current army = [?deployed_army_manpower_k]k" } 
             }
 		}
 	}
@@ -573,11 +726,11 @@ EAI_LAW_upgrade_trade_law = {
 
 		if = { limit = { set_temp_variable = { _check_pp = EAI_tra_law_cost } EAI_PP_has_check_pp = yes }
 
-			set_temp_variable = { _pp_cost = EAI_tra_law_cost }
-			EAI_PP_pay_pp_cost = yes
-
 			if = { limit = { EAI_LAW_get_free_trade = yes } 
             
+				set_temp_variable = { _pp_cost = EAI_tra_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_trade_law" }
                 add_ideas = free_trade
 
 				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE LAW: free_trade (need: [?EAI_average_resource_need]) (script)" } 
@@ -585,6 +738,9 @@ EAI_LAW_upgrade_trade_law = {
 
 			else_if = { limit = { EAI_LAW_get_export_focus = yes } 
                 
+				set_temp_variable = { _pp_cost = EAI_tra_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_trade_law" }
                 add_ideas = export_focus
 
 				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE LAW: export_focus (need: [?EAI_average_resource_need]) (script)" } 
@@ -592,9 +748,22 @@ EAI_LAW_upgrade_trade_law = {
 
 			else_if = { limit = { EAI_LAW_get_limited_exports = yes } 
            
+		   		set_temp_variable = { _pp_cost = EAI_tra_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_trade_law" }
                 add_ideas = limited_exports
 
 				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE LAW: limited_exports (need: [?EAI_average_resource_need]) (script)" } 
+            }
+
+			else_if = { limit = { EAI_LAW_get_closed_economy = yes } 
+           
+		   		set_temp_variable = { _pp_cost = EAI_tra_law_cost }
+				EAI_PP_pay_pp_cost = yes
+				if = { limit = { has_country_flag = EAI_pp_logging } log = "SOURCE: EAI_LAW_upgrade_trade_law" }
+                add_ideas = closed_economy
+
+				if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TRADE LAW: closed_economy (need: [?EAI_average_resource_need]) (script)" } 
             }
 
 			set_country_flag = { flag = EAI_trade_law_recently_changed value = 1 days = 90 } # limits the AI from changing trade law due to minor fluctuations

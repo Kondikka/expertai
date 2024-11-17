@@ -1,0 +1,297 @@
+EAI_MATH_abs = { # var:_val_
+	if = { limit = { EAI_MATH_TRIGGER_abs = yes } }
+}
+
+EAI_MATH_deviation = { # val:_val_ val:_avg
+	if = { limit = { EAI_MATH_TRIGGER_deviation = yes } }
+}
+
+EAI_MATH_normalize = { # var:_val_ var:_min var:_max
+	if = { limit = { EAI_MATH_TRIGGER_normalize = yes } }
+}
+
+EAI_MATH_complement = { # var:_val_
+	if = { limit = { EAI_MATH_TRIGGER_complement = yes } }
+}
+
+EAI_MATH_scale = { # var:_val_ var:_scale
+	if = { limit = { EAI_MATH_TRIGGER_scale = yes } }
+}
+
+EAI_MATH_sqrt = { # var:_val_
+
+	if = { limit = { NOT = { check_variable = { _val_ < 0 } } }
+	
+		set_temp_variable = { sqrt_result = 0 }
+		set_temp_variable = { accuracy = 0.01 }
+		set_temp_variable = { x1 = _val_ }
+		while_loop_effect = { limit = { check_variable = { EAI_sqrt_b = 0 } } break = EAI_sqrt_b
+	
+			set_temp_variable = { a = _val_ }
+			divide_temp_variable = { a = x1 }
+	
+			set_temp_variable = { x2 = x1 }
+			add_to_temp_variable = { x2 = a }
+	
+			divide_temp_variable = { x2 = 2 }
+	
+			set_temp_variable = { abs_x = x2 }
+			subtract_from_temp_variable = { abs_x = x1 }
+			if = { limit = { check_variable = { abs_x < 0 } } multiply_temp_variable = { abs_x = -1 } }
+
+			if = { limit = { check_variable = { abs_x < accuracy } }
+				set_temp_variable = { _val_ = x2 }
+				set_temp_variable = { EAI_sqrt_b = 1 }
+			}
+	
+			set_temp_variable = { x1 = x2 }
+		}
+	
+		set_temp_variable = { EAI_sqrt_b = 0 }
+	}
+	else = {
+		log = "EAI_MATH_sqrt ERROR"
+		log = "_val_=[?_val_]"
+	}
+}
+
+EAI_MATH_square = { # var:_val_
+	if = { limit = { EAI_MATH_TRIGGER_square = yes } }
+}
+
+###
+
+EAI_MATH_get_distance_between_provinces_a_b = { # _province_id_a, _province_id_b, distance_
+
+	@map_width = 5632
+	@map_width_half = 2816
+
+	set_temp_variable = { dx = global.EAI_MAP_province_x_pos^_province_id_a }
+	subtract_from_temp_variable = { dx = global.EAI_MAP_province_x_pos^_province_id_b }
+	if = { limit = { check_variable = { dx < 0 } } multiply_temp_variable = { dx = -1 } }
+	if = { limit = { check_variable = { dx > @map_width_half } }
+		set_temp_variable = { dx_wr = @map_width }
+		subtract_from_temp_variable = { dx_wr = dx }
+		set_temp_variable = { dx = dx_wr }
+	}
+
+	set_temp_variable = { dy = global.EAI_MAP_province_y_pos^_province_id_a }
+	subtract_from_temp_variable = { dy = global.EAI_MAP_province_y_pos^_province_id_b }
+	if = { limit = { check_variable = { dy < 0 } } multiply_temp_variable = { dy = -1 } }
+
+	# log = "_province_id_a=[?_province_id_a] _province_id_b=[?_province_id_b] dx=[?dx] dy=[?dy]"
+
+	multiply_temp_variable = { dx = dx }
+	multiply_temp_variable = { dy = dy }
+	set_temp_variable = { distance_ = dx }
+	add_to_temp_variable = { distance_ = dy }
+
+	set_temp_variable = { _val_ = distance_ }
+	EAI_MATH_sqrt = yes
+	set_temp_variable = { distance_ = _val_ }
+
+	# log = "distance_=[?distance_]"
+}
+
+EAI_MATH_get_random_index_in_array_len = { # _array_len, random_index_
+
+	set_temp_variable = { random_index_ = _array_len }
+	multiply_temp_variable = { random_index_ = random }
+	meta_effect = {
+		text = { set_temp_variable = { random_index_ = [x] } }
+		x = "[?random_index_|0]"
+	}
+	if = { limit = { check_variable = { random_index_ = _array_len } } subtract_from_temp_variable = { random_index_ = 1 } }
+}
+
+EAI_MATH_2d_array_index = { # var:_x var:_y var:_y_w var:index_
+
+	if = {
+		limit = {
+			check_variable = { _y_w > 0 }
+		}
+	
+		set_temp_variable = { index_ = _x }
+		multiply_temp_variable = { index_ = _y_w }
+		add_to_temp_variable = { index_ = _y }
+	}
+	else = {
+		log = "EAI_MATH_2d_array_index ERROR"
+		log = "_y_w=[?_y_w]"
+	}
+}
+
+EAI_MATH_2d_subarray_insert = { # arr:_arr_ var:_val var:_x var:_x_w var:_y_w
+
+	if = {
+		limit = {
+			check_variable = { _arr_^num > 0 }
+			check_variable = { _x_w > 0 }
+			check_variable = { _y_w > 0 }
+		}
+	
+		resize_temp_array = { x_dim = _x_w }
+		resize_temp_array = { y_dim = _y_w }
+		set_temp_variable = { prev_v = _val }
+		for_each_loop = { array = x_dim index = x
+			if = { limit = { check_variable = { x = _x } }
+				for_each_loop = { array = y_dim index = y
+					set_temp_variable = { _x = x }
+					set_temp_variable = { _y = y }
+					EAI_MATH_2d_array_index = yes
+					set_temp_variable = { tmp = _arr_^index_ }
+					set_temp_variable = { _arr_^index_ = prev_v }
+					set_temp_variable = { prev_v = tmp }
+				}
+			}
+		}
+	}
+	else = {
+		log = "EAI_MATH_2d_subarray_insert ERROR"
+		log = "_x_w=[?_x_w]"
+		log = "_y_w=[?_y_w]"
+	}
+}
+
+EAI_MATH_2d_subarray_reset_to_value = { # arr:_arr_ var:_val var:_x var:_x_w var:_y_w
+	
+	if = {
+		limit = {
+			check_variable = { _arr_^num > 0 }
+			check_variable = { _x_w > 0 }
+			check_variable = { _y_w > 0 }
+		}
+	
+		resize_temp_array = { x_dim = _x_w }
+		resize_temp_array = { y_dim = _y_w }
+		set_temp_variable = { val = _val }
+		for_each_loop = { array = x_dim index = x
+			if = { limit = { check_variable = { x = _x } }
+				for_each_loop = { array = y_dim index = y
+					set_temp_variable = { _x = x }
+					set_temp_variable = { _y = y }
+					EAI_MATH_2d_array_index = yes
+					set_temp_variable = { _arr_^index_ = _val }
+				}
+			}
+		}
+	}
+	else = {
+		log = "EAI_MATH_2d_subarray_reset_to_value ERROR"
+		log = "_x=[?_x]"
+		log = "_x_w=[?_x_w]"
+		log = "_y_w=[?_y_w]"
+	}
+}
+
+EAI_MATH_trend = { # var:_long var:_short arr:_data var:trend_
+
+	if = { 
+		limit = { 
+			check_variable = { _data^num > 0 } 
+			check_variable = { _short > 0 } 
+			check_variable = { _short < _long }
+		}
+	
+		clear_temp_array = _set
+		resize_temp_array = { trend_arr = _long }
+		set_temp_variable = { calculated_short = 0 }
+		for_each_loop = { array = trend_arr index = trend_i value = trend_v break = trend_b
+			if = {
+				limit = { 
+					NOT = { 
+						check_variable = { trend_i < _short } 
+						check_variable = { calculated_short = 1 }
+					} 
+				}
+				set_temp_variable = { calculated_short = 1 }
+				EAI_MATH_average = yes
+				set_temp_variable = { avg_short = average_ }
+			}
+			if = { limit = { check_variable = { trend_i < _data^num } }
+				set_temp_variable = { tmp = _data^trend_i }
+			}
+			else = {
+				set_temp_variable = { tmp = prev_value }
+			}
+			add_to_temp_array = { _set = tmp }
+			set_temp_variable = { prev_value = tmp }
+		}
+		EAI_MATH_average = yes
+		set_temp_variable = { avg_long = average_ }
+		set_temp_variable = { avg_diff = avg_short }
+		subtract_from_temp_variable = { avg_diff = avg_long }
+		set_temp_variable = { trend_ = avg_diff }
+		divide_temp_variable = { trend_ = avg_long }
+	}
+	else = {
+		log = "EAI_MATH_trend ERROR"
+		log = "_data^num=[?_data^num]"
+		log = "_short=[?_short]"
+		log = "_long=[?_long]"
+	}
+
+	set_temp_variable = { _long = 0 }
+	set_temp_variable = { _short = 0 }
+}
+
+EAI_MATH_average = { # arr:_set var:average_
+
+	if = { limit = { check_variable = { _set^num > 0 } }
+	
+		set_temp_variable = { set_sum = 0 }
+		for_each_loop = { array = _set index = avg_i value = avg_v
+			add_to_temp_variable = { set_sum = avg_v }
+		}
+		set_temp_variable = { average_ = set_sum }
+		divide_temp_variable = { average_ = _set^num }
+	}
+	else = {
+		log = "EAI_MATH_average ERROR"
+	}
+}
+
+EAI_MATH_lerp = { # var:_from var:_to var:_amount var:lerp_
+	if = { limit = { EAI_MATH_TRIGGER_lerp = yes } }
+}
+
+EAI_MATH_sort_array = { # arr:_items_ arr:_values_
+
+	if = { 
+		limit = { 
+			check_variable = { _items_^num > 0 } 
+			check_variable = { _values_^num > 0 } 
+		}
+		
+		set_temp_variable = { sort_item_index = 1 }
+		while_loop_effect = { break = break_1 limit = { check_variable = { sort_item_index < _items_^num } }
+			set_temp_variable = { sort_item = _items_^sort_item_index }
+			set_temp_variable = { sort_item_value = _values_^sort_item_index }
+			set_temp_variable = { prev_item_index = sort_item_index }
+			subtract_from_temp_variable = { prev_item_index = 1 }
+			while_loop_effect = { break = break_2
+				limit = {
+					check_variable = { var = prev_item_index value = 0 compare = greater_than_or_equals }
+					set_temp_variable = { prev_item = _items_^prev_item_index }
+					set_temp_variable = { prev_item_value = _values_^prev_item_index }
+					check_variable = { prev_item_value < sort_item_value }
+				}
+				set_temp_variable = { tmp_index = prev_item_index }
+				add_to_temp_variable = { tmp_index = 1 }
+				set_temp_variable = { _items_^tmp_index = prev_item }
+				set_temp_variable = { _values_^tmp_index = prev_item_value }
+				subtract_from_temp_variable = { prev_item_index = 1 }
+			}
+			set_temp_variable = { tmp_index = prev_item_index }
+			add_to_temp_variable = { tmp_index = 1 }
+			set_temp_variable = { _items_^tmp_index = sort_item }
+			set_temp_variable = { _values_^tmp_index = sort_item_value }
+			add_to_temp_variable = { sort_item_index = 1 }
+		}
+	}
+	else = {
+		log = "EAI_MATH_sort_array ERROR"
+		log = "_items_^num=[?_items_^num]"
+		log = "_values_^num=[?_values_^num]"
+	}
+}

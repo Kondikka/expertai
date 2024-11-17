@@ -2,6 +2,7 @@
 ###		Electronic technologies
 #######################################################################################
 
+@PR_rockets = 900
 @PR_radio = 1000
 @PR_radar = 700
 @PR_computing_machine = 900
@@ -17,6 +18,7 @@ EAI_PR_STRATEGIES_electronic_technologies = {
 	EAI_PR_STRATEGIES_fire_control_system = yes
 	EAI_PR_STRATEGIES_nukes = yes
 	EAI_PR_STRATEGIES_jet_engines = yes
+	EAI_PR_STRATEGIES_rockets = yes
 }
 
 ###
@@ -25,7 +27,7 @@ EAI_PR_STRATEGIES_radio = {
 
 	if = { 
 		limit = { 
-			has_war = yes
+			always = yes
 		}
 
 		set_temp_variable = { prio_cat = @PR_radio }
@@ -34,7 +36,35 @@ EAI_PR_STRATEGIES_radio = {
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:radio } set_temp_variable = { _prio_val = prio_cat }
 
-			date > 1936.1.1
+			OR = {
+				has_war = yes
+				date > 1939.1.1
+			}
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### improved_radio
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:improved_radio } set_temp_variable = { _prio_val = prio_cat }
+
+			OR = {
+				has_war = yes
+				date > 1939.1.1
+			}
+			subtract_from_temp_variable = { _prio_val = 200 }
+			if = { limit = { date > 1940.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			if = { limit = { date > 1942.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### advanced_radio
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:advanced_radio } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1941.1.1
+			subtract_from_temp_variable = { _prio_val = 200 }
+			if = { limit = { date > 1942.1.1 } add_to_temp_variable = { _prio_val = 100 } }
+			if = { limit = { date > 1944.1.1 } add_to_temp_variable = { _prio_val = 100 } }
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 	}
@@ -52,14 +82,12 @@ EAI_PR_STRATEGIES_radar = {
 					num_of_controlled_factories > 100
 					check_variable = { num_deployed_planes > 2000 }
 				}
-
 				AND = {
 					is_major = yes
 					any_enemy_country = { is_major = yes }
 				}
 				AND = {
 					OR = {
-						EAI_radio_navigation_MODULE_FOCUS = yes
 						EAI_air_to_ground_radar_MODULE_FOCUS = yes
 						AND = { EAI_naval_radar_MODULE_FOCUS = yes check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 } }
 						EAI_radar_tech_focus = yes
@@ -79,9 +107,9 @@ EAI_PR_STRATEGIES_radar = {
 			add_to_temp_variable = { prio_cat = 400 }
 		}
 
-		### radio_detection
+		### cavity_magnatron
 
-		if = { limit = { set_temp_variable = { _prio_tech = token:radio_detection } set_temp_variable = { _prio_val = prio_cat }
+		if = { limit = { set_temp_variable = { _prio_tech = token:cavity_magnatron } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1939.1.1
 			OR = {
@@ -89,73 +117,21 @@ EAI_PR_STRATEGIES_radar = {
 					num_of_controlled_factories > 100
 					check_variable = { num_deployed_planes > 2000 }
 				}
-
 				AND = {
 					is_major = yes
 					any_enemy_country = { is_major = yes }
 				}
 				AND = {
 					OR = {
-						EAI_radio_navigation_MODULE_FOCUS = yes
 						EAI_air_to_ground_radar_MODULE_FOCUS = yes
 						AND = { EAI_naval_radar_MODULE_FOCUS = yes check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 } }
 						EAI_radar_tech_focus = yes
 					}
 				}
 			}
-				
-		} EAI_PR_add_to_priority_research_queue = yes }
-
-		### decimetric_radar
-
-		if = { limit = { set_temp_variable = { _prio_tech = token:decimetric_radar } set_temp_variable = { _prio_val = prio_cat }
-
-			date > 1939.1.1
-			OR = {
-				AND = {
-					num_of_controlled_factories > 100
-					check_variable = { num_deployed_planes > 2000 }
-				}
-
-				AND = {
-					is_major = yes
-					any_enemy_country = { is_major = yes }
-				}
-				AND = {
-					OR = {
-						EAI_radio_navigation_MODULE_FOCUS = yes
-						EAI_air_to_ground_radar_MODULE_FOCUS = yes
-						AND = { EAI_naval_radar_MODULE_FOCUS = yes check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 } }
-						EAI_radar_tech_focus = yes
-					}
-				}
-			}
-				
-		} EAI_PR_add_to_priority_research_queue = yes }
-
-		### improved_decimetric_radar
-
-		if = { limit = { set_temp_variable = { _prio_tech = token:improved_decimetric_radar } set_temp_variable = { _prio_val = prio_cat }
-
-			date > 1939.1.1
-			OR = {
-				AND = {
-					num_of_controlled_factories > 100
-					check_variable = { num_deployed_planes > 2000 }
-				}
-
-				AND = {
-					is_major = yes
-					any_enemy_country = { is_major = yes }
-				}
-				AND = {
-					OR = {
-						EAI_radio_navigation_MODULE_FOCUS = yes
-						EAI_air_to_ground_radar_MODULE_FOCUS = yes
-						AND = { EAI_naval_radar_MODULE_FOCUS = yes check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 } }
-						EAI_radar_tech_focus = yes
-					}
-				}
+			if = { limit = { EAI_radar_tech_focus = yes }
+			
+				add_to_temp_variable = { _prio_val = 400 }
 			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
@@ -170,26 +146,28 @@ EAI_PR_STRATEGIES_radar = {
 					num_of_controlled_factories > 100
 					check_variable = { num_deployed_planes > 2000 }
 				}
-
 				AND = {
 					is_major = yes
 					any_enemy_country = { is_major = yes }
 				}
 				AND = {
 					OR = {
-						EAI_radio_navigation_MODULE_FOCUS = yes
 						EAI_air_to_ground_radar_MODULE_FOCUS = yes
 						AND = { EAI_naval_radar_MODULE_FOCUS = yes check_variable = { EAI_RESEARCH_naval_research_factor > 0.5 } }
 						EAI_radar_tech_focus = yes
 					}
 				}
 			}
+			if = { limit = { EAI_radar_tech_focus = yes }
+			
+				add_to_temp_variable = { _prio_val = 400 }
+			}
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
-		### improved_centimetric_radar
+		### phased_array
 
-		if = { limit = { set_temp_variable = { _prio_tech = token:improved_centimetric_radar } set_temp_variable = { _prio_val = prio_cat }
+		if = { limit = { set_temp_variable = { _prio_tech = token:phased_array } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1941.1.1
 			OR = {
@@ -200,9 +178,9 @@ EAI_PR_STRATEGIES_radar = {
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 
-		### advanced_centimetric_radar
+		### monopulse_radar
 
-		if = { limit = { set_temp_variable = { _prio_tech = token:advanced_centimetric_radar } set_temp_variable = { _prio_val = prio_cat }
+		if = { limit = { set_temp_variable = { _prio_tech = token:monopulse_radar } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1942.1.1
 			OR = {
@@ -406,6 +384,41 @@ EAI_PR_STRATEGIES_jet_engines = {
 		### jet_engines
 
 		if = { limit = { set_temp_variable = { _prio_tech = token:jet_engines } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1945.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+	}
+}
+
+EAI_PR_STRATEGIES_rockets = {
+
+	if = { 
+		limit = { 
+			EAI_SP_rockets_ballistic_missile_focus = yes
+		}
+
+		set_temp_variable = { prio_cat = @PR_rockets }
+
+		### experimental_rockets
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:experimental_rockets } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1942.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### sp_rockets_rocket_bomber
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:sp_rockets_rocket_bomber } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1944.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### sp_rockets_improved_rocket_bomber
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:sp_rockets_improved_rocket_bomber } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1945.1.1
 				

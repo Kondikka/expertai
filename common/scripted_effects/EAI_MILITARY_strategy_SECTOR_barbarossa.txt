@@ -1,0 +1,239 @@
+###############################################################
+### Barbarossa sector strategy
+###############################################################
+
+### Barbarossa
+
+	@EAI_MILITARY_barbarossa_SECTOR_strategy_id = 3
+	@EAI_MILITARY_barbarossa_SECTOR_strategy_prio = 100
+
+	@EAI_MILITARY_barbarossa_SECTOR_num_sectors = 3
+
+###
+
+EAI_MILITARY_barbarossa_SECTOR_print = {
+
+	log = "*********************** EAI_MILITARY_barbarossa_SECTOR_print"
+	log = "Data:"
+
+	resize_temp_array = { sectors = @EAI_MILITARY_barbarossa_SECTOR_num_sectors }
+	resize_temp_array = { datapoints = 18 }
+	set_temp_variable = { _y_w = 18 }
+	for_each_loop = { array = sectors index = _x value = _x_val
+		log = "***********************"
+		for_each_loop = { array = datapoints index = _y value = _y_val
+			EAI_MATH_2d_array_index = yes
+			log = ">[?_y]=[?EAI_MILITARY_SECTOR_weekly_control_pct^index_]"
+		}
+	}
+
+	log = "*********"
+	log = "States:"
+	for_each_loop = { array = EAI_MILITARY_SECTOR_target_states
+		var:v = { log = ">[this.getname]" }
+	}
+
+	log = "*********"
+	log = "Objectives:"
+	for_each_loop = { array = EAI_MILITARY_SECTOR_target_objectives
+		var:v = { log = ">[this.getname]" }
+	}
+
+	log = "*********"
+	log = "Regions:"
+	for_each_loop = { array = EAI_MILITARY_SECTOR_target_regions
+		log = ">[?v]"
+	}
+
+	log = "*********************** EAI_MILITARY_barbarossa_SECTOR_print"
+}
+
+EAI_MILITARY_barbarossa_SECTOR_update = {
+
+	if = {
+		limit = {
+			OR = {
+				tag = GER
+				tag = SOV
+			}
+		}
+
+		set_temp_variable = { _strategy_id = @EAI_MILITARY_barbarossa_SECTOR_strategy_id }
+		set_temp_variable = { _strategy_prio = @EAI_MILITARY_barbarossa_SECTOR_strategy_prio }
+	
+		if = {
+			limit = {
+				OR = {
+					### GER
+	
+						AND = {
+							tag = GER
+							OR = {
+								has_war_with = SOV
+								AND = {
+									OR = {
+										has_global_flag = { flag = EAI_GER_blitz_russia_365d days < 90 }
+										AND = { focus_progress = { focus = GER_war_with_the_ussr progress > 0 } NOT = { has_completed_focus = GER_war_with_the_ussr } }
+									}
+									SOV = { EAI_PREV_deploy_against_THIS = yes }
+								}
+							}
+						}
+	
+					### SOV
+	
+						AND = {
+							tag = SOV
+							has_war_with = GER
+						}
+	
+					###
+				}
+			}
+	
+			EAI_MILITARY_strategy_priorities = yes
+			if = { limit = { check_variable = { has_priority_ = 1 } }
+				if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | SECTOR: EAI_MILITARY_barbarossa_SECTOR_update" }
+				EAI_MILITARY_assign_strategy = yes
+				EAI_MILITARY_barbarossa_SECTOR_preparation = yes
+				EAI_MILITARY_barbarossa_SECTOR_define_sides = yes
+				EAI_MILITARY_barbarossa_SECTOR_get_sector_data = yes
+				EAI_MILITARY_SECTOR_update = yes
+				if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | SECTOR: END EAI_MILITARY_barbarossa_SECTOR_update" }
+			}
+			else = {
+				EAI_MILITARY_SECTOR_clear = yes
+			}
+		}
+		else_if = { limit = { check_variable = { EAI_MILITARY_strategy_id = _strategy_id } }
+			EAI_MILITARY_SECTOR_clear = yes
+		}
+	}
+}
+
+EAI_MILITARY_barbarossa_SECTOR_get_sector_data = {
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_barbarossa_SECTOR_get_sector_data" }
+
+	set_temp_variable = { _num_sectors = @EAI_MILITARY_barbarossa_SECTOR_num_sectors }
+	clear_temp_array = _data_start
+	clear_temp_array = _data_ST_end
+	clear_temp_array = _data_OB_end
+	clear_temp_array = _data_AR_end
+	clear_temp_array = _data_end
+	resize_temp_array = { sectors = _num_sectors }
+	for_each_loop = { array = sectors
+		add_to_temp_array = { _data_start = global.EAI_MAP_barbarossa_sector_data_start^i }
+		add_to_temp_array = { _data_ST_end = global.EAI_MAP_barbarossa_sector_data_ST_end^i }
+		add_to_temp_array = { _data_OB_end = global.EAI_MAP_barbarossa_sector_data_OB_end^i }
+		add_to_temp_array = { _data_AR_end = global.EAI_MAP_barbarossa_sector_data_AR_end^i }
+		add_to_temp_array = { _data_end = global.EAI_MAP_barbarossa_sector_data_end^i }
+	}
+	clear_temp_array = _sector_data
+	for_each_loop = { array = global.EAI_MAP_barbarossa_sectors add_to_temp_array = { _sector_data = v } }
+}
+
+EAI_MILITARY_barbarossa_SECTOR_preparation = {
+
+	### Clear
+
+		if = { limit = { has_country_flag = EAI_MILITARY_SECTOR_preparation }
+
+			### Ger
+					
+			if = { 
+				limit = { 
+					tag = GER
+
+					NOT = {
+						AND = {
+							NOT = { has_war_with = SOV }
+						}
+					}
+				}
+
+				EAI_MILITARY_SECTOR_clear_preparation = yes
+			}
+
+			###
+		}
+
+	### Set
+
+		else = {
+
+			### GER
+
+				if = {
+					limit = {
+						tag = GER
+
+						AND = {
+							NOT = { has_war_with = SOV }
+						}
+					}
+
+					EAI_MILITARY_SECTOR_set_preparation = yes
+				}
+
+			###
+		}
+
+	###
+}
+
+EAI_MILITARY_barbarossa_SECTOR_define_sides = { # >>> arr:_our_side_ arr:_their_side_
+
+	if = { limit = { has_country_flag = EAI_sector_operations_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | EAI_MILITARY_barbarossa_SECTOR_define_sides" }
+
+	clear_temp_array = _our_side_
+	clear_temp_array = _their_side_
+
+	### GER
+
+		if = { limit = { tag = GER }
+		
+			# Allies
+			every_country = { limit = { OR = { tag = GER tag = ROM tag = HUN tag = FIN } }
+				if = { limit = { OR = { EAI_PREV_on_same_side_with_THIS = yes PREV = { NOT = { has_country_flag = EAI_MILITARY_barbarossa_SECTOR_preparation } } } }
+					if = { limit = { NOT = { is_in_array = { _our_side_ = THIS.id } } } add_to_temp_array = { _our_side_ = THIS.id } }
+					for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+					for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+				}
+			}
+
+			# Enemies
+			every_country = { limit = { OR = { tag = SOV } }
+				if = { limit = { OR = { EAI_THIS_is_threat_to_PREV = yes PREV = { NOT = { has_country_flag = EAI_MILITARY_barbarossa_SECTOR_preparation } } } }
+					if = { limit = { NOT = { is_in_array = { _their_side_ = THIS.id } } } add_to_temp_array = { _their_side_ = THIS.id } }
+					for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+					for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				}
+			}
+		}
+
+	### SOV
+
+		else_if = { limit = { tag = SOV }
+
+			# Allies
+			every_country = { limit = { OR = { tag = SOV } }
+				if = { limit = { OR = { EAI_PREV_on_same_side_with_THIS = yes PREV = { NOT = { has_country_flag = EAI_MILITARY_barbarossa_SECTOR_preparation } } } }
+					if = { limit = { NOT = { is_in_array = { _our_side_ = THIS.id } } } add_to_temp_array = { _our_side_ = THIS.id } }
+					for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+					for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+				}
+			}
+
+			# Enemies
+			every_country = { limit = { OR = { tag = GER tag = ROM tag = HUN tag = FIN } }
+				if = { limit = { OR = { EAI_THIS_is_threat_to_PREV = yes PREV = { NOT = { has_country_flag = EAI_MILITARY_barbarossa_SECTOR_preparation } } } }
+					if = { limit = { NOT = { is_in_array = { _their_side_ = THIS.id } } } add_to_temp_array = { _their_side_ = THIS.id } }
+					for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+					for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				}
+			}
+		}
+
+	###
+}

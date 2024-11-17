@@ -2,13 +2,40 @@
 #	Expert AI mod - diplomacy triggers
 ######################################################
 
+EAI_PREV_deploy_against_THIS = {
+
+	OR = {
+		NOT = { EAI_PREV_defeated_THIS = yes }
+		EAI_PREV_imminent_war_against_THIS = yes
+	}
+}
+
+EAI_PREV_imminent_war_against_THIS = {
+
+	set_temp_variable = { EAI_PREV_imminent_war_against_THIS_id = THIS.id }
+	PREV = {
+		NOT = { has_war_with = var:EAI_PREV_imminent_war_against_THIS_id }
+		# has_wargoal_against = var:EAI_PREV_imminent_war_against_THIS_id
+		var:EAI_PREV_imminent_war_against_THIS_id = { EAI_THIS_is_threat_to_PREV = yes }
+	}
+}
+
+EAI_PREV_defeated_THIS = {
+
+	if = { limit = { has_war_with = PREV }
+	
+		has_capitulated = yes
+	}
+	else = { always = yes }
+}
+
 EAI_justifying_wargoal_via_focus_vs_PREV = {
 
 	OR = {
 
 		AND = { focus_progress = { focus = GER_danzig_or_war progress > 0 } NOT = { has_completed_focus = GER_danzig_or_war } PREV = { tag = POL } }
 
-		AND = { focus_progress = { focus = GER_weserubung progress > 0 } NOT = { has_completed_focus = GER_weserubung } PREV = { tag = DEN } }
+		AND = { focus_progress = { focus = GER_operation_weserubung progress > 0 } NOT = { has_completed_focus = GER_operation_weserubung } PREV = { tag = DEN } }
 
 		AND = { focus_progress = { focus = GER_around_maginot progress > 0 } NOT = { has_completed_focus = GER_around_maginot } PREV = { OR = { tag = BEL tag = HOL tag = LUX } } }
 	}
@@ -49,7 +76,7 @@ EAI_is_prepared_for_war = {
 		AND = {
 			enemies_strength_ratio < 0.5
 			surrender_progress < 0.05
-			NOT = { has_country_flag = EAI_MILITARY_trend_losing_war }
+			NOT = { has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 } }
 		}
 	}
 
@@ -75,15 +102,15 @@ EAI_is_threat = {
 
 EAI_THIS_is_threat_to_PREV = {
 
-	set_temp_variable = { prev_id = PREV.id }
+	set_temp_variable = { EAI_THIS_is_threat_to_PREV_id = PREV.id }
 
 	AND = {
 		has_capitulated = no
 		exists = yes
 
 		NOT = { EAI_PREV_has_same_ideology_with_THIS = yes }
-		NOT = { var:faction_leader = { var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
-		NOT = { var:overlord = { var:prev_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
+		NOT = { var:faction_leader = { var:EAI_THIS_is_threat_to_PREV_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
+		NOT = { var:overlord = { var:EAI_THIS_is_threat_to_PREV_id = { EAI_PREV_has_same_ideology_with_THIS = yes } } }
 
 		NOT = { has_war_together_with = PREV }
 		NOT = { var:faction_leader = { has_war_together_with = var:prev_id } }
