@@ -37,8 +37,21 @@ EAI_GER_build_army = {
 	ai_strategy = { type = build_army id = infantry value = 500 }
 	ai_strategy = { type = force_build_armies value = 300 }
 	ai_strategy = { type = equipment_production_min_factories_archetype id = infantry_equipment value = 10 }
-	ai_strategy = { type = equipment_production_min_factories_archetype id = support_equipment value = 6 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = support_equipment value = 3 }
 	ai_strategy = { type = equipment_production_min_factories_archetype id = motorized_equipment value = 3 }
+}
+
+EAI_GER_support_equipment = {
+	allowed = { tag = GER }
+	enable = { 
+		date < 1941.1.1
+		has_army_manpower = { size < 1200000 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = equipment_production_min_factories_archetype id = support_equipment value = 3 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = anti_air_equipment value = 2 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = anti_tank_equipment value = 2 }
 }
 
 EAI_GER_artillery = {
@@ -583,8 +596,9 @@ EAI_GER_poland_DEPLOY_POL = {
 
 	ai_strategy = {
 		type = force_concentration_factor
-		value = 20
+		value = 25
 	}
+
 	ai_strategy = {
 		type = force_concentration_front_factor
 		ratio = 0.5
@@ -595,14 +609,10 @@ EAI_GER_poland_DEPLOY_POL = {
 		state = 10
 		state = 5
 	}
-	ai_strategy = {
-		type = force_concentration_target_weight
-		value = 50
-		
-		state = 10
-	}
 
 	### Avoid
+
+	ai_strategy = { type = garrison value = -50 }
 
 	ai_strategy = {
 		type = force_concentration_front_factor
@@ -624,6 +634,38 @@ EAI_GER_poland_DEPLOY_POL = {
 	    value = -200
 		
 	    area = europe
+	}
+}
+
+EAI_GER_poland_OFFENSIVE_objectives = {
+	allowed = { tag = GER }
+	enable = {
+		OR = {
+			has_global_flag = { flag = EAI_GER_blitz_poland_365d days < 30 }
+			AND = { focus_progress = { focus = GER_danzig_or_war progress > 0 } NOT = { has_completed_focus = GER_danzig_or_war } }
+		}
+		POL = { EAI_PREV_deploy_against_THIS = yes }
+	}
+	abort_when_not_enabled = yes
+
+	### Deploy
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = 50
+		
+		state = 10
+	}
+
+	### Avoid
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -100
+		
+		state_trigger = {
+			NOT = { state = 10 }
+		}
 	}
 }
 
