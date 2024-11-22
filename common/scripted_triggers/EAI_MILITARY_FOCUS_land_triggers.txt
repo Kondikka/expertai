@@ -462,12 +462,12 @@ EAI_maintenance_tech_focus = {
 
 EAI_hospital_tech_focus = {
 
-	NOT = { EAI_use_cheap_infantry = yes }
+	NOT = { EAI_infantry_variant_focus_EARLY = yes }
 }
 
 EAI_logistics_tech_focus = {
 
-	NOT = { EAI_use_cheap_infantry = yes }
+	NOT = { EAI_infantry_variant_focus_EARLY = yes }
 }
 
 EAI_recon_tech_focus = {
@@ -515,6 +515,17 @@ EAI_armored_car_tech_focus = {
 	}
 }
 
+EAI_armored_engineer_tech_focus = {
+
+	num_of_military_factories > 80
+	OR = {
+		EAI_LARM_equipment_production = yes
+		EAI_MARM_equipment_production = yes
+		EAI_HARM_equipment_production = yes
+		EAI_MODARM_equipment_production = yes
+	}
+}
+
 EAI_light_flamethrower_support_tech_focus = {
 
 	OR = {
@@ -538,6 +549,16 @@ EAI_light_armor_tank_recon_tech_focus = {
 ############################################
 #	 Armor tech focuses
 ############################################
+
+EAI_MECH_equipment_production = {
+	OR = {
+		EAI_MARM_equipment_production = yes
+		EAI_HARM_equipment_production = yes
+		EAI_MODARM_equipment_production = yes
+	}
+}
+
+###
 
 EAI_armor_tech_focus = {
 	
@@ -894,8 +915,6 @@ EAI_artillery_tech_focus = {
 		EAI_heavy_armor_tank_design_focus = yes
 		EAI_light_armor_tank_design_focus = yes
 	}
-
-	NOT = { EAI_use_cheap_infantry = yes }
 }
 
 EAI_rart_tech_focus = {
@@ -910,7 +929,7 @@ EAI_rart_tech_focus = {
 	}
 
 	NOT = {
-		EAI_use_cheap_infantry = yes
+		EAI_infantry_variant_focus_EARLY = yes
 		AND = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } num_of_military_factories < 100 }
 	}
 }
@@ -1001,6 +1020,40 @@ EAI_cancel_anti_air_design_focus = {
 	# NOT = { has_country_flag = EAI_stop_air_production_min_duration }
 }
 
+EAI_infantry_variant_focus_EARLY = {
+	set_temp_variable = { tmp = 0 }
+	all_enemy_country = { add_to_temp_variable = { tmp = num_deployed_planes } }
+	check_variable = { tmp < 500 }
+
+	OR = {
+		AND = {
+			is_major = yes
+			OR = {
+				num_of_military_factories < 25
+				date < 1938.1.1
+			}
+		}
+		AND = {
+			is_major = no
+			num_of_military_factories < 10
+		}
+		AND = {
+			tag = JAP
+			has_war_with = CHI
+			date < 1939.1.1
+		}
+		AND = {
+			num_of_military_factories < 10
+			NOT = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } }
+		}
+		AND = {
+			tag = GER
+			has_war = no
+			date < 1938.1.1
+		}
+	}
+}
+
 EAI_infantry_variant_focus_CHEAP = {
 
 	NOT = { EAI_DIFFICULTY_has_difficulty_bonus = yes }
@@ -1018,10 +1071,7 @@ EAI_infantry_variant_focus_CHEAP = {
 		AND = {
 			tag = JAP
 			has_war_with = CHI
-			OR = {
-				date < 1941.1.1
-				has_country_flag = EAI_MILITARY_trend_losing_war
-			}
+			date < 1941.1.1
 		}
 		AND = {
 			tag = CHI

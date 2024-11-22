@@ -70,28 +70,11 @@ EAI_GER_artillery = {
 EAI_GER_more_tanks = {
 	allowed = { tag = GER }
 	enable = {
-		NOT = { FRA = { EAI_THIS_is_threat_to_PREV = yes } }
-		has_army_manpower = { type = armor size < 250000 }
-		OR = {
-			EAI_LARM_equipment_production = yes
-			EAI_MARM_equipment_production = yes
-			EAI_HARM_equipment_production = yes
-		}
+		check_variable = { deployed_army_manpower_k > 1500 }
 	}
-	abort = {
-		NOT = {
-			AND = {
-				has_army_manpower = { type = armor size < 350000 }
-				OR = {
-					EAI_LARM_equipment_production = yes
-					EAI_MARM_equipment_production = yes
-					EAI_HARM_equipment_production = yes
-				}
-			}
-		}
-	}
+	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_production_factor id = armor value = 10 }
+	ai_strategy = { type = equipment_production_factor id = armor value = 100 }
 }
 
 EAI_GER_more_subs = {
@@ -1360,6 +1343,45 @@ EAI_GER_battle_of_britain_DEFENSIVE_save_airforce = {
 	ai_strategy = { type = strategic_air_importance id = 18 value = -50000 }
 }
 
+EAI_GER_battle_of_britain_NAVAL_raid_atlantic = {
+	allowed = { original_tag = GER }
+	enable = {
+		OR = {
+			has_war_with = ENG
+			has_war_with = USA
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = naval_convoy_raid_region id = 49 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 44 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 51 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 58 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 50 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 56 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 57 value = 50000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 61 value = 50000 }
+
+	ai_strategy = { type = naval_convoy_raid_region id = 18 value = -5000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 42 value = -5000 }
+	ai_strategy = { type = naval_convoy_raid_region id = 43 value = -5000 }
+}
+
+EAI_GER_battle_of_britain_NAVAL_avoid = {
+	enable = {
+		has_war_with = ENG
+		NOT = { ENG = { has_capitulated = yes } }
+		alliance_naval_strength_ratio < 1.0
+		NOT = { ENG = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = naval_avoid_region id = 18 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 16 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 43 value = 50 }
+}
+
 ###########################
 # 	Operation Barbarossa
 ###########################
@@ -1756,24 +1778,6 @@ EAI_GER_barbarossa_HISTORICAL_hold_limiter = {
 #########################################################
 #	Naval
 #########################################################
-
-EAI_axis_avoid_ENG = {
-	enable = {
-		has_war_with = ENG
-
-		NOT = { ENG = { has_capitulated = yes } }
-
-		alliance_naval_strength_ratio < 1.0
-
-		NOT = { ENG = { has_country_flag = EAI_naval_invasion_from_@ROOT } }
-	}
-	
-	abort_when_not_enabled = yes
-	
-	ai_strategy = { type = naval_avoid_region id = 18 value = 5000 }
-	ai_strategy = { type = naval_avoid_region id = 16 value = 5000 }
-	ai_strategy = { type = naval_avoid_region id = 43 value = 5000 }
-}
 
 EAI_axis_avoid_mediterranean = {
 	enable = { 

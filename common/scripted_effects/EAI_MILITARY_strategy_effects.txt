@@ -192,8 +192,8 @@ EAI_MILITARY_track_war_trend = {
 			
 				### Define winning and losing
 
-					@war_trend_winning = 0.01
-					@war_trend_losing = -0.01
+					@war_trend_winning = 0.008
+					@war_trend_losing = -0.008
 
 					set_temp_variable = { _val_ = war_trend }
 					EAI_MATH_abs = yes
@@ -282,6 +282,47 @@ EAI_MILITARY_print_trend = {
 	}
 
 	log = "*********************** EAI_MILITARY_print_trend"
+}
+
+### Army size trend
+
+EAI_MILITARY_track_army_trend = {
+
+	if = { limit = { has_war = yes }
+
+		### Set trend
+
+			add_to_array = { array = EAI_MILITARY_army_size_k_weekly index = 0 value = deployed_army_manpower_k }
+			set_temp_variable = { resize = 18 }
+			clamp_temp_variable = { var = resize min = 0 max = EAI_MILITARY_army_size_k_weekly^num }
+			resize_array = { EAI_MILITARY_army_size_k_weekly = resize }
+
+			if = { limit = { check_variable = { EAI_MILITARY_army_size_k_weekly^num > 3 } }
+			
+				### Trend calculation
+
+					set_temp_variable = { _long = 18 }
+					set_temp_variable = { _short = 6 }
+					set_temp_variable = { arr_size = EAI_MILITARY_army_size_k_weekly^num }
+					clamp_temp_variable = { var = arr_size min = 0 max = _long }
+					resize_temp_array = { _data = arr_size }
+					for_each_loop = { array = _data index = data_i value = data_v
+						set_temp_variable = { _data^data_i = EAI_MILITARY_army_size_k_weekly^data_i }
+					}
+					EAI_MATH_trend = yes
+			
+				### Set trend
+
+					set_variable = { EAI_MILITARY_deployed_army_k_trend_value = trend_ }
+
+				###
+			}
+
+		###
+	}
+	else = {
+		clear_array = EAI_MILITARY_army_size_k_weekly
+	}
 }
 
 ###############################################################

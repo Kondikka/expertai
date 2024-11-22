@@ -2,6 +2,87 @@
 #	Expert AI mod - scripted variant AI triggers
 ######################################################
 
+### Enable equipment production
+
+EAI_DESIGN_ARMOR_armored_engineer_production_focus = {
+	num_of_military_factories > 80
+	has_tech = sp_armored_engineer_tech
+	is_special_project_completed = sp:sp_land_flamethrower_tank
+
+	OR = {
+		EAI_LARM_equipment_production = yes
+		EAI_MARM_equipment_production = yes
+		EAI_HARM_equipment_production = yes
+		EAI_MODARM_equipment_production = yes
+	}
+}
+
+EAI_DESIGN_ARMOR_mechanized_production_focus = {
+	EAI_DESIGN_ARMOR_armored_engineer_production_focus = yes
+
+	num_of_military_factories > 150
+	has_tech = mechanised_infantry
+	NOT = { 
+		check_variable = { EAI_needs_steel > 2 } 
+		check_variable = { EAI_steel_resource_shortage > 2 } 
+	}
+
+	OR = {
+		EAI_MARM_equipment_production = yes
+		EAI_HARM_equipment_production = yes
+		EAI_MODARM_equipment_production = yes
+	}
+}
+
+EAI_DESIGN_ARMOR_modern_production_focus = {
+	EAI_DESIGN_ARMOR_mechanized_production_focus = yes
+
+	num_of_military_factories > 150
+	has_tech = main_battle_tank_chassis
+	NOT = { 
+		check_variable = { EAI_needs_chromium > 2 } 
+		check_variable = { EAI_chromium_resource_shortage > 2 } 
+	}
+
+	OR = {
+		EAI_MODARM_equipment_production = yes
+	}
+}
+
+### Enable design upgrade
+
+EAI_DESIGN_ARMOR_armored_engineer_upgrade_focus = {
+	EAI_DESIGN_ARMOR_armored_engineer_production_focus = yes
+	has_country_flag = EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started
+}
+
+EAI_DESIGN_ARMOR_mechanized_upgrade_focus = {
+	EAI_DESIGN_ARMOR_mechanized_production_focus = yes
+	has_country_flag = EAI_DESIGN_ARMOR_mechanized_upgrade_production_started
+}
+
+EAI_DESIGN_ARMOR_modern_upgrade_focus = {
+	EAI_DESIGN_ARMOR_modern_production_focus = yes
+	has_country_flag = EAI_DESIGN_ARMOR_modern_upgrade_production_started
+}
+
+###
+
+EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started = {
+	check_variable = { num_equipment@armored_support_vehicle > 250 }
+	check_variable = { num_equipment@light_tank_flame_chassis > 250 }
+}
+
+EAI_DESIGN_ARMOR_mechanized_upgrade_production_started = {
+	check_variable = { num_equipment@mechanized_equipment > 250 }
+}
+
+EAI_DESIGN_ARMOR_modern_upgrade_production_started = {
+	check_variable = { num_equipment@modern_tank_chassis > 250 }
+}
+
+###
+
 EAI_armor_intel_tier_0 = { # < 60
 
 	check_variable = { EAI_max_armor_seen < 60 }
@@ -139,6 +220,8 @@ EAI_light_armor_art_design_focus = {
 }
 
 EAI_light_flamethrower_support_design_focus = {
+
+	EAI_DESIGN_ARMOR_armored_engineer_production_focus = yes
 
 	EAI_light_flamethrower_support_tech_focus = yes
 

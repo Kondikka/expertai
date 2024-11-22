@@ -130,6 +130,12 @@ focus_tree = {
 		cost = 5
 		#relative_position_id = GER_strengthen_the_kriegsmarine
 
+		available = {
+			NOT = {
+				has_dynamic_modifier = { modifier = GER_economy_of_conquest_modifier }
+			}
+		}
+
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_INDUSTRY FOCUS_FILTER_STABILITY FOCUS_FILTER_POLITICAL_CHARACTER }
 
 		completion_reward = {
@@ -11011,6 +11017,10 @@ focus_tree = {
 				OR = {
 					has_government = democratic
 					has_government = communism
+					AND = {
+						is_historical_focus_on = yes
+						date < 1946.1.1
+					}
 				}
 			}
 		}
@@ -12583,14 +12593,8 @@ focus_tree = {
 				NOT = {
 					any_enemy_country = {
 						is_major = yes
-						any_owned_state = { 
-							is_on_continent = europe 
-							OR = {
-								controller = {
-									original_tag = PREV
-									is_in_faction_with = PREV
-								}
-							}
+						any_controlled_state = { 
+							is_on_continent = europe
 						}
 					}
 				}
@@ -12669,107 +12673,146 @@ focus_tree = {
 			add_ideas = GER_crossing_the_atlantic_ns
 
 			custom_effect_tooltip = generic_skip_one_line_tt
-			every_state = {
+
+			# Add Dockyards and Replace Mils - Cap is 10 states (20 dockyards gained & 20 mils removed) -> cap defined in variable crossing_the_atlantic_max_states_for_dockyards set in history file
+			custom_effect_tooltip = GER_crossing_the_atlantic_dockyards_tt
+
+			if = { #Tooltip so players can know where the hell the dockyards were added
 				limit = {
-					is_fully_controlled_by = ROOT
-					is_on_continent = europe
-					is_coastal = yes
-					arms_factory < 1
+					check_variable = { number_of_states_getting_dockyards > 0 }
 				}
-				add_extra_state_shared_building_slots = 2
-				add_building_construction = {
-					type = dockyard
-					level = 2
-					instant_build = yes
+				custom_effect_tooltip = generic_states_affected_tt
+				every_controlled_state = {
+					limit = { has_state_flag = GER_crossing_the_atlantic_dockyards_built_flag }
+					display_individual_scopes = yes
+					add_building_construction = {
+						type = dockyard
+						level = 2
+						instant_build = yes
+					}
 				}
-				custom_effect_tooltip = GER_crossing_the_atlantic_2_factories_tt
-				hidden_effect = {
-					random_state = {
+			}
+
+			hidden_effect = {
+				every_controlled_state = { #Prio "self-sufficient" coastal states, with 2 mils
+					limit = {
+						is_fully_controlled_by = ROOT
+						is_on_continent = europe
+						is_coastal = yes
+						arms_factory > 1
+						NOT = { has_state_flag = GER_crossing_the_atlantic_dockyards_built_flag }
+					}
+					if = {
 						limit = {
-							is_fully_controlled_by = ROOT
-							is_on_continent = europe
-							NOT = { is_coastal = yes }
-							arms_factory > 1
+							check_variable = { ROOT.number_of_states_getting_dockyards < ROOT.crossing_the_atlantic_max_states_for_dockyards }
 						}
 						remove_building = {
 							type = arms_factory
 							level = 2
 						}
+						add_building_construction = {
+							type = dockyard
+							level = 2
+							instant_build = yes
+						}
+
+						set_state_flag = GER_crossing_the_atlantic_dockyards_built_flag
+						add_to_variable = { ROOT.number_of_states_getting_dockyards = 1 }
+						#log = "Number [?ROOT.number_of_states_getting_dockyards] - Built in [THIS.GetName] - Coastal with 2 mils" #Debug tool
 					}
 				}
-			}
-			every_state = {
-				limit = {
-					is_fully_controlled_by = ROOT
-					is_on_continent = europe
-					is_coastal = yes
-					AND = {
-						arms_factory < 2
-						arms_factory > 0
-					}
-				}
-				add_extra_state_shared_building_slots = 1
-				remove_building = {
-						type = arms_factory
-						level = 1
-					}
-				add_building_construction = {
-					type = dockyard
-					level = 2
-					instant_build = yes
-				}
-				custom_effect_tooltip = GER_crossing_the_atlantic_1_factory_tt
-				hidden_effect = {
-					random_state = {
-						limit = {
-							is_fully_controlled_by = ROOT
-							is_on_continent = europe
-							NOT = { is_coastal = yes }
+
+				every_controlled_state = { #Next prio coastal states with only 1 mil
+					limit = {
+						is_fully_controlled_by = ROOT
+						is_on_continent = europe
+						is_coastal = yes
+						AND = {
+							arms_factory < 2
 							arms_factory > 0
 						}
+						NOT = { has_state_flag = GER_crossing_the_atlantic_dockyards_built_flag }
+					}
+					if = {
+						limit = {
+							check_variable = { ROOT.number_of_states_getting_dockyards < ROOT.crossing_the_atlantic_max_states_for_dockyards }
+						}
+						add_extra_state_shared_building_slots = 1
 						remove_building = {
 							type = arms_factory
 							level = 1
 						}
+						add_building_construction = {
+							type = dockyard
+							level = 2
+							instant_build = yes
+						}
+						custom_effect_tooltip = GER_crossing_the_atlantic_1_factory_tt
+						hidden_effect = {
+							ROOT = {
+								random_controlled_state = {
+									limit = {
+										is_fully_controlled_by = ROOT
+										is_on_continent = europe
+										NOT = { is_coastal = yes }
+										arms_factory > 0
+									}
+									remove_building = {
+										type = arms_factory
+										level = 1
+									}
+								}
+							}
+
+							set_state_flag = GER_crossing_the_atlantic_dockyards_built_flag
+							add_to_variable = { ROOT.number_of_states_getting_dockyards = 1 }
+							#log = "Number [?ROOT.number_of_states_getting_dockyards] - Built in [THIS.GetName] - Coastal with 1 mil" #Debug tool
+						}
+					}
+				}
+
+				every_controlled_state = { #Last are coastal states with no mils on them
+					limit = {
+						is_fully_controlled_by = ROOT
+						is_on_continent = europe
+						is_coastal = yes
+						arms_factory < 1
+						NOT = { has_state_flag = GER_crossing_the_atlantic_dockyards_built_flag }
+					}
+					if = {
+						limit = {
+							check_variable = { ROOT.number_of_states_getting_dockyards < ROOT.crossing_the_atlantic_max_states_for_dockyards }
+						}
+						add_extra_state_shared_building_slots = 2
+						add_building_construction = {
+							type = dockyard
+							level = 2
+							instant_build = yes
+						}
+						custom_effect_tooltip = GER_crossing_the_atlantic_2_factories_tt
+						hidden_effect = {
+							ROOT = {
+								random_controlled_state = {
+									limit = {
+										is_fully_controlled_by = ROOT
+										is_on_continent = europe
+										NOT = { is_coastal = yes }
+										arms_factory > 1
+									}
+									remove_building = {
+										type = arms_factory
+										level = 2
+									}
+								}
+							}
+
+							set_state_flag = GER_crossing_the_atlantic_dockyards_built_flag
+							add_to_variable = { ROOT.number_of_states_getting_dockyards = 1 }
+							#log = "Number [?ROOT.number_of_states_getting_dockyards] - Built in [THIS.GetName] - Coastal with 0 mils" #Debug tool
+						}
 					}
 				}
 			}
-			every_state = {
-				limit = {
-					is_fully_controlled_by = ROOT
-					is_on_continent = europe
-					is_coastal = yes
-					arms_factory > 1
-				}
-				remove_building = {
-						type = arms_factory
-						level = 2
-					}
-				add_building_construction = {
-					type = dockyard
-					level = 2
-					instant_build = yes
-				}
-			}
-
-			
-
-#			for_each_scope_loop = { #fallback if someone, *cough cough* Canada, decides to ignore the #setup is_subject = no >:(
-#				array = global.monroe_doctrine_countries_to_destabilize
-#
-#				IF = {
-#					limit = {
-#						is_subject = yes
-#					}
-#
-#					remove_from_array = {
-#						array = global.monroe_doctrine_countries_to_destabilize
-#						value = THIS
-#					}
-#
-#					#log = "[THIS.GetName] was yeeted for being a subject"
-#				}
-#			}
 		}
 	}
 	
@@ -16990,6 +17033,12 @@ focus_tree = {
 						value = 100
 					}
 				}
+				
+				ROOT = {
+					hidden_effect = {
+						save_event_target_as = alliance_inviter
+					}
+				}
 
 				CHI = { 
 					country_event = {
@@ -17611,6 +17660,15 @@ focus_tree = {
 				}
 			}
 			value = GFX_focus_GER_fuhrerprinzip_bormann
+		}
+		icon = {
+			trigger = {
+				has_country_leader = {
+					ruling_only = yes
+					character = GER_eva_braun
+				}
+			}
+			value = GFX_focus_GER_fuhrerprinzip_braun
 		}
 		icon = GFX_focus_GER_support_the_fuhrer
 
@@ -21259,6 +21317,17 @@ focus_tree = {
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_STABILITY FOCUS_FILTER_POLITICAL_CHARACTER }
 
 		completion_reward = {
+
+			if = {
+				limit = {
+					has_active_mission = GER_growing_public_dissent_mission
+				}
+				add_days_mission_timeout = {
+					mission = GER_growing_public_dissent_mission
+					days = 14
+				}
+				custom_effect_tooltip = generic_skip_one_line_tt
+			}
 		
 			add_stability = 0.05
 			add_political_power = 50
@@ -21323,6 +21392,16 @@ focus_tree = {
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_STABILITY FOCUS_FILTER_POLITICAL_CHARACTER }
 
 		completion_reward = {
+			if = {
+				limit = {
+					has_active_mission = GER_growing_public_dissent_mission
+				}
+				add_days_mission_timeout = {
+					mission = GER_growing_public_dissent_mission
+					days = 45
+				}
+				custom_effect_tooltip = generic_skip_one_line_tt
+			}
 
 			set_country_flag = GER_the_proletarian_revolution_flag
 
@@ -21507,10 +21586,15 @@ focus_tree = {
 				modifier = GER_communist_intel_modifier
 			}
 
-			custom_effect_tooltip = generic_skip_one_line_tt
+			if = {
+				limit = {
+					has_dlc = "La Resistance"
+				}
+				custom_effect_tooltip = generic_skip_one_line_tt
 
-			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = GER_wilhelm_zaisser			
+				custom_effect_tooltip = available_political_advisor
+				show_ideas_tooltip = GER_wilhelm_zaisser			
+			}
 		}
 	}
 	
@@ -21584,22 +21668,27 @@ focus_tree = {
 					modifier = GER_stasi_modifier
 				}
 
-				add_to_variable = { GER_communist_intel_decryption_factor = 0.2 tooltip = decryption_factor_tt }
+				add_to_variable = { GER_communist_intel_subversive_activities_upkeep = -0.3 tooltip = subversive_activites_upkeep_tt }
 				add_to_variable = { GER_communist_intel_stability_factor = -0.05 tooltip = stability_factor_tt }
 			}
 
- 			custom_effect_tooltip = generic_skip_one_line_tt
-
-			GER_wilhelm_zaisser = {
-				remove_trait = {
-					slot = political_advisor
-					trait = GER_intelligence_coordinator
+			if = {
+				limit = {
+					has_dlc = "La Resistance"
 				}
-			}
-			GER_wilhelm_zaisser = {
- 				add_trait = { 
- 					slot = political_advisor
- 					trait = GER_secretary_of_state_security
+ 				custom_effect_tooltip = generic_skip_one_line_tt
+	
+				GER_wilhelm_zaisser = {
+					remove_trait = {
+						slot = political_advisor
+						trait = GER_intelligence_coordinator
+					}
+				}
+				GER_wilhelm_zaisser = {
+ 					add_trait = { 
+ 						slot = political_advisor
+ 						trait = GER_secretary_of_state_security
+ 					}
  				}
  			}
 		}
@@ -21641,6 +21730,7 @@ focus_tree = {
 			ELSE = {
 				add_to_variable = { GER_communist_intel_decryption_factor = 0.2 tooltip = decryption_factor_tt }
 				add_to_variable = { GER_communist_intel_encryption_factor = 0.2 tooltip = encryption_factor_tt }
+
 			}
 		}
 	}
@@ -21655,6 +21745,10 @@ focus_tree = {
 		relative_position_id = GER_effective_operations
 		cost = 5
 		available = {
+		}
+
+		allow_branch = {
+			has_dlc = "La Resistance" 
 		}
 
 		search_filters = {}
@@ -22351,6 +22445,8 @@ focus_tree = {
 			custom_effect_tooltip = GER_integrate_volkskommissariats_tt
 		}
 	}
+
+
 	focus = {
 		id = GER_liberate_austria
 		icon = GFX_focus_generic_attack_austria
@@ -22639,12 +22735,11 @@ focus_tree = {
 		cost = 10
 		available = {
 			ITA = { 
-				OR = {
-					exists = yes
-					is_subject = no
-					NOT = { has_government = communism }
-				}
+				is_subject = no
+				NOT = { has_government = communism }
 			}
+			NOT = { has_guaranteed = ITA }
+			NOT = { has_non_aggression_pact_with = ITA }
 		}
 
 		bypass = {
@@ -22653,6 +22748,9 @@ focus_tree = {
 					exists = no
 					is_subject = yes
 					has_government = communism
+					has_war_with = ROOT
+					is_guaranteed_by = ROOT
+					has_non_aggression_pact_with = ROOT
 				}
 			}
 		}
@@ -24633,6 +24731,12 @@ focus_tree = {
 			if = {
 				limit = {
 					has_dlc = "La Resistance"
+					SPR = {
+						OR = {
+							has_government = democratic
+							has_government = communism
+						}
+					}
 				}
 				SPR = { add_opinion_modifier = { target = GER modifier = ita_supported_spain_civil_war } }
 			}
@@ -25072,6 +25176,16 @@ focus_tree = {
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_POLITICAL_CHARACTER }
 
 		completion_reward = {
+			if = {
+				limit = {
+					has_active_mission = GER_growing_public_dissent_mission
+				}
+				add_days_mission_timeout = {
+					mission = GER_growing_public_dissent_mission
+					days = 30
+				}
+				custom_effect_tooltip = generic_skip_one_line_tt
+			}
 
 			add_popularity = {
 				ideology = neutrality
@@ -27750,12 +27864,14 @@ focus_tree = {
 					owns_state = 89
 					owns_state = 762
 					owns_state = 91
+					owns_state = 72
 				}
 				AUS = {
 					AND = {
 						owns_state = 88
 						owns_state = 89
 						owns_state = 91
+						owns_state = 72
 					}
 				}
 				HUN = {
@@ -27763,6 +27879,7 @@ focus_tree = {
 						owns_state = 88
 						owns_state = 89
 						owns_state = 91
+						owns_state = 72
 					}
 				}
 				NOT = { 
@@ -27801,6 +27918,7 @@ focus_tree = {
 							state = 88
 							state = 89
 							state = 91
+							state = 72
 						}
 						NOT = {
 							OR = {
@@ -27824,6 +27942,7 @@ focus_tree = {
 							state = 88
 							state = 89
 							state = 91
+							state = 72
 						}
 						NOT = {
 							OR = {
@@ -27854,6 +27973,10 @@ focus_tree = {
 								owns_state = 91
 								controls_state = 91
 							}
+							AND = {
+								owns_state = 72
+								controls_state = 72
+							}
 						}
 						NOT = {
 							OR = {
@@ -27883,6 +28006,7 @@ focus_tree = {
 								state = 88
 								state = 89
 								state = 91
+								state = 72
 							}
 							NOT = {
 								OR = {
@@ -27903,6 +28027,7 @@ focus_tree = {
 								state = 88
 								state = 89
 								state = 91
+								state = 72
 							}
 							NOT = {
 								OR = {
@@ -35156,15 +35281,18 @@ focus_tree = {
 		
 		completion_reward = {
 			ENG = {
-				country_event = { id = generic.2 }
+				country_event = { 
+					id = generic.2 
+					hours = 2
+				}
 				add_ai_strategy = {
 					type = befriend
-					id = "GER"			
+					id = GER			
 					value = 1000
 				}
 				add_ai_strategy = {
 					type = alliance
-					id = "GER"			
+					id = GER			
 					value = 200
 				}	
 			}
@@ -37155,35 +37283,54 @@ focus_tree = {
 					technology = atomic_research
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					has_tech = atomic_research
-					NOT = { has_tech = nuclear_reactor }
+					NOT = { is_special_project_completed = sp:sp_nuclear_reactor }
 				}
-				add_tech_bonus = {
-					name = GER_the_mannheim_project
-					bonus = 1.0
-					ahead_reduction = 2
-					technology = nuclear_reactor
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.75
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
 					has_tech = nuclear_reactor
 				}
-				55 = {
+				random_owned_controlled_state = {
+					limit = {
+						nuclear_reactor < 1
+					}
+
+					prioritize = { 55 }
 					add_building_construction = {
 						type = nuclear_reactor
 						level = 1
 						instant_build = yes
 					}
 				}
-				add_tech_bonus = {
-					name = GER_the_mannheim_project
-					bonus = 1.0
-					technology = nukes
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.5
 				}
 			}
+			else = {
+				random_owned_controlled_state = {
+					limit = {
+						nuclear_reactor_heavy_water < 1
+					}
+
+					prioritize = { 55 }
+					add_building_construction = {
+						type = nuclear_reactor_heavy_water
+						level = 1
+						instant_build = yes
+					}
+				}
+				add_breakthrough_progress = {
+					specialization = specialization_nuclear
+					value = 0.5
+				}
+			}			
 		}
 	}
 
