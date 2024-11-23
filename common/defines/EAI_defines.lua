@@ -594,9 +594,9 @@ NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 5000.0				-- AI is extremely unwillin
 NDefines.NAI.INVASION_TARGET_NO_PORT_FACTOR = 0.6 -- 0.3                   -- When selecting invasion target, multiply score with this if the target has no port
 -- NDefines.NAI.INVASION_TARGET_TRUNCATION_SELECT_THRESHOLD = 0 -- 0.6      -- When selecting invasion target, use this threshold for truncation selection. (1.0 means select highest scored target, 0.0 means select randomly from all possible target, 0.5 means select randomly from all targets with more than 50 % of highest score)
 -- NDefines.NAI.INVASION_TARGET_PRIO_NOT_ENEMY_FACTOR =  -- 0.17           -- When calculating priority for an invasion, factor the score with this if the target is not an actual enemy.
-NDefines.NAI.FAILED_INVASION_AVOID_DURATION = 15 -- 60                    -- after a failed invasion, AI will down-prioritize invading the same area again for this number of days
-NDefines.NAI.FAILED_INVASION_AREA_PRIO_FACTOR = 0.9 -- 0.5                 -- for every failed invasion on an area, factor that area's invasion prio with this value
-NDefines.NAI.FAILED_INVASION_PORT_PRIO_FACTOR = 0.9 -- 0.66                -- for every failed invasion on a target port (province), factor the chance that we try to invade that same port again (relative to other ports)
+NDefines.NAI.FAILED_INVASION_AVOID_DURATION = 1 -- 60                    -- after a failed invasion, AI will down-prioritize invading the same area again for this number of days
+NDefines.NAI.FAILED_INVASION_AREA_PRIO_FACTOR = 1 -- 0.5                 -- for every failed invasion on an area, factor that area's invasion prio with this value
+NDefines.NAI.FAILED_INVASION_PORT_PRIO_FACTOR = 1 -- 0.66                -- for every failed invasion on a target port (province), factor the chance that we try to invade that same port again (relative to other ports)
 
 --------------------------------------------------------------------------------------------------------------
 -- AIR AI

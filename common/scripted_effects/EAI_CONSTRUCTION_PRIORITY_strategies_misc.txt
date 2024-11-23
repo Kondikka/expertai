@@ -203,6 +203,67 @@ EAI_PC_build_radar_STRATEGIES = {
 	}
 }
 
+### Radar
+
+@EAI_PC_build_radar_2_TYPE_ID = 15
+@EAI_PC_build_radar_2_PRIO = 1900
+EAI_PC_build_radar_2 = {
+
+	set_temp_variable = { _project_building_type = global.EAI_PC_RADAR }
+	set_temp_variable = { _project_type_id = @EAI_PC_build_radar_2_TYPE_ID }
+	set_temp_variable = { _project_priority = @EAI_PC_build_radar_2_PRIO }
+
+	EAI_PC_build_radar_2_STRATEGIES = yes
+
+	if = {
+		limit = {
+			check_variable = { EAI_PC_build_radar_2_STRATEGIES = 1 }
+
+			set_temp_variable = { _get_queued_num_building_type = _project_building_type }
+			set_temp_variable = { _get_queued_num_type_id = _project_type_id }
+			EAI_PC_get_total_queued_num = yes
+			check_variable = { queued_type_num_ < 2 }
+		}
+
+		if = { limit = { ROOT = { has_country_flag = EAI_construction_logging } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | CONSTRUCTION: EAI_PC_build_radar_2" }
+
+		random_scope_in_array = { array = _target_states_
+
+			EAI_PC_start_project = yes
+		}
+	}
+
+	EAI_PC_clear_project_inputs = yes
+}
+
+EAI_PC_build_radar_2_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_build_radar_2_STRATEGIES = 0 }
+
+	clear_temp_array = _target_states_
+
+	if = {
+		limit = { # Doesn't really work because Iceland can't build radar
+			tag = USA
+			100 = {
+				CONTROLLER = { 
+					is_ai = yes
+					is_in_faction_with = USA 
+					has_war_together_with = USA
+				}
+			}
+		}
+
+		add_to_temp_array = { _target_states_ = 100.id }
+
+		set_temp_variable = { _project_target_level = 3 }
+		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_build_for_ally = 1 }
+
+		set_temp_variable = { EAI_PC_build_radar_2_STRATEGIES = 1 }
+	}
+}
+
 ### Resource
 
 @EAI_PC_resource_extraction_TYPE_ID = 4
