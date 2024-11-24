@@ -164,6 +164,49 @@ EAI_CHI_china_MISC_dont_rush_indochina = {
 	}
 }
 
+EAI_CHI_china_MISC_expand_army_instead_of_attacking = {
+	allowed = {
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		check_variable = { EAI_fielded_eq_ratio < 0.95 }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.25
+		priority = 1000
+		ordertype = front
+		execution_type = careful
+		execute_order = no
+
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_china_theatre = THIS.id }
+			NOT = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = force_concentration_factor
+		value = -100
+	}
+}
+
 ### Prepare
 
 EAI_CHI_china_PREPARE_JAP = {
@@ -192,6 +235,211 @@ EAI_CHI_china_PREPARE_JAP = {
 	ai_strategy = { type = prepare_for_war id = "JAP" value = 200 }
 	ai_strategy = { type = prepare_for_war id = "MEN" value = 200 }
 	ai_strategy = { type = prepare_for_war id = "MAN" value = 200 }
+}
+
+### Deploy
+
+EAI_CHI_china_DEPLOY_garrison_1 = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		OR = {
+			has_war_with = JAP
+			has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
+			AND = {
+				JAP = {
+					focus_progress = { focus = JAP_intervene_in_china progress > 0 } 
+					NOT = { has_completed_focus = JAP_intervene_in_china }
+				}
+			}
+		}
+
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+		}
+
+		OR = {
+			has_country_flag = EAI_MILITARY_trend_stagnant_war
+			NOT = {
+				AND = {
+					OR = {
+						AND = {
+							surrender_progress > 0.1
+							NOT = { surrender_progress > 0.2 }
+						}
+						AND = {
+							has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 }
+							NOT = { check_variable = { EAI_MILITARY_trend_value > 0.02 } }
+						}
+					}
+				}
+				AND = {
+					OR = {
+						AND = {
+							surrender_progress > 0.2
+						}
+						AND = {
+							has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 }
+							check_variable = { EAI_MILITARY_trend_value > 0.02 }
+						}
+					}
+				}
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.4
+		states = {
+			594
+			591
+			592
+			593
+			595
+			596
+			613
+			598
+			597
+			743
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_CHI_china_DEPLOY_garrison_2 = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		OR = {
+			has_war_with = JAP
+			has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
+			AND = {
+				JAP = {
+					focus_progress = { focus = JAP_intervene_in_china progress > 0 } 
+					NOT = { has_completed_focus = JAP_intervene_in_china }
+				}
+			}
+		}
+
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+		}
+
+		OR = {
+			AND = {
+				surrender_progress > 0.1
+				NOT = { surrender_progress > 0.2 }
+			}
+			AND = {
+				has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 }
+				NOT = { check_variable = { EAI_MILITARY_trend_value > 0.02 } }
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.3
+		states = {
+			594
+			591
+			592
+			593
+			595
+			596
+			613
+			598
+			597
+			743
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+}
+
+EAI_CHI_china_DEPLOY_garrison_3 = {
+	allowed = { 
+		OR = {
+			tag = CHI
+			tag = XSM 
+			tag = PRC 
+			tag = YUN 
+			tag = GXC 
+			tag = SHX 
+		}
+	}
+	enable = {
+		OR = {
+			has_war_with = JAP
+			has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
+			AND = {
+				JAP = {
+					focus_progress = { focus = JAP_intervene_in_china progress > 0 } 
+					NOT = { has_completed_focus = JAP_intervene_in_china }
+				}
+			}
+		}
+
+		OR = {
+			JAP = { is_ai = no }
+			check_variable = { global.EAI_sino_japanese_war = 1 } # favor china
+		}
+
+		OR = {
+			AND = {
+				surrender_progress > 0.2
+			}
+			AND = {
+				has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 }
+				check_variable = { EAI_MILITARY_trend_value > 0.02 }
+			}
+		}
+	}
+
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.2
+		states = {
+			594
+			591
+			592
+			593
+			595
+			596
+			613
+			598
+			597
+			743
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
 }
 
 ### Defensive
@@ -286,7 +534,15 @@ EAI_CHI_china_DEFENSIVE_initial_defense = {
 		}
 	}
 	enable = {
-		has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
+		OR = {
+			has_global_flag = { flag = EAI_JAP_blitz_china_1000d value = 1 days < 90 }
+			AND = {
+				JAP = {
+					focus_progress = { focus = JAP_intervene_in_china progress > 0 } 
+					NOT = { has_completed_focus = JAP_intervene_in_china }
+				}
+			}
+		}
 		
 		OR = {
 			JAP = { is_ai = no }
@@ -331,6 +587,7 @@ EAI_CHI_china_OFFENSIVE_operational_resume = {
 		has_country_flag = EAI_operational_initial_resume_timer
 		NOT = { has_country_flag = EAI_MILITARY_operational_pause_timer }
 		EAI_MILITARY_army_readiness_HIGH = yes
+		NOT = { check_variable = { EAI_fielded_eq_ratio < 0.95 } }
 	}
 	abort = {
 		NOT = {
@@ -423,6 +680,39 @@ EAI_CHI_china_OFFENSIVE_protect_coast = {
 		ratio = 0.5
 		priority = 900
 		execution_type = rush_weak
+
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.5
+		priority = 900
+		execution_type = rush_weak
+
+		state_trigger = {
+			OR = {
+				region = 164
+				region = 247
+            	region = 248
+				state = 743
+				state = 597
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = front_unit_request
+		value = 25
 
 		state_trigger = {
 			OR = {
