@@ -268,8 +268,10 @@ NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_OWNED_CORE = 2.00                         
 NDefines.NAI.CONSTRUCTION_PRIO_FACTOR_REPAIRING = 0.30                                  -- factor prio with this if building is being repaired
 -- <end> construction prioritization
 
-NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = 0.8   -- Will at most trade away this fraction of factories.
-NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.8   -- AI will cancel trade deals that are not able to deliver more than this fraction of the agreed amount
+-- NDefines.NAI.TRADEABLE_FACTORIES_FRACTION = -- 0.8   -- Will at most trade away this fraction of factories.
+NDefines.NAI.MIN_DELIVERED_TRADE_FRACTION = 0.5 -- 0.8   -- AI will cancel trade deals that are not able to deliver more than this fraction of the agreed amount
+NDefines.NAI.SEA_PATH_LENGTH_SCORE_BASE = 0 -- -30          -- scoring reduction from naval paths for AI when picking trade partners
+-- NDefines.NAI.MINIMUM_GOOD_TRADE_RATIO_PER_CIV = -- 0.005   -- for each civ factory we have mul with this we are allowed to trade under % of resource on a trade
 
 NDefines.NAI.ESTIMATED_CONVOYS_PER_DIVISION = 6
 
@@ -445,12 +447,11 @@ NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 0.0
 -- Composition
 -------------------
 
--- NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3								-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
--- NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
+-- NDefines.NAI.NAVY_PREFERED_MAX_SIZE = -- 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
 
 -- NDefines.NAI.CARRIER_TASKFORCE_MAX_CARRIER_COUNT = -- 4 		-- optimum carrier count for carrier taskforces
 -- NDefines.NAI.CAPITAL_TASKFORCE_MAX_CAPITAL_COUNT = -- 12 		-- optimum capital count for capital taskforces
--- NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = -- 12			-- optimum screen count for screen taskforces
+NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = 6 -- 12			-- optimum screen count for screen taskforces
 -- NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = -- 16				-- optimum sub count for sub taskforces
 
 -- NDefines.NAI.MIN_CAPITALS_FOR_CARRIER_TASKFORCE = -- 6			-- carrier fleets will at least have this amount of capitals
@@ -547,7 +548,7 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 -- NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = -- 25					-- Threat value per convoy sunk in a region. Decays over time.
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_AVOID_REGION = -- 25 * 10		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = -- 25 * 100		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
--- NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = -- 1				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
+NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 5 -- 1				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
 
 NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_ESCORTING = 20 -- 10.0		-- Amount of naval patrol planes per ship on a convoy escort mission
 NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_PATROLLING = 20 -- 10.0		-- Amount of naval patrol planes per ship on a patrol mission
@@ -615,7 +616,7 @@ NDefines.NAI.PRODUCTION_CARRIER_PLANE_BUFFER_RATIO = 0.25 --1.5				-- in additio
 
 -- NDefines.NAI.LAND_COMBAT_AIR_SUPERIORITY_IMPORTANCE = 0.40		-- Strategic importance of air superiority ( amount of enemy planes in area )
 -- NDefines.NAI.LAND_COMBAT_OUR_ARMIES_AIR_IMPORTANCE = 20			-- Strategic importance of our armies
-NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = 1000		-- Strategic importance of our armies in the combats
+-- NDefines.NAI.LAND_COMBAT_OUR_COMBATS_AIR_IMPORTANCE = -- 155		-- Strategic importance of our armies in the combats
 -- NDefines.NAI.LAND_COMBAT_FRIEND_ARMIES_AIR_IMPORTANCE = 10		-- Strategic importance of friendly armies
 -- NDefines.NAI.LAND_COMBAT_FRIEND_COMBATS_AIR_IMPORTANCE = 8		-- Strategic importance of friendly armies in the combat
 -- NDefines.NAI.LAND_COMBAT_ENEMY_ARMIES_AIR_IMPORTANCE = 12		-- Strategic importance of our armies
@@ -656,11 +657,11 @@ NDefines.NAI.STR_BOMB_MIN_EXCORT_PLANES = 200					-- Min amount of planes reques
 
 -- NDefines.NAI.NAVAL_FIGHTERS_PER_PLANE = 1.0						-- Amounts of air superiority planes requested per enemy plane
 -- NDefines.NAI.NAVAL_STRIKE_PLANES_PER_ARMY = 0					-- Amount of planes requested per enemy army
-NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 40					-- Amount of bombers requested per enemy ship
+NDefines.NAI.NAVAL_STRIKE_PLANES_PER_SHIP = 10					-- Amount of bombers requested per enemy ship
 -- NDefines.NAI.PORT_STRIKE_PLANES_PER_SHIP = 10					-- Amount of bombers request per enemy ship in the port
 -- NDefines.NAI.NAVAL_MIN_EXCORT_PLANES = 100 --0						-- Min amount of planes requested to excort operations
 
--- NDefines.NAI.NAVAL_AIR_SUPERIORITY_IMPORTANCE = 0.10			-- Strategic importance of air superiority ( amount of enemy planes in area )
+NDefines.NAI.NAVAL_AIR_SUPERIORITY_IMPORTANCE = 30 -- 0.10			-- Strategic importance of air superiority ( amount of enemy planes in area )
 NDefines.NAI.NAVAL_SHIP_AIR_IMPORTANCE = 5 --2.0					-- Naval ship air importance
 -- NDefines.NAI.NAVAL_SHIP_IN_PORT_AIR_IMPORTANCE = 6.0			-- Naval ship in the port air importance
 -- NDefines.NAI.NAVAL_COMBAT_AIR_IMPORTANCE = 8.0					-- Naval combat air importance

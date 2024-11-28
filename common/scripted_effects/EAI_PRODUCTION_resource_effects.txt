@@ -154,7 +154,7 @@ EAI_RESOURCE_check_resource_needs = {
 EAI_RESOURCE_check_resource_shortages = {
 
 	@resource_shortage_limit = 0.15
-	@resource_shortage_min_need = -50
+	@resource_shortage_min_need = -25
 
 	### FUEL
 
@@ -387,111 +387,261 @@ EAI_RESOURCE_check_resource_shortages = {
 
 ###
 
-# Average resource need : extraction ratio for resources the AI has a lot of
+# Determine if the trade law should be changed based on resources
 EAI_RESOURCE_calculate_resource_need = {
 
-	set_variable = { EAI_average_resource_need = 0 }
+	if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_RESOURCE_calculate_resource_need" }
 
-	### ALUMINIUM
+	### Trade laws
 
-	if = { limit = { check_variable = { resource_produced@aluminium > 75 } }
+		@EAI_RESOURCE_min_deficit_pct_diff_for_lower_law = -0.25
+		@EAI_RESOURCE_max_deficit_pct_diff_for_higher_law = 0.05
 
-		set_temp_variable = { EAI_aluminium_needed = resource_consumed@aluminium }
-		if = { limit = { check_variable = { resource@aluminium < 0 } }
+		@EAI_RESOURCE_downgrade_trade_law_threshold = 10
+		@EAI_RESOURCE_upgrade_trade_law_threshold = 10
 
-			set_temp_variable = { aluminium_deficit = resource@aluminium }
-			multiply_temp_variable = { aluminium_deficit = -1 }
-			add_to_temp_variable = { EAI_aluminium_needed = aluminium_deficit }
+		@EAI_RESOURCE_min_total_need_to_care_about_resource = 25
+
+		@free_trade = 0
+		@export_focus = 1
+		@limited_exports = 2
+		@closed_economy = 3
+
+		@free_trade_min_export = 0.8
+		@export_focus_min_export = 0.5
+		@limited_exports_min_export = 0.25
+		@closed_economy_min_export = 0
+
+		set_temp_variable = { tmp = 1 }
+		subtract_from_temp_variable = { tmp = @free_trade_min_export }
+		set_temp_variable = { law_available_resources^0 = tmp }
+		set_temp_variable = { tmp = 1 }
+		subtract_from_temp_variable = { tmp = @export_focus_min_export }
+		set_temp_variable = { law_available_resources^1 = tmp }
+		set_temp_variable = { tmp = 1 }
+		subtract_from_temp_variable = { tmp = @limited_exports_min_export }
+		set_temp_variable = { law_available_resources^2 = tmp }
+		set_temp_variable = { tmp = 1 }
+		subtract_from_temp_variable = { tmp = @closed_economy_min_export }
+		set_temp_variable = { law_available_resources^3 = tmp }
+
+		###	Current trade law
+
+			if = { limit = { has_idea = free_trade } set_temp_variable = { current_law = @free_trade } set_temp_variable = { prev_law = -1 } set_temp_variable = { next_law = @export_focus } }
+			else_if = { limit = { has_idea = export_focus } set_temp_variable = { current_law = @export_focus } set_temp_variable = { prev_law = @free_trade } set_temp_variable = { next_law = @limited_exports } }
+			else_if = { limit = { has_idea = limited_exports} set_temp_variable = { current_law = @limited_exports } set_temp_variable = { prev_law = @export_focus } set_temp_variable = { next_law = @closed_economy } }
+			else_if = { limit = { has_idea = closed_economy } set_temp_variable = { current_law = @closed_economy } set_temp_variable = { prev_law = @closed_economy } set_temp_variable = { next_law = -1 } }
+
+		###
+
+			if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "current_law=[?current_law]" }
+			if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "prev_law=[?prev_law]" }
+			if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "next_law=[?next_law]" }
+
+		###
+
+	### Resource vars
+
+		clear_temp_array = produced_resources
+		clear_temp_array = imported_resources
+		clear_temp_array = consumed_resources
+		clear_temp_array = need_resources
+		clear_temp_array = resources
+		
+		add_to_temp_array = { produced_resources = resource_produced@aluminium }
+		add_to_temp_array = { produced_resources = resource_produced@rubber }
+		add_to_temp_array = { produced_resources = resource_produced@tungsten }
+		add_to_temp_array = { produced_resources = resource_produced@steel }
+		add_to_temp_array = { produced_resources = resource_produced@chromium }
+
+		add_to_temp_array = { imported_resources = resource_imported@aluminium }
+		add_to_temp_array = { imported_resources = resource_imported@rubber }
+		add_to_temp_array = { imported_resources = resource_imported@tungsten }
+		add_to_temp_array = { imported_resources = resource_imported@steel }
+		add_to_temp_array = { imported_resources = resource_imported@chromium }
+
+		add_to_temp_array = { consumed_resources = resource_consumed@aluminium }
+		add_to_temp_array = { consumed_resources = resource_consumed@rubber }
+		add_to_temp_array = { consumed_resources = resource_consumed@tungsten }
+		add_to_temp_array = { consumed_resources = resource_consumed@steel }
+		add_to_temp_array = { consumed_resources = resource_consumed@chromium }
+
+		add_to_temp_array = { resources = resource@aluminium }
+		add_to_temp_array = { resources = resource@rubber }
+		add_to_temp_array = { resources = resource@tungsten }
+		add_to_temp_array = { resources = resource@steel }
+		add_to_temp_array = { resources = resource@chromium }
+
+	### Current and next law deficit % per resource
+
+		clear_temp_array = deficit_pcts
+		clear_temp_array = next_deficit_pcts
+		clear_temp_array = prev_deficit_pcts
+		for_each_loop = { array = resources
+
+			if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = ">>>> resource=[?i]" }
+
+			### Current deficit pct
+
+				# Total need
+				set_temp_variable = { total_need = consumed_resources^i }
+				if = { limit = { check_variable = { resources^i < 0 } }
+					set_temp_variable = { deficit = resources^i }
+					multiply_temp_variable = { deficit = -1 }
+					add_to_temp_variable = { total_need = deficit }
+				}
+				else = { set_temp_variable = { deficit = 0 } }
+				add_to_temp_array = { need_resources = total_need }
+				if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "total_need=[?total_need]" }
+				if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit=[?deficit]" }
+		
+				# Deficit %
+				set_temp_variable = { deficit_pct = deficit }
+				divide_temp_variable = { deficit_pct = total_need }	
+				add_to_temp_array = { deficit_pcts = deficit_pct }
+				if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit_pct=[?deficit_pct]" }
+
+				# Current available resources
+				set_temp_variable = { cur_res = produced_resources^i }
+				multiply_temp_variable = { cur_res = law_available_resources^current_law }
+				add_to_temp_variable = { cur_res = imported_resources^i }
+
+			### Next deficit pct
+
+				if = { limit = { NOT = { check_variable = { next_law = -1 } } }
+
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit change from downgrade" }
+				
+					# Available res on new law
+					set_temp_variable = { new_res = produced_resources^i }
+					multiply_temp_variable = { new_res = law_available_resources^next_law }
+					add_to_temp_variable = { new_res = imported_resources^i }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_res=[?new_res]" }
+
+					# New deficit
+					set_temp_variable = { new_deficit = new_res }
+					subtract_from_temp_variable = { new_deficit = total_need }
+					if = { limit = { check_variable = { new_deficit < 0 } }
+						multiply_temp_variable = { new_deficit = -1 }
+					}
+					else = { set_temp_variable = { new_deficit = 0 } }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_deficit=[?new_deficit]" }
+
+					# New deficit %
+					set_temp_variable = { new_deficit_pct = new_deficit }
+					divide_temp_variable = { new_deficit_pct = total_need }
+					add_to_temp_array = { next_deficit_pcts = new_deficit_pct }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_deficit_pct=[?new_deficit_pct]" }
+				}
+
+			### Prev deficit pct
+
+				if = { limit = { NOT = { check_variable = { prev_law = -1 } } }
+
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit change from upgrade" }
+				
+					# Available res on new law
+					set_temp_variable = { new_res = produced_resources^i }
+					multiply_temp_variable = { new_res = law_available_resources^prev_law }
+					add_to_temp_variable = { new_res = imported_resources^i }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_res=[?new_res]" }
+
+					# New deficit
+					set_temp_variable = { new_deficit = new_res }
+					subtract_from_temp_variable = { new_deficit = total_need }
+					if = { limit = { check_variable = { new_deficit < 0 } }
+						multiply_temp_variable = { new_deficit = -1 }
+					}
+					else = { set_temp_variable = { new_deficit = 0 } }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_deficit=[?new_deficit]" }
+
+					# New deficit %
+					set_temp_variable = { new_deficit_pct = new_deficit }
+					divide_temp_variable = { new_deficit_pct = total_need }
+					add_to_temp_array = { prev_deficit_pcts = new_deficit_pct }
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "new_deficit_pct=[?new_deficit_pct]" }
+				}
+
+			###
 		}
-		divide_temp_variable = { EAI_aluminium_needed = resource_produced@aluminium }
-		clamp_temp_variable = { var = EAI_aluminium_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_aluminium_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
 
-		if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: aluminium needed : extracted = [?EAI_aluminium_needed|%0]" }
-	}
+	### Worth changing law?
 
-	### RUBBER
+		### Track need over time
 
-	if = { limit = { OR = { check_variable = { resource_produced@rubber > 75 } synthetic_refinery > 5 } }
+			### Lower
 
-		set_temp_variable = { EAI_rubber_needed = resource_consumed@rubber }
-		if = { limit = { check_variable = { resource@rubber < 0 } }
+				if = { limit = {  NOT = { check_variable = { next_law = -1 } } }
+				
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "checking need to lower trade" }
+	
+					if = {
+						limit = {
+							any_of = { array = resources
+								NOT = { check_variable = { need_resources^i < @EAI_RESOURCE_min_total_need_to_care_about_resource } }
+								set_temp_variable = { deficit_pct_diff = next_deficit_pcts^i }
+								subtract_from_temp_variable = { deficit_pct_diff = deficit_pcts^i }
+								if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit_pct_diff=[?deficit_pct_diff]" }
+								NOT = { check_variable = { deficit_pct_diff > @EAI_RESOURCE_min_deficit_pct_diff_for_lower_law } }
+							}
+						}
+					
+						add_to_variable = { EAI_RESOURCE_downgrade_trade_law_demand = 1 }
+						if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = ">>>>>>>>> worth lowering law demand=[?EAI_RESOURCE_downgrade_trade_law_demand]" }
+					}
+					else = { subtract_from_variable = { EAI_RESOURCE_downgrade_trade_law_demand = 1 } }
+					clamp_variable = { var = EAI_RESOURCE_downgrade_trade_law_demand min = 0 max = @EAI_RESOURCE_downgrade_trade_law_threshold }
+				}
+				else = {
+					clear_variable = EAI_RESOURCE_downgrade_trade_law_demand
+				}
 
-			set_temp_variable = { rubber_deficit = resource@rubber }
-			multiply_temp_variable = { rubber_deficit = -1 }
-			add_to_temp_variable = { EAI_rubber_needed = rubber_deficit }
-		}
-		divide_temp_variable = { EAI_rubber_needed = resource_produced@rubber }
-		clamp_temp_variable = { var = EAI_rubber_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_rubber_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
+			### Higher
 
-		if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: rubber needed : extracted = [?EAI_rubber_needed|%0]" }
-	}
+				if = { limit = { NOT = { check_variable = { prev_law = -1 } } }
+				
+					if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "checking need to raise trade" }
+	
+					if = {
+						limit = {
+							NOT = {
+								any_of = { array = resources
+									NOT = { check_variable = { need_resources^i < @EAI_RESOURCE_min_total_need_to_care_about_resource } }
+									set_temp_variable = { deficit_pct_diff = prev_deficit_pcts^i }
+									subtract_from_temp_variable = { deficit_pct_diff = deficit_pcts^i }
+									if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = "deficit_pct_diff=[?deficit_pct_diff]" }
+									check_variable = { deficit_pct_diff > @EAI_RESOURCE_max_deficit_pct_diff_for_higher_law }
+								}
+							}
+						}
+					
+						add_to_variable = { EAI_RESOURCE_upgrade_trade_law_demand = 1 }
+						if = { limit = { has_country_flag = EAI_detailed_resources_logging } log = ">>>>>>>>> worth raising law demand=[?EAI_RESOURCE_upgrade_trade_law_demand]" }
+					}
+					else = { subtract_from_variable = { EAI_RESOURCE_upgrade_trade_law_demand = 1 } }
+					clamp_variable = { var = EAI_RESOURCE_upgrade_trade_law_demand min = 0 max = @EAI_RESOURCE_upgrade_trade_law_threshold }
+				}
+				else = {
+					clear_variable = EAI_RESOURCE_upgrade_trade_law_demand
+				}
 
-	### TUNGSTEN
+			###
 
-	if = { limit = { check_variable = { resource_produced@tungsten > 75 } }
+		### Upgrade law if exceeded demand threshold
 
-		set_temp_variable = { EAI_tungsten_needed = resource_consumed@tungsten }
-		if = { limit = { check_variable = { resource@tungsten < 0 } }
+			if = { limit = { NOT = { check_variable = { EAI_RESOURCE_downgrade_trade_law_demand < @EAI_RESOURCE_downgrade_trade_law_threshold } } } 
+				if = { limit = { has_country_flag = EAI_resources_logging NOT = { check_variable = { EAI_LAW_get_trade_law = next_law } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: over downgrade threshold EAI_LAW_get_trade_law=[?EAI_LAW_get_trade_law]" }
+				set_variable = { EAI_LAW_get_trade_law = next_law }
+			}
+			else_if = { limit = { NOT = { check_variable = { EAI_RESOURCE_upgrade_trade_law_demand < @EAI_RESOURCE_upgrade_trade_law_threshold } } } 
+				if = { limit = { has_country_flag = EAI_resources_logging NOT = { check_variable = { EAI_LAW_get_trade_law = prev_law } } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: over upgrade threshold EAI_LAW_get_trade_law=[?EAI_LAW_get_trade_law]" }
+				set_variable = { EAI_LAW_get_trade_law = prev_law }
+			}
+			else = { set_variable = { EAI_LAW_get_trade_law  = -1 } }
 
-			set_temp_variable = { tungsten_deficit = resource@tungsten }
-			multiply_temp_variable = { tungsten_deficit = -1 }
-			add_to_temp_variable = { EAI_tungsten_needed = tungsten_deficit }
-		}
-		divide_temp_variable = { EAI_tungsten_needed = resource_produced@tungsten }
-		clamp_temp_variable = { var = EAI_tungsten_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_tungsten_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-
-		if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: tungsten needed : extracted = [?EAI_tungsten_needed|%0]" }
-	}
-
-	### STEEL
-
-	if = { limit = { check_variable = { resource_produced@steel > 75 } }
-
-		set_temp_variable = { EAI_steel_needed = resource_consumed@steel }
-		if = { limit = { check_variable = { resource@steel < 0 } }
-
-			set_temp_variable = { steel_deficit = resource@steel }
-			multiply_temp_variable = { steel_deficit = -1 }
-			add_to_temp_variable = { EAI_steel_needed = steel_deficit }
-		}
-		divide_temp_variable = { EAI_steel_needed = resource_produced@steel }
-		clamp_temp_variable = { var = EAI_steel_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_steel_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-
-		if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: steel needed : extracted = [?EAI_steel_needed|%0]" }
-	}
-
-	### CHROMIUM
-
-	if = { limit = { check_variable = { resource_produced@chromium > 75 } }
-
-		set_temp_variable = { EAI_chromium_needed = resource_consumed@chromium }
-		if = { limit = { check_variable = { resource@chromium < 0 } }
-
-			set_temp_variable = { chromium_deficit = resource@chromium }
-			multiply_temp_variable = { chromium_deficit = -1 }
-			add_to_temp_variable = { EAI_chromium_needed = chromium_deficit }
-		}
-		divide_temp_variable = { EAI_chromium_needed = resource_produced@chromium }
-		clamp_temp_variable = { var = EAI_chromium_needed min = 0 max = 1 }
-		add_to_variable = { EAI_average_resource_need = EAI_chromium_needed }	
-		add_to_temp_variable = { EAI_resource_count = 1 }
-
-		if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCE: chromium needed : extracted = [?EAI_chromium_needed|%0]" }
-	}
+		###
 
 	###
-
-	divide_variable = { EAI_average_resource_need = EAI_resource_count }
-
-	if = { limit = { has_country_flag = EAI_resources_detailed_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: average resource need : extracted = [?EAI_average_resource_need|%0]" }
 }
 
 # Estimate max fuel consumption based on its armor, air and navy

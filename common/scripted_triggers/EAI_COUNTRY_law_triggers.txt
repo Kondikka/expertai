@@ -2427,15 +2427,8 @@ EAI_LAW_get_free_trade = { # 80% resources to market
 		###
 
 		AND = {
-			# How much of its extracted resources the AI needs for production
-			if = { limit = { has_idea = export_focus }
-
-				check_variable = { EAI_average_resource_need < 0.15 }
-			}
-			if = { limit = { has_idea = limited_exports }
-
-				check_variable = { EAI_average_resource_need < 0.20 }
-			}
+			has_variable = EAI_LAW_get_trade_law
+			check_variable = { EAI_LAW_get_trade_law = 0 }
 		}
 	}
 
@@ -2477,15 +2470,6 @@ EAI_LAW_get_export_focus = { # 50% resources to market
 	if = { limit = { original_tag = ROM } 
 
 		NOT = { any_allied_country = { is_major = yes } } 
-	}
-
-	# Keep resources available to the Allies
-	if = { limit = { original_tag = USA } 
-
-		OR = {
-			NOT = { is_in_faction_with = ENG }
-			NOT = { check_variable = { EAI_average_resource_need < 0.65 } }
-		}
 	}
 
 	# Keep resources to itself to be safe
@@ -2579,39 +2563,7 @@ EAI_LAW_get_export_focus = { # 50% resources to market
 		###
 
 		AND = {
-			# How much of its extracted resources the AI needs for production
-			if = { limit = { has_idea = free_trade }
-
-				NOT = { check_variable = { EAI_average_resource_need < 0.25 } }
-				check_variable = { EAI_average_resource_need < 0.50 }
-			}
-			if = { limit = { has_idea = limited_exports }
-
-				NOT = { check_variable = { EAI_average_resource_need < 0.20 } }
-				check_variable = { EAI_average_resource_need < 0.45 }
-			}
-
-			# When switching down, consider whether it has a significant need or shortage and has a significant amount of needed resources
-			if = { limit = { OR = { has_idea = free_trade } }
-
-				OR = {
-					AND = { check_variable = { EAI_aluminium_resource_shortage = 3 } check_variable = { resource_produced@aluminium > 75 } }
-					AND = { check_variable = { EAI_rubber_resource_shortage = 3 } check_variable = { resource_produced@rubber > 75 } }
-					AND = { check_variable = { EAI_tungsten_resource_shortage = 3 } check_variable = { resource_produced@tungsten > 75 } }
-					AND = { check_variable = { EAI_steel_resource_shortage = 3 } check_variable = { resource_produced@steel > 75 } }
-					AND = { check_variable = { EAI_chromium_resource_shortage = 3 } check_variable = { resource_produced@chromium > 75 } }
-
-					count_triggers = {
-						amount = 2
-
-						AND = { check_variable = { EAI_needs_aluminium = 3 } check_variable = { resource_produced@aluminium > 75 } }
-						AND = { check_variable = { EAI_needs_rubber = 3 } check_variable = { resource_produced@rubber > 75 } }
-						AND = { check_variable = { EAI_needs_tungsten = 3 } check_variable = { resource_produced@tungsten > 75 } }
-						AND = { check_variable = { EAI_needs_steel = 3 } check_variable = { resource_produced@steel > 75 } }
-						AND = { check_variable = { EAI_needs_chromium = 3 } check_variable = { resource_produced@chromium > 75 } }
-					}
-				}
-			}
+			check_variable = { EAI_LAW_get_trade_law = 1 }
 		}
 	}
 
@@ -2718,37 +2670,7 @@ EAI_LAW_get_limited_exports = { # 25% resources to market
 		###
 
 		AND = {
-			# How much of its extracted resources the AI needs for production
-			if = { limit = { has_idea = free_trade }
-
-				NOT = { check_variable = { EAI_average_resource_need < 0.50 } }
-			}
-			if = { limit = { has_idea = export_focus }
-
-				NOT = { check_variable = { EAI_average_resource_need < 0.55 } }
-			}
-
-			# When switching down, consider whether it has a significant need or shortage and has a significant amount of needed resources
-			if = { limit = { OR = { has_idea = free_trade has_idea = export_focus } }
-
-				OR = {
-					AND = { check_variable = { EAI_aluminium_resource_shortage = 3 } check_variable = { resource_produced@aluminium > 75 } }
-					AND = { check_variable = { EAI_rubber_resource_shortage = 3 } check_variable = { resource_produced@rubber > 75 } }
-					AND = { check_variable = { EAI_tungsten_resource_shortage = 3 } check_variable = { resource_produced@tungsten > 75 } }
-					AND = { check_variable = { EAI_steel_resource_shortage = 3 } check_variable = { resource_produced@steel > 75 } }
-					AND = { check_variable = { EAI_chromium_resource_shortage = 3 } check_variable = { resource_produced@chromium > 75 } }
-
-					count_triggers = {
-						amount = 2
-						
-						AND = { check_variable = { EAI_needs_aluminium = 3 } check_variable = { resource_produced@aluminium > 75 } }
-						AND = { check_variable = { EAI_needs_rubber = 3 } check_variable = { resource_produced@rubber > 75 } }
-						AND = { check_variable = { EAI_needs_tungsten = 3 } check_variable = { resource_produced@tungsten > 75 } }
-						AND = { check_variable = { EAI_needs_steel = 3 } check_variable = { resource_produced@steel > 75 } }
-						AND = { check_variable = { EAI_needs_chromium = 3 } check_variable = { resource_produced@chromium > 75 } }
-					}
-				}
-			}
+			check_variable = { EAI_LAW_get_trade_law = 2 }
 		}
 	}
 
@@ -2816,11 +2738,21 @@ EAI_LAW_available_limited_exports = {
 
 EAI_LAW_get_closed_economy = { # 0% resources to market
 
-	AND = {
-		tag = JAP
-		has_war = yes
-		date > 1940.1.1
-		USA = { EAI_THIS_is_threat_to_PREV = yes }
+	OR = {
+		### Special cases
+
+		AND = {
+			tag = JAP
+			has_war = yes
+			date > 1940.1.1
+			USA = { EAI_THIS_is_threat_to_PREV = yes }
+		}
+
+		###
+
+		AND = {
+			check_variable = { EAI_LAW_get_trade_law = 3 }
+		}
 	}
 
 	###### Requirements for this law

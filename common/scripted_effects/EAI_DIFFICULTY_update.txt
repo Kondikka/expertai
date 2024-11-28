@@ -26,6 +26,8 @@ EAI_difficulty_weekly_update = {
 	EAI_difficulty_static_desperate_defense = yes
 
 	EAI_difficulty_dynamic_desperate_defense = yes
+
+	EAI_DIFFICULTY_grant_resources = yes
 }
 
 ############################################################################################################
@@ -210,6 +212,102 @@ EAI_difficulty_free_convoys = {
 
 			if = { limit = { has_country_flag = EAI_difficulty_logging } log = "[GetYear] [GetMonth] | DIFFICULTY | [Root.GetName] | adding convoys (global)" } 
 		}
+	}
+}
+
+EAI_DIFFICULTY_grant_resources = {
+
+	if = { limit = { NOT = { has_global_flag = EAI_DIFFICULTY_grant_resources_update } }
+
+		set_global_flag = { flag = EAI_DIFFICULTY_grant_resources_update value = 1 days = 6 }	
+
+		###
+
+			every_state = { limit = { has_state_flag = EAI_DIFFICULTY_grant_resources }
+				clr_state_flag = EAI_DIFFICULTY_grant_resources
+				add_resource = { type = aluminium amount = var:EAI_DIFFICULTY_grant_resources_remove_aluminium show_state_in_tooltip = no }
+				add_resource = { type = rubber amount = var:EAI_DIFFICULTY_grant_resources_remove_rubber show_state_in_tooltip = no }
+				add_resource = { type = tungsten amount = var:EAI_DIFFICULTY_grant_resources_remove_tungsten show_state_in_tooltip = no }
+				add_resource = { type = steel amount = var:EAI_DIFFICULTY_grant_resources_remove_steel show_state_in_tooltip = no }
+				add_resource = { type = chromium amount = var:EAI_DIFFICULTY_grant_resources_remove_chromium show_state_in_tooltip = no }
+			}
+
+		###
+
+			every_country = {
+				if = { 
+					limit = {
+						is_ai = yes
+						OR = {
+							check_variable = { EAI_custom_bonus_34 = 1 }
+							AND = { check_variable = { global.EAI_custom_bonus_34 = 1 } EAI_DIFFICULTY_dynamic_bonus_trigger = yes }
+						}
+					}
+
+					### Get deficit
+
+						set_temp_variable = { deficit_aluminium = resource@aluminium }
+						set_temp_variable = { deficit_rubber = resource@rubber }
+						set_temp_variable = { deficit_tungsten = resource@tungsten }
+						set_temp_variable = { deficit_steel = resource@steel }
+						set_temp_variable = { deficit_chromium = resource@chromium }
+
+						capital_scope = {
+							set_temp_variable = { res_factor = building_level@infrastructure }
+							divide_temp_variable = { res_factor = 5 }
+							add_to_temp_variable = { res_factor = 1 }
+						}
+
+						if = { limit = { check_variable = { modifier@min_export > 0 } }
+							multiply_temp_variable = { res_factor = modifier@min_export }
+						}
+
+						set_temp_variable = { grant_aluminium = 0 }
+						set_temp_variable = { grant_rubber = 0 }
+						set_temp_variable = { grant_tungsten = 0 }
+						set_temp_variable = { grant_steel = 0 }
+						set_temp_variable = { grant_chromium = 0 }
+
+						if = { limit = { check_variable = { deficit_aluminium < 0 } } set_temp_variable = { grant_aluminium = deficit_aluminium } multiply_temp_variable = { grant_aluminium = -1 } }
+						if = { limit = { check_variable = { deficit_rubber < 0 } } set_temp_variable = { grant_rubber = deficit_rubber } multiply_temp_variable = { grant_rubber = -1 } }
+						if = { limit = { check_variable = { deficit_tungsten < 0 } } set_temp_variable = { grant_tungsten = deficit_tungsten } multiply_temp_variable = { grant_tungsten = -1 } }
+						if = { limit = { check_variable = { deficit_steel < 0 } } set_temp_variable = { grant_steel = deficit_steel } multiply_temp_variable = { grant_steel = -1 } }
+						if = { limit = { check_variable = { deficit_chromium < 0 } } set_temp_variable = { grant_chromium = deficit_chromium } multiply_temp_variable = { grant_chromium = -1 } }
+
+						divide_temp_variable = { grant_aluminium = res_factor }
+						divide_temp_variable = { grant_rubber = res_factor }
+						divide_temp_variable = { grant_tungsten = res_factor }
+						divide_temp_variable = { grant_steel = res_factor }
+						divide_temp_variable = { grant_chromium = res_factor }
+
+					### Add resources equal to deficit
+
+						capital_scope = {
+							set_state_flag = EAI_DIFFICULTY_grant_resources
+							add_resource = { type = aluminium amount = grant_aluminium show_state_in_tooltip = no }
+							add_resource = { type = rubber amount = grant_rubber show_state_in_tooltip = no }
+							add_resource = { type = tungsten amount = grant_tungsten show_state_in_tooltip = no }
+							add_resource = { type = steel amount = grant_steel show_state_in_tooltip = no }
+							add_resource = { type = chromium amount = grant_chromium show_state_in_tooltip = no }
+
+							set_variable = { EAI_DIFFICULTY_grant_resources_remove_aluminium = grant_aluminium }
+							set_variable = { EAI_DIFFICULTY_grant_resources_remove_rubber = grant_rubber }
+							set_variable = { EAI_DIFFICULTY_grant_resources_remove_tungsten = grant_tungsten }
+							set_variable = { EAI_DIFFICULTY_grant_resources_remove_steel = grant_steel }
+							set_variable = { EAI_DIFFICULTY_grant_resources_remove_chromium = grant_chromium }
+
+							multiply_variable = { EAI_DIFFICULTY_grant_resources_remove_aluminium = -1 }
+							multiply_variable = { EAI_DIFFICULTY_grant_resources_remove_rubber = -1 }
+							multiply_variable = { EAI_DIFFICULTY_grant_resources_remove_tungsten = -1 }
+							multiply_variable = { EAI_DIFFICULTY_grant_resources_remove_steel = -1 }
+							multiply_variable = { EAI_DIFFICULTY_grant_resources_remove_chromium = -1 }
+						}
+
+					###
+				}
+			}
+
+			###
 	}
 }
 
