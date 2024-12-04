@@ -14,6 +14,19 @@ EAI_infantry_role = {
 	#********************************************************************************************************#
 	#********************************************************************************************************#
 
+	### Notes
+
+		# GENERIC_INFANTRY_TEMPLATE_18_B1_EARLY
+		# GENERIC_INFANTRY_TEMPLATE_18_B2_EARLY < do this upgrade path or the AI implodes due to strange artillery column swaps in early game
+
+		# GENERIC_INFANTRY_TEMPLATE_18_B1_REGULAR
+		# GENERIC_INFANTRY_TEMPLATE_18_B2_REGULAR 
+		# -when AI swaps to more support eq. expensive templates in early/mid game, make sure it only upgrades fielded divisions when it can afford to
+		# -EAI sets UPGRADES_DEFICIT_LIMIT_DAYS = 500, so the AI upgrades fielded divisions very freely otherwise
+		# -and the reason for that change is to prevent the AI from fielding half-completed divisions with weird widths as well as to solve some armor recruitment issues
+
+	###
+
 	#####################################################
 	#	15W
 	#####################################################
@@ -21,7 +34,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_15_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 411 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -35,7 +48,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_15_A_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 412 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 8
@@ -49,7 +62,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_15_A_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 421 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 6
@@ -66,7 +79,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_15_A_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 422 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -86,10 +99,10 @@ EAI_infantry_role = {
 
 	### defense
 
-	GENERIC_INFANTRY_TEMPLATE_18_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_18_A1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 112 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -103,7 +116,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_18_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 110 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -116,10 +129,28 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_18_A_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_18_A1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 111 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 8
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_18_A2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_18_A2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 111 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 8
@@ -137,10 +168,25 @@ EAI_infantry_role = {
 
 	### balanced
 
-	GENERIC_INFANTRY_TEMPLATE_18_B_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_18_B1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 122 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 7
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_18_B2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_18_B2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 122 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -155,7 +201,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_18_B_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 120 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -169,10 +215,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_18_B_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_18_B1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 121 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 7
+				artillery_brigade = 1
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_18_B2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_18_B2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 121 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -191,10 +256,25 @@ EAI_infantry_role = {
 
 	### offense
 
-	GENERIC_INFANTRY_TEMPLATE_18_C_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_18_C1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 132 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 6
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_18_C2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_18_C2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 132 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 6
@@ -209,7 +289,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_18_C_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 130 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 6
@@ -223,10 +303,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_18_C_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_18_C1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 131 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 5
+				artillery_brigade = 2
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_18_C2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_18_C2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 131 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 5
@@ -249,10 +348,25 @@ EAI_infantry_role = {
 
 	### defense
 
-	GENERIC_INFANTRY_TEMPLATE_25_A_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_25_A1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 212 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 11
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_A2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_A2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 212 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 11
@@ -267,7 +381,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_25_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 210 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 11
@@ -281,10 +395,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_25_A_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_25_A1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 211 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 10
+				artillery_brigade = 1
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_A2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_A2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 211 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -303,10 +436,25 @@ EAI_infantry_role = {
 
 	### balanced
 
-	GENERIC_INFANTRY_TEMPLATE_25_B_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_25_B1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 222 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 9
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_B2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_B2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 222 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -321,7 +469,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_25_B_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 220 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -335,10 +483,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_25_B_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_25_B1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 221 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 9
+				artillery_brigade = 2
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_B2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_B2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 221 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -357,10 +524,25 @@ EAI_infantry_role = {
 
 	### offense
 
-	GENERIC_INFANTRY_TEMPLATE_25_C_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_25_C1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 232 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 8
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_C2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_C2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 232 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 8
@@ -375,7 +557,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_25_C_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 230 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 8
@@ -389,10 +571,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_25_C_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_25_C1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 231 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 7
+				artillery_brigade = 3
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_25_C2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_25_C2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 231 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -415,10 +616,25 @@ EAI_infantry_role = {
 
 	### defense
 
-	GENERIC_INFANTRY_TEMPLATE_35_A_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_35_A1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 312 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 15
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_A2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_A2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 312 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 15
@@ -433,7 +649,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_35_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 310 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 15
@@ -447,10 +663,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_35_A_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_35_A1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 311 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 14
+				artillery_brigade = 2
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_A2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_A2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 311 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 14
@@ -469,10 +704,25 @@ EAI_infantry_role = {
 
 	### balanced
 
-	GENERIC_INFANTRY_TEMPLATE_35_B_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_35_B1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 322 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 13
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_B2_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_B2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 322 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 13
@@ -487,7 +737,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_35_B_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 320 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 13
@@ -501,10 +751,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_35_B_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_35_B1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 321 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 13
+				artillery_brigade = 3
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_B2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_B2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 321 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 13
@@ -523,10 +792,25 @@ EAI_infantry_role = {
 
 	### offense
 
-	GENERIC_INFANTRY_TEMPLATE_35_C_EARLY = {
+	GENERIC_INFANTRY_TEMPLATE_35_C1_EARLY = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 332 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@artillery_equipment > 500 } }
+		target_template = {
+			regiments = {
+				infantry = 10
+			}
+			support = {
+				artillery = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_C_EARLY
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_C2_EARLY = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 332 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -541,7 +825,7 @@ EAI_infantry_role = {
 	GENERIC_INFANTRY_TEMPLATE_35_C_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 330 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -555,10 +839,29 @@ EAI_infantry_role = {
 		}
 	}
 
-	GENERIC_INFANTRY_TEMPLATE_35_C_REGULAR = {
+	GENERIC_INFANTRY_TEMPLATE_35_C1_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 331 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { check_variable = { num_equipment@support_equipment > 1000 } }
+		target_template = {
+			regiments = {
+				infantry = 10
+				artillery_brigade = 5
+				anti_air_brigade = 1
+			}
+			support = {
+				engineer = 1
+				artillery = 1
+				anti_tank = 1
+			}
+		}
+		replace_at_match = 1.0
+		replace_with = GENERIC_INFANTRY_TEMPLATE_35_C2_REGULAR
+	}
+	GENERIC_INFANTRY_TEMPLATE_35_C2_REGULAR = {
+		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 331 } } upgrade_prio = { base = 10 }
+		reinforce_prio = 1
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -590,7 +893,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4110 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -606,7 +909,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_A_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4111 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -622,7 +925,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_A_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4112 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -640,7 +943,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_A_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4113 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -660,7 +963,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_B_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4120 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -677,7 +980,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_B_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4121 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -694,7 +997,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_B_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4122 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -713,7 +1016,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_B_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4123 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 8
@@ -734,7 +1037,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_C_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4130 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -751,7 +1054,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_C_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4131 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 9
@@ -768,7 +1071,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_C_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4132 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 6
@@ -787,7 +1090,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_18_C_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4133 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 7
@@ -812,7 +1115,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_A_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4311 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 18
@@ -828,7 +1131,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_A_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4311 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 21
@@ -844,7 +1147,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_A_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4312 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 15
@@ -863,7 +1166,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_A_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4313 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 17
@@ -884,7 +1187,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_B_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4320 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 16
@@ -901,7 +1204,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_B_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4321 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 19
@@ -918,7 +1221,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_B_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4322 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 13
@@ -937,7 +1240,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_B_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4323 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 16
@@ -958,7 +1261,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_C_CHEAP = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4330 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 15
@@ -975,7 +1278,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_C_CHEAP_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4331 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 18
@@ -992,7 +1295,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_C_REGULAR = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4332 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 10
@@ -1011,7 +1314,7 @@ EAI_infantry_role = {
 	MA_INFANTRY_TEMPLATE_35_C_REGULAR_LARGE = {
 		enable = { has_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4333 } } upgrade_prio = { base = 10 }
 		reinforce_prio = 1
-		can_upgrade_in_field = { NOT = { has_country_flag = EAI_TEMPLATE_block_upgrade_fielded_INFANTRY } }
+		can_upgrade_in_field = { always = yes }
 		target_template = {
 			regiments = {
 				infantry = 12

@@ -2,19 +2,31 @@
 #	Expert AI mod - AI template design triggers
 ######################################################
 
+EAI_TEMPLATE_use_cheap_garrison = {
+	num_of_military_factories < 100
+}
+
+EAI_TEMPLATE_use_regular_garrison = {
+	num_of_military_factories < 200
+}
+
+EAI_TEMPLATE_use_expensive_garrison = {
+	NOT = { num_of_military_factories < 200 }
+}
+
 EAI_TEMPLATE_use_mass_infantry = {
 	if = { limit = { NOT = { has_country_flag = EAI_MASS_INFANTRY_TEMPLATE } }
 	
 		surrender_progress > 0.05
-		OR = {
-			check_variable = { EAI_MILITARY_deployed_army_k_trend_value < -0.1 }
-			has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 60 }
-		}
+		check_variable = { EAI_MILITARY_deployed_army_k_trend_value < -0.1 }
+		has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 30 }
+
 		check_variable = { num_equipment@infantry_equipment > 10000 }
 		OR = {
 			check_variable = { num_equipment@support_equipment < 1 }
 			check_variable = { num_equipment@artillery_equipment < 1 }
 		}
+
 	}
 	else = {
 		always = no
@@ -24,10 +36,7 @@ EAI_TEMPLATE_use_mass_infantry = {
 EAI_TEMPLATE_use_mass_infantry_abort = {
 	if = { limit = { has_country_flag = EAI_MASS_INFANTRY_TEMPLATE }
 
-		NOT = {
-			has_country_flag = EAI_MILITARY_trend_losing_war
-			check_variable = { EAI_MILITARY_deployed_army_k_trend_value < 0 }
-		}
+		NOT = { check_variable = { deployed_army_manpower_k < EAI_TEMPLATE_use_mass_infantry_target } }
 	}
 	else = {
 		always = no

@@ -6,10 +6,11 @@
 
 ### Invasion operations
 
-	@EAI_MILITARY_INVASION_min_duration_days = 210
-	@EAI_MILITARY_INVASION_planning_phase_days = 120
-	@EAI_MILITARY_INVASION_execution_phase_days = 130
-	@EAI_MILITARY_INVASION_rapid_phase_days = 145
+	@EAI_MILITARY_INVASION_planning_phase_days = 80
+	@EAI_MILITARY_INVASION_hold_fleet_ops_days = -14
+	@EAI_MILITARY_INVASION_min_duration_days = 90
+	@EAI_MILITARY_INVASION_execution_phase_days = 10
+	@EAI_MILITARY_INVASION_rapid_phase_days = 15
 	@EAI_MILITARY_INVASION_max_failure_weeks = 16
 	@EAI_MILITARY_INVASION_max_failure_grace_control_pct = 0.25
 	@EAI_MILITARY_INVASION_max_failure_grace_period_weeks = 20
@@ -261,19 +262,14 @@ EAI_MILITARY_INVASION_define_sides = { # arr:_states_ >>> arr:_our_side_ arr:_th
 	clear_temp_array = _our_side_
 	clear_temp_array = _their_side_
 
-	THIS = {
-		if = { limit = { NOT = { is_in_array = { _our_side_ = THIS.id } } } add_to_temp_array = { _our_side_ = THIS.id } }
-		for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-		for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-	}
+	set_temp_variable = { _id = THIS.id }
+	EAI_get_side = yes
+	for_each_loop = { array = side_ add_to_temp_array = { _our_side_ = v } }
 
-	for_each_scope_loop = { array = _states_
-		CONTROLLER = {
-			if = { limit = { has_war_with = var:_leader_id }
-				if = { limit = { NOT = { is_in_array = { _their_side_ = THIS.id } } } add_to_temp_array = { _their_side_ = THIS.id } }
-			}
-		}
-	}
+	for_each_loop = { array = _states_ add_to_temp_array = { _states = v } }
+	set_temp_variable = { _at_war = 1 }
+	EAI_get_state_controllers = yes
+	for_each_loop = { array = controllers_ add_to_temp_array = { _their_side_ = v } }
 }
 
 EAI_MILITARY_INVASION_reset_operation = {
@@ -368,11 +364,40 @@ EAI_MILITARY_INVASION_assign_country = {
 
 		###
 
-			set_country_flag = { flag = EAI_MILITARY_INVASION_min_duration value = 1 days = @EAI_MILITARY_INVASION_min_duration_days }
-			set_country_flag = { flag = EAI_MILITARY_INVASION_planning_phase value = 1 days = @EAI_MILITARY_INVASION_planning_phase_days }
-			set_country_flag = { flag = EAI_MILITARY_INVASION_execution_phase value = 1 days = @EAI_MILITARY_INVASION_execution_phase_days }
-			set_country_flag = { flag = EAI_MILITARY_INVASION_rapid_phase value = 1 days = @EAI_MILITARY_INVASION_rapid_phase_days }
-			set_country_flag = { flag = EAI_MILITARY_INVASION_synchronize value = 1 days = @EAI_MILITARY_INVASION_synchronize_days }
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_planning_phase_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_planning_phase value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_planning_phase_days }
+			add_to_temp_variable = { tmp = @EAI_MILITARY_INVASION_hold_fleet_ops_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_hold_fleet_ops value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_planning_phase_days }
+			add_to_temp_variable = { tmp = @EAI_MILITARY_INVASION_min_duration_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_min_duration value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_planning_phase_days }
+			add_to_temp_variable = { tmp = @EAI_MILITARY_INVASION_execution_phase_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_execution_phase value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_planning_phase_days }
+			add_to_temp_variable = { tmp = @EAI_MILITARY_INVASION_rapid_phase_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_rapid_phase value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
+			set_temp_variable = { tmp = @EAI_MILITARY_INVASION_synchronize_days }
+			meta_effect = {
+				text = { set_country_flag = { flag = EAI_MILITARY_INVASION_synchronize value = 1 days = [x] } }
+				x = "[?tmp]"
+			}
 
 		###
 	}

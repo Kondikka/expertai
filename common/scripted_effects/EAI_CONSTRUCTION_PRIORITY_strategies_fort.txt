@@ -21,10 +21,10 @@ EAI_PC_FORT_strategies = {
 
 	###
 
-	EAI_PC_FORT__cancel_strategies = yes
+	EAI_PC_FORT_cancel_strategies = yes
 }
 
-EAI_PC_FORT__cancel_strategies = { # _cancel_strategies
+EAI_PC_FORT_cancel_strategies = { # _cancel_strategies
 
 	if = { limit = { check_variable = { _cancel_strategies^num > 0 } }
 
@@ -33,6 +33,7 @@ EAI_PC_FORT__cancel_strategies = { # _cancel_strategies
 			add_to_temp_array = { _cancel_projects_TYPE_IDS = strategy_type_id }
 		}
 
+		set_temp_variable = { EAI_PC_cancel_projects_source = 6 }
 		EAI_PC_cancel_projects = yes
 	}
 }
@@ -46,6 +47,8 @@ EAI_PC_FORT_strategy_GENERIC = {
 	EAI_PC_FORT_strategy_GENERIC_cities = yes
 
 	EAI_PC_FORT_strategy_GENERIC_frontlines = yes
+
+	EAI_PC_FORT_strategy_GENERIC_rivers = yes
 }
 
 @EAI_PC_FORT_strategy_GENERIC_cities_TYPE_ID = 500
@@ -62,7 +65,7 @@ EAI_PC_FORT_strategy_GENERIC_cities = {
 		limit = {
 			OR = {
 				AND = {
-					has_country_flag = { flag = EAI_MILITARY_trend_stagnant_war days > 180 }
+					has_country_flag = { flag = EAI_MILITARY_trend_stagnant_war value = 1 days > 180 }
 				}
 				AND = {
 					has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 14 }
@@ -93,6 +96,7 @@ EAI_PC_FORT_strategy_GENERIC_cities = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_cities_capital_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 5 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -119,6 +123,7 @@ EAI_PC_FORT_strategy_GENERIC_cities = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_cities_capital_perimeter_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -147,6 +152,7 @@ EAI_PC_FORT_strategy_GENERIC_cities = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_cities_other_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -244,6 +250,7 @@ EAI_PC_FORT_strategy_GENERIC_frontlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_frontlines_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -283,6 +290,119 @@ EAI_PC_FORT_strategy_GENERIC_frontlines_STRATEGIES = {
 	}
 }
 
+@EAI_PC_FORT_strategy_GENERIC_rivers_TYPE_ID = 502
+@EAI_PC_FORT_strategy_GENERIC_rivers_PRIO = 100
+@EAI_PC_FORT_strategy_GENERIC_bottlenecks_TYPE_ID = 503
+@EAI_PC_FORT_strategy_GENERIC_bottlenecks_PRIO = 2000
+EAI_PC_FORT_strategy_GENERIC_rivers = {
+
+	set_temp_variable = { strategy_type_id = @EAI_PC_FORT_strategy_GENERIC_rivers_TYPE_ID }
+
+	EAI_PC_FORT_strategy_GENERIC_rivers_STRATEGIES = yes
+
+	if = {
+		limit = {
+			has_war = yes
+
+			OR = {
+				AND = {
+					has_country_flag = { flag = EAI_MILITARY_trend_stagnant_war value = 1 days > 180 }
+				}
+				AND = {
+					has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 14 }
+					check_variable = { EAI_MILITARY_trend_value > 0.02 }
+				}
+			}
+
+			check_variable = { EAI_PC_FORT_strategy_GENERIC_rivers_STRATEGIES = 1 }
+		}
+
+		for_each_loop = { array = controlled_states add_to_temp_array = { _states = v } }
+		EAI_PC_FORT_generate_river_fortlines = yes
+
+		###################################################
+		### Rivers
+		###################################################
+
+			### Target provinces
+				clear_temp_array = _target_provinces_
+				for_each_loop = { array = river_provinces_ add_to_temp_array = { _target_provinces_ = v } }
+
+				###
+
+				set_temp_variable = { _limit_provinces_queue_one_per_target = 1 }
+				EAI_PC_FORT_limit_provinces = yes
+
+				EAI_PC_FORT_add_to_valid_fortification_projects = yes
+			###
+
+			set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_rivers_PRIO }
+			set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
+			set_temp_variable = { _project_queue_num = 1 }
+			set_temp_variable = { _project_queue_max = 2 }
+			set_temp_variable = { _project_target_level = 4 }
+			set_temp_variable = { _project_type_id = @EAI_PC_FORT_strategy_GENERIC_rivers_TYPE_ID }
+			EAI_PC_FORT_create = yes
+
+		###################################################
+		### Bottlenecks
+		###################################################
+
+			### Target provinces
+				clear_temp_array = _target_provinces_
+				for_each_loop = { array = bottleneck_provinces_ add_to_temp_array = { _target_provinces_ = v } }
+
+				###
+
+				EAI_PC_FORT_add_to_valid_fortification_projects = yes
+			###
+
+			set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GENERIC_bottlenecks_PRIO }
+			set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
+			set_temp_variable = { _project_queue_num = 1 }
+			set_temp_variable = { _project_queue_max = 2 }
+			set_temp_variable = { _project_target_level = 4 }
+			set_temp_variable = { _project_type_id = @EAI_PC_FORT_strategy_GENERIC_bottlenecks_TYPE_ID }
+			EAI_PC_FORT_create = yes
+
+		###################################################
+
+		EAI_PC_FORT_cancel_invalid_fortification_projects = yes
+	}
+	else = { 
+		add_to_temp_array = { _cancel_strategies = @EAI_PC_FORT_strategy_GENERIC_rivers_TYPE_ID }
+		add_to_temp_array = { _cancel_strategies = @EAI_PC_FORT_strategy_GENERIC_bottlenecks_TYPE_ID }
+	}
+}
+EAI_PC_FORT_strategy_GENERIC_rivers_STRATEGIES = {
+
+	set_temp_variable = { EAI_PC_FORT_strategy_GENERIC_rivers_STRATEGIES = 0 }
+
+	if = {
+		limit = {
+
+			#####################################
+			### 	Strategies
+			#####################################
+
+			### JAP
+
+			if = { limit = { tag = JAP }
+			
+				if = {
+					limit = {
+						has_war_with = CHI
+					}
+				
+					any_enemy_country = { NOT = { tag = CHI } is_major = yes }
+				}
+			}
+		}
+	
+		set_temp_variable = { EAI_PC_FORT_strategy_GENERIC_rivers_STRATEGIES = 1 }
+	}
+}
+
 ####################################################################################
 ### SOV
 ####################################################################################
@@ -297,7 +417,7 @@ EAI_PC_FORT_strategy_SOV = {
 }
 
 @EAI_PC_FORT_strategy_SOV_main_line_TYPE_ID = 400
-@EAI_PC_FORT_strategy_SOV_main_line_PRIO = 500
+@EAI_PC_FORT_strategy_SOV_main_line_PRIO = 600
 EAI_PC_FORT_strategy_SOV_main_line = {
 
 	set_temp_variable = { strategy_type_id = @EAI_PC_FORT_strategy_SOV_main_line_TYPE_ID }
@@ -306,7 +426,7 @@ EAI_PC_FORT_strategy_SOV_main_line = {
 		limit = {
 			date > 1941.1.1
 			OR = {
-				GER = { EAI_THIS_is_threat_to_PREV = yes }
+				has_war_with = GER
 				AND = {
 					any_enemy_country = { is_major = yes }
 					surrender_progress > 0.05
@@ -319,43 +439,43 @@ EAI_PC_FORT_strategy_SOV_main_line = {
 		###################################################
 
 		### Target provinces
-			add_to_temp_array = { _target_provinces = 721 }
-			add_to_temp_array = { _target_provinces = 737 }
-			add_to_temp_array = { _target_provinces = 3573 }
-			add_to_temp_array = { _target_provinces = 588 }
-			add_to_temp_array = { _target_provinces = 11405 }
-			add_to_temp_array = { _target_provinces = 453 }
-			add_to_temp_array = { _target_provinces = 9463 }
-			add_to_temp_array = { _target_provinces = 6507 }
-			add_to_temp_array = { _target_provinces = 6495 }
-			add_to_temp_array = { _target_provinces = 9491 }
-			add_to_temp_array = { _target_provinces = 11530 }
-			add_to_temp_array = { _target_provinces = 9543 }
-			add_to_temp_array = { _target_provinces = 11557 }
-			add_to_temp_array = { _target_provinces = 489 }
-			add_to_temp_array = { _target_provinces = 3568 }
-			add_to_temp_array = { _target_provinces = 546 }
-			add_to_temp_array = { _target_provinces = 9288 }
-			add_to_temp_array = { _target_provinces = 6344 }
-			add_to_temp_array = { _target_provinces = 6233 }
-			add_to_temp_array = { _target_provinces = 11271 }
-			add_to_temp_array = { _target_provinces = 6354 }
-			add_to_temp_array = { _target_provinces = 11220 }
-			add_to_temp_array = { _target_provinces = 11241 }
-			add_to_temp_array = { _target_provinces = 9323 }
-			add_to_temp_array = { _target_provinces = 6249 }
-			add_to_temp_array = { _target_provinces = 6326 }
-			add_to_temp_array = { _target_provinces = 3219 }
-			add_to_temp_array = { _target_provinces = 6459 }
-			add_to_temp_array = { _target_provinces = 310 }
-			add_to_temp_array = { _target_provinces = 7482 }
-			add_to_temp_array = { _target_provinces = 10323 }
-			add_to_temp_array = { _target_provinces = 9340 }
+			add_to_temp_array = { _target_provinces_ = 721 }
+			add_to_temp_array = { _target_provinces_ = 737 }
+			add_to_temp_array = { _target_provinces_ = 3573 }
+			add_to_temp_array = { _target_provinces_ = 588 }
+			add_to_temp_array = { _target_provinces_ = 11405 }
+			add_to_temp_array = { _target_provinces_ = 453 }
+			add_to_temp_array = { _target_provinces_ = 9463 }
+			add_to_temp_array = { _target_provinces_ = 6507 }
+			add_to_temp_array = { _target_provinces_ = 6495 }
+			add_to_temp_array = { _target_provinces_ = 9491 }
+			add_to_temp_array = { _target_provinces_ = 11530 }
+			add_to_temp_array = { _target_provinces_ = 9543 }
+			add_to_temp_array = { _target_provinces_ = 11557 }
+			add_to_temp_array = { _target_provinces_ = 489 }
+			add_to_temp_array = { _target_provinces_ = 3568 }
+			add_to_temp_array = { _target_provinces_ = 546 }
+			add_to_temp_array = { _target_provinces_ = 9288 }
+			add_to_temp_array = { _target_provinces_ = 6344 }
+			add_to_temp_array = { _target_provinces_ = 6233 }
+			add_to_temp_array = { _target_provinces_ = 11271 }
+			add_to_temp_array = { _target_provinces_ = 6354 }
+			add_to_temp_array = { _target_provinces_ = 11220 }
+			add_to_temp_array = { _target_provinces_ = 11241 }
+			add_to_temp_array = { _target_provinces_ = 9323 }
+			add_to_temp_array = { _target_provinces_ = 6249 }
+			add_to_temp_array = { _target_provinces_ = 6326 }
+			add_to_temp_array = { _target_provinces_ = 3219 }
+			add_to_temp_array = { _target_provinces_ = 6459 }
+			add_to_temp_array = { _target_provinces_ = 310 }
+			add_to_temp_array = { _target_provinces_ = 7482 }
+			add_to_temp_array = { _target_provinces_ = 10323 }
+			add_to_temp_array = { _target_provinces_ = 9340 }
 
 			###
 
-			set_temp_variable = { _limit_provinces_near_enemies_radius = 50 }
-			EAI_PC_FORT_limit_near_enemies_provinces = yes
+			# set_temp_variable = { _limit_provinces_near_enemies_radius = 100 }
+			# EAI_PC_FORT_limit_near_enemies_provinces = yes
 
 			EAI_PC_FORT_add_to_valid_fortification_projects = yes
 		###
@@ -363,6 +483,7 @@ EAI_PC_FORT_strategy_SOV_main_line = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_SOV_main_line_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -398,25 +519,34 @@ EAI_PC_FORT_strategy_SOV_main_cities_last_stand = {
 		###################################################
 
 		### Leningrad
-			add_to_temp_array = { _target_provinces = 149 }
-			add_to_temp_array = { _target_provinces = 3151 }
+			add_to_temp_array = { _target_provinces_ = 149 }
+			add_to_temp_array = { _target_provinces_ = 3151 }
 		### Moscow
-			add_to_temp_array = { _target_provinces = 11330 }
-			add_to_temp_array = { _target_provinces = 3290 }
-			add_to_temp_array = { _target_provinces = 301 }
-			add_to_temp_array = { _target_provinces = 6380 }
-			add_to_temp_array = { _target_provinces = 3259 }
-			add_to_temp_array = { _target_provinces = 344 }
-			add_to_temp_array = { _target_provinces = 9256 }
-			add_to_temp_array = { _target_provinces = 6245 }
+			add_to_temp_array = { _target_provinces_ = 11330 }
+			add_to_temp_array = { _target_provinces_ = 3290 }
+			add_to_temp_array = { _target_provinces_ = 301 }
+			add_to_temp_array = { _target_provinces_ = 6380 }
+			add_to_temp_array = { _target_provinces_ = 3259 }
+			add_to_temp_array = { _target_provinces_ = 344 }
+			add_to_temp_array = { _target_provinces_ = 9256 }
+			add_to_temp_array = { _target_provinces_ = 6245 }
 		### Stalingrad
-			add_to_temp_array = { _target_provinces = 6503 }
-			add_to_temp_array = { _target_provinces = 9474 }
-			add_to_temp_array = { _target_provinces = 6527 }
-			add_to_temp_array = { _target_provinces = 9504 }
-			add_to_temp_array = { _target_provinces = 3582 }
-			add_to_temp_array = { _target_provinces = 9436 }
-			add_to_temp_array = { _target_provinces = 3529 }
+			add_to_temp_array = { _target_provinces_ = 6503 }
+			add_to_temp_array = { _target_provinces_ = 9474 }
+			add_to_temp_array = { _target_provinces_ = 6527 }
+			add_to_temp_array = { _target_provinces_ = 9504 }
+			add_to_temp_array = { _target_provinces_ = 3582 }
+			add_to_temp_array = { _target_provinces_ = 9436 }
+			add_to_temp_array = { _target_provinces_ = 3529 }
+		### Crimea
+			add_to_temp_array = { _target_provinces_ = 3722 }
+			add_to_temp_array = { _target_provinces_ = 11649 }
+			add_to_temp_array = { _target_provinces_ = 9718 }
+			add_to_temp_array = { _target_provinces_ = 6724 }
+			add_to_temp_array = { _target_provinces_ = 705 }
+			add_to_temp_array = { _target_provinces_ = 3686 }
+			add_to_temp_array = { _target_provinces_ = 6704 }
+			add_to_temp_array = { _target_provinces_ = 6741 }
 			
 			###
 
@@ -428,7 +558,8 @@ EAI_PC_FORT_strategy_SOV_main_cities_last_stand = {
 
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_SOV_main_cities_last_stand_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
-		set_temp_variable = { _project_queue_num = 5 }
+		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -455,6 +586,7 @@ EAI_PC_FORT_strategy_SOV_main_cities_last_stand = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_SOV_main_cities_last_stand_perimeter_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -488,67 +620,13 @@ EAI_PC_FORT_strategy_SOV_defense_in_depth = {
 		### Defense in depth fort lines
 		###################################################
 
-		### Crimea
-			add_to_temp_array = { _target_provinces = 3722 }
-			add_to_temp_array = { _target_provinces = 6741 }
-		### Kursk - center
-			add_to_temp_array = { _target_provinces = 9260 }
-			add_to_temp_array = { _target_provinces = 3580 }
-			add_to_temp_array = { _target_provinces = 558 }
-		### Kharkov - center
-			add_to_temp_array = { _target_provinces = 6481 }
-			add_to_temp_array = { _target_provinces = 418 }
-			add_to_temp_array = { _target_provinces = 6554 }
-		### Bryansk - center
-			add_to_temp_array = { _target_provinces = 3306 }
-			add_to_temp_array = { _target_provinces = 3335 }
-			add_to_temp_array = { _target_provinces = 3226 }
-			add_to_temp_array = { _target_provinces = 352 }
-			add_to_temp_array = { _target_provinces = 6243 }
-		### Rostov - south
-			add_to_temp_array = { _target_provinces = 11559 }
-			add_to_temp_array = { _target_provinces = 585 }
-			add_to_temp_array = { _target_provinces = 9417 }
-			add_to_temp_array = { _target_provinces = 11403 }
-			add_to_temp_array = { _target_provinces = 449 }
-		### Voroneszh - south
-			add_to_temp_array = { _target_provinces = 6279 }
-			add_to_temp_array = { _target_provinces = 6230 }
-			add_to_temp_array = { _target_provinces = 6398 }
-			add_to_temp_array = { _target_provinces = 6341 }
-			add_to_temp_array = { _target_provinces = 413 }
-			add_to_temp_array = { _target_provinces = 3527 }
-			add_to_temp_array = { _target_provinces = 510 }
-			add_to_temp_array = { _target_provinces = 6494 }
-			add_to_temp_array = { _target_provinces = 437 }
-		### Novgorod - north
-			add_to_temp_array = { _target_provinces = 9212 }
-			add_to_temp_array = { _target_provinces = 6154 }
-			add_to_temp_array = { _target_provinces = 71 }
-			add_to_temp_array = { _target_provinces = 6035 }
-			add_to_temp_array = { _target_provinces = 6095 }
-			add_to_temp_array = { _target_provinces = 70 }
-		### Leningrad west - north
-			add_to_temp_array = { _target_provinces = 104 }
-			add_to_temp_array = { _target_provinces = 126 }
-			add_to_temp_array = { _target_provinces = 9120 }
-			add_to_temp_array = { _target_provinces = 11202 }
-			add_to_temp_array = { _target_provinces = 6324 }
-			add_to_temp_array = { _target_provinces = 11392 }
-			add_to_temp_array = { _target_provinces = 6242 }
-		### Smolensk - center
-			add_to_temp_array = { _target_provinces = 306 }
-			add_to_temp_array = { _target_provinces = 3247 }
-			add_to_temp_array = { _target_provinces = 3313 }
-			add_to_temp_array = { _target_provinces = 11272 }
-		### Leningrad east - north
-			add_to_temp_array = { _target_provinces = 11059 }
-			add_to_temp_array = { _target_provinces = 9190 }
-			add_to_temp_array = { _target_provinces = 9082 }
+		### Target provinces
+			for_each_loop = { array = controlled_states if = { limit = { is_in_array = { global.EAI_MAP_barbarossa_theatre = v } } add_to_temp_array = { _states = v } } }
+			EAI_PC_FORT_generate_river_fortlines = yes
 
 			###
 
-			set_temp_variable = { _limit_provinces_near_enemies_radius = 50 }
+			set_temp_variable = { _limit_provinces_near_enemies_radius = 100 }
 			EAI_PC_FORT_limit_near_enemies_provinces = yes
 
 			EAI_PC_FORT_add_to_valid_fortification_projects = yes
@@ -557,6 +635,7 @@ EAI_PC_FORT_strategy_SOV_defense_in_depth = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_SOV_defense_in_depth_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -593,90 +672,90 @@ EAI_PC_FORT_strategy_GER_fortlines = {
 		###################################################
 
 		### Target provinces
-			add_to_temp_array = { _target_provinces = 6282 }
-			add_to_temp_array = { _target_provinces = 3207 }
-			add_to_temp_array = { _target_provinces = 9496 }
-			add_to_temp_array = { _target_provinces = 3572 }
-			add_to_temp_array = { _target_provinces = 6595 }
-			add_to_temp_array = { _target_provinces = 3367 }
-			add_to_temp_array = { _target_provinces = 11444 }
-			add_to_temp_array = { _target_provinces = 6521 }
-			add_to_temp_array = { _target_provinces = 3499 }
-			add_to_temp_array = { _target_provinces = 6441 }
-			add_to_temp_array = { _target_provinces = 514 }
-			add_to_temp_array = { _target_provinces = 3512 }
-			add_to_temp_array = { _target_provinces = 6469 }
-			add_to_temp_array = { _target_provinces = 6570 }
-			add_to_temp_array = { _target_provinces = 529 }
-			add_to_temp_array = { _target_provinces = 6444 }
-			add_to_temp_array = { _target_provinces = 3326 }
-			add_to_temp_array = { _target_provinces = 3271 }
-			add_to_temp_array = { _target_provinces = 3395 }
-			add_to_temp_array = { _target_provinces = 11493 }
-			add_to_temp_array = { _target_provinces = 6513 }
-			add_to_temp_array = { _target_provinces = 3561 }
-			add_to_temp_array = { _target_provinces = 362 }
-			add_to_temp_array = { _target_provinces = 389 }
-			add_to_temp_array = { _target_provinces = 3324 }
-			add_to_temp_array = { _target_provinces = 279 }
-			add_to_temp_array = { _target_provinces = 243 }
-			add_to_temp_array = { _target_provinces = 6401 }
-			add_to_temp_array = { _target_provinces = 548 }
-			add_to_temp_array = { _target_provinces = 11492 }
-			add_to_temp_array = { _target_provinces = 3544 }
-			add_to_temp_array = { _target_provinces = 6511 }
-			add_to_temp_array = { _target_provinces = 3458 }
-			add_to_temp_array = { _target_provinces = 562 }
-			add_to_temp_array = { _target_provinces = 11219 }
-			add_to_temp_array = { _target_provinces = 375 }
-			add_to_temp_array = { _target_provinces = 9456 }
-			add_to_temp_array = { _target_provinces = 11499 }
-			add_to_temp_array = { _target_provinces = 6540 }
-			add_to_temp_array = { _target_provinces = 3299 }
-			add_to_temp_array = { _target_provinces = 3541 }
-			add_to_temp_array = { _target_provinces = 532 }
-			add_to_temp_array = { _target_provinces = 6282 }
-			add_to_temp_array = { _target_provinces = 3207 }
-			add_to_temp_array = { _target_provinces = 9496 }
-			add_to_temp_array = { _target_provinces = 3572 }
-			add_to_temp_array = { _target_provinces = 6595 }
-			add_to_temp_array = { _target_provinces = 3367 }
-			add_to_temp_array = { _target_provinces = 11444 }
-			add_to_temp_array = { _target_provinces = 6521 }
-			add_to_temp_array = { _target_provinces = 3499 }
-			add_to_temp_array = { _target_provinces = 6441 }
-			add_to_temp_array = { _target_provinces = 514 }
-			add_to_temp_array = { _target_provinces = 3512 }
-			add_to_temp_array = { _target_provinces = 6469 }
-			add_to_temp_array = { _target_provinces = 6570 }
-			add_to_temp_array = { _target_provinces = 529 }
-			add_to_temp_array = { _target_provinces = 6444 }
-			add_to_temp_array = { _target_provinces = 3326 }
-			add_to_temp_array = { _target_provinces = 3271 }
-			add_to_temp_array = { _target_provinces = 3395 }
-			add_to_temp_array = { _target_provinces = 11493 }
-			add_to_temp_array = { _target_provinces = 6513 }
-			add_to_temp_array = { _target_provinces = 3561 }
-			add_to_temp_array = { _target_provinces = 362 }
-			add_to_temp_array = { _target_provinces = 389 }
-			add_to_temp_array = { _target_provinces = 3324 }
-			add_to_temp_array = { _target_provinces = 279 }
-			add_to_temp_array = { _target_provinces = 243 }
-			add_to_temp_array = { _target_provinces = 6401 }
-			add_to_temp_array = { _target_provinces = 548 }
-			add_to_temp_array = { _target_provinces = 11492 }
-			add_to_temp_array = { _target_provinces = 3544 }
-			add_to_temp_array = { _target_provinces = 6511 }
-			add_to_temp_array = { _target_provinces = 3458 }
-			add_to_temp_array = { _target_provinces = 562 }
-			add_to_temp_array = { _target_provinces = 11219 }
-			add_to_temp_array = { _target_provinces = 375 }
-			add_to_temp_array = { _target_provinces = 9456 }
-			add_to_temp_array = { _target_provinces = 11499 }
-			add_to_temp_array = { _target_provinces = 6540 }
-			add_to_temp_array = { _target_provinces = 3299 }
-			add_to_temp_array = { _target_provinces = 3541 }
-			add_to_temp_array = { _target_provinces = 532 }
+			add_to_temp_array = { _target_provinces_ = 6282 }
+			add_to_temp_array = { _target_provinces_ = 3207 }
+			add_to_temp_array = { _target_provinces_ = 9496 }
+			add_to_temp_array = { _target_provinces_ = 3572 }
+			add_to_temp_array = { _target_provinces_ = 6595 }
+			add_to_temp_array = { _target_provinces_ = 3367 }
+			add_to_temp_array = { _target_provinces_ = 11444 }
+			add_to_temp_array = { _target_provinces_ = 6521 }
+			add_to_temp_array = { _target_provinces_ = 3499 }
+			add_to_temp_array = { _target_provinces_ = 6441 }
+			add_to_temp_array = { _target_provinces_ = 514 }
+			add_to_temp_array = { _target_provinces_ = 3512 }
+			add_to_temp_array = { _target_provinces_ = 6469 }
+			add_to_temp_array = { _target_provinces_ = 6570 }
+			add_to_temp_array = { _target_provinces_ = 529 }
+			add_to_temp_array = { _target_provinces_ = 6444 }
+			add_to_temp_array = { _target_provinces_ = 3326 }
+			add_to_temp_array = { _target_provinces_ = 3271 }
+			add_to_temp_array = { _target_provinces_ = 3395 }
+			add_to_temp_array = { _target_provinces_ = 11493 }
+			add_to_temp_array = { _target_provinces_ = 6513 }
+			add_to_temp_array = { _target_provinces_ = 3561 }
+			add_to_temp_array = { _target_provinces_ = 362 }
+			add_to_temp_array = { _target_provinces_ = 389 }
+			add_to_temp_array = { _target_provinces_ = 3324 }
+			add_to_temp_array = { _target_provinces_ = 279 }
+			add_to_temp_array = { _target_provinces_ = 243 }
+			add_to_temp_array = { _target_provinces_ = 6401 }
+			add_to_temp_array = { _target_provinces_ = 548 }
+			add_to_temp_array = { _target_provinces_ = 11492 }
+			add_to_temp_array = { _target_provinces_ = 3544 }
+			add_to_temp_array = { _target_provinces_ = 6511 }
+			add_to_temp_array = { _target_provinces_ = 3458 }
+			add_to_temp_array = { _target_provinces_ = 562 }
+			add_to_temp_array = { _target_provinces_ = 11219 }
+			add_to_temp_array = { _target_provinces_ = 375 }
+			add_to_temp_array = { _target_provinces_ = 9456 }
+			add_to_temp_array = { _target_provinces_ = 11499 }
+			add_to_temp_array = { _target_provinces_ = 6540 }
+			add_to_temp_array = { _target_provinces_ = 3299 }
+			add_to_temp_array = { _target_provinces_ = 3541 }
+			add_to_temp_array = { _target_provinces_ = 532 }
+			add_to_temp_array = { _target_provinces_ = 6282 }
+			add_to_temp_array = { _target_provinces_ = 3207 }
+			add_to_temp_array = { _target_provinces_ = 9496 }
+			add_to_temp_array = { _target_provinces_ = 3572 }
+			add_to_temp_array = { _target_provinces_ = 6595 }
+			add_to_temp_array = { _target_provinces_ = 3367 }
+			add_to_temp_array = { _target_provinces_ = 11444 }
+			add_to_temp_array = { _target_provinces_ = 6521 }
+			add_to_temp_array = { _target_provinces_ = 3499 }
+			add_to_temp_array = { _target_provinces_ = 6441 }
+			add_to_temp_array = { _target_provinces_ = 514 }
+			add_to_temp_array = { _target_provinces_ = 3512 }
+			add_to_temp_array = { _target_provinces_ = 6469 }
+			add_to_temp_array = { _target_provinces_ = 6570 }
+			add_to_temp_array = { _target_provinces_ = 529 }
+			add_to_temp_array = { _target_provinces_ = 6444 }
+			add_to_temp_array = { _target_provinces_ = 3326 }
+			add_to_temp_array = { _target_provinces_ = 3271 }
+			add_to_temp_array = { _target_provinces_ = 3395 }
+			add_to_temp_array = { _target_provinces_ = 11493 }
+			add_to_temp_array = { _target_provinces_ = 6513 }
+			add_to_temp_array = { _target_provinces_ = 3561 }
+			add_to_temp_array = { _target_provinces_ = 362 }
+			add_to_temp_array = { _target_provinces_ = 389 }
+			add_to_temp_array = { _target_provinces_ = 3324 }
+			add_to_temp_array = { _target_provinces_ = 279 }
+			add_to_temp_array = { _target_provinces_ = 243 }
+			add_to_temp_array = { _target_provinces_ = 6401 }
+			add_to_temp_array = { _target_provinces_ = 548 }
+			add_to_temp_array = { _target_provinces_ = 11492 }
+			add_to_temp_array = { _target_provinces_ = 3544 }
+			add_to_temp_array = { _target_provinces_ = 6511 }
+			add_to_temp_array = { _target_provinces_ = 3458 }
+			add_to_temp_array = { _target_provinces_ = 562 }
+			add_to_temp_array = { _target_provinces_ = 11219 }
+			add_to_temp_array = { _target_provinces_ = 375 }
+			add_to_temp_array = { _target_provinces_ = 9456 }
+			add_to_temp_array = { _target_provinces_ = 11499 }
+			add_to_temp_array = { _target_provinces_ = 6540 }
+			add_to_temp_array = { _target_provinces_ = 3299 }
+			add_to_temp_array = { _target_provinces_ = 3541 }
+			add_to_temp_array = { _target_provinces_ = 532 }
 
 			###
 
@@ -689,6 +768,7 @@ EAI_PC_FORT_strategy_GER_fortlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_GER_fortlines_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -736,29 +816,29 @@ EAI_PC_FORT_strategy_ITA_fortlines = {
 		###################################################
 
 		### Target provinces
-			add_to_temp_array = { _target_provinces = 9990 }
-			add_to_temp_array = { _target_provinces = 11846 }
-			add_to_temp_array = { _target_provinces = 11882 }
-			add_to_temp_array = { _target_provinces = 3910 }
-			add_to_temp_array = { _target_provinces = 9838 }
-			add_to_temp_array = { _target_provinces = 955 }
-			add_to_temp_array = { _target_provinces = 11803 }
-			add_to_temp_array = { _target_provinces = 883 }
-			add_to_temp_array = { _target_provinces = 9582 }
-			add_to_temp_array = { _target_provinces = 3776 }
-			add_to_temp_array = { _target_provinces = 773 }
-			add_to_temp_array = { _target_provinces = 3780 }
-			add_to_temp_array = { _target_provinces = 776 }
-			add_to_temp_array = { _target_provinces = 6946 }
-			add_to_temp_array = { _target_provinces = 9907 }
-			add_to_temp_array = { _target_provinces = 9879 }
-			add_to_temp_array = { _target_provinces = 11861 }
-			add_to_temp_array = { _target_provinces = 967 }
-			add_to_temp_array = { _target_provinces = 11891 }
-			add_to_temp_array = { _target_provinces = 11721 }
-			add_to_temp_array = { _target_provinces = 9738 }
-			add_to_temp_array = { _target_provinces = 6780 }
-			add_to_temp_array = { _target_provinces = 611 }
+			add_to_temp_array = { _target_provinces_ = 9990 }
+			add_to_temp_array = { _target_provinces_ = 11846 }
+			add_to_temp_array = { _target_provinces_ = 11882 }
+			add_to_temp_array = { _target_provinces_ = 3910 }
+			add_to_temp_array = { _target_provinces_ = 9838 }
+			add_to_temp_array = { _target_provinces_ = 955 }
+			add_to_temp_array = { _target_provinces_ = 11803 }
+			add_to_temp_array = { _target_provinces_ = 883 }
+			add_to_temp_array = { _target_provinces_ = 9582 }
+			add_to_temp_array = { _target_provinces_ = 3776 }
+			add_to_temp_array = { _target_provinces_ = 773 }
+			add_to_temp_array = { _target_provinces_ = 3780 }
+			add_to_temp_array = { _target_provinces_ = 776 }
+			add_to_temp_array = { _target_provinces_ = 6946 }
+			add_to_temp_array = { _target_provinces_ = 9907 }
+			add_to_temp_array = { _target_provinces_ = 9879 }
+			add_to_temp_array = { _target_provinces_ = 11861 }
+			add_to_temp_array = { _target_provinces_ = 967 }
+			add_to_temp_array = { _target_provinces_ = 11891 }
+			add_to_temp_array = { _target_provinces_ = 11721 }
+			add_to_temp_array = { _target_provinces_ = 9738 }
+			add_to_temp_array = { _target_provinces_ = 6780 }
+			add_to_temp_array = { _target_provinces_ = 611 }
 
 			###
 
@@ -771,6 +851,7 @@ EAI_PC_FORT_strategy_ITA_fortlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ITA_fortlines_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -792,6 +873,7 @@ EAI_PC_FORT_strategy_ITA_coastal = {
 	if = {
 		limit = {
 			has_war = yes
+			any_enemy_country = { is_major = yes }
 			OR = {
 				alliance_naval_strength_ratio < 1.0
 				check_variable = { EAI_num_surface_ships < 25 }
@@ -821,6 +903,7 @@ EAI_PC_FORT_strategy_ITA_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ITA_coastal_naval_base_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -848,6 +931,7 @@ EAI_PC_FORT_strategy_ITA_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ITA_coastal_coast_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 2 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -932,6 +1016,7 @@ EAI_PC_FORT_strategy_JAP_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_JAP_islands_asia_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -969,6 +1054,7 @@ EAI_PC_FORT_strategy_JAP_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_JAP_islands_island_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -991,7 +1077,7 @@ EAI_PC_FORT_strategy_JAP_coastal = {
 		limit = {
 			has_war = yes
 			OR = {
-				has_country_flag = EAI_japanese_home_states_controlled_by_enemy
+				has_country_flag = EAI_JAP_homeland_invaded
 				alliance_naval_strength_ratio < 1.0
 			}
 		}
@@ -1016,6 +1102,7 @@ EAI_PC_FORT_strategy_JAP_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_JAP_coastal_naval_base_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1040,6 +1127,7 @@ EAI_PC_FORT_strategy_JAP_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_JAP_coastal_coast_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 2 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1090,6 +1178,7 @@ EAI_PC_FORT_strategy_JAP_frontlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_JAP_frontlines_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1171,6 +1260,7 @@ EAI_PC_FORT_strategy_USA_fortlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_USA_fortlines_city_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1180,22 +1270,22 @@ EAI_PC_FORT_strategy_USA_fortlines = {
 		###################################################
 
 		### Target provinces
-			add_to_temp_array = { _target_provinces = 6984 } add_to_temp_array = { _target_provinces = 822 } add_to_temp_array = { _target_provinces = 3847 } add_to_temp_array = { _target_provinces = 9804 } add_to_temp_array = { _target_provinces = 6885 }
-			add_to_temp_array = { _target_provinces = 865 } add_to_temp_array = { _target_provinces = 3823 } add_to_temp_array = { _target_provinces = 10343 }
-			add_to_temp_array = { _target_provinces = 6882 } add_to_temp_array = { _target_provinces = 3894 } add_to_temp_array = { _target_provinces = 9774 } add_to_temp_array = { _target_provinces = 9673 } add_to_temp_array = { _target_provinces = 9693 }
-			add_to_temp_array = { _target_provinces = 11927 } add_to_temp_array = { _target_provinces = 7083 } add_to_temp_array = { _target_provinces = 10081 } add_to_temp_array = { _target_provinces = 12445 } add_to_temp_array = { _target_provinces = 10468 }
-			add_to_temp_array = { _target_provinces = 1547 } add_to_temp_array = { _target_provinces = 3994 } add_to_temp_array = { _target_provinces = 1485 }
-			add_to_temp_array = { _target_provinces = 10407 } add_to_temp_array = { _target_provinces = 12325 } add_to_temp_array = { _target_provinces = 12498 } add_to_temp_array = { _target_provinces = 7583 }
-			add_to_temp_array = { _target_provinces = 4507 } add_to_temp_array = { _target_provinces = 1643 } add_to_temp_array = { _target_provinces = 7599 } add_to_temp_array = { _target_provinces = 1559 } add_to_temp_array = { _target_provinces = 10355 } add_to_temp_array = { _target_provinces = 1646 } add_to_temp_array = { _target_provinces = 4625 } add_to_temp_array = { _target_provinces = 4540 } add_to_temp_array = { _target_provinces = 4449 } add_to_temp_array = { _target_provinces = 4569 } add_to_temp_array = { _target_provinces = 1523 } add_to_temp_array = { _target_provinces = 7607 } add_to_temp_array = { _target_provinces = 10391 } add_to_temp_array = { _target_provinces = 10333 } add_to_temp_array = { _target_provinces = 9892 } add_to_temp_array = { _target_provinces = 10666 } add_to_temp_array = { _target_provinces = 12646 } add_to_temp_array = { _target_provinces = 10595 }
-			add_to_temp_array = { _target_provinces = 12410 } add_to_temp_array = { _target_provinces = 12341 } add_to_temp_array = { _target_provinces = 5022 }
-			add_to_temp_array = { _target_provinces = 7599 } add_to_temp_array = { _target_provinces = 7555 } add_to_temp_array = { _target_provinces = 4522 } add_to_temp_array = { _target_provinces = 1503 } add_to_temp_array = { _target_provinces = 7485 } add_to_temp_array = { _target_provinces = 7945 } add_to_temp_array = { _target_provinces = 8025 } add_to_temp_array = { _target_provinces = 11743 } add_to_temp_array = { _target_provinces = 4919 }
-			add_to_temp_array = { _target_provinces = 4444 } add_to_temp_array = { _target_provinces = 10477 } add_to_temp_array = { _target_provinces = 4597 } add_to_temp_array = { _target_provinces = 4567 } add_to_temp_array = { _target_provinces = 2043 } add_to_temp_array = { _target_provinces = 1806 } add_to_temp_array = { _target_provinces = 4811 } add_to_temp_array = { _target_provinces = 7892 } add_to_temp_array = { _target_provinces = 12024 } add_to_temp_array = { _target_provinces = 4814 }
-			add_to_temp_array = { _target_provinces = 4442 } add_to_temp_array = { _target_provinces = 9808 } add_to_temp_array = { _target_provinces = 3829 } add_to_temp_array = { _target_provinces = 7528 } add_to_temp_array = { _target_provinces = 971 } add_to_temp_array = { _target_provinces = 11890 } add_to_temp_array = { _target_provinces = 4601 } add_to_temp_array = { _target_provinces = 4527 } add_to_temp_array = { _target_provinces = 1881 } add_to_temp_array = { _target_provinces = 11621 } add_to_temp_array = { _target_provinces = 11635 } add_to_temp_array = { _target_provinces = 954 }
-			add_to_temp_array = { _target_provinces = 5090 } add_to_temp_array = { _target_provinces = 9967 } add_to_temp_array = { _target_provinces = 7643 } add_to_temp_array = { _target_provinces = 8014 } add_to_temp_array = { _target_provinces = 7558 } add_to_temp_array = { _target_provinces = 7466 } add_to_temp_array = { _target_provinces = 7646 } add_to_temp_array = { _target_provinces = 3941 } add_to_temp_array = { _target_provinces = 6958 } add_to_temp_array = { _target_provinces = 6823 } add_to_temp_array = { _target_provinces = 11769 }
-			add_to_temp_array = { _target_provinces = 850 } add_to_temp_array = { _target_provinces = 12765 } add_to_temp_array = { _target_provinces = 7747 } add_to_temp_array = { _target_provinces = 4796 } add_to_temp_array = { _target_provinces = 10914 }
-			add_to_temp_array = { _target_provinces = 12627 } add_to_temp_array = { _target_provinces = 10642 } add_to_temp_array = { _target_provinces = 4975 } add_to_temp_array = { _target_provinces = 3883 } add_to_temp_array = { _target_provinces = 12791 }
-			add_to_temp_array = { _target_provinces = 12553 } add_to_temp_array = { _target_provinces = 10687 } add_to_temp_array = { _target_provinces = 7865 } add_to_temp_array = { _target_provinces = 12183 } add_to_temp_array = { _target_provinces = 3513 } add_to_temp_array = { _target_provinces = 4328 }
-			add_to_temp_array = { _target_provinces = 12633 } add_to_temp_array = { _target_provinces = 10535 } add_to_temp_array = { _target_provinces = 1756 } add_to_temp_array = { _target_provinces = 7764 } add_to_temp_array = { _target_provinces = 7818 } add_to_temp_array = { _target_provinces = 7821 } add_to_temp_array = { _target_provinces = 12765 } add_to_temp_array = { _target_provinces = 11814 } add_to_temp_array = { _target_provinces = 8115 }
+			add_to_temp_array = { _target_provinces_ = 6984 } add_to_temp_array = { _target_provinces_ = 822 } add_to_temp_array = { _target_provinces_ = 3847 } add_to_temp_array = { _target_provinces_ = 9804 } add_to_temp_array = { _target_provinces_ = 6885 }
+			add_to_temp_array = { _target_provinces_ = 865 } add_to_temp_array = { _target_provinces_ = 3823 } add_to_temp_array = { _target_provinces_ = 10343 }
+			add_to_temp_array = { _target_provinces_ = 6882 } add_to_temp_array = { _target_provinces_ = 3894 } add_to_temp_array = { _target_provinces_ = 9774 } add_to_temp_array = { _target_provinces_ = 9673 } add_to_temp_array = { _target_provinces_ = 9693 }
+			add_to_temp_array = { _target_provinces_ = 11927 } add_to_temp_array = { _target_provinces_ = 7083 } add_to_temp_array = { _target_provinces_ = 10081 } add_to_temp_array = { _target_provinces_ = 12445 } add_to_temp_array = { _target_provinces_ = 10468 }
+			add_to_temp_array = { _target_provinces_ = 1547 } add_to_temp_array = { _target_provinces_ = 3994 } add_to_temp_array = { _target_provinces_ = 1485 }
+			add_to_temp_array = { _target_provinces_ = 10407 } add_to_temp_array = { _target_provinces_ = 12325 } add_to_temp_array = { _target_provinces_ = 12498 } add_to_temp_array = { _target_provinces_ = 7583 }
+			add_to_temp_array = { _target_provinces_ = 4507 } add_to_temp_array = { _target_provinces_ = 1643 } add_to_temp_array = { _target_provinces_ = 7599 } add_to_temp_array = { _target_provinces_ = 1559 } add_to_temp_array = { _target_provinces_ = 10355 } add_to_temp_array = { _target_provinces_ = 1646 } add_to_temp_array = { _target_provinces_ = 4625 } add_to_temp_array = { _target_provinces_ = 4540 } add_to_temp_array = { _target_provinces_ = 4449 } add_to_temp_array = { _target_provinces_ = 4569 } add_to_temp_array = { _target_provinces_ = 1523 } add_to_temp_array = { _target_provinces_ = 7607 } add_to_temp_array = { _target_provinces_ = 10391 } add_to_temp_array = { _target_provinces_ = 10333 } add_to_temp_array = { _target_provinces_ = 9892 } add_to_temp_array = { _target_provinces_ = 10666 } add_to_temp_array = { _target_provinces_ = 12646 } add_to_temp_array = { _target_provinces_ = 10595 }
+			add_to_temp_array = { _target_provinces_ = 12410 } add_to_temp_array = { _target_provinces_ = 12341 } add_to_temp_array = { _target_provinces_ = 5022 }
+			add_to_temp_array = { _target_provinces_ = 7599 } add_to_temp_array = { _target_provinces_ = 7555 } add_to_temp_array = { _target_provinces_ = 4522 } add_to_temp_array = { _target_provinces_ = 1503 } add_to_temp_array = { _target_provinces_ = 7485 } add_to_temp_array = { _target_provinces_ = 7945 } add_to_temp_array = { _target_provinces_ = 8025 } add_to_temp_array = { _target_provinces_ = 11743 } add_to_temp_array = { _target_provinces_ = 4919 }
+			add_to_temp_array = { _target_provinces_ = 4444 } add_to_temp_array = { _target_provinces_ = 10477 } add_to_temp_array = { _target_provinces_ = 4597 } add_to_temp_array = { _target_provinces_ = 4567 } add_to_temp_array = { _target_provinces_ = 2043 } add_to_temp_array = { _target_provinces_ = 1806 } add_to_temp_array = { _target_provinces_ = 4811 } add_to_temp_array = { _target_provinces_ = 7892 } add_to_temp_array = { _target_provinces_ = 12024 } add_to_temp_array = { _target_provinces_ = 4814 }
+			add_to_temp_array = { _target_provinces_ = 4442 } add_to_temp_array = { _target_provinces_ = 9808 } add_to_temp_array = { _target_provinces_ = 3829 } add_to_temp_array = { _target_provinces_ = 7528 } add_to_temp_array = { _target_provinces_ = 971 } add_to_temp_array = { _target_provinces_ = 11890 } add_to_temp_array = { _target_provinces_ = 4601 } add_to_temp_array = { _target_provinces_ = 4527 } add_to_temp_array = { _target_provinces_ = 1881 } add_to_temp_array = { _target_provinces_ = 11621 } add_to_temp_array = { _target_provinces_ = 11635 } add_to_temp_array = { _target_provinces_ = 954 }
+			add_to_temp_array = { _target_provinces_ = 5090 } add_to_temp_array = { _target_provinces_ = 9967 } add_to_temp_array = { _target_provinces_ = 7643 } add_to_temp_array = { _target_provinces_ = 8014 } add_to_temp_array = { _target_provinces_ = 7558 } add_to_temp_array = { _target_provinces_ = 7466 } add_to_temp_array = { _target_provinces_ = 7646 } add_to_temp_array = { _target_provinces_ = 3941 } add_to_temp_array = { _target_provinces_ = 6958 } add_to_temp_array = { _target_provinces_ = 6823 } add_to_temp_array = { _target_provinces_ = 11769 }
+			add_to_temp_array = { _target_provinces_ = 850 } add_to_temp_array = { _target_provinces_ = 12765 } add_to_temp_array = { _target_provinces_ = 7747 } add_to_temp_array = { _target_provinces_ = 4796 } add_to_temp_array = { _target_provinces_ = 10914 }
+			add_to_temp_array = { _target_provinces_ = 12627 } add_to_temp_array = { _target_provinces_ = 10642 } add_to_temp_array = { _target_provinces_ = 4975 } add_to_temp_array = { _target_provinces_ = 3883 } add_to_temp_array = { _target_provinces_ = 12791 }
+			add_to_temp_array = { _target_provinces_ = 12553 } add_to_temp_array = { _target_provinces_ = 10687 } add_to_temp_array = { _target_provinces_ = 7865 } add_to_temp_array = { _target_provinces_ = 12183 } add_to_temp_array = { _target_provinces_ = 3513 } add_to_temp_array = { _target_provinces_ = 4328 }
+			add_to_temp_array = { _target_provinces_ = 12633 } add_to_temp_array = { _target_provinces_ = 10535 } add_to_temp_array = { _target_provinces_ = 1756 } add_to_temp_array = { _target_provinces_ = 7764 } add_to_temp_array = { _target_provinces_ = 7818 } add_to_temp_array = { _target_provinces_ = 7821 } add_to_temp_array = { _target_provinces_ = 12765 } add_to_temp_array = { _target_provinces_ = 11814 } add_to_temp_array = { _target_provinces_ = 8115 }
 
 			###
 
@@ -1209,6 +1299,7 @@ EAI_PC_FORT_strategy_USA_fortlines = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_USA_fortlines_fortline_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1262,6 +1353,7 @@ EAI_PC_FORT_strategy_USA_home_coast = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_USA_coastal_naval_base_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1325,6 +1417,7 @@ EAI_PC_FORT_strategy_USA_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_USA_islands_asia_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1362,6 +1455,7 @@ EAI_PC_FORT_strategy_USA_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_USA_islands_island_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1419,6 +1513,7 @@ EAI_PC_FORT_strategy_ENG_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ENG_coastal_naval_base_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1443,6 +1538,7 @@ EAI_PC_FORT_strategy_ENG_coastal = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ENG_coastal_coast_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 2 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1508,6 +1604,7 @@ EAI_PC_FORT_strategy_ENG_cities = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ENG_cities_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_BUNKER }
 		set_temp_variable = { _project_queue_num = 3 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 4 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1568,6 +1665,7 @@ EAI_PC_FORT_strategy_ENG_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ENG_islands_europe_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 2 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1605,6 +1703,7 @@ EAI_PC_FORT_strategy_ENG_islands = {
 		set_temp_variable = { _project_priority = @EAI_PC_FORT_strategy_ENG_islands_island_PRIO }
 		set_temp_variable = { _project_building_type = global.EAI_PC_CBUNKER }
 		set_temp_variable = { _project_queue_num = 1 }
+		set_temp_variable = { _project_queue_max = 2 }
 		set_temp_variable = { _project_target_level = 3 }
 		set_temp_variable = { _project_type_id = strategy_type_id }
 		EAI_PC_FORT_create = yes
@@ -1618,11 +1717,11 @@ EAI_PC_FORT_strategy_ENG_islands = {
 
 ####################################################################################
 
-EAI_PC_FORT_create = { # _target_provinces, [project vars]
+EAI_PC_FORT_create = { # _target_provinces_, [project vars]
 
-	if = { limit = { has_country_flag = EAI_PC_FORT_logging }
+	if = { limit = { has_country_flag = EAI_PC_FORT_logging has_country_flag = EAI_priority_construction_detailed_logging }
 	
-		for_each_loop = { array = _target_provinces
+		for_each_loop = { array = _target_provinces_
 		
 			log = "building fort in province=[?v]" 
 		}
@@ -1630,13 +1729,13 @@ EAI_PC_FORT_create = { # _target_provinces, [project vars]
 
 	EAI_PC_save_project_inputs = yes
 
-	if = { limit = { check_variable = { _target_provinces^num > 0 } }
+	if = { limit = { check_variable = { _target_provinces_^num > 0 } }
 	
 		if = { limit = { check_variable = { _project_queue_num > 0 } } resize_temp_array = { sets = _project_queue_num } }
 		else = { resize_temp_array = { sets = 1 } }
 		for_each_loop = { array = sets index = sets_i value = sets_v break = sets_b
 
-			for_each_loop = { array = _target_provinces index = province_index value = _project_province_id break = b3
+			for_each_loop = { array = _target_provinces_ index = province_index value = _project_province_id break = b3
 
 				EAI_PC_get_project_inputs_provincial = yes
 				set_temp_variable = { _project_queue_num = 0 }
@@ -1646,7 +1745,7 @@ EAI_PC_FORT_create = { # _target_provinces, [project vars]
 		}
 	}
 
-	clear_temp_array = _target_provinces
+	clear_temp_array = _target_provinces_
 	
 	EAI_PC_clear_project_inputs = yes
 }
@@ -1744,9 +1843,9 @@ EAI_PC_FORT_get_city_perimeter_provinces = { # _target_states
 							}
 						}
 					
-						if = { limit = { NOT = { is_in_array = { _target_provinces = _province_id_a } } }
+						if = { limit = { NOT = { is_in_array = { _target_provinces_ = _province_id_a } } }
 									
-							add_to_temp_array = { _target_provinces = _province_id_a }
+							add_to_temp_array = { _target_provinces_ = _province_id_a }
 						}
 					}
 				}
@@ -1775,9 +1874,9 @@ EAI_PC_FORT_get_target_provinces = { # _target_states, _get_province_home_area, 
 					if = { limit = { check_variable = { _get_province_naval_base = 1 } } EAI_PC_province_is_naval_base = yes }
 				}
 			
-				if = { limit = { NOT = { is_in_array = { _target_provinces = _project_province_id } } }
+				if = { limit = { NOT = { is_in_array = { _target_provinces_ = _project_province_id } } }
 					
-					add_to_temp_array = { _target_provinces = _project_province_id }
+					add_to_temp_array = { _target_provinces_ = _project_province_id }
 				}
 			}
 		}
@@ -1868,9 +1967,9 @@ EAI_PC_FORT_get_frontline_provinces = {
 							any_of_scopes = { array = ROOT.enemies controls_province = neighbor_prov }
 						}
 						
-						if = { limit = { NOT = { is_in_array = { _target_provinces = _project_province_id } } }
+						if = { limit = { NOT = { is_in_array = { _target_provinces_ = _project_province_id } } }
 
-							add_to_temp_array = { _target_provinces = _project_province_id }
+							add_to_temp_array = { _target_provinces_ = _project_province_id }
 						}
 					}
 				}
@@ -1879,14 +1978,14 @@ EAI_PC_FORT_get_frontline_provinces = {
 	}
 }
 
-EAI_PC_FORT_limit_near_enemies_provinces = { # _target_provinces, _limit_provinces_near_enemies_radius
+EAI_PC_FORT_limit_near_enemies_provinces = { # _target_provinces_, _limit_provinces_near_enemies_radius
 
-	if = { limit = { check_variable = { _target_provinces^num > 0 } }
+	if = { limit = { check_variable = { _target_provinces_^num > 0 } }
 	
 		### Get states of target provinces
 	
 		clear_temp_array = target_states
-		for_each_loop = { array = _target_provinces value = _project_province_id
+		for_each_loop = { array = _target_provinces_ value = _project_province_id
 
 			var:global.EAI_MAP_province_state_id^_project_province_id = {
 	
@@ -1937,7 +2036,7 @@ EAI_PC_FORT_limit_near_enemies_provinces = { # _target_provinces, _limit_provinc
 				
 					if = { 
 						limit = { 
-							is_in_array = { _target_provinces = _project_province_id } 
+							is_in_array = { _target_provinces_ = _project_province_id } 
 							NOT = { is_in_array = { remove_provinces = _project_province_id } } 
 						}
 
@@ -1951,7 +2050,7 @@ EAI_PC_FORT_limit_near_enemies_provinces = { # _target_provinces, _limit_provinc
 
 		for_each_loop = { array = remove_provinces
 
-			remove_from_temp_array = { array = _target_provinces value = v }
+			remove_from_temp_array = { array = _target_provinces_ value = v }
 		}
 	}
 
@@ -1960,14 +2059,14 @@ EAI_PC_FORT_limit_near_enemies_provinces = { # _target_provinces, _limit_provinc
 	set_temp_variable = { _limit_provinces_near_enemies_radius = 0 }
 }
 
-EAI_PC_FORT_limit_provinces = { # _target_provinces, _limit_provinces_queue_one_per_target, _limit_provinces_naval_base, _limit_provinces_control_days
+EAI_PC_FORT_limit_provinces = { # _target_provinces_, _limit_provinces_queue_one_per_target, _limit_provinces_naval_base, _limit_provinces_control_days
 
-	if = { limit = { check_variable = { _target_provinces^num > 0 } }
+	if = { limit = { check_variable = { _target_provinces_^num > 0 } }
 	
 		### Get provinces that dont meet the criteria
 	
 		clear_temp_array = remove_provinces
-		for_each_loop = { array = _target_provinces value = _project_province_id
+		for_each_loop = { array = _target_provinces_ value = _project_province_id
 
 			if = {
 				limit = {
@@ -1979,7 +2078,7 @@ EAI_PC_FORT_limit_provinces = { # _target_provinces, _limit_provinces_queue_one_
 			
 				if = { 
 					limit = { 
-						is_in_array = { _target_provinces = _project_province_id } 
+						is_in_array = { _target_provinces_ = _project_province_id } 
 						NOT = { is_in_array = { remove_provinces = _project_province_id } } 
 					}
 				
@@ -1992,7 +2091,7 @@ EAI_PC_FORT_limit_provinces = { # _target_provinces, _limit_provinces_queue_one_
 
 		for_each_loop = { array = remove_provinces
 		
-			remove_from_temp_array = { _target_provinces = v }
+			remove_from_temp_array = { _target_provinces_ = v }
 		}
 	}
 
@@ -2003,12 +2102,12 @@ EAI_PC_FORT_limit_provinces = { # _target_provinces, _limit_provinces_queue_one_
 	set_temp_variable = { _limit_provinces_control_days = 0 }
 }
 
-EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces, _limit_provinces_state_avg_control_days
+EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces_, _limit_provinces_state_avg_control_days
 
-	if = { limit = { check_variable = { _target_provinces^num > 0 } }
+	if = { limit = { check_variable = { _target_provinces_^num > 0 } }
 	
 		clear_temp_array = target_states
-		for_each_loop = { array = _target_provinces value = target_province
+		for_each_loop = { array = _target_provinces_ value = target_province
 		
 			if = { limit = { NOT = { is_in_array = { target_states = global.EAI_MAP_province_state_id^target_province } } }
 			
@@ -2023,7 +2122,7 @@ EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces, _lim
 			set_temp_variable = { control_days_div = 0 }
 			for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS value = sum_province
 			
-				if = { limit = { is_in_array = { _target_provinces = sum_province } }
+				if = { limit = { is_in_array = { _target_provinces_ = sum_province } }
 				
 					add_to_temp_variable = { control_days_sum = global.EAI_MAP_province_control_days^sum_province }
 					add_to_temp_variable = { control_days_div = 1 }
@@ -2039,7 +2138,7 @@ EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces, _lim
 			
 				for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS value = remove_province
 			
-					if = { limit = { is_in_array = { _target_provinces = remove_province } }
+					if = { limit = { is_in_array = { _target_provinces_ = remove_province } }
 					
 						add_to_temp_array = { remove_provinces = remove_province }
 					}
@@ -2051,7 +2150,7 @@ EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces, _lim
 	
 		for_each_loop = { array = remove_provinces
 		
-			remove_from_temp_array = { _target_provinces = v }
+			remove_from_temp_array = { _target_provinces_ = v }
 		}
 	}
 
@@ -2060,11 +2159,161 @@ EAI_PC_FORT_limit_provinces_state_avg_control_days = { # _target_provinces, _lim
 	set_temp_variable = { _limit_provinces_state_avg_control_days = 0 }
 }
 
+EAI_PC_FORT_generate_river_fortlines = { # arr:_states >>> arr:river_provinces_ arr:bottleneck_provinces_
+
+	### Get all states that are near enemy front lines
+
+		clear_temp_array = border_states
+		for_each_scope_loop = { array = _states
+			if = {
+				limit = {
+					impassable = no
+					OR = {
+						any_neighbor_state = { CONTROLLER = { has_war_with = ROOT } }
+						NOT = { ROOT = { has_full_control_of_state = PREV } }
+					}
+				}
+				if = { limit = { NOT = { is_in_array = { border_states = THIS.id } } } add_to_temp_array = { border_states = THIS.id } }
+				every_neighbor_state = {
+					if = { 
+						limit = { 
+							impassable = no
+							OR = {
+								CONTROLLER = { has_war_with = ROOT }
+								AND = { is_controlled_by = ROOT NOT = { ROOT = { has_full_control_of_state = PREV } } }
+							}
+						} 
+						if = { limit = { NOT = { is_in_array = { border_states = THIS.id } } } add_to_temp_array = { border_states = THIS.id } }
+					}
+				}
+			}
+		}
+
+	### Get all provinces that are part of front lines 
+
+		clear_temp_array = front_provinces
+		for_each_scope_loop = { array = border_states
+			for_each_loop = { array = global.EAI_MAP_state_province_ids@THIS index = front_prov_i value = _project_province_id break = front_prov_b
+				if = { 
+					limit = { 
+						set_temp_variable = { _get_province_type_id = _project_province_id }
+						EAI_PC_province_is_passable = yes
+						ROOT = { controls_province = _project_province_id }
+					}
+					set_temp_variable = { _get_province_id_neighbors = _project_province_id }
+					EAI_MAP_get_province_neighbors = yes
+					set_temp_variable = { found_enemy_neighbor = 0 }
+					for_each_loop = { array = province_neighbors_ index = neighbor_prov_i value = neighbor_prov_id break = found_enemy_neighbor
+						if = { 
+							limit = { 
+								set_temp_variable = { _get_province_type_id = neighbor_prov_id }
+								EAI_PC_province_is_passable = yes
+								any_of_scopes = { array = ROOT.enemies controls_province = neighbor_prov_id }
+							}
+							set_temp_variable = { found_enemy_neighbor = 1 }
+							if = { limit = { NOT = { is_in_array = { front_provinces = _project_province_id } } } add_to_temp_array = { front_provinces = _project_province_id } }
+						}
+					}
+				}
+			}
+		}
+
+	### Floodfill from front provinces
+
+		set_temp_variable = { its = 0 }
+		set_temp_variable = { max_its = 1000 }
+		set_temp_variable = { depth = 10 }
+		clear_temp_array = unexplored
+		clear_temp_array = explored
+		for_each_loop = { array = front_provinces add_to_temp_array = { unexplored = v } }
+		while_loop_effect = { break = loop_b
+			limit = { 
+				check_variable = { its < max_its }
+				check_variable = { unexplored^num > 0 }
+			}
+			set_temp_variable = { cur_prov = unexplored^0 }
+			remove_from_temp_array = { array = unexplored index = 0 }
+			add_to_temp_array = { explored = cur_prov }
+			set_temp_variable = { num_steps = steps^came_from^cur_prov }
+			add_to_temp_variable = { num_steps = 1 }
+			set_temp_variable = { steps^cur_prov = num_steps }
+			if = { limit = { check_variable = { steps^cur_prov < depth } }
+				set_temp_variable = { _get_province_id_neighbors = cur_prov }
+				EAI_MAP_get_province_neighbors = yes
+				for_each_loop = { array = province_neighbors_ index = i value = v break = neighbor_b
+					if = { limit = { NOT = { any_of_scopes = { array = enemies controls_province = v } } }
+						if = { limit = { NOT = { is_in_array = { unexplored = v } is_in_array = { explored = v } } } 
+							add_to_temp_array = { unexplored = v } 
+							set_temp_variable = { came_from^v = cur_prov }
+						} 
+						else_if = { limit = { check_variable = { steps^cur_prov < steps^came_from^v } }
+							if = { limit = { is_in_array = { explored = v } } remove_from_temp_array = { array = explored value = v } }
+							if = { limit = { NOT = { is_in_array = { unexplored = v } } } add_to_temp_array = { unexplored = v }  }
+							set_temp_variable = { came_from^v = cur_prov }
+						}
+					}
+				}
+			}
+			add_to_temp_variable = { its = 1 }
+		}
+		clear_temp_array = front_area
+		for_each_loop = { array = explored if = { limit = { NOT = { is_in_array = { front_area = v_2 } } } add_to_temp_array = { front_area = v } } }
+
+	###
+
+		clear_temp_array = river_provinces_
+		clear_temp_array = bottleneck_provinces_
+		for_each_loop = { array = front_area index = front_area_i value = front_area_v
+
+			if = { limit = { controls_province = front_area_v }
+			
+				### Id rivers
+	
+					set_temp_variable = { _get_river_connections_id = front_area_v }
+					EAI_MAP_get_river_connections = yes
+					if = { 
+						limit = {
+							check_variable = { river_connections_^num > 0 }
+							any_of = { array = river_connections_ check_variable = { v = came_from^front_area_v } }
+						}
+						add_to_temp_array = { river_provinces_ = _get_river_connections_id }
+					}
+				
+				### Id bottlenecks
+	
+					set_temp_variable = { _get_province_id_neighbors = front_area_v }
+					EAI_MAP_get_province_neighbors = yes
+					if = { 
+						limit = { 
+							set_temp_variable = { out = 0 }
+							set_temp_variable = { tot = 0 }
+							all_of = { array = province_neighbors_ 
+								if = { limit = { check_variable = { came_from^v = front_area_v } } add_to_temp_variable = { out = 1 } }
+								if = { limit = { is_in_array = { front_area = v } } add_to_temp_variable = { tot = 1 } }
+							}
+							check_variable = { tot = province_neighbors_^num }
+							check_variable = { tot > 1 }
+							set_temp_variable = { diff = tot }
+							subtract_from_temp_variable = { diff = out }
+							check_variable = { diff = 1 }
+						}
+						add_to_temp_array = { bottleneck_provinces_ = _get_river_connections_id }
+					}
+	
+				###
+			}
+		}
+
+	###
+
+	clear_temp_array = _states
+}
+
 ###
 
 EAI_PC_FORT_add_to_valid_fortification_projects = {
 
-	for_each_loop = { array = _target_provinces add_to_temp_array = { _valid_provinces = v } }
+	for_each_loop = { array = _target_provinces_ add_to_temp_array = { _valid_provinces = v } }
 }
 
 EAI_PC_FORT_cancel_invalid_fortification_projects = { # _valid_provinces, strategy_type_id
@@ -2083,6 +2332,7 @@ EAI_PC_FORT_cancel_invalid_fortification_projects = { # _valid_provinces, strate
 	if = { limit = { check_variable = { _cancel_projects_PROVINCES^num > 0 } } 
 	
 		add_to_temp_array = { _cancel_projects_TYPE_IDS = strategy_type_id }
+		set_temp_variable = { EAI_PC_cancel_projects_source = 5 }
 		EAI_PC_cancel_projects = yes
 	}
 

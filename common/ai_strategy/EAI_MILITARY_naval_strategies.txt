@@ -2,6 +2,12 @@
 #	Expert AI mod - naval strategies
 ############################################################################################################
 
+EAI_MILITARY_NAVAL_avoid_convoy_escorts = {
+	enable = { always = yes }
+	abort_when_not_enabled = yes
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = 500000 }
+}
+
 ### Set naval zone to avoid if the land near these zones is enemy controlled - to make the AI prefer convoy routes elsewhere
 
 EAI_MILITARY_NAVAL_avoid_borneo = {
@@ -159,7 +165,10 @@ EAI_MILITARY_NAVAL_disable_invasions = { # -25000
 		OR = { 
 			has_country_flag = EAI_stop_all_invasions 
 			has_country_flag = EAI_MILITARY_NAVAL_save_navy 
-			has_country_flag = EAI_MILITARY_NAVAL_invasion_force_reselection
+			AND = { # Don't reselect if already in an invasion op strategy
+				has_country_flag = EAI_MILITARY_NAVAL_invasion_force_reselection
+				NOT = { has_country_flag = EAI_MILITARY_INVASION_min_duration }
+			}
 			has_country_flag = EAI_MILITARY_INVASION_synchronize
 		} 
 	}
@@ -998,6 +1007,8 @@ EAI_MILITARY_INVASION_strategy = {
 	}
 	abort_when_not_enabled = yes
 
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = -500000 }
+
 	ai_strategy = {
 		type = naval_invasion_supremacy_weight
 		value = 50
@@ -1074,6 +1085,22 @@ EAI_MILITARY_INVASION_strategy = {
 	}
 }
 
+EAI_MILITARY_INVASION_fleet_ops = {
+	enable = {
+		check_variable = { EAI_MILITARY_INVASION_states^num > 0 }
+		has_country_flag = EAI_MILITARY_INVASION_hold_fleet_ops
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = naval_invasion_supremacy_weight
+		value = -1000
+	}
+
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_NAVAL_INVASION_SUPPORT" value = 500000 }
+}
+
 EAI_MILITARY_INVASION_planning_phase = {
 	enable = {
 		check_variable = { EAI_MILITARY_INVASION_states^num > 0 }
@@ -1089,8 +1116,8 @@ EAI_MILITARY_INVASION_planning_phase = {
 		execution_type = balanced
 		execute_order = no
 
-		state_trigger = {
-			is_in_array = { FROM.FROM.EAI_MILITARY_INVASION_target_states = THIS.id }
+		country_trigger = {
+			is_in_array = { FROM.EAI_MILITARY_INVASION_target_countries = THIS.id }
 		}
 	}
 }
@@ -1217,10 +1244,22 @@ EAI_MILITARY_INVASION_air_region_68 = { enable = { check_variable = { EAI_MILITA
 
 ###
 
-EAI_MILITARY_INVASION_sea_region_169 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 169 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 169 value = 10000 } ai_strategy = { type = naval_avoid_region id = 169 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_29 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 29 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 29 value = 10000 } ai_strategy = { type = naval_avoid_region id = 29 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_18 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 18 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 18 value = 10000 } ai_strategy = { type = naval_avoid_region id = 18 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_42 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 42 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 42 value = 10000 } ai_strategy = { type = naval_avoid_region id = 42 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_48 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 48 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 48 value = 10000 } ai_strategy = { type = naval_avoid_region id = 48 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_47 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 47 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 47 value = 10000 } ai_strategy = { type = naval_avoid_region id = 47 value = -200 } }
-EAI_MILITARY_INVASION_sea_region_68 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 68 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 68 value = 10000 } ai_strategy = { type = naval_avoid_region id = 68 value = -200 } }
+EAI_MILITARY_INVASION_sea_region_169 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 169 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 169 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_29 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 29 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 29 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_18 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 18 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 18 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_42 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 42 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 42 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_48 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 48 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 48 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_47 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 47 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 47 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_68 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 68 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 68 value = 10000 } }
+EAI_MILITARY_INVASION_sea_region_51 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } NOT = { has_country_flag = EAI_MILITARY_INVASION_planning_phase } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 51 } } abort_when_not_enabled = yes ai_strategy = { type = strike_force_home_base id = 51 value = 10000 } }
+
+###
+
+EAI_MILITARY_INVASION_naval_avoid_169 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 169 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 169 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_29 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 29 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 29 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_18 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 18 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 18 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_42 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 42 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 42 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_48 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 48 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 48 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_47 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 47 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 47 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_68 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 68 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 68 value = -10000 } }
+EAI_MILITARY_INVASION_naval_avoid_51 = { enable = { check_variable = { EAI_MILITARY_INVASION_objectives^num > 0 } is_in_array = { EAI_MILITARY_INVASION_sea_regions = 51 } } abort_when_not_enabled = yes ai_strategy = { type = naval_avoid_region id = 51 value = -10000 } }

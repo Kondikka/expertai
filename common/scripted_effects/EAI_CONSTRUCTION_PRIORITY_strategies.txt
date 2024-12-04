@@ -369,7 +369,10 @@ EAI_PC_dynamic_strategy_SOV = {
 
 		if = { limit = { set_temp_variable = { _transition_to = 2 } check_variable = { EAI_PC_changed_state = 0 }
 
-				num_of_civilian_factories > 180
+				set_temp_variable = { _project_building_type = global.EAI_PC_CIC }
+				EAI_PC_get_total_queued_num = yes
+				add_to_temp_variable = { queued_type_num_ = num_of_civilian_factories }
+				check_variable = { queued_type_num_ > 200 }
 
 			} EAI_PC_transition_state = yes 
 
@@ -545,11 +548,36 @@ EAI_PC_dynamic_strategy_SOV = {
 		if = { limit = { check_variable = { EAI_PC_changed_state = 0 } }
 
 			set_temp_variable = { _assign_fraction = 0.35 }
-			set_temp_variable = { _assign_max = 30 }
+			set_temp_variable = { _assign_max = 45 }
+			if = { limit = { has_global_flag = { flag = EAI_GER_blitz_russia_365d value = 1 days < 180 } }
+				add_to_temp_variable = { _assign_fraction = 0.35 }
+				add_to_temp_variable = { _assign_max = 30 }
+			}
 			EAI_PC_set_max_factory_limit = yes
 
 			EAI_PC_sort_projects_by_build_time = yes
 			EAI_PC_sort_projects_by_priority = yes
+
+			# Low prio
+			clear_temp_array = _sort_projects_TYPES
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_BUNKER }
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_CBUNKER }
+			clear_temp_array = _sort_projects_TYPE_IDS
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 500 }
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 501 }
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 502 }
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 402 }
+			EAI_PC_sort_projects_by_enemy_distance = yes
+
+			# High prio
+			clear_temp_array = _sort_projects_TYPES
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_BUNKER }
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_CBUNKER }
+			clear_temp_array = _sort_projects_TYPE_IDS
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 400 }
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 401 }
+			add_to_temp_array = { _sort_projects_TYPE_IDS = 503 }
+			EAI_PC_sort_projects_by_enemy_distance = yes
 		}
 	}
 }
@@ -741,6 +769,12 @@ EAI_PC_dynamic_strategy_JAP = {
 
 			EAI_PC_sort_projects_by_build_time = yes
 			EAI_PC_sort_projects_by_priority = yes
+
+			# Sort fort projects
+			clear_temp_array = _sort_projects_TYPES
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_BUNKER }
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_CBUNKER }
+			EAI_PC_sort_projects_by_enemy_distance = yes
 		}
 	}
 }
@@ -854,6 +888,11 @@ EAI_PC_dynamic_strategy_GENERIC = {
 
 			EAI_PC_sort_projects_by_build_time = yes
 			EAI_PC_sort_projects_by_priority = yes
+
+			# Sort fort projects
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_BUNKER }
+			add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_CBUNKER }
+			EAI_PC_sort_projects_by_enemy_distance = yes
 		}
 	}
 }

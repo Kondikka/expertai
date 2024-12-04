@@ -406,20 +406,30 @@ EAI_MILITARY_pacific_war_COMBINED_define_sides = { # >>> arr:_our_side_ arr:_the
 
 		if = { limit = { tag = JAP }
 
-			every_country = { limit = { OR = { tag = JAP } }
-				add_to_temp_array = { _our_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-			}
-
 			every_country = { 
 				limit = { 
-					OR = { tag = ENG tag = USA } 
-					if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+					OR = { 
+						tag = JAP 
+					} 
 				}
-				add_to_temp_array = { _their_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				set_temp_variable = { _id = THIS.id }
+				EAI_get_side = yes
+				for_each_loop = { array = side_ if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+			}
+
+			for_each_loop = { array = global.EAI_MAP_pacific_islands_theatre add_to_temp_array = { _states = v } }
+			EAI_get_state_controllers = yes
+			for_each_scope_loop = { array = controllers_
+				if = {
+					limit = {
+						NOT = { is_in_array = { _our_side_ = THIS.id } }
+						EAI_THIS_is_threat_to_PREV = yes
+						if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+					}
+					set_temp_variable = { _id = THIS.id }
+					EAI_get_side = yes
+					for_each_loop = { array = side_ if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				}
 			}
 		}
 
@@ -427,20 +437,31 @@ EAI_MILITARY_pacific_war_COMBINED_define_sides = { # >>> arr:_our_side_ arr:_the
 
 		if = { limit = { tag = USA }
 
-			every_country = { limit = { OR = { tag = ENG tag = USA } }
-				add_to_temp_array = { _our_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-			}
-
 			every_country = { 
 				limit = { 
-					OR = { tag = JAP } 
-					if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+					OR = { 
+						tag = ENG 
+						tag = USA 
+					} 
 				}
-				add_to_temp_array = { _their_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				set_temp_variable = { _id = THIS.id }
+				EAI_get_side = yes
+				for_each_loop = { array = side_ if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
+			}
+
+			for_each_loop = { array = global.EAI_MAP_pacific_islands_theatre add_to_temp_array = { _states = v } }
+			EAI_get_state_controllers = yes
+			for_each_scope_loop = { array = controllers_
+				if = {
+					limit = {
+						NOT = { is_in_array = { _our_side_ = THIS.id } }
+						EAI_THIS_is_threat_to_PREV = yes
+						if = { limit = { NOT = { has_country_flag = EAI_MILITARY_COMBINED_preparation } } has_war_with = PREV } 
+					}
+					set_temp_variable = { _id = THIS.id }
+					EAI_get_side = yes
+					for_each_loop = { array = side_ if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				}
 			}
 		}
 

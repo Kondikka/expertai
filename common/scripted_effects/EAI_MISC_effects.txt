@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 5.103
+@EAI_VERSION = 5.109
 
 EAI_set_version = {
 
@@ -21,8 +21,23 @@ EAI_save_compatibility = {
 
 		### Save compatibility effects
 
-		EAI_MAP_entire_pacific_theatre = yes
-		EAI_MAP_pacific_islands_theatre = yes
+			###
+
+				EAI_MAP_set_province_river_connections = yes
+				EAI_MAP_set_province_adjacencies = yes
+
+			### Variables that store a token value should probably be reset each update
+
+				every_country = {
+					EAI_PR_clear_priority_research_queue = yes
+					EAI_ESP_clear_operation = yes
+				}
+				EAI_ESP_operation_types = yes
+				clr_global_flag = EAI_MIO_add_design_team_init
+
+			###
+
+		###
 	}
 }
 
@@ -134,6 +149,31 @@ EAI_advisor_strategies = {
 			set_variable = { EAI_get_advisor = global.EAI_popular_figurehead_TYPE }
 		}
 	}
+}
+
+###
+
+EAI_get_side = { # var:_id var:_at_war arr:side_
+	if = { limit = { EAI_TRIGGER_get_side = yes } }
+}
+
+EAI_get_sides = { # var:_id arr:_targets arr:our_side_ arr:their_side_
+	clear_temp_array = our_side_
+	clear_temp_array = their_side_
+	set_temp_variable = { _id = THIS.id }
+	EAI_get_side = yes
+	for_each_loop = { array = side_ add_to_temp_array = { our_side_ = v } }
+
+	for_each_scope_loop = { array = _targets
+		set_temp_variable = { _id = THIS.id }
+		EAI_get_side = yes
+		for_each_loop = { array = side_ if = { limit = { NOT = { is_in_array = { their_side_ = v } } } add_to_temp_array = { their_side_ = v } } }
+	}
+	clear_temp_array = _targets
+}
+
+EAI_get_state_controllers = { # arr:_states var:_at_war var:_same_side controllers_
+	if = { limit = { EAI_TRIGGER_get_state_controllers = yes } }
 }
 
 ###
@@ -310,6 +350,12 @@ EAI_fighter_variant_selection = {
 
 EAI_MIO_add_design_team_update = {
 
+	@EAI_MIO_min_army_xp_to_upgrade = 100
+	@EAI_MIO_min_air_xp_to_upgrade = 75
+	@EAI_MIO_trait_diff_max_xp = 200
+	@EAI_MIO_trait_diff_scaled_xp = 150
+	@EAI_MIO_trait_diff_scaled_num = 8
+
 	### Init
 
 		if = { limit = { NOT = { has_global_flag = EAI_MIO_add_design_team_init } }
@@ -331,7 +377,7 @@ EAI_MIO_add_design_team_update = {
 				set_variable = { global.EAI_MIO_eq_cat_MARM = 11 }
 				set_variable = { global.EAI_MIO_eq_cat_HARM = 12 }
 
-			### Set country design teams
+			### Set country design teams #TOKEN
 
 				GER = {
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_INF = token:GER_mauser_organization }
@@ -600,7 +646,7 @@ EAI_MIO_add_design_team_update = {
 
 					if = {
 						limit = {
-							has_army_experience > 70
+							has_army_experience > @EAI_MIO_min_army_xp_to_upgrade
 						}
 
 						set_temp_variable = { found_tech_in_cat = 0 }
@@ -616,13 +662,16 @@ EAI_MIO_add_design_team_update = {
 								if = { 
 									limit = { 
 										NOT = { check_variable = { EAI_MIO_team^found_tech_in_cat = 0 } }
-										OR = {
-											NOT = { check_variable = { trait_diff < 3 } } 
-											AND = {
-												NOT = { check_variable = { trait_diff < 1 } } 
-												has_army_experience > 200
-											}
-										}
+										set_temp_variable = { req_xp = @EAI_MIO_trait_diff_max_xp }
+										set_temp_variable = { _val_ = trait_diff }
+										set_temp_variable = { _max = 0 }
+										set_temp_variable = { _min = @EAI_MIO_trait_diff_scaled_num }
+										EAI_MATH_TRIGGER_normalize = yes
+										set_temp_variable = { _scale = @EAI_MIO_trait_diff_scaled_xp }
+										EAI_MATH_TRIGGER_scale = yes
+										subtract_from_temp_variable = { req_xp = _val_ }
+										NOT = { check_variable = { trait_diff < 1 } } 
+										has_army_experience > var:req_xp
 									}
 									EAI_MIO_add_design_team_ARMY = yes 
 								}
@@ -635,7 +684,7 @@ EAI_MIO_add_design_team_update = {
 					if = {
 						limit = {
 							OR = {
-								has_air_experience > 70 # Can assume the AI created this design by now
+								has_air_experience > @EAI_MIO_min_air_xp_to_upgrade # Can assume the AI created this design by now
 							}
 						}
 
@@ -1420,7 +1469,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 									}
 								}
 							}
-							set_variable = { EAI_MIO_fighter_2_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_B = EAI_MIO_team_cat_traits^_tech_cat }
+							set_variable = { EAI_MIO_fighter_1_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_B = EAI_MIO_team_cat_traits^_tech_cat }
 							set_temp_variable = { team_added = 1 }
 							meta_effect = {
 								text = {
@@ -1460,7 +1509,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 									}
 								}
 							}
-							set_variable = { EAI_MIO_fighter_2_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_C = EAI_MIO_team_cat_traits^_tech_cat }
+							set_variable = { EAI_MIO_fighter_1_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_C = EAI_MIO_team_cat_traits^_tech_cat }
 							set_temp_variable = { team_added = 1 }
 							meta_effect = {
 								text = {
@@ -1500,7 +1549,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 									}
 								}
 							}
-							set_variable = { EAI_MIO_fighter_2_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_D = EAI_MIO_team_cat_traits^_tech_cat }
+							set_variable = { EAI_MIO_fighter_1_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_D = EAI_MIO_team_cat_traits^_tech_cat }
 							set_temp_variable = { team_added = 1 }
 							meta_effect = {
 								text = {

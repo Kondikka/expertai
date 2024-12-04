@@ -214,7 +214,7 @@ EAI_JAP_focus_on_army = {
 EAI_JAP_artillery_equipment = {
 	allowed = { tag = JAP }
 	enable = { check_variable = { num_equipment@artillery_equipment < 250 } }
-	abort = { NOT = { check_variable = { num_equipment@artillery_equipment < 750 } } }
+	abort = { NOT = { check_variable = { num_equipment@artillery_equipment < 2000 } } }
 
 	ai_strategy = { type = equipment_production_min_factories_archetype id = artillery_equipment value = 5 }
 }
@@ -222,7 +222,7 @@ EAI_JAP_artillery_equipment = {
 EAI_JAP_support_equipment = {
 	allowed = { tag = JAP }
 	enable = { check_variable = { num_equipment@support_equipment < 250 } }
-	abort = { NOT = { check_variable = { num_equipment@support_equipment < 750 } } }
+	abort = { NOT = { check_variable = { num_equipment@support_equipment < 2000 } } }
 
 	ai_strategy = { type = equipment_production_min_factories_archetype id = support_equipment value = 3 }
 }
@@ -230,7 +230,7 @@ EAI_JAP_support_equipment = {
 EAI_JAP_motorized_equipment = {
 	allowed = { tag = JAP }
 	enable = { check_variable = { num_equipment@motorized_equipment < 250 } }
-	abort = { NOT = { check_variable = { num_equipment@motorized_equipment < 750 } } }
+	abort = { NOT = { check_variable = { num_equipment@motorized_equipment < 2000 } } }
 
 	ai_strategy = { type = equipment_production_min_factories_archetype id = motorized_equipment value = 1 }
 }
@@ -238,7 +238,7 @@ EAI_JAP_motorized_equipment = {
 EAI_JAP_anti_air_equipment = {
 	allowed = { tag = JAP }
 	enable = { check_variable = { num_equipment@anti_air_equipment < 250 } }
-	abort = { NOT = { check_variable = { num_equipment@anti_air_equipment < 750 } } }
+	abort = { NOT = { check_variable = { num_equipment@anti_air_equipment < 2000 } } }
 
 	ai_strategy = { type = equipment_production_min_factories_archetype id = anti_air_equipment value = 1 }
 }
@@ -339,8 +339,13 @@ EAI_JAP_garrison_home = {
 	ai_strategy = { type = strategic_air_importance id = 76 value = 25000 }
 
 	ai_strategy = {
+		type = garrison
+		value = 100
+	}
+
+	ai_strategy = {
 		type = put_unit_buffers
-		ratio = 0.15
+		ratio = 0.35
 		states = { 
 			533
 			282
@@ -357,17 +362,26 @@ EAI_JAP_garrison_home = {
 		subtract_invasions_from_need = no
 		subtract_fronts_from_need = no
 	}
+
+	ai_strategy = {
+		type = theatre_distribution_demand_increase
+		id = 154
+		value = 4
+	}
 }
 
 EAI_JAP_last_stand = {
 	allowed = { tag = JAP }
 	enable = {
 		has_war = yes
-		has_country_flag = EAI_japanese_home_states_controlled_by_enemy
+		OR = {
+			has_country_flag = EAI_JAP_homeland_invaded
+			alliance_naval_strength_ratio < 0.25
+		}
 	}
 	abort_when_not_enabled = yes
 
-	### japan
+	ai_strategy = { type = strategic_air_importance id = 154 value = 25000 }
 
 	ai_strategy = {
 		type = front_control
@@ -377,20 +391,41 @@ EAI_JAP_last_stand = {
 		execution_type = rush_weak
 		execute_order = yes
 		
-		strategic_region = 154
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_japanese_homeland_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = 50
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_japanese_homeland_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		value = 50
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_japanese_homeland_theatre = THIS.id }
+		}
 	}
 
 	ai_strategy = {
 		type = front_unit_request
-		value = 400
+		value = 50
 
-		strategic_region = 154
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_japanese_homeland_theatre = THIS.id }
+		}
 	}
 
 	ai_strategy = {
 		type = put_unit_buffers
-		ratio = 0.5
-		order_id = 23456
+		ratio = 0.25
 		states = { 
 			533
 			282
@@ -1223,6 +1258,57 @@ EAI_JAP_china_DEFENSIVE_stalemate_hold = {
 			NOT = { is_in_array = { global.EAI_MAP_china_coastal_theatre = THIS.id } }
 			is_in_array = { global.EAI_MAP_china_theatre = THIS.id }
 		}
+	}
+}
+
+EAI_JAP_china_DEFENSIVE_stalemate_aifc = {
+	allowed = { tag = JAP }
+	enable = {
+		is_historical_focus_on = yes
+		check_variable = { global.EAI_sino_japanese_war = 2 }
+		has_war_with = CHI
+		CHI = { is_ai = yes }
+
+		### Conditions
+
+		all_of_scopes = { array = global.EAI_MAP_china_coastal_theatre
+			always = yes
+			if = { limit = { CONTROLLER = { has_war_with = ROOT } } add_to_temp_variable = { tmp1 = 1 } }
+			add_to_temp_variable = { tmp2 = 1 }
+		}
+		divide_temp_variable = { tmp1 = tmp2 }
+		NOT = { check_variable = { tmp1 > 0.05 } }
+
+		date < 1946.1.1
+		CHI = { surrender_progress > 0.75 }
+		if = { limit = { has_global_flag = EAI_JAP_blitz_pacific_1000d }
+			any_enemy_country = { 
+				NOT = { tag = CHI } 
+				is_major = yes 
+			} 
+			alliance_naval_strength_ratio < 2
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		value = -100
+
+		tag = CHI
+		tag = XSM
+		tag = GXC
+		tag = YUN
+	}
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = -100
+
+		tag = CHI
+		tag = XSM
+		tag = GXC
+		tag = YUN
 	}
 }
 

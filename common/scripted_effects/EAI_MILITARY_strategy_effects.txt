@@ -823,36 +823,42 @@ EAI_MILITARY_special_military_strategies = { # Weekly
 				tag = JAP
 				has_war = yes
 			}
+			clear_temp_array = _our_side_
+			clear_temp_array = _their_side_
+			clear_temp_array = _states_
+			set_temp_variable = { _id = THIS.id }
+			for_each_loop = { array = enemies add_to_temp_array = { _targets = v } }
+			EAI_get_sides = yes
+			for_each_loop = { array = our_side_ add_to_temp_array = { _our_side_ = v } }
+			for_each_loop = { array = their_side_ add_to_temp_array = { _their_side_ = v } }
+			for_each_loop = { array = global.EAI_MAP_japanese_homeland_theatre add_to_temp_array = { _states_ = v } }
+			EAI_MAP_get_province_control_pct = yes
 
-			set_variable = { EAI_japanese_home_states_controlled_by_enemy = 0 }
-			for_each_scope_loop = { array = global.EAI_MAP_japanese_homeland_theatre
-
-				if = { 
-					limit = {
-						OR = {
-							CONTROLLER = { has_war_with = ROOT }
-
-							AND = {
-								is_in_home_area = yes
-								ROOT = { 
-									controls_state = PREV
-									NOT = { has_full_control_of_state = PREV } 
-								}
-							}
-						}
-					}
-
-					add_to_variable = { PREV.EAI_japanese_home_states_controlled_by_enemy = 1 }
-				}
+			if = { limit = { check_variable = { our_control_pct_ < 1.0 } }
+				set_country_flag = { flag = EAI_JAP_homeland_invaded value = 1 days = 90 }
 			}
+		}
 
+	### UK home island defense
 
-			# % of states controlled
-			divide_variable = { EAI_japanese_home_states_controlled_by_enemy = global.EAI_MAP_japanese_homeland_theatre^num }
+		if = {
+			limit = {
+				tag = ENG
+				has_war = yes
+			}
+			clear_temp_array = _our_side_
+			clear_temp_array = _their_side_
+			clear_temp_array = _states_
+			set_temp_variable = { _id = THIS.id }
+			for_each_loop = { array = enemies add_to_temp_array = { _targets = v } }
+			EAI_get_sides = yes
+			for_each_loop = { array = our_side_ add_to_temp_array = { _our_side_ = v } }
+			for_each_loop = { array = their_side_ add_to_temp_array = { _their_side_ = v } }
+			for_each_loop = { array = global.EAI_MAP_britain_theatre add_to_temp_array = { _states_ = v } }
+			EAI_MAP_get_province_control_pct = yes
 
-			if = { limit = { check_variable = { EAI_japanese_home_states_controlled_by_enemy > 0 } }
-			
-				set_country_flag = { flag = EAI_japanese_home_states_controlled_by_enemy value = 1 days = 90 }
+			if = { limit = { check_variable = { our_control_pct_ < 1.0 } }
+				set_country_flag = { flag = EAI_ENG_homeland_invaded value = 1 days = 90 }
 			}
 		}
 
@@ -990,10 +996,11 @@ EAI_MILITARY_north_africa_LIMITER = {
 				clear_temp_array = _our_side_
 				clear_temp_array = _their_side_
 				clear_temp_array = _states_
-				add_to_temp_array = { _our_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = enemies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				set_temp_variable = { _id = THIS.id }
+				for_each_loop = { array = enemies add_to_temp_array = { _targets = v } }
+				EAI_get_sides = yes
+				for_each_loop = { array = our_side_ add_to_temp_array = { _our_side_ = v } }
+				for_each_loop = { array = their_side_ add_to_temp_array = { _their_side_ = v } }
 				for_each_loop = { array = global.EAI_MAP_north_africa_theatre add_to_temp_array = { _states_ = v } }
 				EAI_MAP_get_province_control_pct = yes
 	
@@ -1081,10 +1088,11 @@ EAI_MILITARY_spanish_cw_LIMITER = {
 				clear_temp_array = _our_side_
 				clear_temp_array = _their_side_
 				clear_temp_array = _states_
-				add_to_temp_array = { _our_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = enemies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				set_temp_variable = { _id = THIS.id }
+				for_each_loop = { array = enemies add_to_temp_array = { _targets = v } }
+				EAI_get_sides = yes
+				for_each_loop = { array = our_side_ add_to_temp_array = { _our_side_ = v } }
+				for_each_loop = { array = their_side_ add_to_temp_array = { _their_side_ = v } }
 				for_each_loop = { array = global.EAI_MAP_spanish_cw_theatre add_to_temp_array = { _states_ = v } }
 				EAI_MAP_get_province_control_pct = yes
 	
@@ -1309,10 +1317,11 @@ EAI_MILITARY_barbarossa_LIMITER = {
 				clear_temp_array = _our_side_
 				clear_temp_array = _their_side_
 				clear_temp_array = _states_
-				add_to_temp_array = { _our_side_ = THIS.id }
-				for_each_loop = { array = allies if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = subjects if = { limit = { NOT = { is_in_array = { _our_side_ = v } } } add_to_temp_array = { _our_side_ = v } } }
-				for_each_loop = { array = enemies if = { limit = { NOT = { is_in_array = { _their_side_ = v } } } add_to_temp_array = { _their_side_ = v } } }
+				set_temp_variable = { _id = THIS.id }
+				for_each_loop = { array = enemies add_to_temp_array = { _targets = v } }
+				EAI_get_sides = yes
+				for_each_loop = { array = our_side_ add_to_temp_array = { _our_side_ = v } }
+				for_each_loop = { array = their_side_ add_to_temp_array = { _their_side_ = v } }
 				for_each_loop = { array = global.EAI_MAP_barbarossa_theatre add_to_temp_array = { _states_ = v } }
 				EAI_MAP_get_province_control_pct = yes
 	

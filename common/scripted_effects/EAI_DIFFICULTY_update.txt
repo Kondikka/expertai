@@ -28,6 +28,8 @@ EAI_difficulty_weekly_update = {
 	EAI_difficulty_dynamic_desperate_defense = yes
 
 	EAI_DIFFICULTY_grant_resources = yes
+
+	EAI_DIFFICULTY_supply_units = yes
 }
 
 ############################################################################################################
@@ -308,6 +310,32 @@ EAI_DIFFICULTY_grant_resources = {
 			}
 
 			###
+	}
+}
+
+EAI_DIFFICULTY_supply_units = {
+	if = { limit = { NOT = { has_global_flag = EAI_DIFFICULTY_supply_units_update } }
+
+		set_global_flag = { flag = EAI_DIFFICULTY_supply_units_update value = 1 days = 6 }	
+
+		every_country = {
+			if = { 
+				limit = {
+					is_ai = yes
+					OR = {
+						NOT = { check_variable = { EAI_custom_bonus_37 = 0 } }
+						AND = { NOT = { check_variable = { global.EAI_custom_bonus_37 = 0 } } EAI_DIFFICULTY_dynamic_bonus_trigger = yes }
+					}
+				}
+
+				set_temp_variable = { tmp = EAI_custom_bonus_37 }
+				if = { limit = { check_variable = { global.EAI_custom_bonus_37 > EAI_custom_bonus_37 } } set_temp_variable = { tmp = global.EAI_custom_bonus_37 } }
+
+				every_army_leader = { limit = { check_variable = { num_units > 0 } }
+					supply_units = tmp
+				}
+			}
+		}
 	}
 }
 

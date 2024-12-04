@@ -61,12 +61,11 @@ NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_LAND = 50 --50	-- Army XP
 NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_NAVY = 25 --50	-- Same as above but for the ship designer.
 NDefines.NAI.DEFAULT_MODULE_VARIANT_CREATION_XP_CUTOFF_AIR = 25 --25	-- Same as above but for the ship designer.
 
--- Land/air handled by EAI
 -- NDefines.NAI.DEFAULT_LEGACY_VARIANT_CREATION_XP_CUTOFF_LAND = 400 --10	-- Army XP needed before attempting to create a variant of a type that uses the legacy upgrades system. ai_strategy supports land_xp_spend_priority upgrade_xp_cutoff. If none is set this define is used instead.
 -- NDefines.NAI.DEFAULT_LEGACY_VARIANT_CREATION_XP_CUTOFF_NAVY = 400 --25	-- Same as above but for navy XP and navy_xp_spend_priority.
 -- NDefines.NAI.DEFAULT_LEGACY_VARIANT_CREATION_XP_CUTOFF_AIR  = 400 --25	-- Same as above but for air XP and air_xp_spend_priority.
 
-NDefines.NAI.VARIANT_CREATION_XP_RESERVE_LAND = 50 --50					-- If the AI lacks army XP to create a variant it will reserve this much XP for variant creation so that it will eventually be able to create a variant.
+NDefines.NAI.VARIANT_CREATION_XP_RESERVE_LAND = 25 --50					-- If the AI lacks army XP to create a variant it will reserve this much XP for variant creation so that it will eventually be able to create a variant.
 NDefines.NAI.VARIANT_CREATION_XP_RESERVE_NAVY = 50 --50					-- Same as above but for navy XP.
 NDefines.NAI.VARIANT_CREATION_XP_RESERVE_AIR = 50 --50					-- Same as above but for air XP.
 
@@ -85,14 +84,11 @@ NDefines.NAI.LAND_DESIGN_ALTERNATIVE_OF_GREATER_TECH = 1 --1
 -- If a template may be reinforced with the archetype it's considered to be "demanded". If multiple conditions
 -- are met, e.g. it's both in the field and in training, the largest value is used.
 
-NDefines.NAI.LAND_DESIGN_DEMAND_FIELD_DIVISION = 50
+NDefines.NAI.LAND_DESIGN_DEMAND_FIELD_DIVISION = 5000
 NDefines.NAI.LAND_DESIGN_DEMAND_TRAINING_DIVISION = 50
 NDefines.NAI.LAND_DESIGN_DEMAND_GARRISON_DIVISION = 10
 NDefines.NAI.LAND_DESIGN_DEMAND_UNUSED_TEMPLATE = 10 --1
 NDefines.NAI.LAND_DESIGN_DEMAND_ABSENT = 10 --0
--- If a design with a weight when divided by the largest weight falls below this value it's excluded from the
--- selection. Valid values are in the range [0, 1] inclusive.
-NDefines.NAI.LAND_DESIGN_CUTOFF_AS_PERCENTAGE_OF_MAX = 0.25
 
 -- NDefines.NAI.AIR_DESIGN_ALTERNATIVE_ABSENT = 1
 -- NDefines.NAI.AIR_DESIGN_ALTERNATIVE_OF_LESSER_TECH = 1
@@ -108,20 +104,20 @@ NDefines.NAI.LAND_DESIGN_CUTOFF_AS_PERCENTAGE_OF_MAX = 0.01 --0.25
 -- The desire is built up over time and when XP is available it spends it on the action that has the highest accumulated desire. After spending XP the desire is reset, in effect balancing the desires.
 -- Below is the daily desire gain for each action.
 
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_LAND_DOCTRINE = 1    -- How quickly is desire to unlock land doctrines accumulated?
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_NAVAL_DOCTRINE = 1   -- How quickly is desire to unlock naval doctrines accumulated?
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_DOCTRINE = 1     -- How quickly is desire to unlock air doctrines accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_LAND_DOCTRINE = 0.1    -- How quickly is desire to unlock land doctrines accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_NAVAL_DOCTRINE = 0.1   -- How quickly is desire to unlock naval doctrines accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_DOCTRINE = 0.1     -- How quickly is desire to unlock air doctrines accumulated?
 
 --EAI: make sure land template desire is always at the top, if the doctrine desire is high but the mod blocks it, AI wont create templates
 NDefines.NAI.DESIRE_USE_XP_TO_UPDATE_LAND_TEMPLATE = 100.0 --2.0    -- How quickly is desire to update/create templates accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 0.1  -- How quickly is desire to update/create land equipment variants accumulated?
 
-NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_LAND_EQUIPMENT = 50.0  -- How quickly is desire to update/create land equipment variants accumulated?
 NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_NAVAL_EQUIPMENT = 100.0 -- How quickly is desire to update/create naval equipment variants accumulated?
 NDefines.NAI.DESIRE_USE_XP_TO_UPGRADE_AIR_EQUIPMENT = 100.0   -- How quickly is desire to update/create air equipment variants accumulated?
 
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_ARMY_SPIRIT = 0.4    -- How quickly is desire to unlock army spirits accumulated?
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_NAVY_SPIRIT = 0.4   -- How quickly is desire to unlock naval spirits accumulated?
-NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_SPIRIT = 0.4     -- How quickly is desire to unlock air spirits accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_ARMY_SPIRIT = 0.1    -- How quickly is desire to unlock army spirits accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_NAVY_SPIRIT = 0.1   -- How quickly is desire to unlock naval spirits accumulated?
+NDefines.NAI.DESIRE_USE_XP_TO_UNLOCK_AIR_SPIRIT = 0.1     -- How quickly is desire to unlock air spirits accumulated?
 
 NDefines.NAI.DAYS_BETWEEN_CHECK_BEST_DOCTRINE = 7       -- Recalculate desired best doctrine to unlock with this many days inbetween.
 NDefines.NAI.DAYS_BETWEEN_CHECK_BEST_TEMPLATE = 7       -- Recalculate desired best template to upgrade with this many days inbetween.
@@ -137,7 +133,7 @@ NDefines.NAI.GARRISON_TEMPLATE_SCORE_MANPOWER_FACTOR = 0.05 -- formula is (templ
 
 -- NDefines.NCountry.REINFORCEMENT_DIVISION_PRIORITY_COUNT = 8
 
---NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 0 --60					            -- max days we keep track of since failure of a design update
+--NDefines.NAI.DIVISION_DESIGN_MAX_FAILED_DAYS = 1 --60					            -- max days we keep track of since failure of a design update
 
 --NDefines.NAI.BUILD_ARMOR_BASE_COST_WEIGHT = 0 --200
 --NDefines.NAI.BUILD_ARMOR_STRENGTH_MULTIPLIER_WEIGHT = 0 --100
@@ -309,8 +305,14 @@ NDefines.NAI.COMMAND_POWER_BEFORE_SPEND_ON_TRAITS = 65.0
 NDefines.NAI.MIN_AI_UNITS_PER_TILE_FOR_STANDARD_COHESION = 2.0	-- How many units should we have for each tile along a front in order to switch to standard cohesion (less moving around)
 NDefines.NAI.MIN_FRONT_SIZE_TO_CONSIDER_STANDARD_COHESION = 2000	-- How long should fronts be before we consider switching to standard cohesion (under this, standard cohesion fronts will switch back to relaxed)
 
+ASSIGN_DEFENSE_ARMY_DEFENSE_FACTOR = 0 -- 3.0,                   -- Importance of unit's ARMY_DEFENSE stat when assigning to an area defense order
+ASSIGN_DEFENSE_ARMY_ENTRENCHMENT_FACTOR = 0 -- 2.0,              -- Importance of unit's ARMY_ENTRENCHMENT stat when assigning to an area defense order
+ASSIGN_DEFENSE_TEMPLATE_CLASS_SCORE = 100 -- 3.0,                  -- Importance of unit's AI template class (AREA_DEFENSE, CAVALRY) when assigning to an area defense order
+
 NDefines.NAI.ASSIGN_TANKS_TO_WAR_FRONT = 8.0 --4.0
 NDefines.NAI.ASSIGN_TANKS_TO_NON_WAR_FRONT = 0.2 --0.4
+
+NDefines.NAI.STATE_CONTROL_FOR_AREA_DEFENSE = 0.05
 
 --NDefines.NAI.SUPPLY_CRISIS_LIMIT = 1.0
 
@@ -447,16 +449,17 @@ NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 0.0
 -- Composition
 -------------------
 
--- NDefines.NAI.NAVY_PREFERED_MAX_SIZE = -- 80										-- AI will generally attempt to merge fleets into this size but as a soft limit.
+-- NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3								-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
+NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 200 -- was 80								-- AI will generally attempt to merge fleets into this size but as a soft limit.
 
 -- NDefines.NAI.CARRIER_TASKFORCE_MAX_CARRIER_COUNT = -- 4 		-- optimum carrier count for carrier taskforces
--- NDefines.NAI.CAPITAL_TASKFORCE_MAX_CAPITAL_COUNT = -- 12 		-- optimum capital count for capital taskforces
-NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = 6 -- 12			-- optimum screen count for screen taskforces
--- NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = -- 16				-- optimum sub count for sub taskforces
+NDefines.NAI.CAPITAL_TASKFORCE_MAX_CAPITAL_COUNT = 40 -- from 12 		-- optimum capital count for capital taskforces
+NDefines.NAI.SCREEN_TASKFORCE_MAX_SHIP_COUNT = 5 -- from 12			-- optimum screen count for screen taskforces
+NDefines.NAI.SUB_TASKFORCE_MAX_SHIP_COUNT = 5 -- from 16				-- optimum sub count for sub taskforces
 
 -- NDefines.NAI.MIN_CAPITALS_FOR_CARRIER_TASKFORCE = -- 6			-- carrier fleets will at least have this amount of capitals
 -- NDefines.NAI.CAPITALS_TO_CARRIER_RATIO = -- 1.5				-- capital to carrier count in carrier taskfoces
--- NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = -- 4.0					-- screens to capital/carrier count in carrier & capital taskforces
+NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 5.0 -- from 4.0					-- screens to capital/carrier count in carrier & capital taskforces
 
 -- NDefines.NAI.MIN_MAIN_SHIP_RATIO = -- 0.3                      -- if main ship ratio is below this steal other ships.
 -- NDefines.NAI.MIN_SUPPORT_SHIP_RATIO = -- 0.7                   -- if support ship ratio is below this steal other ships.
@@ -520,7 +523,7 @@ NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to ge
 	100000, -- PATROL
 	1000, -- STRIKE FORCE
 	1500, -- CONVOY RAIDING
-	150000, -- CONVOY ESCORT
+	1000, -- CONVOY ESCORT
 	-1, -- MINES PLANTING
 	300, -- MINES SWEEPING
 	0, -- TRAIN
@@ -547,8 +550,8 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 
 -- NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = -- 25					-- Threat value per convoy sunk in a region. Decays over time.
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_AVOID_REGION = -- 25 * 10		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
--- NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = -- 25 * 100		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
-NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 5 -- 1				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
+NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 5000 -- 25 * 100		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
+NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 10 -- 1				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions
 
 NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_ESCORTING = 20 -- 10.0		-- Amount of naval patrol planes per ship on a convoy escort mission
 NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_PATROLLING = 20 -- 10.0		-- Amount of naval patrol planes per ship on a patrol mission
@@ -568,11 +571,13 @@ NDefines.NAI.NAVAL_PATROL_PLANES_PER_SHIP_PATROLLING = 20 -- 10.0		-- Amount of 
 -- naval invasions
 -------------------------
 
-ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = 10 --0.3 -- if we are fighting against an enemy home area from our home area and if the enemy area is larger than this ratio, non strategy invasions are disabled
+NDefines.NAI.INVASION_COASTAL_PROVS_PER_ORDER = 12 -- 24 -- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+
+-- NDefines.NAI.ENEMY_HOME_AREA_RATIO_TO_DISABLE_INVASIONS = 2 --0.3 -- if we are fighting against an enemy home area from our home area and if the enemy area is larger than this ratio, non strategy invasions are disabled
 
 NDefines.NAI.ENEMY_NAVY_STRENGTH_DONT_BOTHER = 1000							-- If the enemy has a navy at least these many times stronger that the own, don't bother invading
-NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 --0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
-NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
+NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE = 0 -- 0.08			-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend.
+NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 -- 0.4	-- Compares the estimated strength of the country/faction compared to it's enemies to see if it should invade or stay at home to defend, but while being a defensive country.
 
 -- NDefines.NAI.MAX_UNIT_RATIO_FOR_INVASIONS = -- 0.4                         -- countries won't use armies more than this ratio of total units for invasions
 -- NDefines.NAI.MIN_UNIT_RATIO_FOR_INVASIONS = -- 0.1                         -- don't allocate more divisions than this for naval invasions
@@ -580,14 +585,14 @@ NDefines.NAI.RELATIVE_STRENGTH_TO_INVADE_DEFENSIVE = 0 --0.4	-- Compares the est
 -- NDefines.NAI.MIN_FRONT_SCORE_FOR_AFTER_INVASION_AREAS = -- 1500			-- min score for army fronts that are created on recently invaded regions
 
 -- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_DURATION = -- 90								-- after successful invasion AI will prio the enemy area for this number of days
--- NDefines.NAI.NAVAL_INVADED_AREA_PRIO_MULT = -- 1.2									-- fronts that belongs to recent invasions gets more prio
--- NDefines.NAI.MIN_NUM_CONQUERED_PROVINCES_TO_DEPRIO_NAVAL_INVADED_FRONTS = -- 20	-- if you conquer this amount of provinces after a naval invasion it will lose its prio status and will act as a regular front
+NDefines.NAI.NAVAL_INVADED_AREA_PRIO_MULT = 2 -- 1.2									-- fronts that belongs to recent invasions gets more prio
+NDefines.NAI.MIN_NUM_CONQUERED_PROVINCES_TO_DEPRIO_NAVAL_INVADED_FRONTS = 50 -- 20	-- if you conquer this amount of provinces after a naval invasion it will lose its prio status and will act as a regular front
 
 -- NDefines.NAI.MIN_INVASION_PLAN_VALUE_TO_EXECUTE = -- 0.3               -- ai will only activate invasions if plan value is above this
 -- NDefines.NAI.MIN_INVASION_ORG_FACTOR_TO_EXECUTE = -- 0.9               -- ai will only activate invasions if average org factor is above this
 -- NDefines.NAI.MIN_INVASION_UNITS_READY_TO_EXECUTE = -- 0.9              -- ai will only activate invasions if this ratio of assigned units are ready
 NDefines.NAI.MAX_INVASION_SIZE = 12 -- 24                                 -- max invasion group size
-NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = 10
+NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = 10 -- 15
 
 NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 5000.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.
 

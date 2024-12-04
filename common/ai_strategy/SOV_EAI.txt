@@ -54,12 +54,30 @@ EAI_SOV_reduce_air_production = {
 	allowed = { tag = SOV }
 	enable = {
 		surrender_progress > 0
-		has_deployed_air_force_size = { size > 6000 type = fighter }
+		OR = {
+			AND = {
+				check_variable = { EAI_FOCUS/AIR/fighter = global.EAI_ON }
+				has_deployed_air_force_size = { size > 6000 type = fighter }
+			}
+			AND = {
+				check_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_ON }
+				has_deployed_air_force_size = { size > 4000 type = heavy_fighter }
+			}
+		}
 	}
 	abort = {
 		NOT = {
 			surrender_progress > 0
-			has_deployed_air_force_size = { size > 4000 type = fighter }
+			OR = {
+				AND = {
+					check_variable = { EAI_FOCUS/AIR/fighter = global.EAI_ON }
+					has_deployed_air_force_size = { size > 3000 type = fighter }
+				}
+				AND = {
+					check_variable = { EAI_FOCUS/AIR/heavy_fighter = global.EAI_ON }
+					has_deployed_air_force_size = { size > 2000 type = heavy_fighter }
+				}
+			}
 		}
 	}
 	
@@ -624,7 +642,7 @@ EAI_SOV_defense_in_depth_195 = { # Leningrad
 		}
 	} 
 	abort_when_not_enabled = yes 
-	ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 195 states = { 195 } subtract_invasions_from_need = no subtract_fronts_from_need = no } 
+	ai_strategy = { type = put_unit_buffers ratio = 0.05 order_id = 195 states = { 195 } subtract_invasions_from_need = no subtract_fronts_from_need = no } 
 }
 
 ### Prepare
@@ -805,9 +823,15 @@ EAI_SOV_barbarossa_DEPLOY_FIN = {
 
 	ai_strategy = {
 		type = front_unit_request
-		value = 15
+		value = 50
 
-		tag = FIN
+		area = winter_war_front
+		area = just_finland
+	}
+	ai_strategy = {
+		type = theatre_distribution_demand_increase
+		id = 146 
+		value = 10
 	}
 	ai_strategy = {
 		type = prepare_for_war # Careful, makes the AI stop using air volunteers
@@ -927,6 +951,41 @@ EAI_SOV_barbarossa_DEFENSIVE_losing_war = {
 				is_in_faction_with = GER
 			}
 		}
+	}
+}
+
+EAI_SOV_barbarossa_DEFENSIVE_crimea = {
+	allowed = { tag = SOV }
+	enable = {
+		OR = {
+			has_country_flag = EAI_MILITARY_trend_stagnant_war
+			has_country_flag = EAI_MILITARY_trend_losing_war
+		}
+		137 = { is_fully_controlled_by = ROOT }
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.9
+		priority = 5000
+		execution_type = careful
+		execute_order = no
+		manual_attack = no
+		
+		state = 196
+		state = 137
+		state = 234
+	}
+
+	ai_strategy = {
+		type = front_unit_request
+		value = 50
+
+		state = 196
+		state = 137
+		state = 234
 	}
 }
 

@@ -19,7 +19,7 @@ EAI_ENG_air_production = {
 	enable = { always = yes }
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = air_factory_balance value = 125 }
+	ai_strategy = { type = air_factory_balance value = 180 }
 }
 
 EAI_ENG_focus_on_fighters = {
@@ -213,8 +213,13 @@ EAI_ENG_garrison_home = {
 	ai_strategy = { type = strategic_air_importance id = 1 value = 25000 }
 
 	ai_strategy = {
+		type = garrison
+		value = 100
+	}
+
+	ai_strategy = {
 		type = put_unit_buffers
-		ratio = 0.50
+		ratio = 0.35
 		states = { 
 			127
 			125
@@ -232,12 +237,17 @@ EAI_ENG_garrison_home = {
 	ai_strategy = {
 		type = put_unit_buffers
 		ratio = 0.10
-		order_id = 9
 		states = { 
 			126
 		}
 		subtract_invasions_from_need = no
 		subtract_fronts_from_need = no
+	}
+
+	ai_strategy = {
+		type = theatre_distribution_demand_increase
+		id = 126
+		value = 4
 	}
 }
 
@@ -307,6 +317,78 @@ EAI_allies_stop_queueing_invasions_vs_SOV = {
 
         tag = SOV
     }
+}
+
+EAI_ENG_last_stand = {
+	allowed = { tag = ENG }
+	enable = {
+		has_war = yes
+		OR = {
+			has_country_flag = EAI_ENG_homeland_invaded
+			alliance_naval_strength_ratio < 0.25
+		}
+	}
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = strategic_air_importance id = 1 value = 25000 }
+
+	ai_strategy = {
+		type = front_control
+		ordertype = front
+		ratio = 0.75
+		priority = 1000
+		execution_type = rush_weak
+		execute_order = yes
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_britain_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = force_concentration_target_weight
+		value = 50
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_britain_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = force_concentration_front_factor
+		value = 50
+		
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_britain_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = front_unit_request
+		value = 100
+
+		state_trigger = {
+			is_in_array = { global.EAI_MAP_britain_theatre = THIS.id }
+		}
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.25
+		states = { 
+			127
+			123
+			338
+			126
+			125
+			122
+			129
+			132
+			130
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
 }
 
 ###
@@ -395,50 +477,6 @@ EAI_RAJ_ignore_ENG = {
 	
 	ai_strategy = { type = dont_defend_ally_borders id = "ENG" value = 500 }
 	ai_strategy = { type = dont_defend_ally_borders id = "FRA" value = 500 }
-}
-
-EAI_ENG_last_stand = {
-	allowed = { tag = ENG }
-	enable = {
-		has_war = yes
-		any_owned_state = {
-			OR = {
-				region = 1
-				region = 2
-				region = 3
-			}
-			NOT = { is_fully_controlled_by = ENG }
-		}
-	}
-	abort_when_not_enabled = yes
-
-	### japan
-
-	ai_strategy = {
-		type = front_control
-		ordertype = front
-		ratio > 0.75
-		priority = 900
-		execution_type = rush_weak
-		execute_order = yes
-		
-		state_trigger = {
-			OR = {
-				region = 1
-				region = 2
-				region = 3
-			}
-		}
-	}
-
-	ai_strategy = {
-		type = front_unit_request
-		value = 400
-		
-		strategic_region = 1
-		strategic_region = 2
-		strategic_region = 3
-	}
 }
 
 ###########################
@@ -909,13 +947,15 @@ EAI_ENG_battle_of_britain_NAVAL_atlantic_convoy_route = {
 	ai_strategy = { type = strategic_air_importance id = 50 value = 25000 }
 	ai_strategy = { type = strategic_air_importance id = 55 value = 25000 }
 
-	ai_strategy = { type = naval_avoid_region id = 49 value = 50 }
-	# ai_strategy = { type = naval_avoid_region id = 44 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 51 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 58 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 49 value = 5000 }
+	ai_strategy = { type = naval_avoid_region id = 44 value = 5000 }
+	ai_strategy = { type = naval_avoid_region id = 51 value = 5000 }
+	ai_strategy = { type = naval_avoid_region id = 58 value = 5000 }
 	# ai_strategy = { type = naval_avoid_region id = 50 value = 50 }
-	ai_strategy = { type = naval_avoid_region id = 56 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 56 value = 5000 }
 	ai_strategy = { type = naval_avoid_region id = 57 value = 50 }
+
+	ai_strategy = { type = naval_avoid_region id = 66 value = 5000 }
 }
 
 EAI_ENG_battle_of_britain_NAVAL_europe_convoy_route = {
@@ -930,6 +970,40 @@ EAI_ENG_battle_of_britain_NAVAL_europe_convoy_route = {
 	ai_strategy = { type = naval_avoid_region id = 42 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 18 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 16 value = 50 }
+}
+
+EAI_ENG_battle_of_britain_NAVAL_conserve_fuel = {
+	allowed = { tag = ENG }
+	enable = { 
+		has_war_with = GER
+		fuel_ratio < 0.5
+		NOT = {
+			has_country_flag = EAI_ENG_homeland_invaded
+			any_of_scopes = { array = global.EAI_MAP_britain_theatre
+				CONTROLLER = { has_war_with = ENG }
+			}
+		}
+	}
+	abort = { 
+		NOT = { 
+			AND = { 
+				has_war_with = GER
+				fuel_ratio < 0.75
+				NOT = {
+					has_country_flag = EAI_ENG_homeland_invaded
+					any_of_scopes = { array = global.EAI_MAP_britain_theatre
+						CONTROLLER = { has_war_with = ENG }
+					}
+				}
+			} 
+		} 
+	}
+
+	# ai_strategy = { type = naval_mission_threshold id = "MISSION_PATROL" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_STRIKE_FORCE" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_ESCORT" value = 500000 }
+	ai_strategy = { type = naval_mission_threshold id = "MISSION_CONVOY_RAIDING" value = 500000 }
+	# ai_strategy = { type = naval_mission_threshold id = "MISSION_NAVAL_INVASION_SUPPORT" value = 500000 }
 }
 
 #########################################################
@@ -959,6 +1033,10 @@ EAI_allies_avoid_mediterranean = {
 		alliance_naval_strength_ratio < 3
 		NOT = { 
 			check_variable = { ROOT.ai_strategy_invade@ITA > 500 } 
+			any_state = {
+				region = 23
+				CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+			}
 		}
 	}
 	

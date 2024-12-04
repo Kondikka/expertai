@@ -35,26 +35,38 @@ ability = {
 		
 		
 		ai_will_do = { #EAI
-			factor = -1
+			base = -1
+
 			modifier = {
 				FROM = {
-					has_war_support > 0.4
-					command_power > 55
-					has_manpower > 100000
-					has_equipment = { infantry_equipment > 1000 }
+					EAI_MILITARY_ABILITY_force_attack = yes
 				}
 
-				set_temp_variable = { EAI_fraction_units_combat = num_units_offensive_combats }
-				divide_temp_variable = { EAI_fraction_units_combat = num_units }
-				OR = {
-					AND = { check_variable = { EAI_fraction_units_combat > 0.5 } }
-					AND = { FROM = { command_power > 90 } check_variable = { EAI_fraction_units_combat > 0.25 } }
+				set_temp_variable = { tmp = num_units_offensive_combats }
+				divide_temp_variable = { tmp = num_units }
+				check_variable = { tmp > 0.1 }
+
+				add = 1000
+			}
+
+			modifier = {
+				FROM = {
+					EAI_MILITARY_ABILITY_force_attack_HOLD = yes
 				}
 
-				OR = {
-					check_variable = { avg_offensive_combat_status < 0.5 }
-					FROM = { command_power > 75 }
+				add = -2000
+			}
+
+			modifier = {
+				FROM = {
+					has_war_support > 0.8
+					NOT = { has_country_flag = EAI_MILITARY_trend_losing_war }
 				}
+
+				set_temp_variable = { tmp = num_units_offensive_combats }
+				divide_temp_variable = { tmp = num_units }
+				check_variable = { tmp > 0.5 }
+				check_variable = { avg_offensive_combat_status < 0.5 }
 				
 				add = 2
 			}

@@ -16,6 +16,57 @@ EAI_test_trigger = {
 	log = "*****************************************************"
 }
 
+EAI_TRIGGER_get_side = { # var:_id var:_at_war_with arr:side_
+	clear_temp_array = side_
+	if = { 
+		limit = { 
+			if = { limit = { NOT = { check_variable = { _at_war_with = 0 } } } has_war_with = var:_at_war_with }
+		} 
+		add_to_temp_array = { side_ = _id } 
+	}
+	var:_id = {
+		all_of_scopes = { array = allies 
+			if = { 
+				limit = { 
+					NOT = { is_in_array = { side_ = THIS.id } }
+					if = { limit = { NOT = { check_variable = { _at_war_with = 0 } } } has_war_with = var:_at_war_with }
+				} 
+				add_to_temp_array = { side_ = THIS.id }
+			} 
+		}
+		all_of_scopes = { array = subjects 
+			if = { 
+				limit = { 
+					NOT = { is_in_array = { side_ = THIS.id } } 
+					if = { limit = { NOT = { check_variable = { _at_war_with = 0 } } } has_war_with = var:_at_war_with }
+				} 
+				add_to_temp_array = { side_ = THIS.id }
+			} 
+		}
+	}
+	set_temp_variable = { _at_war = 0 }
+}
+
+EAI_TRIGGER_get_state_controllers = { # arr:_states var:_at_war var:_same_side controllers_
+	clear_temp_array = controllers_
+	set_temp_variable = { this_id = THIS.id }
+	all_of_scopes = { array = _states
+		CONTROLLER = {
+			if = { 
+				limit = { 
+					NOT = { is_in_array = { controllers_ = THIS.id } }
+					if = { limit = { check_variable = { _at_war = 1 } } has_war_with = var:this_id }
+					if = { limit = { check_variable = { _same_side = 1 } } var:this_id = { EAI_PREV_on_same_side_with_THIS = yes } }
+				} 
+				add_to_temp_array = { controllers_ = THIS.id }
+			} 
+		}
+	}
+	set_temp_variable = { _at_war = 0 }
+	set_temp_variable = { _same_side = 0 }
+	clear_temp_array = _states
+}
+
 EAI_is_island_state = {
 
 	is_in_array = { global.EAI_MAP_island_states = THIS.id }

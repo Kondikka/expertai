@@ -2,21 +2,48 @@
 #	Expert AI mod - tech prio triggers
 ############################################################################
 
-### Land Doctrines
+### Spirits
 
-EAI_land_doctrine_progress_limit = {
-
+EAI_land_spirit_limit = {
 	OR = {
 		AND = {
 			has_war = no
-			set_temp_variable = { _check_xp = 200 }
+			set_temp_variable = { _check_xp = 150 }
 			NOT = { EAI_XP_has_army_check_xp = yes }
 		}
 
 		AND = {
 			has_war = yes
 			NOT = { surrender_progress > 0.1 }
+			set_temp_variable = { _check_xp = 100 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
+
+		AND = {
+			has_war = yes
+			surrender_progress > 0.1
+			set_temp_variable = { _check_xp = 50 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
+
+		### Strategies
+	}
+}
+
+### Land Doctrines
+
+EAI_land_doctrine_progress_limit = {
+	OR = {
+		AND = {
+			has_war = no
 			set_temp_variable = { _check_xp = 150 }
+			NOT = { EAI_XP_has_army_check_xp = yes }
+		}
+
+		AND = {
+			has_war = yes
+			NOT = { surrender_progress > 0.1 }
+			set_temp_variable = { _check_xp = 100 }
 			NOT = { EAI_XP_has_army_check_xp = yes }
 		}
 
@@ -214,5 +241,31 @@ EAI_carrier_tech_bonus = {
 	OR = {
 		AND = { original_tag = ENG has_completed_focus = uk_carrier_focus }
 		AND = { original_tag = USA has_completed_focus = USA_carrier_primacy }
+	}
+}
+
+###
+
+EAI_PR_year_FACTOR = { # var:_year var:_prio_val
+	set_temp_variable = { _val_ = global.EAI_days_elapsed }
+	set_temp_variable = { _min = _year }
+	subtract_from_temp_variable = { _min = global.year }
+	multiply_temp_variable = { _min = 365 }
+	set_temp_variable = { _max = _min }
+	add_to_temp_variable = { _max = 365 }
+	EAI_MATH_TRIGGER_normalize = yes
+	add_to_temp_variable = { _val_ = 1 }
+	multiply_temp_variable = { _prio_val = _val_ }
+}
+
+EAI_PR_equipment_usage_FACTOR = { # var:_eq_1 var:_eq_2 var:_ratio var:_prio_val
+	if = { limit = { check_variable = { _eq_2 > 0 } }
+		set_temp_variable = { _val_ = _eq_1 }
+		divide_temp_variable = { _val_ = _eq_2 }
+		set_temp_variable = { _min = 0 }
+		set_temp_variable = { _max = _ratio }
+		EAI_MATH_TRIGGER_normalize = yes
+		add_to_temp_variable = { _val_ = 1 }
+		multiply_temp_variable = { _prio_val = _val_ }
 	}
 }
