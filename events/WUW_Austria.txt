@@ -510,37 +510,7 @@ country_event = { #German assassination of Wilhelm Zehner, Zehner dies
 		custom_effect_tooltip = AUS_anschluss_ratio_lowered
 		AUS_lower_anschluss_ratio = yes
 
-		IF = {
-			limit = {
-				ROOT = {
-					OR = {
-						has_government = neutrality
-						has_completed_focus = AUS_reinstate_the_imperial_council
-					}
-					AND = {
-						NOT = { has_completed_focus = AUS_ban_dnsap}
-						NOT = { has_completed_focus = AUS_rebuild_democratic_systems}	
-						NOT = { has_completed_focus = AUS_clamp_down_on_dnsap}
-					}
-				}
-			}
-
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down_monarchist
-
-			add_popularity = {
-				ideology = fascism
-				popularity = 0.05
-			}
-		}
-
-		ELSE = {
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down
-
-			add_popularity = {
-				ideology = neutrality
-				popularity = 0.05
-			}
-		}
+		#the tooltips were lying, the ticking rate doesn't start here, it starts in .103
 	}
 }
 
@@ -634,37 +604,7 @@ country_event = { #triggers missions for countdown to murder of MHC
 		custom_effect_tooltip = AUS_anschluss_ratio_lowered
 		AUS_lower_anschluss_ratio = yes
 
-		IF = {
-			limit = {
-				ROOT = {
-					OR = {
-						has_government = neutrality
-						has_completed_focus = AUS_reinstate_the_imperial_council
-					}
-					AND = {
-						NOT = { has_completed_focus = AUS_ban_dnsap}
-						NOT = { has_completed_focus = AUS_rebuild_democratic_systems}	
-						NOT = { has_completed_focus = AUS_clamp_down_on_dnsap}
-					}
-				}
-			}
-
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down_monarchist
-
-			add_popularity = {
-				ideology = fascism
-				popularity = 0.05
-			}
-		}
-
-		ELSE = {
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down
-
-			add_popularity = {
-				ideology = neutrality
-				popularity = 0.05
-			}
-		}
+		#the tooltips were lying, the ticking rate doesn't start here, it starts in .103
 	}
 }
 
@@ -3478,6 +3418,16 @@ country_event = { #FROM, Austria, Demands we integrate
 	picture = GFX_report_event_german_troops
 	is_triggered_only = yes
 
+	immediate = {
+		FROM = { #Original FROM.OWNER, the country that the decision targets
+			FROM = {
+				OWNER = {
+					set_country_flag = AUS_annexation_demand_sent_flag
+				}
+			}
+		}
+	}
+
 	option = { #no!
 		name = AUS_political_events.37.a
 		ai_chance = {
@@ -3525,23 +3475,54 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 		}
-
-		IF = {
-			limit = {
-				is_subject = no 
-			}
-			set_country_flag = AUS_annexation_demand_sent_flag
-		}
 		
-
-		IF = {
+		IF = { #Hungary
 			limit = {
 				ROOT = {
-					original_tag = HUN
+					OR = {
+						AND = {
+							original_tag = HUN
+							has_country_flag = is_current_expansion_target_for_AUS_flag 
+						}
+						AND = {
+							has_subject = HUN
+							HUN = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+					}												
 				}
 			}
 			FROM = {
-				effect_tooltip = {
+				every_state = {
+					limit = {
+						OR = {
+							state = 155
+							state = 974
+							state = 973
+							state = 154
+							state = 43
+						}
+						OR = {
+							is_fully_controlled_by = ROOT
+							controller = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+					add_claim_by = AUS
+				}
+
+				IF = {
+					limit = {
+						HUN = {
+							is_subject_of = ROOT
+						}
+					}
+					create_wargoal = {
+						type = take_claimed_state
+						target = HUN
+					}
+				}
+				ELSE = {
 					create_wargoal = {
 						type = take_claimed_state
 						target = ROOT
@@ -3554,52 +3535,64 @@ country_event = { #FROM, Austria, Demands we integrate
 						id = ROOT
 						value = 100
 					}
+					country_event = {
+						id = AUS_political_events.38
+						hours = 12 
+					}
 				}
 
-				country_event = {
-					id = AUS_political_events.38
-					hours = 12 
-				}
 			}
 		}
-		ELSE_IF = {
+		ELSE_IF = { #Czechoslovakia
 			limit = {
 				ROOT = {
-					original_tag = CZE
+					OR = {
+						AND = {
+							original_tag = CZE
+							has_country_flag = is_current_expansion_target_for_AUS_flag 
+						}
+						AND = {
+							has_subject = CZE
+							CZE = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+						
+					}
 				}
 			}
 			FROM = {
 
-				IF = {
-					limit = { 69 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 69 #Sudeten,
+				every_state = {
+					limit = {
+						OR = {
+							state = 69
+							state = 972
+							state = 9
+							state = 75
+							state = 74
+							state = 72
+						}
+						OR = {
+							is_fully_controlled_by = ROOT
+							controller = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+					add_claim_by = AUS
 				}
 
 				IF = {
-					limit = { 972 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 972 #southern sudeten 
+					limit = {
+						CZE = {
+							is_subject_of = ROOT
+						}
+					}
+					create_wargoal = {
+						type = take_claimed_state
+						target = CZE
+					}
 				}
-
-				IF = {
-					limit = { 9 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 9 #Bohemia
-				}
-
-				IF = {
-					limit = { 75 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 75 #Moravia
-				}
-
-				IF = {
-					limit = { 74 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 74 #Eastern Sudetenland
-				}
-				IF = {
-					limit = { 72 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 72 #Zaolzie
-				}
-
-				effect_tooltip = {
+				ELSE = {
 					create_wargoal = {
 						type = take_claimed_state
 						target = ROOT
@@ -3619,7 +3612,7 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 		}
-		ELSE_IF = {
+		ELSE_IF = { #Intact Yugoslavia
 			limit = {
 				ROOT = {
 					OR = {
@@ -3691,7 +3684,7 @@ country_event = { #FROM, Austria, Demands we integrate
 			}
 
 		}
-		ELSE_IF = {
+		ELSE_IF = { #Yugoslavian Puppets
 			limit = {
 				FROM.FROM = {
 					OWNER = {
@@ -3828,35 +3821,57 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 		}
-		ELSE_IF = {
+		ELSE_IF = { #Poland
 			limit = {
-				ROOT = {
-					original_tag = POL
+				OR = {
+					ROOT = {
+						original_tag = POL
+						POL = { has_country_flag = is_current_expansion_target_for_AUS_flag } 
+					}
+					POL = {
+						is_subject_of = ROOT
+						has_country_flag = is_current_expansion_target_for_AUS_flag
+					}
 				}
 			}
+
 			FROM = {
 
-				IF = {
-					limit = { 88 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 88 #Krakow
+				every_state = {
+					limit = {
+						OR = {
+							state = 88
+							state = 89
+							state = 91
+						}
+						OR = {
+							is_fully_controlled_by = ROOT
+							controller = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+					add_claim_by = AUS
 				}
 
 				IF = {
-					limit = { 89 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 89 #Stanislawow
+					limit = {
+						POL = {
+							is_subject_of = ROOT
+						}
+					}
+					create_wargoal = {
+						type = take_claimed_state
+						target = POL
+					}
 				}
-
-				IF = {
-					limit = { 91 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 91 #Lwow
-				}
-
-				effect_tooltip = {
+				ELSE = {
 					create_wargoal = {
 						type = take_claimed_state
 						target = ROOT
 					}
 				}
+		
 				add_ai_strategy = { 
 					type = antagonize
 					id = ROOT
@@ -3869,40 +3884,53 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 		}
-		ELSE_IF = {
+		ELSE_IF = { #Romania
 			limit = {
-				ROOT = {
-					original_tag = ROM
+				OR = {
+					ROOT = {
+						original_tag = ROM
+						ROM = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+					}
+					ROM = {
+						is_subject_of = ROOT
+						has_country_flag = is_current_expansion_target_for_AUS_flag
+					}
 				}
 			}
+
+			every_state = {
+				limit = {
+					OR = {
+						state = 76
+						state = 83
+						state = 84
+						state = 82
+						state = 80
+					}
+					OR = {
+						is_fully_controlled_by = ROOT
+						controller = {
+							is_subject_of = ROOT
+						}
+					}
+				}
+				add_claim_by = AUS
+			}
+
+
 			FROM = {
-			
 				IF = {
-					limit = { 76 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 76 # North Transylvania
+					limit = {
+						ROM = {
+							is_subject_of = ROOT
+						}
+					}
+					create_wargoal = {
+						type = take_claimed_state
+						target = ROM
+					}
 				}
-
-				IF = {
-					limit = { 83 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 83 # North Transylvania
-				}
-
-				IF = {
-					limit = { 84 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 84 # North Transylvania
-				}
-
-				IF = {
-					limit = { 82 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 82 # North Transylvania
-				}
-
-				IF = {
-					limit = { 80 = { is_fully_controlled_by = FROM }}
-					add_state_claim = 80 # North Transylvania
-				}
-				
-				effect_tooltip = {
+				ELSE = {
 					create_wargoal = {
 						type = take_claimed_state
 						target = ROOT
@@ -3922,49 +3950,129 @@ country_event = { #FROM, Austria, Demands we integrate
 					}
 				}
 			}
+		}
 
-			ELSE_IF = {
-				limit = {
+		ELSE_IF = { #Albania
+			limit = {
+				OR = {
 					ROOT = {
 						original_tag = ALB
+						ALB = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+					}
+					ALB = {
+						is_subject_of = ROOT
+						has_country_flag = is_current_expansion_target_for_AUS_flag
 					}
 				}
-				FROM = {
 				
-					IF = {
-						limit = { 934 = { is_fully_controlled_by = FROM }}
-						add_state_claim = 934 #Shkodër
-					}
+			}
+			FROM = {
 
-					IF = {
-						limit = { 44 = { is_fully_controlled_by = FROM }}
-						add_state_claim = 44 #Central Albania
-					}
-
-					IF = {
-						limit = { 805 = { is_fully_controlled_by = FROM }}
-						add_state_claim = 805 # North Epirus
-					}
-					
-					effect_tooltip = {
-						create_wargoal = {
-							type = take_claimed_state
-							target = ROOT
+				every_state = {
+					limit = {
+						OR = {
+							state = 934
+							state = 44
+							state = 805
+						}
+						OR = {
+							is_fully_controlled_by = ROOT
+							controller = {
+								is_subject_of = ROOT
+							}
 						}
 					}
+					add_claim_by = AUS
+				}
+					
+				IF = {
+					limit = {
+						ALB = {
+							is_subject_of = ROOT
+						}
+					}
+					create_wargoal = {
+						type = take_claimed_state
+						target = ALB
+					}
+				}
+				ELSE = {
+					create_wargoal = {
+						type = take_claimed_state
+						target = ROOT
+					}
+				}
 
 					
-					country_event = {
-						id = AUS_political_events.38
-						hours = 12 
-					}
+				country_event = {
+					id = AUS_political_events.38
+					hours = 12 
+				}
 					
-					hidden_effect = {
-						add_ai_strategy = { 
-							type = antagonize
-							id = ROOT
-							value = 100
+				hidden_effect = {
+					add_ai_strategy = { 
+						type = antagonize
+						id = ROOT
+						value = 100
+					}
+				}
+			}
+		}
+
+		ELSE = { #something strange has happened, check all states and add claims/transfer any that might be fully controlled by the mystery owner... apart from YUG. DO NOT TOUCH YUG!
+			FROM = {
+				every_state = {
+					limit = {
+						is_on_continent = europe
+						OR = {
+							state = 155
+							state = 974
+							state = 973
+							state = 154
+							state = 43
+							state = 69
+							state = 972
+							state = 9
+							state = 75
+							state = 74
+							state = 72
+							state = 88
+							state = 89
+							state = 91
+							state = 76
+							state = 83
+							state = 84
+							state = 82
+							state = 80
+							state = 934
+							state = 44
+							state = 805
 						}
+						OR = {
+							is_fully_controlled_by = ROOT
+							controller = {
+								is_subject_of = ROOT
+							}
+						}
+					}
+					add_claim_by = AUS
+				}
+
+				create_wargoal = {
+					type = take_claimed_state
+					target = ROOT
+				}
+
+				country_event = {
+					id = AUS_political_events.38
+					hours = 12 
+				}
+					
+				hidden_effect = {
+					add_ai_strategy = { 
+						type = antagonize
+						id = ROOT
+						value = 100
 					}
 				}
 			}
@@ -4037,26 +4145,41 @@ country_event = { #FROM, Austria, Demands we integrate
 						}
 					}
 				}
-				
 			}
 		}
-
-		set_country_flag = AUS_annexation_demand_sent_flag
 
 		IF = {
 			limit = {
 				ROOT = { 
 					OR = {
 						original_tag = POL
+						POL = {
+							is_subject_of = ROOT
+						}
 						original_tag = ROM
+						ROM = {
+							is_subject_of = ROOT
+						}
 						original_tag = YUG
+						YUG = {
+							is_subject_of = ROOT
+						}
 					}
 				}
 			}
 
-			IF = {
+			IF = { #Poland
 				limit = {
-					original_tag = POL
+					OR = {
+						AND = {
+							original_tag = POL
+							has_country_flag = is_current_expansion_target_for_AUS_flag 
+						}
+						POL = {
+							is_subject_of = ROOT
+							POL = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+					}
 				}
 
 				FROM = {
@@ -4066,30 +4189,38 @@ country_event = { #FROM, Austria, Demands we integrate
 					}
 				}
 				effect_tooltip = {
-					IF = {
-						limit = { 88 = { is_fully_controlled_by = ROOT }}
-						88 = {
-							transfer_state_to = FROM
+
+					every_state = {
+						limit = {
+							OR = {
+								state = 88
+								state = 89
+								state = 91
+							}
+							OR = {
+								is_fully_controlled_by = ROOT
+								controller = {
+									is_subject_of = ROOT
+								}
+							}
 						}
-					}
-					IF = {
-						limit = { 89 = { is_fully_controlled_by = ROOT }}
-						89 = {
-							transfer_state_to = FROM
-						}
-					}
-					IF = {
-						limit = { 91 = { is_fully_controlled_by = ROOT }}
-						91 = {
-							transfer_state_to = FROM
-						}
+						transfer_state_to = FROM
 					}
 				}
 			}
 
-			ELSE_IF = {
+			ELSE_IF = { #Romania
 				limit = {
-					original_tag = ROM
+					OR = {
+						AND = {
+							original_tag = ROM
+							has_country_flag = is_current_expansion_target_for_AUS_flag 
+						}
+						ROM = {
+							is_subject_of = ROOT
+							ROM = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+					}
 				}
 
 				FROM = {
@@ -4100,41 +4231,28 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 
 				effect_tooltip = {
-					IF = {
-						limit = { 76 = { is_fully_controlled_by = ROOT }}
-						76 = {
-							transfer_state_to = FROM
+					every_state = {
+						limit = {
+							OR = {
+								state = 76
+								state = 83
+								state = 84
+								state = 82
+								state = 80
+							}
+							OR = {
+								is_fully_controlled_by = ROOT
+								controller = {
+									is_subject_of = ROOT
+								}
+							}
 						}
+						transfer_state_to = FROM
 					}
-					IF = {
-						limit = { 83 = { is_fully_controlled_by = ROOT }}
-						83 = {
-							transfer_state_to = FROM
-						}
-					}
-					IF = {
-						limit = { 84 = { is_fully_controlled_by = ROOT }}
-						84 = {
-							transfer_state_to = FROM
-						}
-					}
-					IF = {
-						limit = { 82 = { is_fully_controlled_by = ROOT }}
-						82 = {
-							transfer_state_to = FROM
-						}
-					}
-					IF = {
-						limit = { 80 = { is_fully_controlled_by = ROOT }}
-						80 = {
-							transfer_state_to = FROM
-						}
-					}
-					
 				}
 			}
 
-			ELSE_IF = {
+			ELSE_IF = { #YUG stuff NEVER TOUCH!!!
 				limit = {
 					OR = {
 						AND = {
@@ -4181,7 +4299,7 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 
-			ELSE_IF = {
+			ELSE_IF = { #Even more YUG stuff, Save yoursellf DO NOT TOUCH!
 				limit = {
 					FROM.FROM = {
 						OWNER = {
@@ -4266,7 +4384,7 @@ country_event = { #FROM, Austria, Demands we integrate
 			}
 		}	
 
-		ELSE = {
+		ELSE = { #Weirdness has happened, curse you ahistorical!
 			FROM = {
 				country_event = {
 					id = AUS_political_events.39
@@ -4274,7 +4392,28 @@ country_event = { #FROM, Austria, Demands we integrate
 				}
 			}
 
-			custom_effect_tooltip = GAME_OVER_TT
+
+			IF  = {
+				limit = {
+					OR = {
+						original_tag = HUN
+						original_tag = ALB
+						original_tag = CZE
+					}
+				}
+				effect_tooltip = {
+					FROM = {
+						annex_country = {
+							target = ROOT
+							transfer_troops = yes
+						}
+					}
+				}
+				custom_effect_tooltip = GAME_OVER_TT
+			}
+			ELSE = {
+				custom_effect_tooltip = AUS_political_events.37_tt
+			}
 		}			
 	}
 }
@@ -4302,18 +4441,39 @@ country_event = { #FROM resists annexation
 				}
 			}
 			custom_effect_tooltip = AUS_political_events.38_tt
+
+			IF = {
+				limit = {
+					FROM = {
+						FROM = {
+							OWNER = {
+								has_country_flag = is_current_expansion_target_for_AUS_flag
+							}
+						}
+					}
+				}
+				FROM = {
+					FROM = {
+						OWNER = {
+							clr_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+					}
+				}
+			}
 		}
 
 	
 		ELSE = {
-			#effect_tooltip = {
-				create_wargoal = {
-					type = take_claimed_state
-					target = FROM
+
+			custom_effect_tooltip = AUS_political_events.38_tt
+			FROM = {
+				FROM = {
+					OWNER = {
+						clr_country_flag = is_current_expansion_target_for_AUS_flag
+					}
 				}
-			#}
+			}
 		}
-		
 	}
 }
 
@@ -4331,128 +4491,248 @@ country_event = { #FROM integrates
 		}
 
 
-		IF = {
-			limit = { FROM = { original_tag = POL } }
-			
-			IF = {
-				limit = { 88 = { is_fully_controlled_by = FROM }}
-				88 = {
+		IF = { #Poland
+			limit = { 
+				FROM = {
+					OR = {
+						AND = { 
+							original_tag = POL
+							has_country_flag = is_current_expansion_target_for_AUS_flag 
+						}
+						AND = { 
+							has_subject = POL
+							POL = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+					}
+				} 
+			}
+
+			effect_tooltip = {
+				every_state = {
+					limit = {
+						OR = {
+							state = 88
+							state = 89
+							state = 91
+						}
+						OR = {
+							is_fully_controlled_by = FROM
+							controller = {
+								is_subject_of = FROM
+							}
+						}
+					}
 					transfer_state_to = ROOT
 				}
 			}
-			IF = {
-				limit = { 89 = { is_fully_controlled_by = FROM }}
-				89 = {
-					transfer_state_to = ROOT
-				}
-			}
-			IF = {
-				limit = { 91 = { is_fully_controlled_by = FROM }}
-				91 = {
-					transfer_state_to = ROOT
-				}
+
+			POL = {
+				clr_country_flag = is_current_expansion_target_for_AUS_flag
 			}
 		}
 
-		ELSE_IF = {
+		ELSE_IF = { #Romnia/Transylvania
 			limit = { 
 				FROM = { 
 					OR = {
-						original_tag = ROM 
-						original_tag = TRA
+						AND = {
+							original_tag = ROM
+							has_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+						AND = {
+							has_subject = ROM
+							ROM = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						} 
+						AND = {
+							original_tag = TRA
+							has_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+						AND = {
+							has_subject = TRA
+							TRA = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
 					}
 					
 				} 
 			}
 
-			IF = {
-				limit = { 76 = { is_fully_controlled_by = FROM }}
-				76 = {
-					transfer_state_to = ROOT
+			every_state = {
+				limit = {
+					OR = {
+						state = 76
+						state = 83
+						state = 84
+						state = 82
+						state = 80
+					}
+					OR = {
+						is_fully_controlled_by = FROM
+						controller = {
+							is_subject_of = FROM
+						}
+					}
 				}
+				transfer_state_to = ROOT
 			}
+
 			IF = {
-				limit = { 83 = { is_fully_controlled_by = FROM }}
-				83 = {
-					transfer_state_to = ROOT
-				}
+				limit = { ROM = { has_country_flag = is_current_expansion_target_for_AUS_flag }}
+				ROM = { clr_country_flag = is_current_expansion_target_for_AUS_flag }
 			}
-			IF = {
-				limit = { 84 = { is_fully_controlled_by = FROM }}
-				84 = {
-					transfer_state_to = ROOT
-				}
-			}
-			IF = {
-				limit = { 82 = { is_fully_controlled_by = FROM }}
-				82 = {
-					transfer_state_to = ROOT
-				}
-			}
-			IF = {
-				limit = { 
-					80 = { is_fully_controlled_by = FROM }
-					FROM = { original_tag = ROM }
-				}
-				80 = {
-					transfer_state_to = ROOT
-				}
+
+			ELSE_IF = {
+				limit = { TRA = { has_country_flag = is_current_expansion_target_for_AUS_flag }}
+				TRA = { clr_country_flag = is_current_expansion_target_for_AUS_flag }
 			}
 		}
 
-		ELSE_IF = {
+		ELSE_IF = { #Czechoslovakia
 			limit = {
-				NOT = { #is not yug or splinter of yug
+				FROM = {
 					OR = {
-						853 = {
-							OR = {
-								AND = {
-									is_owned_by = FROM
-									is_controlled_by = FROM
-								}
-								OWNER = {
-									is_subject_of = FROM
-									owns_state = 853
-									controls_state = 853
-								}
-							}
+						AND = {
+							original_tag = CZE
+							has_country_flag = is_current_expansion_target_for_AUS_flag
 						}
-						102 = {
-							OR = {
-								AND = {
-									is_owned_by = FROM
-									is_controlled_by = FROM
-								}
-								OWNER = {
-									is_subject_of = FROM
-									owns_state = 102
-									controls_state = 102
-								}
-							}
-						}
-						109 = {
-							OR = {
-								AND = {
-									is_owned_by = FROM
-									is_controlled_by = FROM
-								}
-								OWNER = {
-									is_subject_of = FROM
-									owns_state = 109
-									controls_state = 109
-								}
-							}
+						AND = {
+							has_subject = CZE
+							CZE = { has_country_flag = is_current_expansion_target_for_AUS_flag }
 						}
 					}
 				}
 			}
 			annex_country = {
-				target = FROM
+				target = CZE
 				transfer_troops = yes
-			}		
+			}
+
+			CZE = {
+				clr_country_flag = is_current_expansion_target_for_AUS_flag
+			}
 		}
 
-		IF = {
+		ELSE_IF = { #Hungary
+			limit = {
+				FROM = {
+					OR = {
+						AND = {
+							original_tag = HUN
+							has_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+						AND = {
+							has_subject = HUN
+							HUN = { has_country_flag = is_current_expansion_target_for_AUS_flag }
+						}
+					}
+				}
+			}
+			annex_country = {
+				target = HUN
+				transfer_troops = yes
+			}
+
+			HUN = {
+				clr_country_flag = is_current_expansion_target_for_AUS_flag
+			}
+		}
+
+		ELSE_IF = { #Albania
+			limit = {
+				FROM = {
+					OR = {
+						AND = {
+							original_tag = ALB
+							has_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+						AND = {
+							has_subject = ALB
+							ALB = { has_country_flag = is_current_expansion_target_for_AUS_flag } 
+						}
+					}
+				}
+			}
+			annex_country = {
+				target = ALB
+				transfer_troops = yes
+			}
+
+			ALB = {
+				clr_country_flag = is_current_expansion_target_for_AUS_flag
+			}
+		}
+		ELSE = { #something strange has happened, check all states and add claims/transfer any that might be fully controlled by the mystery owner... apart from YUG. DO NOT TOUCH YUG!
+			ROOT = {
+				every_state = {
+					limit = {
+						is_on_continent = europe
+						OR = {
+							state = 155
+							state = 974
+							state = 973
+							state = 154
+							state = 43
+							state = 69
+							state = 972
+							state = 9
+							state = 75
+							state = 74
+							state = 72
+							state = 88
+							state = 89
+							state = 91
+							state = 76
+							state = 83
+							state = 84
+							state = 82
+							state = 80
+							state = 934
+							state = 44
+							state = 805
+						}
+						OR = {
+							is_fully_controlled_by = FROM
+							controller = {
+								is_subject_of = FROM
+							}
+						}
+					}
+					transfer_state_to = AUS
+				}
+
+				IF  = {
+					limit = {
+						FROM = {
+							has_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+					}
+					FROM = {
+						clr_country_flag = is_current_expansion_target_for_AUS_flag
+					}
+				}
+
+				ELSE_IF  = {
+					limit = {
+						FROM = {
+							any_subject_country = {
+								has_country_flag = is_current_expansion_target_for_AUS_flag
+							}
+							
+						}
+					}
+					FROM = {
+						every_subject_country = {
+							limit = {
+								has_country_flag = is_current_expansion_target_for_AUS_flag
+							}
+							clr_country_flag = is_current_expansion_target_for_AUS_flag
+						}
+					}
+				}
+			}
+		}
+
+
+		IF = { #YUG stuff
 			limit = { 
 				FROM = { 
 					owns_state = 102
@@ -4465,7 +4745,7 @@ country_event = { #FROM integrates
 			}
 		}
 
-		ELSE_IF = {
+		ELSE_IF = { #YUG stuff
 			limit = { 
 				FROM.FROM = { 
 					OWNER = {
@@ -4479,7 +4759,7 @@ country_event = { #FROM integrates
 				transfer_state = 102
 			}
 		}
-		IF = {
+		IF = { #YUG stuff
 			limit = { 
 				FROM = { 
 					owns_state = 853
@@ -4492,7 +4772,7 @@ country_event = { #FROM integrates
 			}
 		}
 
-		ELSE_IF = {
+		ELSE_IF = { #YUG stuff
 			limit = { 
 				FROM.FROM = { 
 					OWNER = {
@@ -4508,7 +4788,7 @@ country_event = { #FROM integrates
 		}
 
 
-		IF = {
+		IF = { #YUG stuff
 			limit = { 
 				FROM = { 
 					owns_state = 109
@@ -4521,7 +4801,7 @@ country_event = { #FROM integrates
 			}
 		}
 
-		ELSE_IF = {
+		ELSE_IF = { #YUG stuff
 			limit = { 
 				FROM.FROM = { 
 					OWNER = {
@@ -4535,6 +4815,8 @@ country_event = { #FROM integrates
 				transfer_state_to = ROOT
 			}
 		}
+
+
 	}
 }
 
@@ -5725,7 +6007,7 @@ country_event = { #FROM demands Trentino and Alto Adige
 	id = AUS_political_events.58
 	title = AUS_political_events.58.t
 	desc = AUS_political_events.58.desc
-	picture = GFX_report_event_hitler_parade
+	picture = GFX_report_event_soldiers_parade
 	is_triggered_only = yes
 
 	fire_only_once = yes
@@ -5885,41 +6167,12 @@ country_event = { #FROM complains about Jansa
 		complete_national_focus = AUS_establish_bohme_plan
 
 		custom_effect_tooltip = AUS_political_events.60.a_tt
-
+		custom_effect_tooltip = generic_skip_one_line_tt
 		custom_effect_tooltip = AUS_anschluss_ratio_lowered
 		AUS_lower_anschluss_ratio = yes
+		custom_effect_tooltip = generic_skip_one_line_tt
 
-		IF = {
-			limit = {
-				ROOT = {
-					OR = {
-						has_government = neutrality
-						has_completed_focus = AUS_reinstate_the_imperial_council
-					}
-					AND = {
-						NOT = { has_completed_focus = AUS_ban_dnsap}
-						NOT = { has_completed_focus = AUS_rebuild_democratic_systems}	
-						NOT = { has_completed_focus = AUS_clamp_down_on_dnsap}
-					}
-				}
-			}
-
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down_monarchist
-
-			add_popularity = {
-				ideology = fascism
-				popularity = 0.05
-			}
-		}
-
-		ELSE = {
-			custom_effect_tooltip = AUS_anschluss_ratio_ticking_down
-
-			add_popularity = {
-				ideology = neutrality
-				popularity = 0.05
-			}
-		}
+		#the tooltips were lying, the ticking rate doesn't start here, it starts in .103
 
 		FROM = {
 			country_event = {
@@ -8940,7 +9193,7 @@ country_event = { #Event for Germany, Hitler wants Austria
 
 		set_country_flag = GER_hitler_wants_austria_flag
 
-		IF = {
+		IF = { #This is where the ticking actually starts, NOT ANYWHERE ELSE
 			limit = {
 				AUS = {
 					OR = {
@@ -9000,7 +9253,7 @@ country_event = { #Event for Austria, Hitler wants Austria, Now.
 			
 		}
 
-		IF = {
+		IF = { #Here is where the ticking down rate starts, NOWHERE ELSE!
 			limit = {
 				ROOT = {
 					OR = {
@@ -9359,7 +9612,7 @@ country_event = { #Informs ROOT that FROM has armed border guards
 	id = AUS_political_events.109
 	title = AUS_political_events.109.t
 	desc = AUS_political_events.109.desc
-	picture = GFX_report_event_hitler_parade
+	picture = GFX_report_event_soldiers_parade
 
 	is_triggered_only = yes
 
