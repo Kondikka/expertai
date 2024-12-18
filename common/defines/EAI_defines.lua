@@ -141,7 +141,7 @@ NDefines.NAI.GARRISON_TEMPLATE_SCORE_MANPOWER_FACTOR = 0.05 -- formula is (templ
 
 -- NDefines.NAI.UPGRADE_DIVISION_RELUCTANCE = 7 -- 7					-- How often to consider upgrading to new templates for units in the field
 -- NDefines.NAI.UPGRADE_PERCENTAGE_OF_FORCES = 0.01 -- 0.03				-- How big part of the army that should be considered for upgrading
-NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 500                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
+NDefines.NAI.UPGRADES_DEFICIT_LIMIT_DAYS = 7 -- 7                          -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 --NDefines.NAI.LOW_PRIO_TEMPLATE_BONUS_FOR_GARRISONS = 100000		-- bonus to make ai more likely to assign low prio units to garrisons
 --NDefines.NAI.LOW_PRIO_TEMPLATE_PENALTY_FOR_FRONTS = 100000		-- penalty to make ai less likely to assign low prio units to fronts
@@ -206,7 +206,7 @@ NDefines.NAI.DEPLOY_MIN_EQUIPMENT_CAP_DEPLOY_FACTOR = 0.85 -- If training is cap
 -- EQUIPMENT PRODUCTION
 --------------------------------------------------------------------------------------------------------------
 
-NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 1 -- [0.4] -- Base value for how much of currently used equipment the AI will at least strive to have in stock
+NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR = 0.5 -- 0.8 -- Base value for how much of currently used equipment the AI will at least strive to have in stock
 -- NDefines.NAI.PRODUCTION_EQUIPMENT_SURPLUS_FACTOR_GARRISON = -- [0.3]
 
 NDefines.NAI.SHIPS_PRODUCTION_BASE_COST = 1
@@ -462,7 +462,7 @@ NDefines.NAI.MISSING_CONVOYS_BOOST_FACTOR = 0.0
 -------------------
 
 -- NDefines.NAI.NAVAL_MISSION_MIN_FLEET_SIZE = 3								-- AI will not send too small fleets on missions. Ignored if total number of ships country has is below	this.
-NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 200 -- was 80								-- AI will generally attempt to merge fleets into this size but as a soft limit.
+NDefines.NAI.NAVY_PREFERED_MAX_SIZE = 120 -- was 80								-- AI will generally attempt to merge fleets into this size but as a soft limit.
 
 -- NDefines.NAI.CARRIER_TASKFORCE_MAX_CARRIER_COUNT = -- 4 		-- optimum carrier count for carrier taskforces
 NDefines.NAI.CAPITAL_TASKFORCE_MAX_CAPITAL_COUNT = 40 -- from 12 		-- optimum capital count for capital taskforces
@@ -489,7 +489,7 @@ NDefines.NAI.SCREENS_TO_CAPITAL_RATIO = 5.0 -- from 4.0					-- screens to capita
 --NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_CONVOY_DEFENSE_MAX_CONVOY_THREAT = -- 1500-- AI will increase screen assignment for escort missions as threate increases
 
 NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_LAYING = 0.05  -- 0.10 -- maximum ratio of screens forces to be used in mine laying
-NDefines.NAI.MAX_PATROL_TO_STRIKE_FORCE_RATIO = 5.0 -- 3.0	-- maximum patrol/strike force ratio
+NDefines.NAI.MAX_PATROL_TO_STRIKE_FORCE_RATIO = 4.0 -- 3.0	-- maximum patrol/strike force ratio
 
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING = -- 0.10 -- maximum ratio of screens forces to be used in mine sweeping
 -- NDefines.NAI.MAX_SCREEN_TASKFORCES_FOR_MINE_SWEEPING_PRIO = -- 0.8 -- if you have mines near your owned states, you will start priotize mine missions and will assign this ratio of screens
@@ -522,7 +522,7 @@ NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to 
 	200, -- PATROL
 	200, -- STRIKE FORCE
 	200, -- CONVOY RAIDING
-	100000, -- CONVOY ESCORT
+	100, -- CONVOY ESCORT
 	200, -- MINES PLANTING
 	100, -- MINES SWEEPING
 	0, -- TRAIN
@@ -532,11 +532,11 @@ NDefines.NAI.MIN_NAVAL_MISSION_PRIO_TO_ASSIGN = {  -- priorities for regions to 
 
 NDefines.NAI.HIGH_PRIO_NAVAL_MISSION_SCORES = {  -- priorities for regions to get assigned to a mission
 	0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
-	100000, -- PATROL
+	1000000, -- PATROL
 	1000, -- STRIKE FORCE
 	1500, -- CONVOY RAIDING
 	1000, -- CONVOY ESCORT
-	-1, -- MINES PLANTING
+	10, -- MINES PLANTING
 	300, -- MINES SWEEPING
 	0, -- TRAIN
 	0, -- RESERVE_FLEET
@@ -560,7 +560,7 @@ NDefines.NAI.MAX_MISSION_PER_TASKFORCE = {  -- max mission region/taskforce rati
 -- convoy escorts
 -------------------------
 
--- NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = -- 25					-- Threat value per convoy sunk in a region. Decays over time.
+-- NDefines.NAI.REGION_THREAT_PER_SUNK_CONVOY = 2500 -- 25					-- Threat value per convoy sunk in a region. Decays over time.
 -- NDefines.NAI.REGION_THREAT_LEVEL_TO_AVOID_REGION = -- 25 * 10		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
 NDefines.NAI.REGION_THREAT_LEVEL_TO_BLOCK_REGION = 25 * 5000 -- 25 * 100		-- How much threat must be generated in region ( by REGION_THREAT_PER_SUNK_CONVOY ) so the AI will decide to mark the region as avoid
 NDefines.NAI.REGION_CONVOY_DANGER_DAILY_DECAY = 10 -- 1				-- When convoys are sunk it generates threat in the region which the AI uses to prio nalval missions

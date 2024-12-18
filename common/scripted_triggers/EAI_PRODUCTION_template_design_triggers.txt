@@ -17,16 +17,41 @@ EAI_TEMPLATE_use_expensive_garrison = {
 EAI_TEMPLATE_use_mass_infantry = {
 	if = { limit = { NOT = { has_country_flag = EAI_MASS_INFANTRY_TEMPLATE } }
 	
-		surrender_progress > 0.05
-		check_variable = { EAI_MILITARY_deployed_army_k_trend_value < -0.1 }
-		has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 30 }
-
-		check_variable = { num_equipment@infantry_equipment > 10000 }
 		OR = {
-			check_variable = { num_equipment@support_equipment < 1 }
-			check_variable = { num_equipment@artillery_equipment < 1 }
-		}
 
+			### Strategies
+
+				AND = {
+					tag = SOV
+					check_variable = { deployed_army_manpower_k < 4000 }
+
+					any_enemy_country = { is_major = yes }
+					NOT = { EAI_MILITARY_not_losing_TRIGGER = yes }
+					EAI_MILITARY_home_threatened_TRIGGER = yes
+
+					set_temp_variable = { mass_infantry_target_size_ = 4500 }
+				}
+
+			### Generic
+
+				AND = {
+					surrender_progress > 0.05
+					check_variable = { EAI_MILITARY_deployed_army_k_trend_value < -0.1 }
+					has_country_flag = { flag = EAI_MILITARY_trend_losing_war value = 1 days > 30 }
+			
+					check_variable = { num_equipment@infantry_equipment > 10000 }
+					OR = {
+						check_variable = { num_equipment@support_equipment < 1 }
+						check_variable = { num_equipment@artillery_equipment < 1 }
+					}
+					
+					set_temp_variable = { last = EAI_MILITARY_army_size_k_weekly^num }
+					subtract_from_temp_variable = { last = 1 }
+					set_temp_variable = { mass_infantry_target_size_ = EAI_MILITARY_army_size_k_weekly^last }
+				}
+
+			###
+		}
 	}
 	else = {
 		always = no

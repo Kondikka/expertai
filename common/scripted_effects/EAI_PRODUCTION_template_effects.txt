@@ -33,6 +33,7 @@ EAI_TEMPLATE_set_variables = {
 EAI_TEMPLATE_set_template_flags = {
 
 	EAI_TEMPLATE_set_infantry_template_flags = yes
+	EAI_TEMPLATE_set_mass_infantry_template_flags = yes
 	EAI_TEMPLATE_set_marine_template_flags = yes
 	EAI_TEMPLATE_set_mountaineer_template_flags = yes
 	EAI_TEMPLATE_set_motorized_template_flags = yes
@@ -119,9 +120,7 @@ EAI_TEMPLATE_set_infantry_template_flags = {
 
 	if = { limit = { EAI_TEMPLATE_use_mass_infantry = yes }
 		set_country_flag = EAI_MASS_INFANTRY_TEMPLATE
-		set_temp_variable = { last = EAI_MILITARY_army_size_k_weekly^num }
-		subtract_from_temp_variable = { last = 1 }
-		set_variable = { EAI_TEMPLATE_use_mass_infantry_target = EAI_MILITARY_army_size_k_weekly^last }
+		set_variable = { EAI_TEMPLATE_use_mass_infantry_target = mass_infantry_target_size }
 		# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: EAI_TEMPLATE_use_mass_infantry"
 	}
 	else_if = { limit = { EAI_TEMPLATE_use_mass_infantry_abort = yes }
@@ -654,6 +653,77 @@ EAI_TEMPLATE_mass_assault_40w_infantry_role = {
 					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4333 }
 				}
 			}
+		}
+	}
+}
+
+##################################################
+# 	MASS INFANTRY
+##################################################
+
+EAI_TEMPLATE_set_mass_infantry_template_flags = {
+
+	if = { limit = { EAI_TEMPLATE_use_mass_infantry = yes }
+
+		set_variable = { EAI_TEMPLATE_use_mass_infantry_target = mass_infantry_target_size_ }
+		EAI_TEMPLATE_set_mass_infantry_template_flag = yes
+	}
+	else_if = { limit = { EAI_TEMPLATE_use_mass_infantry_abort = yes }
+
+		clr_country_flag = EAI_MASS_INFANTRY_TEMPLATE
+	}
+}
+
+EAI_TEMPLATE_set_mass_infantry_template_flag = {
+
+	if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH } }
+
+		### Regular size
+
+		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 10 }
+		}
+
+		### Large size
+
+		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 11 }
+		}
+	}
+
+	if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_26W_INF_WIDTH } }
+
+		### Regular size
+
+		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 20 }
+		}
+
+		### Large size
+
+		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 21 }
+		}
+	}
+
+	if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH } }
+
+		### Regular size
+
+		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 30 }
+		}
+
+		### Large size
+
+		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+
+			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 31 }
 		}
 	}
 }
@@ -1335,6 +1405,12 @@ EAI_TEMPLATE_armor_template_upgrade = {
 				set_temp_variable = { _check_xp = 450 }
 				EAI_XP_has_army_check_xp = yes
 			}
+
+			### Strategies
+
+				EAI_PR_Priorize_tanks_if_MA_Build = yes
+
+			###
 		}
 
 		set_country_flag = EAI_larm_template_upgrade
@@ -1379,6 +1455,12 @@ EAI_TEMPLATE_armor_template_upgrade = {
 				set_temp_variable = { _check_xp = 450 }
 				EAI_XP_has_army_check_xp = yes
 			}
+
+			### Strategies
+
+				EAI_PR_Priorize_tanks_if_MA_Build = yes
+
+			###
 		}
 
 		set_country_flag = EAI_marm_template_upgrade
@@ -1423,6 +1505,12 @@ EAI_TEMPLATE_armor_template_upgrade = {
 				set_temp_variable = { _check_xp = 450 }
 				EAI_XP_has_army_check_xp = yes
 			}
+
+			### Strategies
+
+				EAI_PR_Priorize_tanks_if_MA_Build = yes
+
+			###
 		}
 
 		set_country_flag = EAI_harm_template_upgrade
@@ -1700,89 +1788,13 @@ EAI_TEMPLATE_suppression_template_upgrade = {
 
 	    	NOT = { has_country_flag = EAI_TEMPLATE_suppression_template_upgrade }
 
-	    	OR = {
-				date > 1938.1.1
-				has_war = yes
-			}
-
-			### XP req.
-
-			set_temp_variable = { _check_xp = 100 } 
-			EAI_XP_has_army_check_xp = yes
+	    	has_war = yes
+			
+			check_variable = { num_occupied_states > 1 }
         }
 
 		set_country_flag = EAI_TEMPLATE_suppression_template_upgrade
 
 		if = { limit = { has_country_flag = EAI_template_upgrade_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading suppression" } 
-		
-		set_temp_variable = { _xp_cost = _check_xp }
-		EAI_XP_pay_army_xp_cost = yes
-    }
-
-	if = {
-        limit = {
-	    	has_country_flag = EAI_military_focus_config_finished
-
-			OR = {
-				has_country_flag = { flag = EAI_SUPPRESSION_TEMPLATE value = 2 }
-				has_country_flag = { flag = EAI_SUPPRESSION_TEMPLATE value = 3 }
-			}
-
-	    	NOT = { has_country_flag = EAI_TEMPLATE_suppression_template_upgrade_2 }
-
-			### XP req.
-
-			set_temp_variable = { _check_xp = 105 } 
-			EAI_XP_has_army_check_xp = yes
-        }
-
-		set_country_flag = EAI_TEMPLATE_suppression_template_upgrade_2
-
-		if = { limit = { has_country_flag = EAI_template_upgrade_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: upgrading suppression 2" } 
-		
-		set_temp_variable = { _xp_cost = _check_xp }
-		EAI_XP_pay_army_xp_cost = yes
-		
-		division_template = {
-			name = "Suppression Template 2"
-	
-			priority = 1
-	
-			regiments = {
-				cavalry = { x = 0 y = 0 }
-				cavalry = { x = 0 y = 1 }
-				cavalry = { x = 0 y = 2 }
-				cavalry = { x = 0 y = 3 }
-				# cavalry = { x = 0 y = 4 }
-
-				cavalry = { x = 1 y = 0 }
-				cavalry = { x = 1 y = 1 }
-				cavalry = { x = 1 y = 2 }
-				cavalry = { x = 1 y = 3 }
-				# cavalry = { x = 1 y = 4 }
-
-				cavalry = { x = 2 y = 0 }
-				cavalry = { x = 2 y = 1 }
-				cavalry = { x = 2 y = 2 }
-				cavalry = { x = 2 y = 3 }
-				# cavalry = { x = 2 y = 4 }
-
-				cavalry = { x = 3 y = 0 }
-				cavalry = { x = 3 y = 1 }
-				cavalry = { x = 3 y = 2 }
-				cavalry = { x = 3 y = 3 }
-				# cavalry = { x = 3 y = 4 }
-
-				cavalry = { x = 4 y = 0 }
-				cavalry = { x = 4 y = 1 }
-				cavalry = { x = 4 y = 2 }
-				cavalry = { x = 4 y = 3 }
-				# cavalry = { x = 4 y = 4 }
-			}
-
-			support = {
-				military_police = { x = 0 y = 0 }
-			}
-		}
     }
 }

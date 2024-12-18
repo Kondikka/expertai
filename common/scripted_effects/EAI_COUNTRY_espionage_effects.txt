@@ -1540,22 +1540,44 @@ EAI_ESP_agency_upgrade_strategies = {
 
 	if = { limit = { tag = SOV }
 
-		if = { limit = { NOT = { has_completed_focus = SOV_the_workers_dictatorship } }
-
-			set_temp_variable = { EAI_build_espionage_agency = 0 }
-			set_temp_variable = { EAI_espionage_agency_target_level = 0 }
-		}
-		else_if = { 
-			limit = {
-				OR = {
-					check_variable = { EAI_PC_strategy_state = 1 }
-					check_variable = { EAI_PC_strategy_state = 1.5 }
-					check_variable = { EAI_PC_strategy_state = 2 }
+		if = { limit = { is_historical_focus_on = yes }
+		
+			# Max CIC build
+			if = {
+				limit = {
+					date < 1941.1.1
 				}
+			
+				set_temp_variable = { EAI_build_espionage_agency = 0 }
+				set_temp_variable = { EAI_espionage_agency_target_level = 0 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						check_variable = { EAI_PC_strategy_state = 1 }
+						check_variable = { EAI_PC_strategy_state = 1.5 }
+						check_variable = { EAI_PC_strategy_state = 2 }
+					}
+				}
+			
+				set_temp_variable = { EAI_build_espionage_agency = 1 }
+				set_temp_variable = { EAI_espionage_agency_target_level = 0 }
 			}
 
-			set_temp_variable = { EAI_build_espionage_agency = 1 }
-			set_temp_variable = { EAI_espionage_agency_target_level = 0 }
+			# Build agency for Trotsky
+			if = {
+				limit = {
+					OR = {
+						has_completed_focus = SOV_the_workers_dictatorship
+						focus_progress = { focus = SOV_the_workers_dictatorship progress > 0 }
+						has_completed_focus = SOV_behead_the_snake
+						focus_progress = { focus = SOV_behead_the_snake progress > 0 }
+					}
+				}
+			
+				set_temp_variable = { EAI_build_espionage_agency = 1 }
+				set_temp_variable = { EAI_espionage_agency_target_level = 0 }
+			}
 		}
 	}
 
