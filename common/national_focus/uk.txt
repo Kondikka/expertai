@@ -8947,19 +8947,27 @@ focus_tree = {
 		relative_position_id = ENG_home_defence
 		cost = 10
 		historical_ai = { #EAI
+
+			### General situation
+
+			IRQ = { EAI_THIS_is_threat_to_PREV = yes }
+			NOT = { EAI_MILITARY_home_threatened_TRIGGER = yes }
+			EAI_MILITARY_not_losing_TRIGGER = yes
 			any_enemy_country = {
-	            is_faction_leader = yes
 	            is_major = yes
 	        }
-			date > 1941.1.1
 			NOT = {
 				any_state = {
 					OR = { region = 128 region = 28 }
 					CONTROLLER = { has_war_with = ROOT }
 				}
 			}
+
+			### Army size and timing
+
+			date > 1941.1.1
 			has_army_manpower = { size > 700000 }
-			any_country = { is_in_faction_with = ENG any_neighbor_country = { tag = PER } }
+			any_country = { is_in_faction_with = ENG any_neighbor_country = { tag = IRQ } }
 		}
 		ai_will_do = { #EAI
 			factor = 1
@@ -9017,14 +9025,17 @@ focus_tree = {
 			### General situation
 
 			PER = { EAI_THIS_is_threat_to_PREV = yes }
-
-			PER = { check_variable = { party_popularity@fascism > 0.2 } }
-
-			has_war_with = GER
+			NOT = { EAI_MILITARY_home_threatened_TRIGGER = yes }
+			EAI_MILITARY_not_losing_TRIGGER = yes
+			any_enemy_country = {
+	            is_major = yes
+	        }
 
 			### Army size and timing
 
 			date > 1941.6.1
+			has_army_manpower = { size > 700000 }
+			any_country = { is_in_faction_with = ENG any_neighbor_country = { tag = PER } }
 		}
 		ai_will_do = { #EAI
 			factor = 1
@@ -9036,6 +9047,9 @@ focus_tree = {
 			}
 		}		
 		completion_reward = {
+			hidden_effect = { #EAI
+				set_country_flag = { flag = EAI_ENG_invasion_of_iran value = 1 days = 180 }
+			}
 			create_wargoal = {
 				type = take_state_focus
 				target = PER

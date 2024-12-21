@@ -229,7 +229,8 @@ EAI_PC_bimonthly_update = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 	EAI_PC_build_nuclear_facility = yes
 	EAI_PC_resource_extraction = yes
 	EAI_PC_resource_extraction_2 = yes
-	EAI_PC_naval_base = yes
+	EAI_PC_naval_base_invasion = yes
+	EAI_PC_naval_base_for_ally = yes
 	EAI_PC_infrastructure_for_supply = yes
 	EAI_PC_antiair = yes
 	EAI_PC_rocket_site = yes
@@ -1090,6 +1091,7 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 								check_variable = { EAI_PC_progress^_project_id < EAI_PC_project_cost^_project_id } 
 								check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 }
 								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_building_slot_available = yes } }
+								set_temp_variable = { reason = 1 }
 							}
 
 						### Project set to be cancelled when no slot reserved and no slot available
@@ -1098,20 +1100,30 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 								check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 }
 								check_variable = { EAI_PC_cancel_unbuildable^_project_id = 1 } 
 								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_building_slot_available = yes } }
+								set_temp_variable = { reason = 2 }
 							}
 
 						### Doesnt control location
 
 							if = { limit = { check_variable = { EAI_PC_project_build_for_ally^_project_id = 0 } }
 								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_controls_location = yes } }
+								set_temp_variable = { reason = 3 }
+							}
+							else_if = { limit = { check_variable = { EAI_PC_target_province^_project_id = 0 } }
+								NOT = { var:EAI_PC_target_state^_project_id = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } } }
+								set_temp_variable = { reason = 4 }
 							}
 							else = {
-								NOT = { var:EAI_PC_target_state^_project_id = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } } }
+								NOT = { var:global.province_controllers^EAI_PC_target_province^_project_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } }
+								set_temp_variable = { reason = 5 }
 							}
 
 						###
 					}
 				}
+			
+				set_temp_variable = { EAI_PC_end_project_source = 1 }
+				EAI_PC_end_project = yes
 
 				### Log
 
@@ -1135,33 +1147,15 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 								}
 							}
 						} 
-						
-						set_temp_variable = { v0 = i }
-						set_temp_variable = { v1 = _project_id }
-						set_temp_variable = { v2 = EAI_PC_building_type^_project_id }
-						set_temp_variable = { v3 = EAI_PC_assigned_factories^_project_id }
-						set_temp_variable = { v4 = EAI_PC_progress^_project_id }
-						set_temp_variable = { v5 = EAI_PC_priority^_project_id }
-						set_temp_variable = { v6 = EAI_PC_build_time^_project_id }
-						set_temp_variable = { v7 = EAI_PC_target_state^_project_id }
-						set_temp_variable = { v8 = EAI_PC_target_province^_project_id }
-						set_temp_variable = { v9 = EAI_PC_type_id^_project_id }
-						if = { 
-							limit = { 
-								check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 }
-								check_variable = { EAI_PC_progress^_project_id < EAI_PC_project_cost^_project_id } 
-								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_building_slot_available = yes } }
-							} 
-							
-							log = "REASON: no slots" 
-						}
-						if = { limit = { NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_controls_location = yes } } } log = "REASON: lost control" }
+
+						if = { limit = { check_variable = { reason = 1 } } log = "REASON: started construction, no building slots available" }
+						if = { limit = { check_variable = { reason = 2 } } log = "REASON: set to be cancelled on invalid location" }
+						if = { limit = { check_variable = { reason = 3 } } log = "REASON: does not control location" }
+						if = { limit = { check_variable = { reason = 4 } } log = "REASON: ally does not control state" }
+						if = { limit = { check_variable = { reason = 5 } } log = "REASON: ally does not control province" }
 					}
 
 				###
-			
-				set_temp_variable = { EAI_PC_end_project_source = 1 }
-				EAI_PC_end_project = yes
 			}
 		}
 
@@ -1486,9 +1480,18 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 						AND = {
 							PREV = { EAI_PC_controls_location = yes }
 						}
-						AND = {
+						AND = { # Build for ally
 							check_variable = { _project_build_for_ally = 1 }
-							PREV = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } }
+							OR = {
+								# Controls state
+								PREV = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } }
+
+								# Controls province if province type
+								AND = {
+									NOT = { check_variable = { _project_province_id = 0 } }
+									var:global.province_controllers^_project_province_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+								}
+							}
 						}
 					}
 				}
@@ -1609,6 +1612,9 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 					add_to_temp_variable = { queued_amount = 1 }
 					subtract_from_temp_variable = { _project_queue_num = 1 }
 				}
+			}
+			else = {
+				if = { limit = { has_country_flag = EAI_priority_construction_logging } log = "location not valid for PC" }
 			}
 
 		###
