@@ -59,6 +59,136 @@ EAI_RESEARCH_check_for_empty_research_slots = {
 	else = { clr_country_flag = EAI_unused_research_slots_extended }
 }
 
+###
+
+EAI_RESEARCH_doctrine_switch_fix = {
+
+	EAI_RESEARCH_land_doctrine_switch_fix = yes
+	EAI_RESEARCH_air_doctrine_switch_fix = yes
+	EAI_RESEARCH_naval_doctrine_switch_fix = yes
+}
+
+EAI_RESEARCH_land_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_land_doctrine_switch NOT = { EAI_land_doctrine_progress_limit = yes } }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_army_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MW_DOCTRINE } NOT = { has_tech = mobile_warfare } }
+
+				set_technology = { mobile_warfare = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_SF_DOCTRINE } NOT = { has_tech = superior_firepower } }
+
+				set_technology = { superior_firepower = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_GB_DOCTRINE } NOT = { has_tech = trench_warfare } }
+
+				set_technology = { trench_warfare = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/land/land_doctrine = global.EAI_MA_DOCTRINE } NOT = { has_tech = mass_assault } }
+
+				set_technology = { mass_assault = 1 }
+				EAI_XP_pay_army_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_land_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed land doctrine switch" }
+		}
+	}
+}
+
+EAI_RESEARCH_air_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_air_doctrine_switch NOT = { EAI_air_doctrine_progress_limit = yes } }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@air_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_air_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_SD_DOCTRINE } NOT = { has_tech = air_superiority } }
+
+				set_technology = { air_superiority = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_BFS_DOCTRINE } NOT = { has_tech = formation_flying } }
+
+				set_technology = { formation_flying = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/AIR/air_doctrine = global.EAI_OI_DOCTRINE } NOT = { has_tech = force_rotation } }
+
+				set_technology = { force_rotation = 1 }
+				EAI_XP_pay_air_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_air_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed air doctrine switch" }
+		}
+	}
+}
+
+EAI_RESEARCH_naval_doctrine_switch_fix = {
+
+	if = { limit = { has_country_flag = EAI_fix_naval_doctrine_switch NOT = { EAI_naval_doctrine_progress_limit = yes } }
+
+		set_temp_variable = { _xp_cost = 100 }
+		set_temp_variable = { xp_cost_reduction_modifier = modifier@naval_doctrine_cost_factor }
+		add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+		multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+		
+		if = { 
+			limit = { 
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_navy_check_xp = yes
+			}
+
+			if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_FIB_DOCTRINE } NOT = { has_tech = fleet_in_being } }
+
+				set_technology = { fleet_in_being = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_TI_DOCTRINE } NOT = { has_tech = trade_interdiction } }
+
+				set_technology = { trade_interdiction = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			else_if = { limit = { check_variable = { EAI_FOCUS/NAVY/naval_doctrine = global.EAI_BS_DOCTRINE } NOT = { has_tech = base_strike } }
+
+				set_technology = { base_strike = 1 }
+				EAI_XP_pay_navy_xp_cost = yes
+			}
+			
+			clr_country_flag = EAI_fix_naval_doctrine_switch
+
+			if = { limit = { has_country_flag = EAI_research_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESEARCH: fixed naval doctrine switch" }
+		}
+	}
+}
+
+###
+
 ### Research factors
 
 EAI_RESEARCH_research_factors = {
