@@ -30,6 +30,32 @@ on_actions = {
 			EAI_monthly_update = yes
 		}
 	}
+	on_war = {
+		effect = {
+			if = {
+				limit = { ROOT = { is_ai = yes } }
+				ROOT = {
+					# Count active fronts and set relevant flags
+					set_variable = { num_of_active_fronts = 0 }
+					every_enemy_country = {
+						limit = { has_border_with_root = yes }
+						ROOT = { add_to_variable = { num_of_active_fronts = 1 } }
+					}
+					
+					if = {
+						limit = { check_variable = { num_of_active_fronts > 1 } }
+						set_country_flag = EAI_fighting_multiple_fronts
+						
+						# Identify priority enemies
+						every_enemy_country = {
+							limit = { is_major = yes }
+							set_country_flag = EAI_priority_enemy
+						}
+					}
+				}
+			}
+		}
+	}
 	on_puppet = {
 		effect = {
 
