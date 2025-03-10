@@ -1,0 +1,294 @@
+############################################################################################################
+#	Expert AI mod - Japan-specific Air Force Management
+############################################################################################################
+
+# This enhanced system specifically improves Japan's air force distribution across the Pacific theater
+
+### Japan Air Base Distribution ###
+
+# Prevent overcrowding of Japanese airbases by enforcing strict distribution
+EAI_JAP_airbase_distribution = {
+	enable = {
+		tag = JAP
+		is_ai = yes
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# More aggressively spread out planes across available airbases
+	ai_strategy = {
+		type = air_base_use_percentage
+		value = 60  # Lower than the generic 80 to force more spreading
+	}
+	
+	# Much stronger penalty for overcrowded bases
+	ai_strategy = {
+		type = air_base_weight
+		id = "FACTOR"
+		value = -150
+		
+		air_base_weight_factor_trigger = {
+			has_air_base_capacity_percentage = {
+				tag = ROOT
+				ratio > 0.7  # Lower threshold than generic
+			}
+		}
+	}
+	
+	# Bonus for empty bases to encourage wide distribution
+	ai_strategy = {
+		type = air_base_weight
+		id = "FACTOR"
+		value = 200
+		
+		air_base_weight_factor_trigger = {
+			has_air_base_capacity_percentage = {
+				tag = ROOT
+				ratio < 0.3
+			}
+		}
+	}
+}
+
+# Japan-specific air mission assignment based on front priority
+EAI_JAP_mission_priority_by_region = {
+	enable = {
+		tag = JAP
+		is_ai = yes
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize key Pacific regions with strong emphasis
+	ai_strategy = {
+		type = strategic_air_importance
+		id = 72  # South China Sea
+		value = 400
+	}
+	
+	ai_strategy = {
+		type = strategic_air_importance
+		id = 78  # Philippines Sea
+		value = 350
+	}
+	
+	ai_strategy = {
+		type = strategic_air_importance
+		id = 80  # East China Sea
+		value = 300
+	}
+	
+	ai_strategy = {
+		type = strategic_air_importance
+		id = 85  # Okinawa
+		value = 300
+	}
+	
+	ai_strategy = {
+		type = strategic_air_importance
+		id = 92  # Sea of Japan
+		value = 250
+	}
+	
+	# Forward bases in conquered territories - high priority to keep planes moving forward
+	ai_strategy = {
+		type = air_base_preference
+		value = 300
+		
+		id = "STATE"
+		
+		state_trigger = {
+			is_fully_controlled_by = JAP
+			air_base > 0
+			is_on_continent = asia
+			is_core_of = ROOT
+			NOT = { is_capital = yes }
+		}
+	}
+	
+	# Forward bases in conquered territories - high priority
+	ai_strategy = {
+		type = air_base_preference
+		value = 350
+		
+		id = "STATE"
+		
+		state_trigger = {
+			is_fully_controlled_by = JAP
+			air_base > 0
+			is_on_continent = asia
+			NOT = { is_core_of = ROOT }
+		}
+	}
+	
+	# Forward pacific island bases - very high priority
+	ai_strategy = {
+		type = air_base_preference
+		value = 400
+		
+		id = "STATE"
+		
+		state_trigger = {
+			is_fully_controlled_by = JAP
+			air_base > 0
+			is_island_state = yes
+			NOT = { is_core_of = ROOT }
+		}
+	}
+}
+
+# Dynamic reallocation of Japanese air forces based on frontline developments
+EAI_JAP_dynamic_air_reallocation = {
+	enable = {
+		tag = JAP
+		is_ai = yes
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Evacuate airbases that could be threatened
+	ai_strategy = {
+		type = air_base_preference
+		id = "STATE"
+		value = -500  # Much stronger negative than generic
+		
+		state_trigger = {
+			any_neighbor_state = {
+				OR = {
+					is_controlled_by = USA
+					is_controlled_by = ENG
+					is_controlled_by = HOL
+					is_controlled_by = PHI
+					is_controlled_by = AST
+					is_controlled_by = RAJ
+				}
+			}
+		}
+	}
+	
+	# Prioritize air regions with active naval combat
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 600
+		
+		id = "REGION"
+		
+		region_trigger = {
+			has_naval_battle = yes
+		}
+	}
+	
+	# Prioritize air regions where enemy carriers are active
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 800
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_country = {
+				is_major = yes
+				has_war_with = JAP
+				has_deployed_air_force_with_equipment = {
+					type = cv_fighter
+					size > 0
+					region = PREV
+				}
+			}
+		}
+	}
+}
+
+# More aggressive air mission prioritization for Japan
+EAI_JAP_mission_aggressiveness = {
+	enable = {
+		tag = JAP
+		is_ai = yes
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# High priority for naval strikes against US/UK fleets
+	ai_strategy = {
+		type = mission_threshold
+		id = naval_strike
+		value = -300  # Much lower threshold than default
+		
+		region_trigger = {
+			any_country = {
+				OR = {
+					tag = USA
+					tag = ENG
+					tag = HOL
+				}
+				has_navy_size = { 
+					size > 0
+					region = PREV
+				}
+			}
+		}
+	}
+	
+	# High priority for air superiority over key naval regions
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -250
+		
+		region_trigger = {
+			OR = {
+				region = 72  # South China Sea
+				region = 78  # Philippines Sea
+				region = 80  # East China Sea
+				region = 85  # Okinawa
+				region = 92  # Sea of Japan
+			}
+		}
+	}
+}
+
+# Japanese carrier air operations
+EAI_JAP_carrier_air_operations = {
+	enable = {
+		tag = JAP
+		is_ai = yes
+		has_war = yes
+		has_navy_size = { 
+			type = carrier
+			size > 0 
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize carrier fighters 
+	ai_strategy = {
+		type = unit_ratio
+		id = cv_fighter
+		value = 30
+	}
+	
+	# Prioritize carrier naval bombers
+	ai_strategy = {
+		type = unit_ratio
+		id = cv_naval_bomber
+		value = 25
+	}
+	
+	# Ensure production of carrier planes
+	ai_strategy = {
+		type = equipment_production_factor
+		id = cv_fighter
+		value = 20
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = cv_naval_bomber
+		value = 25
+	}
+} 

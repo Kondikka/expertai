@@ -1,0 +1,451 @@
+############################################################################################################
+#	Expert AI mod - Paratrooper Target Selection
+############################################################################################################
+
+# This system improves AI paratrooper usage by identifying high-value targets for paradrops
+# and assigning priorities to different types of targets based on strategic importance
+
+### USA Target Selection - European Theater ###
+
+EAI_AIR_USA_normandy_paradrops = {
+	enable = {
+		tag = USA
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 50 }
+		has_deployed_air_force_with_equipment = { type = air_transport size > 40 }
+		has_deployed_unit_with_equipment = { type = paratrooper size > 3 }
+		has_war_with = GER
+		date > 1943.1.1
+		
+		# Ensure preparations for D-Day are underway
+		OR = {
+			ENG = {
+				has_war_with = GER
+				surrender_progress < 0.2
+				any_owned_state = {
+					is_coastal = yes
+					is_controlled_by = ENG
+					OR = {
+						region = 8
+						region = 20
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = USA_has_units_in_england
+				any_state = {
+					is_owned_by = ENG
+					is_controlled_by = ENG
+					USA = { has_deployed_unit_in_state = PREV }
+				}
+			}
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize French coastal regions for paradrops
+	ai_strategy = {
+		type = paradrop_target
+		id = 16  # Northern France
+		value = 200
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 15  # Normandy
+		value = 300
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 17  # Brittany
+		value = 150
+	}
+	
+	# Target states with important infrastructure
+	ai_strategy = {
+		type = area_priority
+		id = northwest_france
+		value = 100
+	}
+	
+	# Increase paranormal priority in preparation for major operations
+	ai_strategy = {
+		type = paradrop
+		value = 100
+	}
+}
+
+### UK Target Selection - European Theater ###
+
+EAI_AIR_ENG_market_garden_paradrops = {
+	enable = {
+		tag = ENG
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 30 }
+		has_deployed_air_force_with_equipment = { type = air_transport size > 20 }
+		has_deployed_unit_with_equipment = { type = paratrooper size > 2 }
+		has_war_with = GER
+		date > 1943.1.1
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize Low Countries and Ruhr regions
+	ai_strategy = {
+		type = paradrop_target
+		id = 7   # Netherlands
+		value = 200
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 34  # Low Countries
+		value = 150
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 51  # Rhineland
+		value = 120
+	}
+	
+	# Target behind enemy lines to disrupt reinforcements
+	ai_strategy = {
+		type = area_priority
+		id = low_countries
+		value = 100
+	}
+	
+	# Increased paradrop priority
+	ai_strategy = {
+		type = paradrop
+		value = 75
+	}
+}
+
+### Japan Target Selection - Pacific Theater ###
+
+EAI_AIR_JAP_island_hopping_paradrops = {
+	enable = {
+		tag = JAP
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 20 }
+		has_deployed_air_force_with_equipment = { type = air_transport size > 10 }
+		has_deployed_unit_with_equipment = { type = paratrooper size > 1 }
+		OR = {
+			has_war_with = USA
+			has_war_with = ENG
+			has_war_with = HOL
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize critical Pacific islands
+	ai_strategy = {
+		type = paradrop_target
+		id = 631  # Midway Island
+		value = 100
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 629  # Hawaii
+		value = 150
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 326  # Philippines
+		value = 150
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 333  # Borneo
+		value = 80
+	}
+	
+	ai_strategy = {
+		type = paradrop_target
+		id = 335  # Java
+		value = 120
+	}
+	
+	# General Pacific strategy
+	ai_strategy = {
+		type = area_priority
+		id = south_east_asia
+		value = 50
+	}
+	
+	# Aggressive island capture priority
+	ai_strategy = {
+		type = paradrop
+		value = 50
+	}
+}
+
+### Strategic Target Selection for All Countries ###
+
+# High-value strategic targets
+EAI_AIR_strategic_paradrop_targets = {
+	enable = {
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		OR = {
+			tag = USA
+			tag = ENG
+			tag = JAP
+		}
+		OR = {
+			has_deployed_air_force_with_equipment = { type = air_transport size > 20 }
+			has_equipment = { transport_plane > 30 }
+		}
+		has_deployed_unit_with_equipment = { type = paratrooper size > 1 }
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Target enemy capitals if within range
+	ai_strategy = {
+		type = strategic_region_priority
+		value = 200
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_state = {
+				is_capital = yes
+				OR = {
+					is_controlled_by = GER
+					is_controlled_by = ITA
+					is_controlled_by = SOV
+					is_controlled_by = JAP
+					is_controlled_by = USA
+					is_controlled_by = ENG
+				}
+				NOT = { is_controlled_by = ROOT }
+				air_range_from_state = {
+					from = ROOT
+					range = 1000
+				}
+			}
+		}
+	}
+	
+	# Target states with important resources
+	ai_strategy = {
+		type = strategic_region_priority
+		value = 150
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_state = {
+				NOT = { is_controlled_by = ROOT }
+				any_enemy_country = {
+					controls_state = PREV
+				}
+				OR = {
+					oil > 4
+					rubber > 4
+					aluminium > 4
+					tungsten > 4
+					steel > 4
+				}
+				air_range_from_state = {
+					from = ROOT
+					range = 1000
+				}
+			}
+		}
+	}
+	
+	# Target states with important infrastructure
+	ai_strategy = {
+		type = strategic_region_priority
+		value = 100
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_state = {
+				NOT = { is_controlled_by = ROOT }
+				any_enemy_country = {
+					controls_state = PREV
+				}
+				OR = {
+					industrial_complex > 3
+					arms_factory > 3
+					naval_base > 5
+					air_base > 5
+				}
+				air_range_from_state = {
+					from = ROOT
+					range = 1000
+				}
+			}
+		}
+	}
+}
+
+### Coordination with Naval Invasions ###
+
+# Coordinate paradrops with planned naval invasions
+EAI_AIR_naval_invasion_support_paradrops = {
+	enable = {
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		OR = {
+			tag = USA
+			tag = ENG
+			tag = JAP
+		}
+		has_deployed_air_force_with_equipment = { type = air_transport size > 15 }
+		has_deployed_unit_with_equipment = { type = paratrooper size > 1 }
+		
+		# Has planned naval invasions
+		custom_trigger_tooltip = {
+			tooltip = has_naval_invasion_plans
+			any_state = {
+				any_enemy_country = {
+					controls_state = PREV
+				}
+				ROOT = {
+					has_naval_invasion_plan_to = PREV
+				}
+			}
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Target states where naval invasions are planned
+	ai_strategy = {
+		type = paradrop_target
+		value = 500
+		
+		id = "STATE"
+		
+		state_trigger = {
+			any_enemy_country = {
+				controls_state = PREV
+			}
+			ROOT = {
+				has_naval_invasion_plan_to = PREV
+			}
+			air_range_from_state = {
+				from = ROOT
+				range = 1000
+			}
+		}
+	}
+	
+	# Prioritize paradrops to support naval operations
+	ai_strategy = {
+		type = paradrop
+		value = 150
+	}
+	
+	# Ensure sufficient air superiority over invasion areas
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 300
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_state = {
+				any_enemy_country = {
+					controls_state = PREV
+				}
+				ROOT = {
+					has_naval_invasion_plan_to = PREV
+				}
+			}
+		}
+	}
+}
+
+### Trigger Paradrops When Conditions Are Right ###
+
+# Execute paradrops when opportunity arises
+EAI_AIR_execute_paradrops = {
+	enable = {
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		OR = {
+			tag = USA
+			tag = ENG
+			tag = JAP
+		}
+		has_deployed_air_force_with_equipment = { type = air_transport size > 20 }
+		has_deployed_unit_with_equipment = { type = paratrooper size > 1 }
+		
+		# Air superiority conditions met
+		custom_trigger_tooltip = {
+			tooltip = has_air_superiority_somewhere
+			any_state = {
+				any_enemy_country = {
+					controls_state = PREV
+				}
+				NOT = { has_active_resistance = yes }
+				ROOT = {
+					air_superiority_ratio = {
+						target = PREV
+						ratio > 0.7
+					}
+				}
+				air_range_from_state = {
+					from = ROOT
+					range = 1000
+				}
+			}
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# When opportunity is right, aggressively use paratroopers
+	ai_strategy = {
+		type = paradrop
+		value = 200
+	}
+	
+	# Only target states where air superiority exists
+	ai_strategy = {
+		type = paradrop_target
+		value = 500
+		
+		id = "STATE"
+		
+		state_trigger = {
+			any_enemy_country = {
+				controls_state = PREV
+			}
+			NOT = { has_active_resistance = yes }
+			ROOT = {
+				air_superiority_ratio = {
+					target = PREV
+					ratio > 0.7
+				}
+			}
+			air_range_from_state = {
+				from = ROOT
+				range = 1000
+			}
+		}
+	}
+} 

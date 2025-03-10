@@ -22,6 +22,53 @@ on_actions = {
 		effect = {
 
 			EAI_weekly_update = yes
+            
+            # Weekly air force optimization checks
+            if = {
+                limit = { tag = JAP is_ai = yes has_war = yes }
+                
+                # Apply Japan-specific air force optimizations
+                if = {
+                    limit = { has_country_flag = EAI_JAP_air_redistribution_active }
+                    EAI_JAP_redistribute_air_force = yes
+                }
+                
+                # Optimize mission assignments regardless of redistribution flag
+                EAI_optimize_air_mission_assignment = yes
+                
+                # Check and optimize carrier wings
+                if = {
+                    limit = { has_navy_size = { type = carrier size > 0 } }
+                    EAI_optimize_carrier_wings = yes
+                }
+                
+                # Force redistribution if conditions warrant
+                if = {
+                    limit = { 
+                        NOT = { has_country_flag = EAI_air_wings_redistributing }
+                        OR = {
+                            # When any country declares war on Japan
+                            any_country = {
+                                has_war_with = JAP
+                                has_country_flag = { flag = EAI_MILITARY_recent_wardec_90d value = 1 } 
+                            }
+                            # When Japan has recently conquered territory
+                            any_owned_state = {
+                                NOT = { is_core_of = JAP }
+                                days_since_capture < 14
+                                has_air_base > 0
+                            }
+                            # When home territory is being bombed
+                            any_owned_state = {
+                                is_core_of = JAP
+                                days_since_last_strategic_bombing < 7
+                            }
+                        }
+                    }
+                    # Force immediate air wing redistribution
+                    EAI_force_air_wing_redistribution = yes
+                }
+            }
 		}
 	}
 	on_monthly = {
@@ -73,6 +120,155 @@ on_actions = {
                     clr_country_flag = EAI_early_war_air_strategy
                     clr_country_flag = EAI_mid_war_air_strategy
                     set_country_flag = { flag = EAI_late_war_air_strategy days = 90 }
+                }
+                
+                # Check and manage paratrooper availability for major powers
+                if = {
+                    limit = {
+                        OR = {
+                            tag = USA
+                            tag = ENG
+                            tag = JAP
+                        }
+                        has_war = yes
+                        has_tech = paratroopers
+                    }
+                    
+                    # Check paratrooper units and production status
+                    if = {
+                        limit = {
+                            NOT = { has_country_flag = EAI_paratrooper_focused }
+                            OR = {
+                                # Has sufficient transport planes
+                                has_equipment = { transport_plane > 20 }
+                                # Has sufficient paratrooper divisions
+                                has_deployed_unit_with_equipment = { type = paratrooper size > 0 }
+                                # Has deployed transport aircraft
+                                has_deployed_air_force_with_equipment = { type = air_transport size > 10 }
+                            }
+                        }
+                        # Set flag to prioritize paratroopers
+                        set_country_flag = { flag = EAI_paratrooper_focused days = 90 }
+                    }
+                    
+                    # Check if we need to increase transport plane production
+                    if = {
+                        limit = {
+                            has_country_flag = EAI_paratrooper_focused
+                            NOT = { has_equipment = { transport_plane > 20 } }
+                            NOT = { has_deployed_air_force_with_equipment = { type = air_transport size > 15 } }
+                        }
+                        # Set flag to prioritize transport plane production
+                        set_country_flag = { flag = EAI_transport_production_needed days = 90 }
+                    }
+                    
+                    # Check if we need to train more paratroopers
+                    if = {
+                        limit = {
+                            has_country_flag = EAI_paratrooper_focused
+                            NOT = { has_deployed_unit_with_equipment = { type = paratrooper size > 1 } }
+                        }
+                        # Set flag to train paratroopers
+                        set_country_flag = { flag = EAI_paratrooper_training_needed days = 90 }
+                    }
+                    
+                    # Check for strategic opportunities for paradrops
+                    if = {
+                        limit = {
+                            has_country_flag = EAI_paratrooper_focused
+                            has_deployed_unit_with_equipment = { type = paratrooper size > 1 }
+                            has_deployed_air_force_with_equipment = { type = air_transport size > 10 }
+                            
+                            # Check if we have air superiority somewhere
+                            any_state = {
+                                any_enemy_country = {
+                                    controls_state = PREV
+                                }
+                                ROOT = {
+                                    air_superiority_ratio = {
+                                        target = PREV
+                                        ratio > 0.7
+                                    }
+                                }
+                            }
+                        }
+                        # Set flag to encourage paradrop operations
+                        set_country_flag = { flag = EAI_paradrop_opportunity days = 30 }
+                    }
+                }
+                
+                # Japan-specific air force management
+                if = {
+                    limit = {
+                        tag = JAP
+                        is_ai = yes
+                        has_war = yes
+                    }
+                    
+                    # Set flag for air force redistribution after conquering new territories
+                    if = {
+                        limit = {
+                            NOT = { has_country_flag = EAI_JAP_air_redistribution_active }
+                            any_owned_state = {
+                                air_base > 0
+                                NOT = { is_core_of = JAP }
+                                days_since_last_strategic_bombing < 30
+                            }
+                        }
+                        set_country_flag = { flag = EAI_JAP_air_redistribution_active days = 30 }
+                        
+                        # Force all air wings to be redistributed to respond to threats
+                        every_owned_state = {
+                            limit = { 
+                                has_deployed_air_force_sufficient_strength = yes
+                                OR = {
+                                    # Evacuate threatened bases
+                                    any_neighbor_state = {
+                                        OR = {
+                                            is_controlled_by = USA
+                                            is_controlled_by = ENG
+                                            is_controlled_by = HOL
+                                        }
+                                    }
+                                    # Overcrowded bases
+                                    has_air_base_capacity_percentage = {
+                                        tag = JAP
+                                        ratio > 0.9
+                                    }
+                                }
+                            }
+                            # Mark for redistribution
+                            set_state_flag = { flag = EAI_air_wings_need_redistribution days = 7 }
+                        }
+                    }
+                    
+                    # Special air strategy for Pacific operations
+                    if = {
+                        limit = {
+                            OR = {
+                                has_war_with = USA
+                                has_war_with = ENG
+                                has_war_with = HOL
+                            }
+                            NOT = { has_country_flag = EAI_JAP_pacific_air_strategy }
+                        }
+                        set_country_flag = { flag = EAI_JAP_pacific_air_strategy days = 180 }
+                        
+                        # Prioritize carrier-based operations
+                        if = {
+                            limit = { has_navy_size = { type = carrier size > 3 } }
+                            add_to_variable = { EAI_carrier_air_wing_ratio = 5 }
+                        }
+                    }
+                    
+                    # Special strategy for China operations
+                    if = {
+                        limit = {
+                            has_war_with = CHI
+                            NOT = { has_country_flag = EAI_JAP_china_air_strategy }
+                        }
+                        set_country_flag = { flag = EAI_JAP_china_air_strategy days = 180 }
+                    }
                 }
             }
 		}

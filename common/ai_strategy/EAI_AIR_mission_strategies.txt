@@ -513,6 +513,253 @@ EAI_AIR_wing_reserve_rotation = {
 	}
 }
 
+### Paratrooper Strategy for Major Allied and Axis Powers ###
+
+# USA paratrooper strategy - Operation Overlord style
+EAI_AIR_USA_paratrooper_strategy = {
+	enable = {
+		tag = USA
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 50 }
+		OR = {
+			has_war_with = GER
+			has_war_with = ITA
+			has_war_with = JAP
+			AND {
+				is_in_faction_with = ENG
+				ENG = { has_war = yes }
+			}
+		}
+		# Only enable when past mid-war phase
+		OR = {
+			date > 1943.1.1
+			has_country_flag = EAI_late_war_air_strategy
+			has_country_flag = EAI_late_war
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize transport planes for paratrooper operations
+	ai_strategy = {
+		type = equipment_production_factor
+		id = transport_plane
+		value = 25
+	}
+	
+	# Build more transport planes
+	ai_strategy = {
+		type = equipment_production_min_factories
+		id = transport_plane
+		value = 5
+	}
+	
+	# Increase paratroopers ratio
+	ai_strategy = {
+		type = unit_ratio
+		id = paratrooper
+		value = 15
+	}
+	
+	# More aggressively use paratroopers
+	ai_strategy = {
+		type = paradrop
+		value = 50
+	}
+	
+	# Prioritize air superiority to support paradrops
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -350
+		
+		region_trigger = {
+			any_neighbor_state = {
+				is_controlled_by = GER
+				is_coastal = yes
+				NOT = { has_active_resistance = yes }
+			}
+		}
+	}
+}
+
+# England paratrooper strategy - Operation Market Garden style
+EAI_AIR_ENG_paratrooper_strategy = {
+	enable = {
+		tag = ENG
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 30 }
+		OR = {
+			has_war_with = GER
+			has_war_with = ITA
+			AND {
+				is_in_faction_with = USA
+				USA = { has_war = yes }
+			}
+		}
+		# Enable in late war or if losing ground
+		OR = {
+			date > 1942.1.1
+			has_country_flag = EAI_mid_war_air_strategy
+			has_country_flag = EAI_late_war_air_strategy
+			has_country_flag = EAI_late_war
+			surrender_progress > 0.1
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize production of transport planes
+	ai_strategy = {
+		type = equipment_production_factor
+		id = transport_plane
+		value = 20
+	}
+	
+	# Allocate factories to transport planes
+	ai_strategy = {
+		type = equipment_production_min_factories
+		id = transport_plane
+		value = 3
+	}
+	
+	# Build paratroopers
+	ai_strategy = {
+		type = unit_ratio
+		id = paratrooper
+		value = 12
+	}
+	
+	# Make strategic use of paratroopers
+	ai_strategy = {
+		type = paradrop
+		value = 40
+	}
+	
+	# Prioritize taking key areas with paratroopers
+	ai_strategy = {
+		type = state_value_strategic_air_importance
+		value = 100
+		state_target_strategic_air_importance_factor = {
+			factor = 1.5
+			state = {
+				is_controlled_by = GER
+				OR = {
+					industrial_complex > 3
+					is_capital = yes
+					has_resources > 9
+				}
+			}
+		}
+	}
+}
+
+# Japan paratrooper strategy - Pacific island hopping
+EAI_AIR_JAP_paratrooper_strategy = {
+	enable = {
+		tag = JAP
+		has_war = yes
+		is_ai = yes
+		has_tech = paratroopers
+		has_equipment = { transport_plane > 20 }
+		OR = {
+			has_war_with = USA
+			has_war_with = ENG
+			has_war_with = CHI
+		}
+		# Enable early for Japan to use in Pacific theater
+		OR = {
+			date > 1940.6.1
+			has_country_flag = EAI_mid_war_air_strategy
+			has_country_flag = EAI_late_war_air_strategy
+			has_country_flag = EAI_late_war
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Moderate production of transport planes
+	ai_strategy = {
+		type = equipment_production_factor
+		id = transport_plane
+		value = 15
+	}
+	
+	# Allocate some factories
+	ai_strategy = {
+		type = equipment_production_min_factories
+		id = transport_plane
+		value = 2
+	}
+	
+	# Build paratroopers, but fewer than other powers due to focus on naval
+	ai_strategy = {
+		type = unit_ratio
+		id = paratrooper
+		value = 8
+	}
+	
+	# Aggressive use for island capture
+	ai_strategy = {
+		type = paradrop
+		value = 35
+	}
+	
+	# Target island states for paradrops
+	ai_strategy = {
+		type = state_value_strategic_air_importance
+		value = 90
+		state_target_strategic_air_importance_factor = {
+			factor = 2.0
+			state = {
+				OR = {
+					is_controlled_by = USA
+					is_controlled_by = ENG
+				}
+				is_island_state = yes
+				OR = {
+					has_naval_base > 0
+					has_air_base > 0
+					has_resources > 0
+				}
+			}
+		}
+	}
+}
+
+# Common paratrooper transport plane production
+EAI_AIR_paratrooper_transport_production = {
+	enable = {
+		OR = {
+			tag = USA
+			tag = ENG
+			tag = JAP
+		}
+		has_tech = paratroopers
+		is_ai = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Enable production of air transports and don't stop
+	ai_strategy = {
+		type = build_airplane
+		id = air_transport
+		value = 300
+	}
+	
+	# Air transport will be produced
+	ai_strategy = {
+		type = unit_ratio
+		id = air_transport
+		value = 25
+	}
+}
+
 ### Coordinated Air Operations ###
 
 # Coordinate air operations with planned ground offensives

@@ -1,0 +1,183 @@
+############################################################################################################
+#	Expert AI mod - Air Force Scripted Effects
+############################################################################################################
+
+# Forces air wing redeployment by setting distribution weights
+EAI_force_air_wing_redistribution = {
+	# Clear any existing redistribution flag first
+	clr_country_flag = EAI_air_wings_redistributing
+	
+	# Set a flag to mark that redistribution is happening
+	set_country_flag = { flag = EAI_air_wings_redistributing days = 3 }
+	
+	# Set the country's air wing allocation strategy to be recalculated
+	if = {
+		limit = { tag = JAP }
+		set_country_flag = { flag = EAI_JAP_air_redistribution_active days = 7 }
+	}
+	else = {
+		set_country_flag = { flag = EAI_air_redistribution_active days = 7 }
+	}
+}
+
+# Japan-specific air force redistribution
+EAI_JAP_redistribute_air_force = {
+	if = {
+		limit = { is_ai = yes tag = JAP }
+		
+		# Forces the AI to reevaluate air base allocation
+		every_owned_state = {
+			limit = { 
+				has_deployed_air_force_sufficient_strength = yes
+				has_air_base > 1
+			}
+			
+			# Determine priority for this airbase
+			if = {
+				limit = {
+					# Forward bases - high priority
+					NOT = { is_core_of = ROOT }
+					air_base > 2
+					NOT = {
+						any_neighbor_state = {
+							OR = {
+								is_controlled_by = USA
+								is_controlled_by = ENG
+								is_controlled_by = HOL
+								is_controlled_by = PHI
+							}
+						}
+					}
+				}
+				set_variable = { airbase_priority = 3 }
+			}
+			else_if = {
+				limit = {
+					# Home islands - medium priority
+					is_core_of = ROOT
+					NOT = { is_capital = yes }
+				}
+				set_variable = { airbase_priority = 2 }
+			}
+			else = {
+				# Default priority
+				set_variable = { airbase_priority = 1 }
+			}
+			
+			# Apply effects based on priority
+			if = {
+				limit = { check_variable = { airbase_priority > 2 } }
+				set_state_flag = { flag = EAI_high_priority_airbase days = 7 }
+			}
+		}
+		
+		# Temporary shift in strategy to encourage redeployment
+		add_ai_strategy = {
+			type = air_base_use_percentage
+			value = -20
+			id = "TEMP_REALLOCATION"
+			days = 3
+		}
+		
+		# Apply a temporary strong weight to high priority bases
+		add_ai_strategy = {
+			type = air_base_weight
+			id = "FACTOR"
+			value = 500
+			days = 3
+			
+			air_base_weight_factor_trigger = {
+				has_state_flag = EAI_high_priority_airbase
+			}
+		}
+	}
+}
+
+# Ensure proper mission assignment for available air wings
+EAI_optimize_air_mission_assignment = {
+	if = {
+		limit = { is_ai = yes }
+		
+		# Temporary rebalance of mission priorities to force reassignment
+		if = {
+			limit = { tag = JAP }
+			
+			# Strong bias toward naval missions in Pacific war
+			if = {
+				limit = { has_war_with = USA }
+				add_ai_strategy = {
+					type = mission_threshold
+					id = naval_strike
+					value = -400
+					days = 3
+				}
+				
+				add_ai_strategy = {
+					type = mission_threshold
+					id = naval_patrol
+					value = -300
+					days = 3
+				}
+			}
+			
+			# Strong bias toward CAS in China war
+			if = {
+				limit = { has_war_with = CHI }
+				add_ai_strategy = {
+					type = mission_threshold
+					id = cas
+					value = -350
+					days = 3
+				}
+				
+				add_ai_strategy = {
+					type = mission_threshold
+					id = air_superiority
+					value = -250
+					days = 3
+				}
+			}
+		}
+	}
+}
+
+# Helper effect to force optimal distribution of carrier aircraft
+EAI_optimize_carrier_wings = {
+	if = {
+		limit = { 
+			tag = JAP
+			has_navy_size = { type = carrier size > 0 }
+		}
+		
+		# Reset existing carrier planes
+		set_variable = { carrier_fighters_needed = 0 }
+		set_variable = { carrier_bombers_needed = 0 }
+		
+		# Calculate needed carrier planes
+		every_owned_ship = {
+			limit = { has_equipment = { type = carrier size > 0 } }
+			add_to_variable = { ROOT.carrier_fighters_needed = 20 }
+			add_to_variable = { ROOT.carrier_bombers_needed = 20 }
+		}
+		
+		# Ensure carrier planes are properly prioritized
+		if = {
+			limit = { check_variable = { carrier_fighters_needed > 0 } }
+			
+			# Temporarily boost carrier aircraft production
+			add_ai_strategy = {
+				type = equipment_production_factor
+				id = cv_fighter
+				value = 50
+				days = 30
+			}
+			
+			add_ai_strategy = {
+				type = equipment_production_factor
+				id = cv_naval_bomber
+				value = 50
+				days = 30
+			}
+		}
+	}
+} 
