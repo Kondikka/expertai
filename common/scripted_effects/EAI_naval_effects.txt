@@ -1,0 +1,184 @@
+############################################################################################################
+#	Expert AI mod - Naval Scripted Effects
+############################################################################################################
+
+# Force Japan to set up proper fleet compositions
+EAI_JAP_optimize_fleet_composition = {
+	if = {
+		limit = { 
+			tag = JAP
+			is_ai = yes
+			has_war = yes
+		}
+		
+		# Pacific Fleet composition - carrier strike groups
+		if = {
+			limit = { has_navy_size = { type = carrier size > 0 } }
+			
+			# Set up carrier strike fleets
+			set_country_flag = { flag = EAI_JAP_carrier_strike_fleets days = 30 }
+			
+			# Ensure proper escort ratios
+			add_ai_strategy = {
+				type = naval_composition_carrier_ratio 
+				value = 20       # Percentage of carriers in fleet
+				id = "FLEET_COMPOSITION"
+				days = 30
+			}
+			
+			add_ai_strategy = {
+				type = naval_composition_capital_ship_ratio 
+				value = 25       # Percentage of capital ships
+				id = "FLEET_COMPOSITION"
+				days = 30
+			}
+			
+			add_ai_strategy = {
+				type = naval_composition_screen_ratio 
+				value = 55       # Percentage of screens
+				id = "FLEET_COMPOSITION"
+				days = 30
+			}
+		}
+		
+		# Strike force mission priority
+		add_ai_strategy = {
+			type = naval_mission_threshold
+			threshold = 0.2
+			mission = strike_force
+			value = -100
+			days = 30
+		}
+		
+		# Invasion support priority
+		add_ai_strategy = {
+			type = naval_mission_threshold
+			threshold = 0.3
+			mission = naval_invasion_support
+			value = -100
+			days = 30
+		}
+	}
+}
+
+# Force Japan to prepare naval invasions
+EAI_JAP_prepare_naval_invasions = {
+	if = {
+		limit = { 
+			tag = JAP
+			is_ai = yes
+			has_war = yes
+			has_country_flag = EAI_JAP_planning_naval_invasion
+			NOT = { has_country_flag = EAI_JAP_naval_invasion_in_progress }
+		}
+		
+		# Set flag for invasion in progress
+		set_country_flag = { flag = EAI_JAP_naval_invasion_in_progress days = 90 }
+		
+		# Ensure proper invasion support for preparation
+		every_owned_state = {
+			limit = {
+				is_coastal = yes
+				is_fully_controlled_by = ROOT
+				naval_base > 0
+			}
+			
+			# Mark as naval invasion staging area
+			set_state_flag = { flag = EAI_naval_invasion_staging_area days = 90 }
+		}
+		
+		# Ensure sufficient invasion fleet
+		add_ai_strategy = {
+			type = naval_mission_threshold
+			threshold = 0.0  # Always engage for naval invasion support
+			mission = naval_invasion_support
+			value = -250
+			days = 90
+		}
+		
+		# Ensure naval superiority in invasion regions
+		if = {
+			limit = { has_war_with = USA }
+			add_ai_strategy = {
+				type = strategic_air_importance
+				id = 78  # Philippines Sea
+				value = 800
+				days = 90
+			}
+		}
+		
+		if = {
+			limit = { has_war_with = ENG }
+			add_ai_strategy = {
+				type = strategic_air_importance
+				id = 72  # South China Sea
+				value = 800
+				days = 90
+			}
+		}
+	}
+}
+
+# Send submarines on convoy raiding
+EAI_JAP_submarine_warfare = {
+	if = {
+		limit = { 
+			tag = JAP
+			is_ai = yes
+			has_war = yes
+			has_navy_size = { type = submarine size > 5 }
+		}
+		
+		# Ensure submarines are properly utilized
+		add_ai_strategy = {
+			type = unit_ratio
+			id = submarine
+			value = 30
+			days = 180
+		}
+		
+		# Aggressive convoy raiding
+		add_ai_strategy = {
+			type = naval_mission_threshold
+			threshold = 0.0  # Always engage
+			mission = convoy_raiding
+			value = -200
+			days = 90
+		}
+		
+		# Target convoy routes
+		if = {
+			limit = { has_war_with = USA }
+			add_ai_strategy = {
+				type = naval_avoid_region
+				id = 105  # Pacific Ocean near Hawaii
+				value = -200
+				days = 90
+			}
+			
+			add_ai_strategy = {
+				type = naval_avoid_region
+				id = 106  # West Pacific Ocean
+				value = -200
+				days = 90
+			}
+		}
+		
+		if = {
+			limit = { has_war_with = ENG }
+			add_ai_strategy = {
+				type = naval_avoid_region
+				id = 72  # South China Sea
+				value = -200
+				days = 90
+			}
+			
+			add_ai_strategy = {
+				type = naval_avoid_region
+				id = 65  # Bay of Bengal
+				value = -200
+				days = 90
+			}
+		}
+	}
+} 

@@ -68,6 +68,116 @@ on_actions = {
                     # Force immediate air wing redistribution
                     EAI_force_air_wing_redistribution = yes
                 }
+                
+                # Naval invasion planning for Japan
+                if = {
+                    limit = {
+                        NOT = { has_country_flag = EAI_JAP_planning_naval_invasion }
+                        has_navy_size = { size > 40 }  # Needs a substantial navy
+                        OR = {
+                            has_war_with = USA
+                            has_war_with = ENG
+                            has_war_with = HOL
+                            has_war_with = CHI
+                        }
+                    }
+                    
+                    # Set flag to indicate naval invasion planning is active
+                    set_country_flag = { flag = EAI_JAP_planning_naval_invasion days = 60 }
+                    
+                    # Temporary boost to naval invasion planning
+                    add_ai_strategy = {
+                        type = naval_invasion
+                        value = 200
+                        days = 30
+                    }
+                    
+                    # Prioritize targeted invasions based on war situation
+                    if = {
+                        limit = { has_war_with = USA }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 326  # Philippines
+                            value = 1000
+                            days = 120
+                        }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 631  # Midway
+                            value = 800
+                            days = 180
+                        }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 629  # Hawaii
+                            value = 1200
+                            days = 365
+                        }
+                    }
+                    
+                    if = {
+                        limit = { has_war_with = ENG }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 329  # Singapore
+                            value = 1000
+                            days = 120
+                        }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 336  # Sumatra
+                            value = 800
+                            days = 180
+                        }
+                    }
+                    
+                    if = {
+                        limit = { has_war_with = CHI }
+                        add_ai_strategy = {
+                            type = invade
+                            id = 608  # Shanghai
+                            value = 800
+                            days = 90
+                        }
+                    }
+                }
+                
+                # Naval operations management
+                EAI_JAP_optimize_fleet_composition = yes
+                
+                # If planning invasion, prepare it
+                if = {
+                    limit = { has_country_flag = EAI_JAP_planning_naval_invasion }
+                    EAI_JAP_prepare_naval_invasions = yes
+                }
+                
+                # Submarine warfare
+                if = {
+                    limit = { has_navy_size = { type = submarine size > 5 } }
+                    EAI_JAP_submarine_warfare = yes
+                }
+                
+                # Research priority on naval tech
+                add_ai_strategy = {
+                    type = research_tech
+                    id = transport_tech
+                    value = 50
+                    days = 180
+                }
+                
+                add_ai_strategy = {
+                    type = research_tech
+                    id = naval_equipment
+                    value = 50
+                    days = 180
+                }
+                
+                add_ai_strategy = {
+                    type = research_tech
+                    id = carrier
+                    value = 50
+                    days = 180
+                }
             }
 		}
 	}
