@@ -1,0 +1,564 @@
+############################################################################################################
+#	Expert AI mod - Advanced Air Force Mission Optimization
+############################################################################################################
+
+# This system improves AI air force management by dynamically adjusting air mission priorities
+# based on battlefield conditions, properly distributing air wings across theaters, optimizing
+# mission assignments, and implementing better airbase management
+
+### Dynamic Air Mission Prioritization Based on War Phase ###
+
+# Early war phase - prioritize air superiority and reconnaissance
+EAI_AIR_early_war_mission_priority = {
+	enable = {
+		has_war = yes
+		OR = {
+			AND = {
+				date < 1940.1.1
+				has_war_with = FROM
+				NOT = { has_country_flag = EAI_late_war }
+			}
+			has_country_flag = { flag = EAI_early_war_air_strategy days = 90 }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize air superiority to gain control of airspace first
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -200
+	}
+	
+	# Keep reconnaissance high to spot enemy movements
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -100
+	}
+	
+	# Moderate focus on CAS to support ground operations
+	ai_strategy = {
+		type = mission_threshold
+		id = cas
+		value = -100
+	}
+	
+	# Lower priority for strategic bombing early on
+	ai_strategy = {
+		type = mission_threshold
+		id = strategic_bombing
+		value = 100
+	}
+}
+
+# Mid-war phase - balanced approach with emphasis on ground support
+EAI_AIR_mid_war_mission_priority = {
+	enable = {
+		has_war = yes
+		OR = {
+			AND = {
+				date > 1940.1.1
+				date < 1943.1.1
+				has_war_with = FROM
+				NOT = { has_country_flag = EAI_late_war }
+				NOT = { has_country_flag = EAI_early_war_air_strategy }
+			}
+			has_country_flag = { flag = EAI_mid_war_air_strategy days = 90 }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Balance between air superiority and close air support
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -150
+	}
+	
+	# Increase CAS for ground support
+	ai_strategy = {
+		type = mission_threshold
+		id = cas
+		value = -150
+	}
+	
+	# Start selective strategic bombing
+	ai_strategy = {
+		type = mission_threshold
+		id = strategic_bombing
+		value = -50
+	}
+	
+	# More naval bombing if at war with naval powers
+	ai_strategy = {
+		type = mission_threshold
+		id = naval_bombing
+		value = -100
+		target_country_trigger = {
+			FROM = {
+				OR = {
+					tag = ENG
+					tag = USA
+					tag = JAP
+					has_navy_size = { size > 49 }
+				}
+			}
+		}
+	}
+}
+
+# Late-war phase - heavy focus on strategic bombing and overwhelming air superiority
+EAI_AIR_late_war_mission_priority = {
+	enable = {
+		has_war = yes
+		OR = {
+			AND = {
+				date > 1943.1.1
+				has_war_with = FROM
+			}
+			has_country_flag = { flag = EAI_late_war_air_strategy days = 90 }
+			has_country_flag = EAI_late_war
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# High priority for both air superiority and strategic bombing
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -200
+	}
+	
+	ai_strategy = {
+		type = mission_threshold
+		id = strategic_bombing
+		value = -150
+	}
+	
+	# Keep strong CAS support
+	ai_strategy = {
+		type = mission_threshold
+		id = cas
+		value = -175
+	}
+	
+	# Increase naval bombing for coastal operations
+	ai_strategy = {
+		type = mission_threshold
+		id = naval_bombing
+		value = -125
+	}
+}
+
+### Theater-Based Air Wing Management ###
+
+# Distribute air wings based on frontline importance
+EAI_AIR_theater_distribution = {
+	enable = {
+		has_war = yes
+		has_war_with = FROM
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize air regions covering active fronts
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 200
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_neighbor_state = {
+				is_owned_by = ROOT
+				is_controlled_by = ROOT
+				is_fully_controlled_by = ROOT
+				custom_trigger_tooltip = {
+					tooltip = is_border_state
+					is_border_state = yes
+				}
+			}
+		}
+	}
+	
+	# Even higher priority for regions with active combat
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 300
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_neighbor_state = {
+				is_owned_by = ROOT
+				has_active_combat = yes
+			}
+		}
+	}
+	
+	# Prioritize regions with enemy bombers active
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 250
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_neighbor_state = {
+				is_owned_by = ROOT
+				FROM = { has_strategic_bombing_in_state = PREV }
+			}
+		}
+	}
+}
+
+# Defensive air distribution for homeland defense
+EAI_AIR_homeland_defense_priority = {
+	enable = {
+		has_war = yes
+		any_enemy_country = {
+			has_strategic_bombing_in_state = ROOT
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize interceptors over core territory
+	ai_strategy = {
+		type = strategic_air_importance
+		value = 500
+		
+		id = "REGION"
+		
+		region_trigger = {
+			any_neighbor_state = {
+				is_owned_by = ROOT
+				is_core_of = ROOT
+				any_enemy_country = {
+					has_strategic_bombing_in_state = PREV
+				}
+			}
+		}
+	}
+	
+	# Assign more interceptors when homeland is under attack
+	ai_strategy = {
+		type = unit_ratio
+		id = interceptor
+		value = 30
+	}
+}
+
+### Mission Type Optimization ###
+
+# Adjust fighter and CAS ratios based on doctrine
+EAI_AIR_doctrine_based_composition_superior_firepower = {
+	enable = {
+		has_tech = superior_firepower
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Superior Firepower - favor CAS for ground support
+	ai_strategy = {
+		type = unit_ratio
+		id = cas
+		value = 40
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = fighter
+		value = 25
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = tactical_bomber
+		value = 15
+	}
+}
+
+EAI_AIR_doctrine_based_composition_mobile_warfare = {
+	enable = {
+		has_tech = mobile_warfare
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Mobile Warfare - balanced fighter and CAS
+	ai_strategy = {
+		type = unit_ratio
+		id = cas
+		value = 30
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = fighter
+		value = 30
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = tactical_bomber
+		value = 10
+	}
+}
+
+EAI_AIR_doctrine_based_composition_grand_battleplan = {
+	enable = {
+		has_tech = grand_battleplan
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Grand Battleplan - tactical bombers for breakthrough
+	ai_strategy = {
+		type = unit_ratio
+		id = cas
+		value = 20
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = fighter
+		value = 25
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = tactical_bomber
+		value = 25
+	}
+}
+
+EAI_AIR_doctrine_based_composition_mass_assault = {
+	enable = {
+		has_tech = mass_assault
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Mass Assault - focus on cheap fighters and CAS
+	ai_strategy = {
+		type = unit_ratio
+		id = cas
+		value = 35
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = fighter
+		value = 35
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = tactical_bomber
+		value = 5
+	}
+}
+
+# Strategic bomber focus for major powers with industry
+EAI_AIR_strategic_bombing_focus = {
+	enable = {
+		has_war = yes
+		is_major = yes
+		has_tech = strategic_destruction
+		industrial_complex > 40
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = strategic_bomber
+		value = 20
+	}
+	
+	# Target enemy industrial centers
+	ai_strategy = {
+		type = strategic_bombing_target
+		id = industrial_complex
+		value = 100
+	}
+	
+	ai_strategy = {
+		type = strategic_bombing_target
+		id = arms_factory
+		value = 80
+	}
+	
+	ai_strategy = {
+		type = strategic_bombing_target
+		id = synthetic_refinery
+		value = 70
+	}
+}
+
+# Naval bomber focus for wars against naval powers
+EAI_AIR_naval_bombing_focus = {
+	enable = {
+		has_war = yes
+		any_enemy_country = {
+			OR = {
+				tag = ENG
+				tag = USA
+				tag = JAP
+				has_navy_size = { size > 49 }
+			}
+		}
+		OR = {
+			any_owned_state = {
+				is_coastal = yes
+			}
+			num_of_naval_factories > 5
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = naval_bomber
+		value = 25
+	}
+	
+	ai_strategy = {
+		type = unit_ratio
+		id = cv_naval_bomber
+		value = 15
+	}
+	
+	ai_strategy = {
+		type = equipment_production_factor
+		id = naval_bomber
+		value = 15
+	}
+}
+
+### Airbase Management ###
+
+# Prevent overcrowding of airbases by redistributing planes
+EAI_AIR_airbase_management = {
+	enable = {
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Increase priority for using alternative airbases
+	ai_strategy = {
+		type = air_base_use_percentage
+		value = 80
+	}
+	
+	# Give higher weight to dispersed air forces
+	ai_strategy = {
+		type = air_base_weight
+		id = "FACTOR"
+		value = -50
+		
+		air_base_weight_factor_trigger = {
+			has_air_base_capacity_percentage = {
+				tag = ROOT
+				ratio > 0.8
+			}
+		}
+	}
+	
+	# Evacuate air wings from threatened airbases
+	ai_strategy = {
+		type = air_base_preference
+		id = "STATE"
+		value = -100
+		
+		state_trigger = {
+			is_owned_by = ROOT
+			any_enemy_country = {
+				has_war_with = ROOT
+				controls_state = PREV
+			}
+		}
+	}
+}
+
+# Reserve rotation system for damaged air wings
+EAI_AIR_wing_reserve_rotation = {
+	enable = {
+		has_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Set wing rotation threshold
+	ai_strategy = {
+		type = air_wing_reinforcement_threshold
+		value = 70
+	}
+	
+	# Reduce mission assignment when planes are damaged
+	ai_strategy = {
+		type = air_wing_mission_threshold
+		value = 60
+	}
+}
+
+### Coordinated Air Operations ###
+
+# Coordinate air operations with planned ground offensives
+EAI_AIR_ground_support_coordination = {
+	enable = {
+		has_war = yes
+		has_war_with = FROM
+		has_active_battle_plan = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize CAS in regions with planned offensives
+	ai_strategy = {
+		type = mission_threshold
+		id = cas
+		value = -250
+		
+		region_trigger = {
+			any_neighbor_state = {
+				ROOT = {
+					has_battle_plan = {
+						has_offensive_line = yes
+						targeting_state = PREV
+					}
+				}
+			}
+		}
+	}
+	
+	# Ensure air superiority over breakthrough areas
+	ai_strategy = {
+		type = mission_threshold
+		id = air_superiority
+		value = -300
+		
+		region_trigger = {
+			any_neighbor_state = {
+				ROOT = {
+					has_battle_plan = {
+						has_offensive_line = yes
+						targeting_state = PREV
+						is_active = yes
+					}
+				}
+			}
+		}
+	}
+} 

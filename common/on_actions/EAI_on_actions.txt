@@ -28,6 +28,53 @@ on_actions = {
 		effect = {
 
 			EAI_monthly_update = yes
+            
+            # Update air force strategy flags monthly based on war progress
+            if = {
+                limit = { is_ai = yes }
+                
+                # Early war air strategy - first 3 years of the war
+                if = {
+                    limit = {
+                        has_war = yes
+                        NOT = { has_country_flag = EAI_early_war_air_strategy }
+                        NOT = { has_country_flag = EAI_mid_war_air_strategy }
+                        NOT = { has_country_flag = EAI_late_war_air_strategy }
+                        NOT = { has_country_flag = EAI_late_war }
+                        date < 1940.1.1
+                    }
+                    set_country_flag = { flag = EAI_early_war_air_strategy days = 90 }
+                }
+                
+                # Mid war air strategy - 1940-1943
+                if = {
+                    limit = {
+                        has_war = yes
+                        NOT = { has_country_flag = EAI_mid_war_air_strategy }
+                        NOT = { has_country_flag = EAI_late_war_air_strategy }
+                        NOT = { has_country_flag = EAI_late_war }
+                        date > 1940.1.1
+                        date < 1943.1.1
+                    }
+                    clr_country_flag = EAI_early_war_air_strategy
+                    set_country_flag = { flag = EAI_mid_war_air_strategy days = 90 }
+                }
+                
+                # Late war air strategy - post-1943
+                if = {
+                    limit = {
+                        has_war = yes
+                        NOT = { has_country_flag = EAI_late_war_air_strategy }
+                        OR = {
+                            date > 1943.1.1
+                            has_country_flag = EAI_late_war
+                        }
+                    }
+                    clr_country_flag = EAI_early_war_air_strategy
+                    clr_country_flag = EAI_mid_war_air_strategy
+                    set_country_flag = { flag = EAI_late_war_air_strategy days = 90 }
+                }
+            }
 		}
 	}
 	on_war = {
@@ -239,6 +286,41 @@ on_actions = {
 			}
 
 			ROOT = { EAI_MILITARY_track_war_trend_reset = yes }
+            
+            # Set initial air strategy based on war date
+            if = {
+                limit = { is_ai = yes }
+                
+                # Early war air strategy (pre-1940)
+                if = {
+                    limit = {
+                        date < 1940.1.1
+                        NOT = { has_country_flag = EAI_late_war }
+                    }
+                    set_country_flag = { flag = EAI_early_war_air_strategy days = 90 }
+                }
+                
+                # Mid war air strategy (1940-1943)
+                if = {
+                    limit = {
+                        date > 1940.1.1
+                        date < 1943.1.1
+                        NOT = { has_country_flag = EAI_late_war }
+                    }
+                    set_country_flag = { flag = EAI_mid_war_air_strategy days = 90 }
+                }
+                
+                # Late war air strategy (post-1943)
+                if = {
+                    limit = {
+                        OR = {
+                            date > 1943.1.1
+                            has_country_flag = EAI_late_war
+                        }
+                    }
+                    set_country_flag = { flag = EAI_late_war_air_strategy days = 90 }
+                }
+            }
 
 			###
 
