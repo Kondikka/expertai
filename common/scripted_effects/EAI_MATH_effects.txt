@@ -63,11 +63,20 @@ EAI_MATH_square = { # var:_val_
 
 EAI_MATH_get_distance_between_provinces_a_b = { # _province_id_a, _province_id_b, distance_
 
+	set_temp_variable = { _point_a_x = global.EAI_MAP_province_x_pos^_province_id_a }
+	set_temp_variable = { _point_a_y = global.EAI_MAP_province_y_pos^_province_id_a }
+	set_temp_variable = { _point_b_x = global.EAI_MAP_province_x_pos^_province_id_b }
+	set_temp_variable = { _point_b_y = global.EAI_MAP_province_y_pos^_province_id_b }
+	EAI_MATH_get_distance_between_points_a_b = yes
+}
+
+EAI_MATH_get_distance_between_points_a_b = { # _point_a_x, _point_a_y, _point_b_x, _point_b_y, distance_
+
 	@map_width = 5632
 	@map_width_half = 2816
 
-	set_temp_variable = { dx = global.EAI_MAP_province_x_pos^_province_id_a }
-	subtract_from_temp_variable = { dx = global.EAI_MAP_province_x_pos^_province_id_b }
+	set_temp_variable = { dx = _point_a_x }
+	subtract_from_temp_variable = { dx = _point_b_x }
 	if = { limit = { check_variable = { dx < 0 } } multiply_temp_variable = { dx = -1 } }
 	if = { limit = { check_variable = { dx > @map_width_half } }
 		set_temp_variable = { dx_wr = @map_width }
@@ -75,11 +84,9 @@ EAI_MATH_get_distance_between_provinces_a_b = { # _province_id_a, _province_id_b
 		set_temp_variable = { dx = dx_wr }
 	}
 
-	set_temp_variable = { dy = global.EAI_MAP_province_y_pos^_province_id_a }
-	subtract_from_temp_variable = { dy = global.EAI_MAP_province_y_pos^_province_id_b }
+	set_temp_variable = { dy = _point_a_y }
+	subtract_from_temp_variable = { dy = _point_b_y }
 	if = { limit = { check_variable = { dy < 0 } } multiply_temp_variable = { dy = -1 } }
-
-	# log = "_province_id_a=[?_province_id_a] _province_id_b=[?_province_id_b] dx=[?dx] dy=[?dy]"
 
 	multiply_temp_variable = { dx = dx }
 	multiply_temp_variable = { dy = dy }
@@ -89,8 +96,6 @@ EAI_MATH_get_distance_between_provinces_a_b = { # _province_id_a, _province_id_b
 	set_temp_variable = { _val_ = distance_ }
 	EAI_MATH_sqrt = yes
 	set_temp_variable = { distance_ = _val_ }
-
-	# log = "distance_=[?distance_]"
 }
 
 EAI_MATH_get_random_index_in_array_len = { # _array_len, random_index_

@@ -1,0 +1,135 @@
+#################################################
+#	Expert AI
+#################################################
+
+EAI_STRATEGY_need_convoy_escorts = {
+	OR = {
+		original_tag = ENG
+		original_tag = USA
+		original_tag = ITA
+		original_tag = JAP
+		#TO DO for ahistorical content : any country with large navy
+	}
+}
+
+EAI_STRATEGY_CHL_start_tanks = {
+	if = {
+		limit = {
+			EAI_MODE_challenging = yes
+			tag = SOV
+			check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+		}
+		date > 1942.1.1	
+	}
+}
+
+EAI_STRATEGY_CHL_mass_infantry_prioritize_tanks = {
+	if = {
+		limit = {
+			EAI_MODE_challenging = yes
+			EAI_STRATEGY_mass_infantry = yes
+			check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH }
+		}
+		date > 1942.1.1
+	}
+}
+
+EAI_STRATEGY_mass_infantry = {
+	AND = {
+		check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE }
+
+		OR = {
+			original_tag = SOV
+
+			original_tag = RAJ
+
+			original_tag = CHI
+			original_tag = SHX
+			original_tag = GXC
+			original_tag = YUN
+			original_tag = PRC
+			original_tag = XSM
+
+			original_tag = FIN
+
+			original_tag = MAN
+			original_tag = MEN
+		}
+	}
+}
+
+EAI_STRATEGY_CHL_use_rubber_heavy_fighter_design = {
+	EAI_MODE_challenging = yes
+	OR = {
+		AND = {
+			original_tag = ENG
+			OR = {
+				is_historical_focus_on = yes
+				is_in_faction_with = USA
+			}
+		}
+		original_tag = USA
+		original_tag = GER
+	}
+}
+
+EAI_STRATEGY_ignore_shortage_aircraft_design = {
+	EAI_is_island_nation = yes
+}
+
+EAI_STRATEGY_plans_on_using_rangers = {
+	AND = {
+		OR = {
+			original_tag = GER
+			original_tag = HUN
+			original_tag = ROM
+
+			is_in_faction_with = GER
+		}
+		check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+		is_historical_focus_on = yes
+	}
+}
+
+EAI_STRATEGY_CHL_wait_for_better_tanks = { #the goal is to not start division creation until a good tank design is available
+	if = {
+		limit = {
+			original_tag = SOV
+			EAI_MODE_challenging = yes
+		}
+		OR = {
+			has_tech = improved_medium_tank_chassis
+			has_tech = improved_heavy_tank_chassis
+		}
+		# OR = { #to give time for AI to create the tank design before producing divisions # AI needs to be forced to build tank equipment in this case
+		# 	check_variable = { num_equipment@medium_tank_chassis_2 > 500 }
+		# 	check_variable = { num_equipment@medium_tank_chassis_3 > 500 }
+		# 	check_variable = { num_equipment@heavy_tank_chassis_2 > 500 }
+		# 	check_variable = { num_equipment@heavy_tank_chassis_3 > 500 }
+		# }
+	}
+	if = {
+		limit = {
+			original_tag = USA
+			EAI_MODE_challenging = yes
+		}
+		OR = {
+			has_tech = improved_medium_tank_chassis
+			has_tech = improved_heavy_tank_chassis
+		}
+	}
+}
+
+EAI_STRATEGY_use_rangers = {
+	OR = {
+		AND = {
+			has_war_with = SOV
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+		}
+		AND = {
+			EAI_STRATEGY_plans_on_using_rangers = yes
+			date > 1940.8.1
+		}
+		original_tag = FIN
+	}
+}

@@ -32,7 +32,18 @@ EAI_GER_air_production_increase = {
 	}
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = air_factory_balance value = 40 }
+	ai_strategy = { type = air_factory_balance value = 45 }
+}
+
+EAI_GER_air_reduce_naval_bomber_production= {
+	allowed = { tag = GER }
+	enable = { 
+		date > 1940.6.1 
+	}
+	abort_when_not_enabled = yes
+
+	# ai_strategy = { type = unit_ratio id = cas value = -20 }
+	ai_strategy = { type = unit_ratio id = naval_bomber value = -20 }
 }
 
 EAI_GER_build_army = {
@@ -74,17 +85,19 @@ EAI_GER_artillery = {
 	}
 	abort_when_not_enabled = yes
 
-	ai_strategy = { type = equipment_production_min_factories_archetype id = artillery_equipment value = 10 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = artillery_equipment value = 5 }
 }
 
-EAI_GER_more_tanks = {
+EAI_GER_limit_tanks_to_focus_on_planes = {
 	allowed = { tag = GER }
 	enable = {
-		check_variable = { deployed_army_manpower_k > 1500 }
+		check_variable = { num_equipment_in_armies@medium_tank_chassis > 16000 }
 	}
-	abort_when_not_enabled = yes
+	abort = {
+		check_variable = { num_equipment_in_armies@medium_tank_chassis < 13000 }
+	}
 
-	ai_strategy = { type = equipment_production_factor id = armor value = 100 }
+	ai_strategy = { type = equipment_production_factor id = armor value = -60 }
 }
 
 EAI_GER_more_subs = {
@@ -384,9 +397,18 @@ EAI_GER_garrison_home = {
 }
 
 EAI_GER_garrison_atlantic_wall = {
-	allowed = { tag = GER }
 	enable = {
-		any_enemy_country = { is_ai = no is_major = yes naval_strength_ratio = { tag = GER ratio > 1.0 } }
+		OR = {
+			tag = GER
+			AND = {
+				is_in_faction_with = GER
+				NOT = { tag = ITA }
+				NOT = { tag = FIN }
+				NOT = { tag = JAP }
+				NOT = { tag = SPR }
+			}
+		}
+		any_enemy_country = { is_major = yes naval_strength_ratio = { tag = GER ratio > 1.0 } }
 	}
 	abort_when_not_enabled = yes
 
@@ -1307,7 +1329,10 @@ EAI_GER_battle_of_britain_DEFENSIVE_save_airforce = {
 		is_historical_focus_on = yes
 		has_war_with = ENG
 		NOT = { ENG = { surrender_progress > 0 } }
-		date > 1941.1.1
+		OR = {
+			date > 1941.1.1
+			SOV = { is_ai = no }
+		}
 		NOT = { check_variable = { ENG.num_deployed_planes < 500 } }
 		check_variable = { num_deployed_planes < 3000 }
 		OR = {
@@ -1329,7 +1354,10 @@ EAI_GER_battle_of_britain_DEFENSIVE_save_airforce = {
 				is_historical_focus_on = yes
 				has_war_with = ENG
 				NOT = { ENG = { surrender_progress > 0 } }
-				date > 1941.1.1
+				OR = {
+					date > 1941.1.1
+					SOV = { is_ai = no }
+				}
 				NOT = { check_variable = { ENG.num_deployed_planes < 500 } }
 				check_variable = { num_deployed_planes < 3500 }
 				OR = {
@@ -1390,6 +1418,7 @@ EAI_GER_battle_of_britain_NAVAL_avoid = {
 	ai_strategy = { type = naval_avoid_region id = 18 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 16 value = 50 }
 	ai_strategy = { type = naval_avoid_region id = 43 value = 50 }
+	ai_strategy = { type = naval_avoid_region id = 42 value = 50 }
 }
 
 ###########################

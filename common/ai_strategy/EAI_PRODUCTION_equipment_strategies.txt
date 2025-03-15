@@ -12,28 +12,31 @@ EAI_PROD_EQUIP_UPGRADE_production_line_upgrades = {
 	enable = { always = yes }
 	abort = { always = no }
 	
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_artillery_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_destroyer_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_aa_chassis_2 value = 200 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_artillery_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_destroyer_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_aa_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_amphibious_chassis_2 value = 100 }
 
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_artillery_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_destroyer_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_aa_chassis_2 value = 200 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_artillery_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_destroyer_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_aa_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_amphibious_chassis_2 value = 100 }
 
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_artillery_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_destroyer_chassis_2 value = 200 }
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_aa_chassis_2 value = 200 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_artillery_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_destroyer_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_aa_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_amphibious_chassis_2 value = 100 }
 
-	# ai_strategy = { type = production_upgrade_desire_offset id = fighter_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = cv_fighter_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = CAS_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = nav_bomber_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = tac_bomber_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = heavy_fighter_equipment_2 value = 200 }
-	# ai_strategy = { type = production_upgrade_desire_offset id = strat_bomber_equipment_2 value = 200 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = fighter_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = cv_fighter_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = CAS_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = nav_bomber_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = tac_bomber_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = heavy_fighter_equipment_2 value = 100 }
+	# ai_strategy = { type = production_upgrade_desire_offset id = strat_bomber_equipment_2 value = 100 }
 }
 
 # Infantry
@@ -59,13 +62,44 @@ EAI_PROD_EQUIP_UPGRADE_artillery_eq = {
 }
 
 EAI_PROD_EQUIP_UPGRADE_mechanized_eq = {
-	enable = { has_equipment = { mechanized_equipment < 1000 } }
+	enable = { 
+		has_equipment = { mechanized_equipment < 1000 } 
+		ai_has_completed_army_doctrine = yes
+		OR = {
+			AND = {
+				EAI_STRATEGY_use_rangers = yes
+				has_tech = ski_troops #Don't spend XP on mechanized until you have ski troops
+			}
+			NOT = { EAI_STRATEGY_use_rangers = yes }
+		}
+	}
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_1 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_2 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_3 value = 1000 }
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_1 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_3 value = 100 }
+}
+
+EAI_PROD_EQUIP_UPGRADE_mechanized_eq_BLOCK = {
+	enable = { 
+		NOT = {
+			ai_has_completed_army_doctrine = yes
+		}
+		OR = {
+			AND = {
+				EAI_STRATEGY_use_rangers = yes
+				NOT = { has_tech = ski_troops } #Don't spend XP on mechanized until you have ski troops
+			}
+			date < 1941.2.1 # To prevent XP spending before EAI_STRATEGY_use_rangers is true
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_1 value = -100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_2 value = -100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = mechanized_equipment_3 value = -100 }
 }
 
 EAI_PROD_EQUIP_UPGRADE_larm_eq = {
@@ -73,9 +107,9 @@ EAI_PROD_EQUIP_UPGRADE_larm_eq = {
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_1 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_2 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_3 value = -100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_1 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = light_tank_chassis_3 value = 100 }
 }
 
 EAI_PROD_EQUIP_UPGRADE_marm_eq = {
@@ -83,10 +117,10 @@ EAI_PROD_EQUIP_UPGRADE_marm_eq = {
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_0 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_1 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_2 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_3 value = -100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_0 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_1 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = medium_tank_chassis_3 value = 100 }
 }
 
 EAI_PROD_EQUIP_UPGRADE_harm_eq = {
@@ -94,9 +128,9 @@ EAI_PROD_EQUIP_UPGRADE_harm_eq = {
 	
 	abort_when_not_enabled = yes
 	
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_1 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_2 value = 1000 }
-	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_3 value = -100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_1 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_2 value = 100 }
+	ai_strategy = { type = production_upgrade_desire_offset id = heavy_tank_chassis_3 value = 100 }
 }
 
 ######################################
@@ -142,9 +176,9 @@ EAI_PROD_EQUIP_more_trucks_3 = {
 #	Min production
 ######################################
 
-EAI_PROD_EQUIP_MIN_armored_support_vehicle_0 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_0 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 2 } }
-EAI_PROD_EQUIP_MIN_armored_support_vehicle_1 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_1 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 2 } }
-EAI_PROD_EQUIP_MIN_armored_support_vehicle_2 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_2 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 2 } }
+EAI_PROD_EQUIP_MIN_armored_support_vehicle_0 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_0 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
+EAI_PROD_EQUIP_MIN_armored_support_vehicle_1 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_1 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
+EAI_PROD_EQUIP_MIN_armored_support_vehicle_2 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_2 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
 EAI_PROD_EQUIP_MIN_armored_support_vehicle_3 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_3 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
 EAI_PROD_EQUIP_MIN_armored_support_vehicle_4 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_4 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
 EAI_PROD_EQUIP_MIN_armored_support_vehicle_5 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_armored_support_vehicle_5 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = armored_support_vehicle value = 1 } }
@@ -153,12 +187,22 @@ EAI_PROD_EQUIP_MIN_armored_support_vehicle_6 = { enable = { has_country_flag = E
 ###
 
 EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_0 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_0 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
-EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_1 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_1 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_1 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_1 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 0 } }
 EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_2 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_2 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
-EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_3 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_3 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_3 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_3 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 0 } }
 EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_4 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_4 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
-EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_5 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_5 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
-EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_6 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_6 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_5 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_5 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 0 } }
+EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_6 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_light_tank_flame_chassis_6 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_flame_chassis value = 0 } }
+
+###
+
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_0 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_0 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_1 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_1 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 0 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_2 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_2 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_3 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_3 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 0 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_4 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_4 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_5 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_5 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 1 } }
+EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_6 = { enable = { has_country_flag = EAI_PROD_EQUIP_MIN_medium_tank_flame_chassis_6 } abort_when_not_enabled = yes ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_flame_chassis value = 0 } }
 
 ###
 
@@ -602,6 +646,321 @@ EAI_PROD_EQUIP_MIN_medium_armor_6 = {
 
 ###
 
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_1 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 100 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 90 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_2 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 150 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 140 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_3 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 200 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 190 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_4 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 250 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 240 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_5 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 300 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 290 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_light_armor_6 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 350 
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 340 
+				EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = light_tank_amphibious_chassis value = 10 }
+}
+
+###
+
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_1 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 100 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 90 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_2 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 150 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 140 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_3 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 200 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 190 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_4 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 250 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 240 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_5 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 300 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 290 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_medium_armor_6 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 350 
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 340 
+				EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = medium_tank_amphibious_chassis value = 10 }
+}
+
+###
+
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_1 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 100 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 90 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_2 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 150 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 140 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_3 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 200 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 190 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_4 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 250 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 240 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_5 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 300 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 290 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+EAI_PROD_EQUIP_MIN_amphibious_heavy_armor_6 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 350 
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 340 
+				EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = heavy_tank_amphibious_chassis value = 10 }
+}
+
+###
+
 EAI_PROD_EQUIP_MIN_light_armor_0 = { 
 	enable = { 
 		is_major = yes 
@@ -846,6 +1205,104 @@ EAI_PROD_EQUIP_MIN_heavy_armor_6 = {
 
 ###
 
+EAI_PROD_EQUIP_MIN_amphibious_mechanized_5 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 100 
+		EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 90 
+				EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = amphibious_mechanized_equipment value = 5 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = mechanized_equipment value = -2 }
+}
+
+EAI_PROD_EQUIP_MIN_amphibious_mechanized_10 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 150 
+		EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 140
+				EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = amphibious_mechanized_equipment value = 5 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = mechanized_equipment value = -2 }
+}
+
+EAI_PROD_EQUIP_MIN_amphibious_mechanized_15 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 200 
+		EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 190
+				EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = amphibious_mechanized_equipment value = 5 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = mechanized_equipment value = -2 }
+}
+
+EAI_PROD_EQUIP_MIN_amphibious_mechanized_20 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 250
+		EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 240
+				EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = amphibious_mechanized_equipment value = 5 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = mechanized_equipment value = -2 }
+}
+
+EAI_PROD_EQUIP_MIN_amphibious_mechanized_25 = { 
+	enable = { 
+		is_major = yes 
+		num_of_military_factories > 300
+		EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+	} 
+	abort = { 
+		NOT = {
+			AND = {
+				is_major = yes 
+				num_of_military_factories > 290
+				EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = yes 
+			}
+		}
+	} 
+	ai_strategy = { type = equipment_production_min_factories_archetype id = amphibious_mechanized_equipment value = 5 }
+	ai_strategy = { type = equipment_production_min_factories_archetype id = mechanized_equipment value = -2 }
+}
+
+
+###
+
 EAI_PROD_EQUIP_MIN_floating_harbors_1 = {
 	enable = {
 		num_of_naval_factories > 15
@@ -1083,12 +1540,14 @@ EAI_PROD_EQUIP_FACTOR_motorized_equipment_MAJORS = {
 			EAI_HARM_equipment_production = yes
 			EAI_MODARM_equipment_production = yes
 		}
+		NOT = {EAI_DESIGN_ARMOR_mechanized_production_focus = yes}
 	} 
 	abort = {
 		NOT = {
 			AND = {
 				has_equipment = { motorized_equipment < 2000 }
 				is_major = yes NOT = { EAI_armor_tech_focus = yes }
+				EAI_DESIGN_ARMOR_mechanized_production_focus = yes
 				OR = {
 					EAI_LARM_equipment_production = yes
 					EAI_MARM_equipment_production = yes
@@ -1100,6 +1559,37 @@ EAI_PROD_EQUIP_FACTOR_motorized_equipment_MAJORS = {
 	}
 	abort_when_not_enabled = yes
 	ai_strategy = { type = equipment_variant_production_factor id = motorized_equipment value = 50 }
+}
+
+EAI_PROD_EQUIP_FACTOR_mechanized_equipment_MAJORS = { 
+	enable = { 
+		has_equipment = { mechanized_equipment < 1000 }
+		is_major = yes NOT = { EAI_armor_tech_focus = yes }
+		EAI_DESIGN_ARMOR_mechanized_production_focus = yes
+		OR = {
+			EAI_LARM_equipment_production = yes
+			EAI_MARM_equipment_production = yes
+			EAI_HARM_equipment_production = yes
+			EAI_MODARM_equipment_production = yes
+		}
+	} 
+	abort = {
+		NOT = {
+			AND = {
+				has_equipment = { mechanized_equipment < 2000 }
+				is_major = yes NOT = { EAI_armor_tech_focus = yes }
+				NOT = {EAI_DESIGN_ARMOR_mechanized_production_focus = yes}
+				OR = {
+					EAI_LARM_equipment_production = yes
+					EAI_MARM_equipment_production = yes
+					EAI_HARM_equipment_production = yes
+					EAI_MODARM_equipment_production = yes
+				}
+			}
+		}
+	}
+	abort_when_not_enabled = yes
+	ai_strategy = { type = equipment_variant_production_factor id = mechanized_equipment value = 50 }
 }
 
 EAI_PROD_EQUIP_FACTOR_light_tank_chassis_MAJORS = { 

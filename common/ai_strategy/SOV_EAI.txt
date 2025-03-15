@@ -5,13 +5,13 @@
 EAI_SOV_CHL_focus_on_infantry_equipment_over_armor = {
 	allowed = { tag = SOV }
 	enable = {
-		has_global_flag = EAI_challenging_mode
+		EAI_MODE_challenging = yes
 		check_variable = { deployed_army_manpower_k < 3950 }
 	}
 	abort = {
 		NOT = {
 			AND = {
-				has_global_flag = EAI_challenging_mode
+				EAI_MODE_challenging = yes
 				check_variable = { deployed_army_manpower_k < 4000 }
 			}
 		}
@@ -26,13 +26,13 @@ EAI_SOV_CHL_focus_on_infantry_equipment_over_armor = {
 EAI_SOV_focus_on_infantry_equipment_over_armor = {
 	allowed = { tag = SOV }
 	enable = {
-		NOT = { has_global_flag = EAI_challenging_mode }
+		EAI_MODE_normal = yes
 		check_variable = { deployed_army_manpower_k < 2950 }
 	}
 	abort = {
 		NOT = {
 			AND = {
-				NOT = { has_global_flag = EAI_challenging_mode }
+				EAI_MODE_normal = yes
 				check_variable = { deployed_army_manpower_k < 3000 }
 			}
 		}
@@ -47,14 +47,14 @@ EAI_SOV_focus_on_infantry_equipment_over_armor = {
 EAI_SOV_CHL_focus_on_infantry_equipment_min_production = {
 	allowed = { tag = SOV }
 	enable = {
-		has_global_flag = EAI_challenging_mode
+		EAI_MODE_challenging = yes
 		check_variable = { deployed_army_manpower_k < 4450 }
 		num_of_military_factories > 50
 	}
 	abort = {
 		NOT = {
 			AND = {
-				has_global_flag = EAI_challenging_mode
+				EAI_MODE_challenging = yes
 				check_variable = { deployed_army_manpower_k < 4500 }
 				num_of_military_factories > 40
 			}
@@ -70,14 +70,14 @@ EAI_SOV_CHL_focus_on_infantry_equipment_min_production = {
 EAI_SOV_focus_on_infantry_equipment_min_production = {
 	allowed = { tag = SOV }
 	enable = {
-		NOT = { has_global_flag = EAI_challenging_mode }
+		EAI_MODE_normal = yes
 		check_variable = { deployed_army_manpower_k < 2950 }
 		num_of_military_factories > 50
 	}
 	abort = {
 		NOT = {
 			AND = {
-				NOT = { has_global_flag = EAI_challenging_mode }
+				EAI_MODE_normal = yes
 				check_variable = { deployed_army_manpower_k < 3000 }
 				num_of_military_factories > 40
 			}
@@ -190,7 +190,7 @@ EAI_SOV_emergency_increase_infantry_production_over_armor = {
 EAI_SOV_CHL_enough_infantry = {
 	allowed = { tag = SOV }
 	enable = {
-		has_global_flag = EAI_challenging_mode
+		EAI_MODE_challenging = yes
 		NOT = { check_variable = { deployed_army_manpower_k < 5000 } }
 		OR = {
 			check_variable = { num_equipment@support_equipment < 250 }
@@ -201,8 +201,8 @@ EAI_SOV_CHL_enough_infantry = {
 	abort =  {
 		NOT = {
 			AND = {
-				has_global_flag = EAI_challenging_mode
-				NOT = { check_variable = { deployed_army_manpower_k < 3000 } }
+				EAI_MODE_challenging = yes
+				check_variable = { deployed_army_manpower_k > 4950 }
 				OR = {
 					check_variable = { num_equipment@support_equipment < 1000 }
 					check_variable = { num_equipment@anti_air_equipment < 1000 }
@@ -218,8 +218,8 @@ EAI_SOV_CHL_enough_infantry = {
 EAI_SOV_enough_infantry = {
 	allowed = { tag = SOV }
 	enable = {
-		NOT = { has_global_flag = EAI_challenging_mode }
-		NOT = { check_variable = { deployed_army_manpower_k < 3000 } }
+		EAI_MODE_normal = yes
+		NOT = { check_variable = { deployed_army_manpower_k < 3350 } }
 		OR = {
 			check_variable = { num_equipment@support_equipment < 250 }
 			check_variable = { num_equipment@anti_air_equipment < 250 }
@@ -229,8 +229,8 @@ EAI_SOV_enough_infantry = {
 	abort =  {
 		NOT = {
 			AND = {
-				NOT = { has_global_flag = EAI_challenging_mode }
-				NOT = { check_variable = { deployed_army_manpower_k < 2500 } }
+				EAI_MODE_normal = yes
+				NOT = { check_variable = { deployed_army_manpower_k < 3000 } }
 				OR = {
 					check_variable = { num_equipment@support_equipment < 1000 }
 					check_variable = { num_equipment@anti_air_equipment < 1000 }
@@ -554,6 +554,43 @@ EAI_SIK_avoid_factions = {
 	ai_strategy = { type = diplo_action_desire id = SIK target = offer_join_faction value = -1000 }
 }
 
+EAI_SOV_JAP_non_aggression_pact = { 
+	allowed = {
+		OR = {
+			tag = SOV
+			tag = MON
+			tag = SIK
+		}
+	}
+	enable = {
+		is_historical_focus_on = yes
+
+		OR = {
+			tag = SOV
+			is_in_faction_with = SOV
+			is_subject_of = SOV
+		}
+
+		GER = { EAI_THIS_is_threat_to_PREV = yes }
+
+		JAP = { has_completed_focus = JAP_non_aggression_pact_with_the_soviet_union }
+
+		NOT = {
+			JAP = { has_war_with = SOV }
+			JAP = { has_capitulated = yes is_subject = yes }
+			SOV = { has_capitulated = yes is_subject = yes }
+			JAP = { is_in_faction_with = SOV }
+		}
+	}
+	
+	abort_when_not_enabled = yes
+
+	ai_strategy = { type = diplo_action_acceptance id = JAP target = non_aggression_pact value = 1000 }
+	ai_strategy = { type = diplo_action_acceptance id = MAN target = non_aggression_pact value = 1000 }
+	ai_strategy = { type = diplo_action_acceptance id = MEN target = non_aggression_pact value = 1000 }
+	ai_strategy = { type = diplo_action_acceptance id = CHI target = non_aggression_pact value = 1000 }
+}
+
 ### Comintern should not give access to allies
 
 EAI_SOV_no_access_to_allies = {
@@ -705,6 +742,8 @@ EAI_SOV_defense_in_depth_242 = { allowed = { tag = SOV } enable = { any_of_scope
 EAI_SOV_defense_in_depth_137 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_137 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 137 states = { 137 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
 EAI_SOV_defense_in_depth_221 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_221 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 221 states = { 221 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
 EAI_SOV_defense_in_depth_202 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_202 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 202 states = { 202 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_226 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_226 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 226 states = { 226 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
+EAI_SOV_defense_in_depth_227 = { allowed = { tag = SOV } enable = { any_of_scopes = { array = global.EAI_MAP_SOV_garrison_strategy_227 CONTROLLER = { has_war_with = ROOT } } } abort_when_not_enabled = yes ai_strategy = { type = put_unit_buffers ratio = 0.02 order_id = 227 states = { 227 } subtract_invasions_from_need = no subtract_fronts_from_need = no } }
 EAI_SOV_defense_in_depth_195 = { # Leningrad
 	allowed = { tag = SOV } 
 	enable = { 
@@ -830,6 +869,81 @@ EAI_SOV_barbarossa_DEPLOY_dumb = {
 				surrender_progress < 0.15
 
 				check_variable = { global.EAI_eastern_front = 0 } # favor germany
+
+				NOT = { any_enemy_country = { is_ai = no is_major = yes } } # cancel if any enemy is a player major
+			}
+		}
+	}
+
+	ai_strategy = {
+		type = put_unit_buffers
+		ratio = 0.4
+		states = { 
+			253
+			219
+			254
+			248
+			408
+			409
+			560
+			561
+			657
+			563
+		}
+		subtract_invasions_from_need = no
+		subtract_fronts_from_need = no
+	}
+	ai_strategy = {
+		type = front_unit_request
+		value = 450
+		
+		tag = MAN
+	}
+	ai_strategy = {
+		type = front_unit_request
+		value = -60
+		
+		tag = GER
+	}
+	ai_strategy = {
+		type = front_unit_request
+		value = -60
+		
+		tag = ROM
+	}
+	ai_strategy = {
+		type = front_unit_request
+		value = -60
+		
+		tag = HUN
+	}
+}
+
+EAI_SOV_barbarossa_DEPLOY_dumb_historical = {
+	allowed = { tag = SOV }
+	enable = {
+		OR = {
+			has_country_flag = EAI_barbarossa_defensive
+			has_country_flag = EAI_SOV_eastern_garrison
+		}
+
+		surrender_progress < 0.30
+
+		check_variable = { global.EAI_eastern_front = 2 } # historical
+
+		NOT = { any_enemy_country = { is_ai = no is_major = yes } } # cancel if any enemy is a player major
+	}
+	abort = {
+		NOT = {
+			AND = {
+				OR = {
+					has_country_flag = EAI_barbarossa_defensive
+					has_country_flag = EAI_SOV_eastern_garrison
+				}
+
+				surrender_progress < 0.035
+
+				check_variable = { global.EAI_eastern_front = 2 } # historical
 
 				NOT = { any_enemy_country = { is_ai = no is_major = yes } } # cancel if any enemy is a player major
 			}
@@ -1118,7 +1232,7 @@ EAI_SOV_barbarossa_DEFENSIVE_initial_defense_hold = {
 		OR = {
 			AND = {
 				has_war_with = GER
-				has_global_flag = EAI_challenging_mode
+				EAI_MODE_challenging = yes
 				has_country_flag = { flag = EAI_barbarossa_defensive days < 180 }
 			}
 			AND = {

@@ -40,6 +40,9 @@ EAI_DESIGN_ARMOR_armored_engineer_production_focus = {
 		EAI_MARM_equipment_production = yes
 		EAI_HARM_equipment_production = yes
 		EAI_MODARM_equipment_production = yes
+		EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = yes
+		EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = yes
+		EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = yes
 	}
 }
 
@@ -58,6 +61,53 @@ EAI_DESIGN_ARMOR_mechanized_production_focus = {
 		EAI_HARM_equipment_production = yes
 		EAI_MODARM_equipment_production = yes
 	}
+}
+
+EAI_DESIGN_MARINE_amphibious_mechanized_production_focus = {
+
+	EAI_amtrac_tech_focus = yes
+	has_tech = amphibious_mechanized_infantry
+
+	# NOT = { 
+	# 	check_variable = { EAI_needs_steel > 2 } 
+	# 	check_variable = { EAI_steel_resource_shortage > 2 } 
+	# }
+}
+
+EAI_DESIGN_MARINE_amphibious_light_armor_production_focus = {
+
+	EAI_amphibious_tech_focus = yes
+	EAI_light_amphibious_armor_focus = yes
+	has_tech = amphibious_drive
+
+	# NOT = { 
+	# 	check_variable = { EAI_needs_steel > 2 } 
+	# 	check_variable = { EAI_steel_resource_shortage > 2 } 
+	# }
+}
+
+EAI_DESIGN_MARINE_amphibious_medium_armor_production_focus = {
+
+	EAI_amphibious_tech_focus = yes
+	EAI_medium_amphibious_armor_focus = yes
+	has_tech = amphibious_drive
+
+	# NOT = { 
+	# 	check_variable = { EAI_needs_steel > 2 } 
+	# 	check_variable = { EAI_steel_resource_shortage > 2 } 
+	# }
+}
+
+EAI_DESIGN_MARINE_amphibious_heavy_armor_production_focus = {
+
+	EAI_amphibious_tech_focus = yes
+	EAI_heavy_amphibious_armor_focus = yes
+	has_tech = amphibious_drive
+
+	# NOT = { 
+	# 	check_variable = { EAI_needs_steel > 2 } 
+	# 	check_variable = { EAI_steel_resource_shortage > 2 } 
+	# }
 }
 
 EAI_DESIGN_ARMOR_modern_production_focus = {
@@ -79,7 +129,7 @@ EAI_DESIGN_ARMOR_modern_production_focus = {
 
 EAI_DESIGN_ARMOR_armored_engineer_upgrade_focus = {
 	EAI_DESIGN_ARMOR_armored_engineer_production_focus = yes
-	has_country_flag = EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started
+	# has_country_flag = EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started
 }
 
 EAI_DESIGN_ARMOR_mechanized_upgrade_focus = {
@@ -94,10 +144,10 @@ EAI_DESIGN_ARMOR_modern_upgrade_focus = {
 
 ###
 
-EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started = {
-	check_variable = { num_equipment@armored_support_vehicle > 250 }
-	check_variable = { num_equipment@light_tank_flame_chassis > 250 }
-}
+# EAI_DESIGN_ARMOR_armored_engineer_upgrade_production_started = {
+# 	check_variable = { num_equipment@armored_support_vehicle > 250 }
+# 	check_variable = { num_equipment@light_tank_flame_chassis > 250 }
+# }
 
 EAI_DESIGN_ARMOR_mechanized_upgrade_production_started = {
 	check_variable = { num_equipment@mechanized_equipment > 1000 }
@@ -158,6 +208,7 @@ EAI_has_modern_tank_TD_design = {
 EAI_light_armor_tank_design_focus = {
 
 	EAI_LARM_military_focus = yes
+	NOT = { EAI_light_amphibious_armor_focus = yes } #Don't design light tanks as Amphibious light tanks are the one which will be used
 }
 
 EAI_light_armor_aa_design_focus = {
@@ -229,8 +280,21 @@ EAI_light_flamethrower_support_design_focus = {
 
 	OR = {
 		AND = { EAI_LARM_equipment_production = yes has_design_based_on = light_tank_chassis }
+		AND = { EAI_amphibious_tech_focus = yes has_design_based_on = light_tank_amphibious_chassis }
+	}
+}
+
+EAI_medium_flamethrower_support_design_focus = {
+
+	EAI_DESIGN_ARMOR_armored_engineer_production_focus = yes
+
+	EAI_medium_flamethrower_support_tech_focus = yes
+
+	OR = {
 		AND = { EAI_MARM_equipment_production = yes has_design_based_on = medium_tank_chassis }
 		AND = { EAI_HARM_equipment_production = yes has_design_based_on = heavy_tank_chassis }
+		AND = { EAI_amphibious_tech_focus = yes has_design_based_on = medium_tank_amphibious_chassis }
+		AND = { EAI_amphibious_tech_focus = yes has_design_based_on = heavy_tank_amphibious_chassis }
 	}
 }
 
@@ -247,11 +311,9 @@ EAI_light_armor_tank_recon_design_focus = {
 
 EAI_light_armor_amphibious_tank_design_focus = {
 
-	EAI_light_armor_tank_design_focus = yes
-
 	has_tech = amphibious_drive
 
-	EAI_amphibious_division_focus = yes
+	EAI_light_amphibious_armor_focus = yes
 }
 
 ### Medium armor
@@ -259,6 +321,7 @@ EAI_light_armor_amphibious_tank_design_focus = {
 EAI_medium_armor_tank_design_focus = {
 
 	EAI_MARM_military_focus = yes
+	NOT = { EAI_medium_amphibious_armor_focus = yes } #Don't design Medium tanks as Amphibious Medium tanks are the one which will be used
 }
 
 EAI_medium_armor_aa_design_focus = {
@@ -323,11 +386,9 @@ EAI_medium_armor_art_design_focus = {
 
 EAI_medium_armor_amphibious_tank_design_focus = {
 
-	EAI_medium_armor_tank_design_focus = yes
-
 	has_tech = amphibious_drive
 
-	EAI_amphibious_division_focus = yes
+	EAI_medium_amphibious_armor_focus = yes
 }
 
 ### Heavy armor
@@ -335,6 +396,7 @@ EAI_medium_armor_amphibious_tank_design_focus = {
 EAI_heavy_armor_tank_design_focus = {
 
 	EAI_HARM_military_focus = yes
+	NOT = { EAI_heavy_amphibious_armor_focus = yes } #Don't design Heavy tanks as Amphibious Heavy tanks are the one which will be used
 }
 
 EAI_heavy_armor_aa_design_focus = {
@@ -355,11 +417,9 @@ EAI_heavy_armor_art_design_focus = {
 
 EAI_heavy_armor_amphibious_tank_design_focus = {
 
-	EAI_heavy_armor_tank_design_focus = yes
-
 	has_tech = amphibious_drive
 
-	EAI_amphibious_division_focus = yes
+	EAI_heavy_amphibious_armor_focus = yes
 }
 
 ###### Block design if true
@@ -629,5 +689,24 @@ EAI_save_xp_for_advanced_techs = {
 			is_major = no 
 			meta_trigger = { text = { check_variable = { [x]_experience > 450 } } x = "[EAI_GetExperienceType]" }
 		} 
+	}
+}
+
+EAI_has_correct_equipment_to_unlock_MARM_template = {
+	if = { limit = { EAI_MODE_challenging = yes }
+		if = { limit = { original_tag = USA }
+			has_tech = improved_medium_tank_chassis
+			has_tech = mechanised_infantry
+		}
+		else_if = { limit = { original_tag = SOV }
+			has_tech = improved_medium_tank_chassis
+			has_tech = mechanised_infantry
+		}
+		else = {
+			always = yes
+		}
+	}
+	else = {
+		always = yes
 	}
 }

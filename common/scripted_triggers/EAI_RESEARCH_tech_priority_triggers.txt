@@ -149,7 +149,6 @@ EAI_air_doctrine_BFS_priority = {
 }
 
 EAI_air_doctrine_OI_priority = {
-
 	OR = {
 		NOT = { has_tech = fighter_veteran_initiative }
 		NOT = { has_tech = cas_veteran_initiative }
@@ -157,11 +156,10 @@ EAI_air_doctrine_OI_priority = {
 	}
 }
 
-EAI_specops_doctrine_progress_limit = {
-
+EAI_specops_MNT_doctrine_progress_limit = {
 	OR = {
 		AND = {
-			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
 			set_temp_variable = { _check_xp = 400 }
 			NOT = { EAI_XP_has_army_check_xp = yes }
 
@@ -183,6 +181,64 @@ EAI_specops_doctrine_progress_limit = {
 		}
 	}
 }
+
+EAI_specops_MAR_doctrine_progress_limit = {
+	OR = {
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			set_temp_variable = { _check_xp = 150 }
+			NOT = { EAI_XP_has_navy_check_xp = yes }
+			NOT = {
+				has_tech = grand_battlefleet
+				has_tech = carrier_battlegroups
+				has_tech = floating_airfield_ti
+			}
+		}
+		AND = {
+			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			set_temp_variable = { _check_xp = 250 }
+			NOT = { EAI_XP_has_navy_check_xp = yes }
+		}
+	}
+}
+
+EAI_specops_PAR_doctrine_progress_limit = {
+	OR = {
+		AND = {
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+				check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			}
+			set_temp_variable = { _check_xp = 150 }
+			NOT = { EAI_XP_has_air_check_xp = yes }
+			NOT = {
+				has_tech = offensive_formations
+				has_tech = mass_destruction
+				has_tech = forward_interception
+				has_tech = high_level_bombing
+			}
+			NOT = {
+				has_tech = special_forces_mountaineers
+				has_tech = special_forces_marines
+			}
+		}
+		AND = {
+			OR = {
+				check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MNT_SPEC_OPS }
+				check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
+			}
+			set_temp_variable = { _check_xp = 250 }
+			NOT = { EAI_XP_has_air_check_xp = yes }
+			NOT = {
+				has_tech = special_forces_mountaineers
+				has_tech = special_forces_marines
+			}
+		}
+	}
+}
+
+
+
 
 ###
 
@@ -242,7 +298,7 @@ EAI_GER_SOV_armor_tech_bonus = {
 }
 
 EAI_fighter_tech_bonus = {
-	NOT = { has_global_flag = EAI_historical_mode }
+	NOT = { EAI_MODE_historical = yes }
 	OR = {
 		AND = { original_tag = ENG has_completed_focus = fighter_command_focus }
 		#AND = { original_tag = ITA has_completed_focus = ITA_air_innovation_2 }
@@ -280,16 +336,5 @@ EAI_PR_equipment_usage_FACTOR = { # var:_eq_1 var:_eq_2 var:_ratio var:_prio_val
 		EAI_MATH_TRIGGER_normalize = yes
 		add_to_temp_variable = { _val_ = 1 }
 		multiply_temp_variable = { _prio_val = _val_ }
-	}
-}
-
-EAI_PR_Priorize_tanks_if_MA_Build = {
-	if = {
-		limit = {
-			has_global_flag = EAI_challenging_mode
-			check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH }
-			EAI_Land_Doctrine_Country_Is_MA = yes
-		}
-		date > 1942.1.1
 	}
 }

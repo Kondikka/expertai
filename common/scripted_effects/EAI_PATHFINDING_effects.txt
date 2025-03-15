@@ -256,7 +256,7 @@ EAI_PATHFIND_get_lowest_from_open_list = {
 #	Provincial pathfinding
 ###########################################
 
-EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _pathfind_prov_type
+EAI_PATHFIND_PROV_get_path = { # var:_pathfind_prov_start, var:_pathfind_prov_end, var:_pathfind_prov_type >>> var:pathfind_prov_success_ arr:pathfind_prov_path_
 
 	if = { limit = { has_country_flag = EAI_pathfind_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PATHFIND PROV: START - [?_pathfind_prov_start] -> [?_pathfind_prov_end] - type [?_pathfind_prov_type]" }
 
@@ -265,10 +265,10 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 
 	add_to_temp_array = { open_list_id = _pathfind_prov_start }
 
-	set_temp_variable = { max_its = 1000 }
+	set_temp_variable = { max_its = 100 }
 	set_temp_variable = { its = 0 }
-	set_temp_variable = { found_target = 0 }
-	while_loop_effect = { break = found_target
+	set_temp_variable = { pathfind_prov_success_ = 0 }
+	while_loop_effect = { break = pathfind_prov_success_
 		limit = {
 			check_variable = { open_list_id^num > 0 }
 			check_variable = { its < max_its }
@@ -295,7 +295,7 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 		remove_from_temp_array = { array = open_list_id value = cur_id }
 
 		# Draw visited
-		if = { limit = { has_country_flag = EAI_pathfind_draw_path }
+		if = { limit = { has_country_flag = EAI_pathfind_draw_visited }
 		
 			var:global.EAI_MAP_province_state_id^cur_id = {
 				meta_effect = {
@@ -321,15 +321,16 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 		
 			if = { limit = { has_country_flag = EAI_pathfind_logging } log = "PATHFIND: found path, end = [?cur_id], its = [?its]" }
 
-			set_temp_variable = { found_target = 1 }
+			set_temp_variable = { pathfind_prov_success_ = 1 }
 
 			set_temp_variable = { build_path_cur_id = cur_id }
 			clear_temp_array = pathfind_prov_path_reversed
-			while_loop_effect = { limit = { NOT = { check_variable = { build_path_cur_id = _pathfind_start } } }
+			while_loop_effect = { limit = { NOT = { check_variable = { build_path_cur_id = _pathfind_prov_start } } }
 			
 				add_to_temp_array = { pathfind_prov_path_reversed = build_path_cur_id }
 				set_temp_variable = { build_path_cur_id = came_from_id^build_path_cur_id }
 			}
+			add_to_temp_array = { pathfind_prov_path_reversed = _pathfind_prov_start }
 
 			clear_temp_array = pathfind_prov_path_
 			for_each_loop = { array = pathfind_prov_path_reversed
@@ -370,25 +371,12 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 
 				if = { limit = { NOT = { is_in_array = { closed_list_id = neighbor_id } } }
 
-					set_temp_variable = { neighbor_g = 0 }
-	
-					set_temp_variable = { _province_id_a = cur_id }
-					set_temp_variable = { _province_id_b = neighbor_id }
-					EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
-					add_to_temp_variable = { neighbor_g = distance_ }
-					EAI_PATHFIND_PROV_cost_modifier = yes
-					add_to_temp_variable = { neighbor_g = cur_g }
-	
-					set_temp_variable = { _province_id_a = neighbor_id }
-					set_temp_variable = { _province_id_b = _pathfind_prov_end }
-					EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
-					set_temp_variable = { neighbor_h = distance_ }
-					multiply_temp_variable = { neighbor_h = 1.1 }
-	
-					set_temp_variable = { neighbor_f = neighbor_g }
-					add_to_temp_variable = { neighbor_f = neighbor_h }
+					EAI_PATHFIND_PROV_g_cost = yes
+					EAI_PATHFIND_PROV_h_cost = yes
+					set_temp_variable = { neighbor_f = neighbor_g_ }
+					add_to_temp_variable = { neighbor_f = neighbor_h_ }
 
-					if = { limit = { has_country_flag = EAI_pathfind_detailed_logging } log = "PATHFIND: neighbor_id=[?neighbor_id] neighbor_g=[?neighbor_g] neighbor_h=[?neighbor_h] neighbor_f=[?neighbor_f]" }
+					if = { limit = { has_country_flag = EAI_pathfind_detailed_logging } log = "PATHFIND: neighbor_id=[?neighbor_id] neighbor_g_=[?neighbor_g_] neighbor_h_=[?neighbor_h_] neighbor_f=[?neighbor_f]" }
 	
 					if = {
 						limit = {
@@ -399,7 +387,7 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 						}
 	
 						set_temp_variable = { came_from_id^neighbor_id = cur_id }
-						set_temp_variable = { prov_g^neighbor_id = neighbor_g }
+						set_temp_variable = { prov_g^neighbor_id = neighbor_g_ }
 						set_temp_variable = { prov_f^neighbor_id = neighbor_f }
 						add_to_temp_array = { open_list_id = neighbor_id }
 					}
@@ -408,7 +396,7 @@ EAI_PATHFIND_PROV_get_path = { # _pathfind_prov_start, _pathfind_prov_end, _path
 		}
 	}
 
-	if = { limit = { check_variable = { found_target = 0 } }
+	if = { limit = { check_variable = { pathfind_prov_success_ = 0 } }
 	
 		if = { limit = { has_country_flag = EAI_pathfind_logging } log = "PATHFIND: could not find path, its=[?its]" }
 	}
@@ -424,48 +412,39 @@ EAI_PATHFIND_PROV_get_neighbors = {
 
 		if = { 
 			limit = {
+
+				### Path through friendly provinces
 				
-				if = { limit = { check_variable = { _pathfind_prov_type = 0 } }
-				
-					meta_trigger = {
-						text = {
-							OR = {
-								controls_province = [x]
-								any_allied_country = {
-									controls_province = [x]
-								}
+					if = { limit = { check_variable = { _pathfind_prov_type = 0 } }
+					
+						OR = {
+							controls_province = neighbor_id
+							any_allied_country = {
+								controls_province = neighbor_id
 							}
 						}
-						x = "[?neighbor_id]"
 					}
-				}
 
-				if = { limit = { check_variable = { _pathfind_prov_type = 1 } }
-				
-					meta_trigger = {
-						text = {
-							controls_province = [x]
-							var:global.EAI_MAP_province_state_id^neighbor_id = {
-								any_province_building_level = {
-									province = { id = [x] }
-									building = rail_way
-									level > 0
-								}
+				### Path through defensible provinces
+
+					if = { limit = { check_variable = { _pathfind_prov_type = 1 } }
+					
+						OR = {
+							controls_province = neighbor_id
+							any_allied_country = {
+								controls_province = neighbor_id
 							}
 						}
-						x = "[?neighbor_id]"
 					}
-				}
 
-				if = { limit = { check_variable = { _pathfind_prov_type = 2 } }
-				
-					meta_trigger = {
-						text = {
-							controls_province = [x]
-						}
-						x = "[?neighbor_id]"
+				### Rail networks
+
+					if = { limit = { check_variable = { _pathfind_prov_type = 2 } }
+					
+						controls_province = neighbor_id
 					}
-				}
+
+				###
 			}
 
 			add_to_temp_array = { pathfind_prov_neighbors = neighbor_id }
@@ -473,17 +452,108 @@ EAI_PATHFIND_PROV_get_neighbors = {
 	}
 }
 
-EAI_PATHFIND_PROV_cost_modifier = {
+EAI_PATHFIND_PROV_g_cost = {
 
-	if = { limit = { check_variable = { _pathfind_prov_type = 2 } }
+	### Path through friendly provinces
 
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_plains } } multiply_temp_variable = { neighbor_g = 3.0 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_desert } } multiply_temp_variable = { neighbor_g = 3.0 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_marsh } } multiply_temp_variable = { neighbor_g = 3.0 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_jungle } } multiply_temp_variable = { neighbor_g = 1.5 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_forest } } multiply_temp_variable = { neighbor_g = 1.5 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_urban } } multiply_temp_variable = { neighbor_g = 1.25 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_hills } } multiply_temp_variable = { neighbor_g = 1.25 } }
-		if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_mountain } } multiply_temp_variable = { neighbor_g = 1.0 } }
-	}
+		if = { limit = { check_variable = { _pathfind_prov_type = 0 } }
+
+			set_temp_variable = { _province_id_a = cur_id }
+			set_temp_variable = { _province_id_b = neighbor_id }
+			EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
+			set_temp_variable = { neighbor_g_ = distance_ }
+		}
+
+	### Path through defensible provinces
+
+		if = { limit = { check_variable = { _pathfind_prov_type = 2 } }
+
+			set_temp_variable = { _province_id_a = cur_id }
+			set_temp_variable = { _province_id_b = neighbor_id }
+			EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
+			set_temp_variable = { neighbor_g_ = distance_ }
+
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_plains } } multiply_temp_variable = { neighbor_g_ = 3.0 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_desert } } multiply_temp_variable = { neighbor_g_ = 3.0 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_marsh } } multiply_temp_variable = { neighbor_g_ = 3.0 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_jungle } } multiply_temp_variable = { neighbor_g_ = 1.5 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_forest } } multiply_temp_variable = { neighbor_g_ = 1.5 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_urban } } multiply_temp_variable = { neighbor_g_ = 1.25 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_hills } } multiply_temp_variable = { neighbor_g_ = 1.25 } }
+			if = { limit = { check_variable = { global.EAI_MAP_province_terrain_type^neighbor_id = global.EAI_MAP_PROV_TYPE_mountain } } multiply_temp_variable = { neighbor_g_ = 1.0 } }
+		}
+
+	### Rail networks
+
+		if = { limit = { check_variable = { _pathfind_prov_type = 1 } }
+
+			set_temp_variable = { neighbor_g_ = 1 }
+
+			if = { 
+				limit = { # Optimization: reduce meta effects
+					check_variable = { global.EAI_PC_railway_connections^cur_id = 1 } 
+					check_variable = { global.EAI_PC_railway_connections^neighbor_id = 1 } 
+				}
+				meta_effect = {
+					text = {
+						set_temp_variable = { _has_railway_connection_^neighbor_id = global.EAI_PC_railway_connection_level_[a]^[b] }
+					}
+					a = "[?cur_id]"
+					b = "[?neighbor_id]"
+				}
+			}
+			
+			if = { limit = { check_variable = { _has_railway_connection_^neighbor_id > 0 } }
+				set_temp_variable = { divisor = _has_railway_connection_^neighbor_id }
+				add_to_temp_variable = { divisor = 1 }
+				divide_temp_variable = { neighbor_g_ = divisor }
+			}
+			if = { limit = { check_variable = { _designated_railway_network_^neighbor_id = 1 } } multiply_temp_variable = { neighbor_g_ = 0.5 } }
+		}
+
+	###
+
+	add_to_temp_variable = { neighbor_g_ = cur_g }
+}
+
+EAI_PATHFIND_PROV_h_cost = {
+
+	### Path through friendly provinces
+
+		if = { limit = { check_variable = { _pathfind_prov_type = 0 } }
+
+			set_temp_variable = { _province_id_a = neighbor_id }
+			set_temp_variable = { _province_id_b = _pathfind_prov_end }
+			EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
+			set_temp_variable = { neighbor_h_ = distance_ }
+
+			multiply_temp_variable = { neighbor_h_ = 1.1 }
+		}
+
+	### Path through defensible provinces
+
+		if = { limit = { check_variable = { _pathfind_prov_type = 2 } }
+
+			set_temp_variable = { _province_id_a = neighbor_id }
+			set_temp_variable = { _province_id_b = _pathfind_prov_end }
+			EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
+			set_temp_variable = { neighbor_h_ = distance_ }
+
+			multiply_temp_variable = { neighbor_h_ = 1.1 }
+		}
+
+	### Rail networks
+
+		if = { limit = { check_variable = { _pathfind_prov_type = 1 } }
+
+			set_temp_variable = { _province_id_a = neighbor_id }
+			set_temp_variable = { _province_id_b = _pathfind_prov_end }
+			EAI_MATH_get_distance_between_provinces_a_b = yes # _province_id_a, _province_id_b, distance_
+			set_temp_variable = { neighbor_h_ = distance_ }
+
+			if = { limit = { check_variable = { _designated_railway_network_^neighbor_id = 1 } } multiply_temp_variable = { neighbor_h_ = 0.5 } }
+			if = { limit = { check_variable = { _has_railway_connection_^neighbor_id > 0 } } multiply_temp_variable = { neighbor_h_ = 0.5 } }
+		}
+
+	###
 }

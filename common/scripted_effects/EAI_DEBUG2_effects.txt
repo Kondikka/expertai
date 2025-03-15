@@ -4,13 +4,14 @@ EAI_test_effect = {
 
 	###
 
-	59 = {
-		set_temp_variable = { _project_building_type = global.EAI_PC_RSITE }
-		set_temp_variable = { _project_replace_shared = 1 }
-		set_temp_variable = { _project_type_id = 2354 }
+	2 = {
+		set_temp_variable = { _project_building_type = global.EAI_PC_AIR }
+		# set_temp_variable = { _project_replace_shared = 1 }
+		set_temp_variable = { _project_build_for_ally = 1 }
+		set_temp_variable = { _project_type_id = 0 }
 		set_temp_variable = { _project_priority = 1000 }
 		set_temp_variable = { _project_queue_num = 1 }
-		EAI_PC_start_project = yes
+		EAI_PC_start_project = yes 
 	}
 
 	###
@@ -33,65 +34,92 @@ EAI_test_daily = {
 
 	if = { limit = { has_country_flag = EAI_test_daily_logging }
 
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MW_DOCTRINE } }
+		EAI_purge_debug = yes
+		EAI_mefo_debug = yes
+	}
+}
+
+EAI_purge_debug = {
+
+	if = { limit = { tag = SOV }
+	
+		if = {
+			limit = {
+				NOT = { has_country_flag = SOV_civil_war_triggered_flag } # check if Civil war has been triggered first TODO_THOMAS: remove if not using paranoia
+				has_country_flag = SOV_paranoia_system_active_flag
+			}
+			
+			log = "SOV_paranoia=[?SOV_paranoia] paranoia_weekly_bucket=[?SOV_paranoia_weekly_bucket]"
 		
 			if = {
 				limit = {
-					OR = {
-						# has_tech = mobile_warfare
-						has_tech = superior_firepower
-						has_tech = trench_warfare
-						has_tech = mass_assault
+					set_temp_variable = { SOV_temp_paranoia_days = SOV_medium_paranoia_days }
+					add_to_temp_variable = { SOV_temp_paranoia_days = SOV_high_paranoia_days }
+					check_variable = { SOV_temp_paranoia_days > 3 }
+					NOT = { has_country_flag = SOV_paranoia_conducting_inspection_flag } #Don't trigger a random purge if one is already going to be triggered from decision
+					SOV_paranoia_is_finishing_purge_focus = no #Don't trigger a random purge if one is already going to be triggered from focus
+					NOT = { has_country_flag = SOV_paranoia_random_purge_cooldown_from_focus_flag } #Wait 15 days after a purge has been triggered from focus
+					NOT = { has_country_flag = SOV_paranoia_random_purge_cooldown_from_decision_flag } #Wait 15 days after a purge has been triggered from decision
+				}
+
+				if = { limit = { NOT = { check_variable = { SOV_medium_paranoia_days = 0 } } }
+		
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_purge_debug: medium purge possible medium_paranoia_days=[?SOV_medium_paranoia_days] high_paranoia_days=[?SOV_high_paranoia_days] paranoia_weekly_bucket=[?SOV_paranoia_weekly_bucket]"
+				
+					if = { limit = { check_variable = { SOV_paranoia_weekly_bucket > 400 } }
+					
+						log = "SOV_paranoia_weekly_bucket > 400"
+					}
+			
+					if = { limit = { check_variable = { SOV_medium_paranoia_days > SOV_high_paranoia_days } }
+					
+						log = "SOV_medium_paranoia_days > SOV_high_paranoia_days"
 					}
 				}
+		
+				if = { limit = { NOT = { check_variable = { SOV_high_paranoia_days = 0 } } }
+		
+					log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_purge_debug: great purge possible medium_paranoia_days=[?SOV_medium_paranoia_days] high_paranoia_days=[?SOV_high_paranoia_days] paranoia_weekly_bucket=[?SOV_paranoia_weekly_bucket]"
 			
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_test_daily ERROR"
+					if = { limit = { check_variable = { SOV_high_paranoia_days > SOV_medium_paranoia_days } }
+					
+						log = "SOV_high_paranoia_days > SOV_medium_paranoia_days"
+					}
+					
+					if = { limit = { check_variable = { SOV_paranoia_weekly_bucket > 400 } }
+					
+						log = "SOV_paranoia_weekly_bucket > 400"
+					}
+				}
 			}
 		}
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_SF_DOCTRINE } }
-		
-			if = {
-				limit = {
-					OR = {
-						has_tech = mobile_warfare
-						# has_tech = superior_firepower
-						has_tech = trench_warfare
-						has_tech = mass_assault
-					}
-				}
-			
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_test_daily ERROR"
-			}
+	}
+}
+
+EAI_mefo_debug = {
+
+	if = { limit = { tag = GER }
+
+		if = { limit = { has_country_flag = GER_mefo_bills_penalty_flag }
+			log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_mefo_debug: GER_mefo_bills_penalty_flag"
 		}
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_GB_DOCTRINE } }
-		
-			if = {
-				limit = {
-					OR = {
-						has_tech = mobile_warfare
-						has_tech = superior_firepower
-						# has_tech = trench_warfare
-						has_tech = mass_assault
-					}
+	
+		if = {
+			limit = {
+				OR = {
+					has_dynamic_modifier = { modifier = GER_mefo_bills_modifier }
+					has_dynamic_modifier = { modifier = GER_economy_of_conquest_modifier }
 				}
-			
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_test_daily ERROR"
 			}
-		}
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } }
-		
-			if = {
-				limit = {
-					OR = {
-						has_tech = mobile_warfare
-						has_tech = superior_firepower
-						has_tech = trench_warfare
-						# has_tech = mass_assault
-					}
-				}
+
+			if = { limit = { check_variable = { GER_industrial_consumer_goods_factor > 0.5 } }
 			
-				log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_test_daily ERROR"
+				log = "GER_industrial_consumer_goods_factor=[?GER_industrial_consumer_goods_factor] GER_monthly_consumer_goods_increase=[?GER_monthly_consumer_goods_increase]"
 			}
+			
+			# GER_industrial_consumer_goods_expected_value
+			# GER_industrial_industrial_capacity_factory
+			# GER_industrial_industrial_capacity_dockyard
 		}
 	}
 }

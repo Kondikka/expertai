@@ -173,6 +173,18 @@ EAI_has_unlocked_building = { if = { limit = { PREV = { has_country_flag = EAI_P
 
 		PREV = { has_tech = experimental_rockets }
 	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_NBASE } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_HUB } }
+
+	}
 }
 
 EAI_available_AIR = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_available_AIR > THIS=[this.getname] PREV=[prev.getname]" } 
@@ -271,7 +283,7 @@ EAI_PC_can_build_project = { if = { limit = { PREV = { has_country_flag = EAI_PC
 
 	OR = {
 		AND = {
-			EAI_PC_controls_location = yes
+			EAI_PC_location_controlled_by_PREV = yes
 		}
 		AND = {
 			check_variable = { PREV.EAI_PC_project_build_for_ally^_project_id = 1 }
@@ -282,18 +294,37 @@ EAI_PC_can_build_project = { if = { limit = { PREV = { has_country_flag = EAI_PC
 	EAI_PC_building_slot_available = yes
 }
 
-# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id
-EAI_PC_controls_location = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_controls_location > THIS=[this.getname] PREV=[prev.getname] _project_building_type=[?_project_building_type] _project_province_id=[?_project_province_id]" } 
+# THIS = STATE, PREV = BUILDER, _project_building_type, _project_build_for_ally, _project_province_id, _project_connect_id
+EAI_PC_location_controlled_by_PREV = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_location_controlled_by_PREV > THIS=[this.getname] PREV=[prev.getname] _project_building_type=[?_project_building_type] _project_province_id=[?_project_province_id]" } 
 
 	impassable = no
 
+	# Province
 	if = { limit = { is_in_array = { global.EAI_PC_BUILDING_PROVINCIAL = _project_building_type } }
-
-		PREV = { controls_province = _project_province_id }
+	
+		if = { limit = { check_variable = { _project_build_for_ally = 0 } }
+			PREV = { controls_province = _project_province_id }
+			if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+				PREV = { controls_province = _project_connect_id }
+			}
+		}
+		else = { # Ally project
+			var:global.province_controllers^_project_province_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+			if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+				var:global.province_controllers^_project_connect_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+			}
+		}
 	}
+
+	# State
 	else = {
 
-		is_controlled_by = PREV
+		if = { limit = { check_variable = { _project_build_for_ally = 0 } }
+			is_controlled_by = PREV
+		}
+		else = { # Ally project
+			CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
+		}
 	}
 }
 
@@ -431,6 +462,32 @@ EAI_PC_building_slot_available = { if = { limit = { PREV = { has_country_flag = 
 			text = {
 				free_building_slots = { 
 					building = naval_base
+					size > 0
+					include_locked = no 
+					province = [x]
+				}
+			}
+			x = "[?_project_province_id]"
+		}
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+
+		meta_trigger = {
+			text = {
+				check_variable = { global.EAI_PC_railway_connection_level_[x]^[y] < 5 }
+			}
+			x = "[?_project_province_id]"
+			y = "[?_project_connect_id]"
+		}
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_HUB } }
+
+		meta_trigger = {
+			text = {
+				free_building_slots = { 
+					building = supply_node
 					size > 0
 					include_locked = no 
 					province = [x]
@@ -583,6 +640,43 @@ EAI_PC_province_is_border = { if = { limit = { PREV = { has_country_flag = EAI_P
 EAI_PC_province_is_passable = { if = { limit = { PREV = { has_country_flag = EAI_PC_trace_functions } } log = "EAI_PC_province_is_passable > THIS=[this.getname] PREV=[prev.getname] _get_province_type_id=[?_get_province_type_id]" }
 	
 	is_in_array = { global.EAI_MAP_PROV_LAND_TYPES = global.EAI_MAP_province_terrain_type^_get_province_type_id }
+}
+
+# THIS = STATE, PREV = BUILDER
+EAI_PC_state_has_supply_hub = {
+	OR = {
+		any_province_building_level = {
+			province = { all_provinces = yes }
+			building = supply_node
+			level > 0
+		}
+		any_province_building_level = {
+			province = { all_provinces = yes }
+			building = naval_base
+			level > 0
+		}
+	}
+}
+
+# _province_hub_id
+EAI_PC_prov_has_supply_hub = {
+	meta_trigger = {
+		text = {
+			OR = {
+				any_province_building_level = {
+					province = { id = [x] }
+					building = supply_node
+					level > 0
+				}
+				any_province_building_level = {
+					province = { id = [x] }
+					building = naval_base
+					level > 0
+				}
+			}
+		}
+		x = "[?_province_hub_id]"
+	}
 }
 
 ### air base

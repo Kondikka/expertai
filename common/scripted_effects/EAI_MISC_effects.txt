@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 5.114
+@EAI_VERSION = 5.115
 
 EAI_set_version = {
 
@@ -18,6 +18,15 @@ EAI_save_compatibility = {
 		}
 
 		### Save compatibility effects
+
+			### 5.115
+
+				if = { limit = { check_variable = { global.EAI_version < 5.115 } }
+				
+					EAI_PC_set_global_variables = yes
+					EAI_MAP_set_province_railway_connections = yes
+					set_global_flag = EAI_delayed_startup_effects
+				} 
 
 			### 5.111
 
@@ -53,6 +62,19 @@ EAI_check_game_version = { # Show warning to players
 		
 	# 	country_event = EAI.5
 	# }
+}
+
+###
+
+EAI_MODE_set_challenging = {
+	set_global_flag = EAI_challenging_mode
+
+	set_global_flag = EAI_free_convoys
+}
+EAI_MODE_clear_challenging = {
+	clr_global_flag = EAI_challenging_mode
+
+	clr_global_flag = EAI_free_convoys
 }
 
 ###
@@ -183,167 +205,192 @@ EAI_get_state_controllers = { # arr:_states var:_at_war var:_same_side controlle
 
 # Transitions between fighter variants based on resources
 EAI_fighter_variant_selection = {
+	if = {
+		limit = {
+			NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E } }
+		}
+		
+		set_temp_variable = { rubber_excess = 0 }
+		set_temp_variable = { aluminium_shortage = 0 }
 
-	set_temp_variable = { rubber_excess = 0 }
-	set_temp_variable = { aluminium_shortage = 0 }
+		### Normal variant
 
-	### Normal variant
+		if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } }
 
-	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } }
+			# Has aluminium shortage
+			if = {
+				limit = {
+					check_variable = { EAI_aluminium_resource_shortage > 2 }
+					NOT = { EAI_STRATEGY_ignore_shortage_aircraft_design = yes }
+				}
 
-		# Has aluminium shortage
-		if = {
-			limit = {
-				check_variable = { EAI_aluminium_resource_shortage > 2 }
+				set_temp_variable = { aluminium_shortage = 1 }
 			}
 
-			set_temp_variable = { aluminium_shortage = 1 }
-		}
-
-		# Can afford the estimated extra rubber consumption
-		if = {
-			limit = {
-				check_variable = { resource@rubber > 0 }
-				set_temp_variable = { rubber_needed = resource_consumed@rubber }
-				multiply_temp_variable = { rubber_needed = 2 }
-				check_variable = { resource@rubber > rubber_needed }
-			}
-
-			set_temp_variable = { rubber_excess = 1 }
-		}
-	}
-
-	### More rubber variant
-
-	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } }
-
-		# Has aluminium shortage
-		if = {
-			limit = {
-				check_variable = { EAI_aluminium_resource_shortage > 2 }
-			}
-
-			set_temp_variable = { aluminium_shortage = 1 }
-		}
-
-		# Doesn't have rubber shortage
-		if = {
-			limit = {
-				NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
-			}
-
-			set_temp_variable = { rubber_excess = 1 }
-		}
-	}
-
-	### Less aluminium variant
-
-	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } }
-
-		# Can afford the estimated extra aluminium consumption
-		if = {
-			limit = {
-				NOT = {
-					AND = {
-						check_variable = { resource@aluminium > 0 }
-						set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
-						multiply_temp_variable = { aluminium_needed = 3 }
-						check_variable = { resource@aluminium > aluminium_needed }
+			# Can afford the estimated extra rubber consumption
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = { resource@rubber > 0 }
+							set_temp_variable = { rubber_needed = resource_consumed@rubber }
+							multiply_temp_variable = { rubber_needed = 1.5 }#from 2 to 1.5 as rubber based variants are critical to get
+							check_variable = { resource@rubber > rubber_needed }
+						}
+						EAI_STRATEGY_CHL_use_rubber_heavy_fighter_design = yes
 					}
+				}
+
+				set_temp_variable = { rubber_excess = 1 }
+			}
+		}
+
+		### More rubber variant
+
+		if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } }
+
+			# Has aluminium shortage
+			if = {
+				limit = {
+					check_variable = { EAI_aluminium_resource_shortage > 2 }
+					NOT = { EAI_STRATEGY_ignore_shortage_aircraft_design = yes }
+				}
+
+				set_temp_variable = { aluminium_shortage = 1 }
+			}
+
+			# Doesn't have rubber shortage
+			if = {
+				limit = {
+					OR = {
+						NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
+						EAI_STRATEGY_CHL_use_rubber_heavy_fighter_design = yes
+					}
+				}
+
+				set_temp_variable = { rubber_excess = 1 }
+			}
+		}
+
+		### Less aluminium variant
+
+		if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } }
+
+			# Can afford the estimated extra aluminium consumption
+			if = {
+				limit = {
+					NOT = {
+						AND = {
+							check_variable = { resource@aluminium > 0 }
+							set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
+							multiply_temp_variable = { aluminium_needed = 3 }
+							check_variable = { resource@aluminium > aluminium_needed }
+						}
+					}
+					NOT = {EAI_STRATEGY_ignore_shortage_aircraft_design = yes}	
+				}
+
+				set_temp_variable = { aluminium_shortage = 1 }
+			}
+
+			# Can afford the estimated extra rubber consumption
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = { resource@rubber > 0 }
+							set_temp_variable = { rubber_needed = resource_consumed@rubber }
+							multiply_temp_variable = { rubber_needed = 2 }
+							check_variable = { resource@rubber > rubber_needed }
+						}
+						EAI_STRATEGY_CHL_use_rubber_heavy_fighter_design = yes
+					}
+				}
+
+				set_temp_variable = { rubber_excess = 1 }
+			}
+		}
+
+		### More rubber + less aluminium variant
+
+		if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } }
+
+			# Doesn't have rubber shortage
+			if = {
+				limit = {
+					OR = {
+						NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
+						EAI_STRATEGY_CHL_use_rubber_heavy_fighter_design = yes
+					}
+				}
+
+				set_temp_variable = { rubber_excess = 1 }
+			}
+
+			# Can afford the estimated extra aluminium consumption
+			if = {
+				limit = {
+					NOT = {
+						AND = {
+							check_variable = { resource@aluminium > 0 }
+							set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
+							multiply_temp_variable = { aluminium_needed = 3 }
+							check_variable = { resource@aluminium > aluminium_needed }
+						}
+					}
+					NOT = { EAI_STRATEGY_ignore_shortage_aircraft_design = yes }
+				}
+
+				set_temp_variable = { aluminium_shortage = 1 }
+			}
+		}
+
+		###### 
+
+		if = { limit = { NOT = { has_country_flag = EAI_fighter_variant_selection_timeout } }
+
+			if = { limit = { check_variable = { aluminium_shortage = 1 } check_variable = { rubber_excess = 1 } }
+
+				if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } } } 
+					
+					set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+					set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D }
+
+					# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber + less aluminium"
 				}
 			}
 
-			set_temp_variable = { aluminium_shortage = 1 }
-		}
+			else_if = { limit = { check_variable = { aluminium_shortage = 1 } }
 
-		# Can afford the estimated extra rubber consumption
-		if = {
-			limit = {
-				check_variable = { resource@rubber > 0 }
-				set_temp_variable = { rubber_needed = resource_consumed@rubber }
-				multiply_temp_variable = { rubber_needed = 2 }
-				check_variable = { resource@rubber > rubber_needed }
-			}
+				if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } } } 
+					
+					set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+					set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C }
 
-			set_temp_variable = { rubber_excess = 1 }
-		}
-	}
-
-	### More rubber + less aluminium variant
-
-	if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } }
-
-		# Doesn't have rubber shortage
-		if = {
-			limit = {
-				NOT = { check_variable = { EAI_rubber_resource_shortage > 2 } }
-			}
-
-			set_temp_variable = { rubber_excess = 1 }
-		}
-
-		# Can afford the estimated extra aluminium consumption
-		if = {
-			limit = {
-				NOT = {
-					AND = {
-						check_variable = { resource@aluminium > 0 }
-						set_temp_variable = { aluminium_needed = resource_consumed@aluminium }
-						multiply_temp_variable = { aluminium_needed = 3 }
-						check_variable = { resource@aluminium > aluminium_needed }
-					}
+					# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Less aluminium"
 				}
 			}
 
-			set_temp_variable = { aluminium_shortage = 1 }
-		}
-	}
+			else_if = { limit = { check_variable = { rubber_excess = 1 } }
 
-	###### 
+				if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } } } 
 
-	if = { limit = { NOT = { has_country_flag = EAI_fighter_variant_selection_timeout } }
+					set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+					set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B }
 
-		if = { limit = { check_variable = { aluminium_shortage = 1 } check_variable = { rubber_excess = 1 } }
-
-			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D } } } 
-				
-				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
-				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_D }
-
-				# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber + less aluminium"
+					# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber"
+				}
 			}
-		}
 
-		else_if = { limit = { check_variable = { aluminium_shortage = 1 } }
+			else = {
 
-			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C } } } 
-				
-				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
-				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_C }
+				if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } } } 
+					
+					set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
+					set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A }
 
-				# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Less aluminium"
-			}
-		}
-
-		else_if = { limit = { check_variable = { rubber_excess = 1 } }
-
-			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B } } } 
-				
-				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
-				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_B }
-
-				# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: More rubber"
-			}
-		}
-
-		else = {
-
-			if = { limit = { NOT = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A } } } 
-				
-				set_country_flag = { flag = EAI_fighter_variant_selection_timeout value = 1 days = 90 }
-				set_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_A }
-
-				# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Normal type"
+					# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | FIGHTER VARIANT SELECTION: Normal type"
+				}
 			}
 		}
 	}
@@ -394,7 +441,7 @@ EAI_MIO_add_design_team_update = {
 
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_FTR = token:GER_messerschmitt_organization }
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_LARM = token:GER_daimler_benz_organization }
-					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_MARM = token:GER_daimler_benz_organization }
+					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_MARM = token:GER_man_organization }
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_HARM = token:GER_porsche_organization }
 				}
 
@@ -667,8 +714,8 @@ EAI_MIO_add_design_team_update = {
 										NOT = { check_variable = { EAI_MIO_team^found_tech_in_cat = 0 } }
 										set_temp_variable = { req_xp = @EAI_MIO_trait_diff_max_xp }
 										set_temp_variable = { _val_ = trait_diff }
-										set_temp_variable = { _max = 0 }
-										set_temp_variable = { _min = @EAI_MIO_trait_diff_scaled_num }
+										set_temp_variable = { _min = 0 }
+										set_temp_variable = { _max = @EAI_MIO_trait_diff_scaled_num }
 										EAI_MATH_TRIGGER_normalize = yes
 										set_temp_variable = { _scale = @EAI_MIO_trait_diff_scaled_xp }
 										EAI_MATH_TRIGGER_scale = yes
@@ -689,8 +736,8 @@ EAI_MIO_add_design_team_update = {
 							OR = {
 								has_air_experience > @EAI_MIO_min_air_xp_to_upgrade # Can assume the AI created this design by now
 							}
+							EAI_FTR_military_focus = yes #Not useful for heavy fighters
 						}
-
 						EAI_MIO_create_fighter_variant_with_team = yes
 					}
 
@@ -927,10 +974,10 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = light_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
+											special_type_slot_1 = fuel_tanks_small
 											special_type_slot_2 = fuel_tanks_small
-											special_type_slot_3 = armor_plate_small
-											special_type_slot_4 = self_sealing_fuel_tanks_small
+											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_4 = armor_plate_small
 										}
 										design_team = mio:[x]
 									}
@@ -970,9 +1017,9 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = light_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
-											special_type_slot_2 = fuel_tanks_small
-											special_type_slot_3 = armor_plate_small
+											special_type_slot_1 = armor_plate_small
+											special_type_slot_2 = armor_plate_small
+											special_type_slot_3 = fuel_tanks_small
 											special_type_slot_4 = non_strategic_materials_small
 										}
 										design_team = mio:[x]
@@ -1013,9 +1060,9 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = light_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
-											special_type_slot_2 = fuel_tanks_small
-											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = self_sealing_fuel_tanks_small
+											special_type_slot_3 = armor_plate_small
 											special_type_slot_4 = non_strategic_materials_small
 										}
 										design_team = mio:[x]
@@ -1026,7 +1073,46 @@ EAI_MIO_create_fighter_variant_with_team = {
 						}
 					}
 	
-				###
+				### Variant E
+
+					if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E } }
+
+						if = {
+							limit = {
+								set_temp_variable = { trait_diff = EAI_MIO_team_cat_traits^_tech_cat }
+								subtract_from_temp_variable = { trait_diff = EAI_MIO_fighter_4_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E }
+								OR = {
+									NOT = { check_variable = { trait_diff < 3 } }
+									AND = {
+										NOT = { check_variable = { trait_diff < 1 } }
+										has_air_experience > 200
+									}
+								}
+							}
+							set_variable = { EAI_MIO_fighter_4_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E = EAI_MIO_team_cat_traits^_tech_cat }
+							set_temp_variable = { team_added = 1 }
+							meta_effect = {
+								text = {
+									create_equipment_variant = {
+										type = small_plane_airframe_4
+										mark_older_equipment_obsolete = yes
+										modules = {
+											fixed_main_weapon_slot = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_2 = light_mg_4x
+											engine_type_slot = engine_4_1x
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = fuel_tanks_small
+											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_4 = armor_plate_small
+										}
+										design_team = mio:[x]
+									}
+								}
+								x = "[?EAI_MIO_team^_tech_cat.GetTokenKey]"
+							}
+						}
+				}
 			}
 		}
 
@@ -1074,8 +1160,8 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
-											special_type_slot_2 = armor_plate_small
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = fuel_tanks_small
 											special_type_slot_3 = armor_plate_small
 											special_type_slot_4 = armor_plate_small
 										}
@@ -1115,11 +1201,10 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
-											special_type_slot_2 = armor_plate_small
-											special_type_slot_3 = armor_plate_small
-											special_type_slot_4 = self_sealing_fuel_tanks_small
-										}
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = fuel_tanks_small
+											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_4 = armor_plate_small										}
 										design_team = mio:[x]
 									}
 								}
@@ -1158,7 +1243,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
+											special_type_slot_1 = fuel_tanks_small
 											special_type_slot_2 = armor_plate_small
 											special_type_slot_3 = armor_plate_small
 											special_type_slot_4 = non_strategic_materials_small
@@ -1201,9 +1286,9 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_4_1x
-											special_type_slot_1 = drop_tanks
+											special_type_slot_1 = self_sealing_fuel_tanks_small
 											special_type_slot_2 = armor_plate_small
-											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_3 = armor_plate_small
 											special_type_slot_4 = non_strategic_materials_small
 										}
 										design_team = mio:[x]
@@ -1214,7 +1299,45 @@ EAI_MIO_create_fighter_variant_with_team = {
 						}
 					}
 	
-				###
+				### Variant E
+	
+					if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E } }
+						
+						if = {
+							limit = {
+								set_temp_variable = { trait_diff = EAI_MIO_team_cat_traits^_tech_cat }
+								subtract_from_temp_variable = { trait_diff = EAI_MIO_fighter_3_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E }
+								OR = {
+									NOT = { check_variable = { trait_diff < 3 } }
+									AND = {
+										NOT = { check_variable = { trait_diff < 1 } }
+										has_air_experience > 200
+									}
+								}
+							}
+							set_variable = { EAI_MIO_fighter_3_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E = EAI_MIO_team_cat_traits^_tech_cat }
+							set_temp_variable = { team_added = 1 }
+							meta_effect = {
+								text = {
+									create_equipment_variant = {
+										type = small_plane_airframe_3
+										mark_older_equipment_obsolete = yes
+										modules = {
+											fixed_main_weapon_slot = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
+											engine_type_slot = engine_4_1x
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = fuel_tanks_small
+											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_4 = armor_plate_small										}
+										design_team = mio:[x]
+									}
+								}
+								x = "[?EAI_MIO_team^_tech_cat.GetTokenKey]"
+							}
+						}
+					}
 			}
 		}
 
@@ -1262,7 +1385,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_2 = light_mg_4x
 											engine_type_slot = engine_3_1x
-											special_type_slot_1 = drop_tanks
+											special_type_slot_1 = fuel_tanks_small
 											special_type_slot_2 = armor_plate_small
 											special_type_slot_3 = armor_plate_small
 										}
@@ -1300,11 +1423,11 @@ EAI_MIO_create_fighter_variant_with_team = {
 										modules = {
 											fixed_main_weapon_slot = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
-											fixed_auxiliary_weapon_slot_2 = light_mg_4x
+											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_3_1x
-											special_type_slot_1 = drop_tanks
-											special_type_slot_2 = armor_plate_small
-											special_type_slot_3 = self_sealing_fuel_tanks_small
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = self_sealing_fuel_tanks_small
+											special_type_slot_3 = armor_plate_small
 										}
 										design_team = mio:[x]
 									}
@@ -1342,7 +1465,7 @@ EAI_MIO_create_fighter_variant_with_team = {
 										modules = {
 											fixed_main_weapon_slot = heavy_mg_4x
 											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
-											fixed_auxiliary_weapon_slot_2 = light_mg_4x
+											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
 											engine_type_slot = engine_3_1x
 											special_type_slot_1 = drop_tanks
 											special_type_slot_2 = armor_plate_small
@@ -1398,7 +1521,45 @@ EAI_MIO_create_fighter_variant_with_team = {
 						}
 					}
 	
-				###
+				### Variant E
+	
+					if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E } }
+		
+						if = {
+							limit = {
+								set_temp_variable = { trait_diff = EAI_MIO_team_cat_traits^_tech_cat }
+								subtract_from_temp_variable = { trait_diff = EAI_MIO_fighter_2_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E }
+								OR = {
+									NOT = { check_variable = { trait_diff < 3 } }
+									AND = {
+										NOT = { check_variable = { trait_diff < 1 } }
+										has_air_experience > 200
+									}
+								}
+							}
+							set_variable = { EAI_MIO_fighter_2_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E = EAI_MIO_team_cat_traits^_tech_cat }
+							set_temp_variable = { team_added = 1 }
+							meta_effect = {
+								text = {
+									create_equipment_variant = {
+										type = small_plane_airframe_2
+										mark_older_equipment_obsolete = yes
+										modules = {
+											fixed_main_weapon_slot = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_1 = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_2 = heavy_mg_4x
+											engine_type_slot = engine_3_1x
+											special_type_slot_1 = fuel_tanks_small
+											special_type_slot_2 = fuel_tanks_small
+											special_type_slot_3 = self_sealing_fuel_tanks_small
+										}
+										design_team = mio:[x]
+									}
+								}
+								x = "[?EAI_MIO_team^_tech_cat.GetTokenKey]"
+							}
+						}
+					}
 			}
 		}
 
@@ -1574,7 +1735,43 @@ EAI_MIO_create_fighter_variant_with_team = {
 						}
 					}
 	
-				###
+				### Variant E
+
+					if = { limit = { check_variable = { EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E } }
+
+						if = {
+							limit = {
+								set_temp_variable = { trait_diff = EAI_MIO_team_cat_traits^_tech_cat }
+								subtract_from_temp_variable = { trait_diff = EAI_MIO_fighter_1_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E }
+								OR = {
+									NOT = { check_variable = { trait_diff < 3 } }
+									AND = {
+										NOT = { check_variable = { trait_diff < 1 } }
+										has_air_experience > 200
+									}
+								}
+							}
+							set_variable = { EAI_MIO_fighter_1_last_upgrade_traits^global.EAI_FIGHTER_VARIANT_E = EAI_MIO_team_cat_traits^_tech_cat }
+							set_temp_variable = { team_added = 1 }
+							meta_effect = {
+								text = {
+									create_equipment_variant = {
+										type = small_plane_airframe_1
+										mark_older_equipment_obsolete = yes
+										modules = {
+											fixed_main_weapon_slot = heavy_mg_4x
+											fixed_auxiliary_weapon_slot_1 = light_mg_4x
+											engine_type_slot = engine_2_1x
+											special_type_slot_1 = drop_tanks
+											special_type_slot_2 = self_sealing_fuel_tanks_small
+										}
+										design_team = mio:[x]
+									}
+								}
+								x = "[?EAI_MIO_team^_tech_cat.GetTokenKey]"
+							}
+						}
+					}
 			}
 		}
 
@@ -2524,5 +2721,21 @@ EAI_remove_relief_of_command = {
 		}
 	
 		remove_ideas = relief_of_command_spirit
+	}
+}
+
+EAI_simulate_fleet_training_monthly = {
+	if = {
+		limit = {
+			has_war = no
+			date > 1937.1.1 #AI trains properly early game
+		}
+		if = {
+			limit = {
+				original_tag = USA	
+			}
+			navy_experience = 30
+			#FUEL reduction not needed as USA has virtually infinite fuel
+		}
 	}
 }

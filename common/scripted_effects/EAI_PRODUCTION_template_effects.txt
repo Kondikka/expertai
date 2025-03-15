@@ -152,8 +152,14 @@ EAI_TEMPLATE_generic_20w_infantry_role = {
 
 		### VARIANT: REGULAR
 		else = {
+			if = { limit = { EAI_STRATEGY_plans_on_using_rangers = yes }
 
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 111 }
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 113 }
+			}
+			else = {
+
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 111 }
+			}
 		}
 	}
 
@@ -174,8 +180,14 @@ EAI_TEMPLATE_generic_20w_infantry_role = {
 
 		### VARIANT: REGULAR
 		else = {
+			if = { limit = { EAI_STRATEGY_plans_on_using_rangers = yes }
 
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 121 }
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 123 }
+			}
+			else = {
+
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 121 }
+			}
 		}
 	}
 
@@ -196,8 +208,14 @@ EAI_TEMPLATE_generic_20w_infantry_role = {
 
 		### VARIANT: REGULAR
 		else = {
+			if = { limit = { EAI_STRATEGY_plans_on_using_rangers = yes }
 
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 131 }
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 133 }
+			}
+			else = {
+
+				set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 131 }
+			}
 		}
 	}
 }
@@ -742,10 +760,33 @@ EAI_TEMPLATE_set_marine_template_flags = {
 			check_variable = { EAI_FOCUS/LAND/spec_ops = global.EAI_MAR_SPEC_OPS }
 		}
 
-		if = { limit = { has_country_flag = EAI_TEMPLATE_marine_template_upgrade NOT = { AND = { EAI_amphibious_division_focus = yes has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade } } }
-		
+		if = {
+			limit = {
+				has_country_flag = EAI_TEMPLATE_marine_template_upgrade
+				OR = {
+					# If EAI_amphibious_division_focus = yes and has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade
+					# then the if returns false regardless of has_global_flag = EAI_challenging_mode
+					AND = {
+						EAI_amphibious_division_focus = yes
+						has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade
+					}
+					# If EAI_amphibious_division_focus = yes and has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade is false
+					# then the if returns true only if has_global_flag = EAI_challenging_mode is false
+					AND = {
+						EAI_MODE_normal = yes
+						EAI_amphibious_division_focus = yes
+						NOT = { has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade }
+					}
+					# If EAI_amphibious_division_focus = no and has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade is false
+					# then the if always returns true regardless of has_global_flag = EAI_challenging_mode
+					AND = {
+						NOT = { EAI_amphibious_division_focus = yes }
+						NOT = { has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade }
+					}
+				}
+			}
 			EAI_TEMPLATE_generic_40w_marine_role = yes
-		}
+		}	
 
 		if = { limit = { has_country_flag = EAI_TEMPLATE_amphibious_template_upgrade EAI_amphibious_division_focus = yes }
 		
@@ -1321,6 +1362,7 @@ EAI_TEMPLATE_set_suppression_template_flags = {
 
 			set_temp_variable = { _check_xp = 100 }
 			EAI_XP_has_army_check_xp = yes
+			EAI_land_doctrine_completed = yes
 		}
 	
 		set_country_flag = { flag = EAI_SUPPRESSION_TEMPLATE value = 2 } 
@@ -1331,6 +1373,7 @@ EAI_TEMPLATE_set_suppression_template_flags = {
 			has_country_flag = { flag = EAI_SUPPRESSION_TEMPLATE value = 2 }
 
 			EAI_40w_template_unlocked = yes
+			EAI_land_doctrine_completed = yes
 		}
 	
 		set_country_flag = { flag = EAI_SUPPRESSION_TEMPLATE value = 3 } 
@@ -1371,6 +1414,7 @@ EAI_TEMPLATE_armor_template_upgrade = {
 	if = {
 		limit = {
 			NOT = { has_country_flag = EAI_larm_template_upgrade }
+			NOT = { EAI_amphibious_division_focus = yes } #Don't produce tank divisions as amphibious tank divisions are filling this role
 
 			### Focus req.
 
@@ -1408,7 +1452,8 @@ EAI_TEMPLATE_armor_template_upgrade = {
 
 			### Strategies
 
-				EAI_PR_Priorize_tanks_if_MA_Build = yes
+				EAI_STRATEGY_CHL_mass_infantry_prioritize_tanks = yes
+				EAI_STRATEGY_CHL_wait_for_better_tanks = yes
 
 			###
 		}
@@ -1421,6 +1466,7 @@ EAI_TEMPLATE_armor_template_upgrade = {
 	if = {
 		limit = {
 			NOT = { has_country_flag = EAI_marm_template_upgrade }
+			NOT = { EAI_amphibious_division_focus = yes } #Don't produce tank divisions as amphibious tank divisions are filling this role
 
 			### Focus req.
 
@@ -1458,7 +1504,8 @@ EAI_TEMPLATE_armor_template_upgrade = {
 
 			### Strategies
 
-				EAI_PR_Priorize_tanks_if_MA_Build = yes
+				EAI_STRATEGY_CHL_mass_infantry_prioritize_tanks = yes
+				EAI_STRATEGY_CHL_wait_for_better_tanks = yes
 
 			###
 		}
@@ -1471,7 +1518,7 @@ EAI_TEMPLATE_armor_template_upgrade = {
 	if = {
 		limit = {
 			NOT = { has_country_flag = EAI_harm_template_upgrade }
-
+			NOT = { EAI_amphibious_division_focus = yes } #Don't produce tank divisions as amphibious tank divisions are filling this role
 			### Focus req.
 
 			EAI_HARM_military_focus = yes
@@ -1508,7 +1555,8 @@ EAI_TEMPLATE_armor_template_upgrade = {
 
 			### Strategies
 
-				EAI_PR_Priorize_tanks_if_MA_Build = yes
+				EAI_STRATEGY_CHL_mass_infantry_prioritize_tanks = yes
+				EAI_STRATEGY_CHL_wait_for_better_tanks = yes
 
 			###
 		}
@@ -1580,11 +1628,20 @@ EAI_TEMPLATE_amphibious_template_upgrade = {
 			has_tech = amphibious_drive
 			has_tech = amphibious_mechanized_infantry
 
+			### Strategies
+			EAI_STRATEGY_CHL_wait_for_better_tanks = yes
+
 			OR = {
 				EAI_LARM_military_focus = yes
 				EAI_MARM_military_focus = yes
 				EAI_HARM_military_focus = yes
 			}
+
+			### Priorities
+
+			set_temp_variable = { _check_xp = 30 }
+			EAI_XP_has_army_check_xp = yes
+
         }
 
         set_country_flag = EAI_TEMPLATE_amphibious_template_upgrade

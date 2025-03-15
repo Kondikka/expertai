@@ -510,8 +510,21 @@ EAI_MILITARY_save_airforce_strategy = {
 							divide_temp_variable = { air_ratio = air_force_size_@THIS }
 						}
 
-						check_variable = { air_difference > 800 } # enemy has > 800 fighters
-						check_variable = { air_ratio < 0.25 } # ratio to enemy < 0.25
+						### SOV
+						
+							if = { limit = { tag = SOV }
+								check_variable = { air_difference > 800 }
+								check_variable = { air_ratio < 0.5 }
+							}
+
+						###
+
+							else = {
+								check_variable = { air_difference > 800 } # enemy has > 800 fighters
+								check_variable = { air_ratio < 0.25 } # ratio to enemy < 0.25
+							}
+
+						###
 					}
 
 					ROOT = { 
@@ -537,7 +550,19 @@ EAI_MILITARY_save_airforce_strategy = {
 
 			if = { 
 				limit = { 
-					has_deployed_air_force_size = { size > 2000 type = fighter } 
+					### SOV
+						
+						if = { limit = { tag = SOV }
+							has_deployed_air_force_size = { size > 3000 type = fighter } 
+						}
+
+					###
+
+						else = {
+							has_deployed_air_force_size = { size > 2000 type = fighter } 
+						}
+
+					###
 				}
 
 				clr_country_flag = EAI_MILITARY_save_airforce_strategy
@@ -580,10 +605,25 @@ EAI_MILITARY_save_airforce_strategy = {
 
 					if = {
 						limit = {
-							OR = {
-								check_variable = { air_difference > 400 }
-								check_variable = { air_ratio < 0.30 }
-							}
+							### SOV
+						
+								if = { limit = { tag = SOV }
+									OR = {
+										check_variable = { air_difference > 400 }
+										check_variable = { air_ratio < 0.7 }
+									}
+								}
+
+							###
+
+								else = {
+									OR = {
+										check_variable = { air_difference > 400 }
+										check_variable = { air_ratio < 0.30 }
+									}
+								}
+
+							###
 						}
 
 						set_temp_variable = { break = 1 }

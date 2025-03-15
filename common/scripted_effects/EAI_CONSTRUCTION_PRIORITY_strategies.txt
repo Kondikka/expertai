@@ -15,6 +15,7 @@ EAI_PC_startup_strategies = {
 
 	if = { limit = { tag = SOV } EAI_PC_startup_strategy_SOV = yes }
 	if = { limit = { tag = JAP } EAI_PC_startup_strategy_JAP = yes }
+	if = { limit = { tag = USA } EAI_PC_startup_strategy_USA = yes }
 }
 
 EAI_PC_startup_strategy_SOV = {
@@ -173,6 +174,54 @@ EAI_PC_startup_strategy_JAP = {
 	}
 }
 
+EAI_PC_startup_strategy_USA = {
+
+    ### Define states to develop infrastructure
+    clear_array = EAI_PC_USA_TARGET_STATES_FOR_INFRA
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 378 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 379 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 387 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 380 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 377 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 376 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 375 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 374 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 371 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 372 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 373 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 368 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 389 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 391 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 394 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 393 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 261 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 360 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 358 }
+    add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 357 }
+	add_to_array = { EAI_PC_USA_TARGET_STATES_FOR_INFRA = 388 }
+
+    for_each_scope_loop = { array = EAI_PC_USA_TARGET_STATES_FOR_INFRA
+        # Step 1: Check and calculate how much infrastructure is needed
+        set_temp_variable = { _project_building_type = global.EAI_PC_INF } # Specify infrastructure type
+        EAI_PC_get_total_building_level = yes                             # Fetch current level and queued levels
+
+        set_temp_variable = { needed_infra = 5 }                          # Target maximum level
+        subtract_from_temp_variable = { needed_infra = building_level_ }  # Calculate levels still needed
+
+        # Step 2: If more infrastructure is required, queue the projects
+        if = {
+            limit = { check_variable = { needed_infra > 0 } }
+
+            set_temp_variable = { _project_type_id = strategy_type_id }    # Use the USA-specific strategy type ID
+            set_temp_variable = { _project_priority = strategy_type_prio } # High priority for these projects
+            set_temp_variable = { _project_queue_num = needed_infra }      # Queue the calculated number of levels
+
+            EAI_PC_start_project = yes
+        }
+    }
+}
+
+
 ###############################################################
 ### 	Dynamic strategies
 ###############################################################
@@ -186,6 +235,7 @@ EAI_PC_dynamic_strategies = {
 
 	if = { 		limit = { tag = SOV } EAI_PC_dynamic_strategy_SOV = yes }
 	else_if = { limit = { tag = JAP } EAI_PC_dynamic_strategy_JAP = yes }
+	else_if = { limit = { tag = USA } EAI_PC_dynamic_strategy_USA = yes }
 
 	###
 
@@ -803,6 +853,139 @@ EAI_PC_dynamic_strategy_JAP_daily = {
 			EAI_PC_queue_new_shared_types = yes
 		}
 	}
+}
+
+### USA
+
+EAI_PC_dynamic_strategy_USA = {
+
+    ###################################################################################################
+    ### State 0: Null State
+    ###################################################################################################
+
+    if = { limit = { check_variable = { EAI_PC_strategy_state = 0 } }
+
+        ### Transition to State 1
+        if = { 
+            limit = { 
+                set_temp_variable = { _transition_to = 1 } 
+                check_variable = { EAI_PC_changed_state = 0 }
+                always = yes
+            }
+            EAI_PC_transition_state = yes
+
+            ### Effect of Transition
+            set_country_flag = EAI_PC_dynamic_strategy_delay_effect
+            set_country_flag = { flag = EAI_PC_dynamic_strategy_delay_effect_duration value = 1 days = 1 }
+        }
+    }
+
+    ###################################################################################################
+    ### State 1: Full Factory Fraction Until 1937
+    ###################################################################################################
+
+    if = { limit = { check_variable = { EAI_PC_strategy_state = 1 } }
+
+        ### Entry Effect
+        if = { 
+            limit = { check_variable = { EAI_PC_changed_state = 1 } }
+            set_variable = { EAI_PC_changed_state = 0 }
+            set_country_flag = EAI_block_AI_construction
+        }
+
+        ### Effect Until 1937
+        if = {
+            limit = { date < 1937.6.1 }
+            set_temp_variable = { _assign_fraction = 1 }   # Allow full factory utilization
+            EAI_PC_set_max_factory_limit = yes
+        }
+
+        ### Transition After 1937
+        else = {
+            set_temp_variable = { _transition_to = 2 }
+            EAI_PC_transition_state = yes
+        }
+    }
+
+    ###################################################################################################
+    ### State 2: Generic Behavior After 1937
+    ###################################################################################################
+
+    if = { limit = { check_variable = { EAI_PC_strategy_state = 2 } }
+
+        ### Entry Effect
+        if = { 
+            limit = { check_variable = { EAI_PC_changed_state = 1 } }
+            set_variable = { EAI_PC_changed_state = 0 }
+            clr_country_flag = EAI_block_AI_construction
+        }
+
+        ### Default Behavior
+        if = { 
+            limit = { check_variable = { EAI_PC_changed_state = 0 } }
+
+            set_temp_variable = { _assign_fraction = 0.35 } # Default fraction
+            set_temp_variable = { _assign_max = 30 }        # Default maximum factories
+            EAI_PC_set_max_factory_limit = yes
+
+            EAI_PC_sort_projects_by_build_time = yes
+            EAI_PC_sort_projects_by_priority = yes
+
+            # Sort fort projects
+            add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_BUNKER }
+            add_to_temp_array = { _sort_projects_TYPES = global.EAI_PC_CBUNKER }
+            EAI_PC_sort_projects_by_enemy_distance = yes
+        }
+    }
+}
+
+EAI_PC_dynamic_strategy_USA_daily = {
+
+    ###################################################################################################
+    ### State 1: Queue Projects During Early Phase
+    ###################################################################################################
+
+    if = { limit = { check_variable = { EAI_PC_strategy_state = 1 } }
+
+        if = { 
+            limit = { 
+                has_country_flag = EAI_PC_dynamic_strategy_delay_effect 
+                NOT = { has_country_flag = EAI_PC_dynamic_strategy_delay_effect_duration }
+            }
+            clr_country_flag = EAI_PC_dynamic_strategy_delay_effect
+            EAI_PC_clear_game_construction_queue = yes
+        }
+
+        ### Queue Projects with Reserved Factories
+        if = {
+            limit = {
+                check_variable = { EAI_PC_reserved_factories_available > 0 }
+            }
+            set_temp_variable = { _queue_new_shared_types_with_factories_FACTORIES = EAI_PC_reserved_factories_available }
+            add_to_temp_array = { _queue_new_shared_types_with_factories_TYPES = global.EAI_PC_CIC }
+            set_temp_variable = { _project_type_id = strategy_type_id }
+            set_temp_variable = { _project_priority = strategy_type_prio }
+            EAI_PC_queue_new_shared_types = yes
+        }
+    }
+
+    ###################################################################################################
+    ### State 2: Generic Daily Behavior
+    ###################################################################################################
+
+    if = { limit = { check_variable = { EAI_PC_strategy_state = 2 } }
+
+        if = { 
+            limit = { 
+                check_variable = { EAI_PC_reserved_factories_available > 0 }
+            }
+            set_temp_variable = { _queue_new_shared_types_with_factories_FACTORIES = EAI_PC_reserved_factories_available }
+            add_to_temp_array = { _queue_new_shared_types_with_factories_TYPES = global.EAI_PC_MIC }
+            set_temp_variable = { _project_type_id = strategy_type_id }
+            set_temp_variable = { _project_priority = strategy_type_prio }
+            EAI_PC_queue_new_shared_types = yes
+        }
+    }
 }
 
 ### GENERIC

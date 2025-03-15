@@ -1037,7 +1037,7 @@ ETH_second_italo_ethiopian_war_category = {
 		timeout_effect = {
 			remove_ideas = ETH_christmas_offensive_idea
 
-			# TODO_MANU Change to Italian event, and move activation effects to there
+			# MM: Change to Italian event, and move activation effects to there
 			hidden_effect = {
 				ITA = {
 					ITA_benito_mussolini = {
@@ -1286,6 +1286,16 @@ ETH_italian_occupation_category = {
 				}
 				RAJ = { all_owned_state = { is_controlled_by = RAJ } }
 			}
+
+			if = {
+				limit = {
+					RAJ = { is_ai = no } #to block ai from stealing advisors, if mp peole have to coordinate themselves
+				}
+				OR = {
+					RAJ = { NOT = { has_completed_focus = RAJ_chindits_dlc } }
+					RAJ = { NOT = { has_completed_focus = RAJ_chindits } } #non dlc version
+				}
+			}
 		}
 
 		visible = {
@@ -1309,17 +1319,16 @@ ETH_italian_occupation_category = {
 				}	
 				hidden_effect = {
 					RAJ = {
+						create_orde_wingate = yes
 						RAJ_orde_wingate = {
-							add_corps_commander_role = {
-								#character = RAJ_orde_wingate
-								traits = { jungle_rat commando }
-								skill = 4
-								attack_skill = 3
-								defense_skill = 3
-								planning_skill = 2
-								logistics_skill = 5
-							}
 							set_nationality = ETH
+							if = {
+								limit = {
+									has_character_flag = is_in_raj
+								}
+								clr_character_flag = is_in_raj
+							}
+							set_character_flag = is_in_ethiopia
 						}
 					}
 				}
@@ -1351,12 +1360,10 @@ ETH_italian_occupation_category = {
 			}
 		}
 		state_target = yes
+		target_array = ROOT.core_states
 		on_map_mode = map_only 
 		target_trigger = {
 			FROM = {
-				is_core_of = ETH
-				NOT = { is_controlled_by = ETH }
-				# Patriot states
 				OR = {
 					state = 842
 					state = 841
@@ -1365,6 +1372,8 @@ ETH_italian_occupation_category = {
 					state = 840
 					state = 839
 				}
+				NOT = { is_controlled_by = ETH }
+				# Patriot states
 			}
 		}
 		target_root_trigger = {
@@ -1697,8 +1706,10 @@ ETH_anti_colonialism_category = {
 					has_active_resistance = yes
 				}
 			}
-			
 		}
+
+		target_array = global.colonial_powers
+		
 		target_root_trigger = { original_tag = ETH } 
 		# on_map_mode = map_only
 		fire_only_once = yes  
@@ -1801,7 +1812,7 @@ ETH_improve_country_category = {
 			}
 		}
 		target_root_trigger = { tag = ETH } # For now - change if making it generic
-		state_target = yes
+		state_target = any_controlled_state
 		on_map_mode = map_only
 		fire_only_once = yes # Only once per State
 		available = {
@@ -1858,7 +1869,7 @@ ETH_improve_country_category = {
 			}
 		}
 		target_root_trigger = { tag = ETH } # For now - change if making it generic
-		state_target = yes
+		state_target = any_owned_state
 		on_map_mode = map_only
 		# fire_only_once = yes # Only once per State
 		available = {
@@ -1911,7 +1922,7 @@ ETH_improve_country_category = {
 			}
 		}
 		target_root_trigger = { tag = ETH } # For now - change if making it generic
-		state_target = yes
+		state_target = any_owned_state
 		on_map_mode = map_only
 		fire_only_once = yes # Only once per State
 		available = {

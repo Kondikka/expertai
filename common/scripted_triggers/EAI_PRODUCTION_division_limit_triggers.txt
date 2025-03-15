@@ -34,16 +34,19 @@ EAI_armored_division_limit = {
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_sp_anti_air_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_sp_artillery_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@medium_tank_destroyer_brigade }
+	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@amphibious_medium_armor }
 
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@heavy_armor }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@heavy_sp_anti_air_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@heavy_sp_artillery_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@heavy_tank_destroyer_brigade }
+	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@amphibious_heavy_armor }
 
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_armor }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_sp_anti_air_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_sp_artillery_brigade }
 	add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@modern_tank_destroyer_brigade }
+	# add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@amphibious_modern_armor } #to replace with correct name
 
 	if = { limit = { OR = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } check_variable = { EAI_FOCUS/LAND/attachment = global.EAI_LARM_ATTACHMENT } } } # dont count the garbage it starts with
 
@@ -51,9 +54,112 @@ EAI_armored_division_limit = {
 		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_anti_air_brigade }
 		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_sp_artillery_brigade }
 		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@light_tank_destroyer_brigade }
+		add_to_temp_variable = { EAI_arm_bat_count = num_battalions_with_type@amphibious_light_armor }
 	}
 
 	check_variable = { EAI_arm_bat_count > EAI_armor_division_cap }
+}
+
+EAI_armor_production_design_upgrade_fix_needed = {
+	OR = {
+		AND = {
+			OR = {
+				AND = {
+					check_variable = { num_equipment@medium_tank_amphibious_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@medium_tank_amphibious_chassis > 0.1}
+				}
+				AND = {
+					check_variable = { num_equipment@heavy_tank_amphibious_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@heavy_tank_amphibious_chassis > 0.1}
+				}
+				AND = {
+					check_variable = { num_equipment@light_tank_amphibious_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@light_tank_amphibious_chassis > 0.1}
+				}
+			}
+			EAI_amphibious_division_focus = yes
+		}
+		AND = {
+			OR = {
+				AND = {
+					check_variable = { num_equipment@medium_tank_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@medium_tank_chassis > 0.1}
+				}
+				OR = {
+					AND = {
+						check_variable = { num_equipment@mechanized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@mechanized_equipment > 0.1}
+					}
+					AND = {
+						check_variable = { num_equipment@motorized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@motorized_equipment > 0.1}
+					}
+				}
+			}
+			EAI_MARM_military_focus = yes
+			NOT = { EAI_amphibious_division_focus = yes }
+		}
+		AND = {
+			OR = {
+				AND = {
+					check_variable = { num_equipment@heavy_tank_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@heavy_tank_chassis > 0.1}
+				}
+				OR = {
+					AND = {
+						check_variable = { num_equipment@mechanized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@mechanized_equipment > 0.1}
+					}
+					AND = {
+						check_variable = { num_equipment@motorized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@motorized_equipment > 0.1}
+					}
+				}
+			}
+			EAI_HARM_military_focus = yes
+			NOT = { EAI_amphibious_division_focus = yes }
+		} 
+		AND = {
+			OR = {
+				AND = {
+					check_variable = { num_equipment@light_tank_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@light_tank_chassis > 0.1}
+				}
+				OR = {
+					AND = {
+						check_variable = { num_equipment@mechanized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@mechanized_equipment > 0.1}
+					}
+					AND = {
+						check_variable = { num_equipment@motorized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@motorized_equipment > 0.1}
+					}
+				}
+			}
+			EAI_LARM_military_focus = yes
+			NOT = { EAI_amphibious_division_focus = yes }
+		} 
+		AND = {
+			OR = {
+				AND = {
+					check_variable = { num_equipment@modern_tank_chassis < 50}
+					check_variable = { num_equipment_in_armies_k@modern_tank_chassis > 0.1}
+				}
+				OR = {
+					AND = {
+						check_variable = { num_equipment@mechanized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@mechanized_equipment > 0.1}
+					}
+					AND = {
+						check_variable = { num_equipment@motorized_equipment < 50}
+						check_variable = { num_equipment_in_armies_k@motorized_equipment > 0.1}
+					}
+				}
+			}
+			EAI_MODARM_equipment_production = yes
+			NOT = { EAI_amphibious_division_focus = yes }
+		}
+	}
 }
 
 EAI_light_armor_division_limit = {

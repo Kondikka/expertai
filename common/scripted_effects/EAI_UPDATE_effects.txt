@@ -320,6 +320,39 @@ EAI_bimonthly_update = {
 EAI_monthly_update = {
 
 	#################################################
+	### 	Global yearly update
+	#################################################
+
+	IF = { 
+		limit = { NOT = { has_global_flag = EAI_global_yearly_update } }
+
+
+		set_temp_variable = { EAI_month_modulo = global.EAI_months_elapsed_corrected }
+		modulo_temp_variable = {
+			EAI_month_modulo = 12
+		}
+		if = {
+			limit = {
+				check_variable = { EAI_month_modulo = 0 }
+				check_variable = { global.EAI_months_elapsed > 0 } 
+			}
+			add_to_variable = { global.EAI_years_elapsed = 1 }
+			set_global_flag = { flag = EAI_global_yearly_update value = 1 days = 2 }
+		}
+		if = {
+			limit = {
+				check_variable = { EAI_month_modulo = 8 } #I want the yearly update to occur in September, so that training tank divisions again for 9 months allow them to deploy in summer. 
+			}
+			every_country = {
+				EAI_armor_production_design_upgrade_fix = yes
+			}
+		}
+	}
+
+	set_global_flag = { flag = EAI_global_yearly_update value = 1 days = 2 }
+
+
+	#################################################
 	### 	Global monthly update
 	#################################################
 
@@ -334,6 +367,13 @@ EAI_monthly_update = {
 		every_country = {
 
 			EAI_num_fighters_deployed = yes
+		}
+
+		###
+
+		if = { limit = { NOT = { has_global_flag = EAI_delayed_startup_effects } check_variable = { global.EAI_months_elapsed = 2 } }
+			set_global_flag = EAI_delayed_startup_effects
+			EAI_delayed_startup_effects = yes
 		}
 	}
 
@@ -360,13 +400,13 @@ EAI_monthly_update = {
 			}
 			else = { subtract_from_variable = { EAI_biyearly_update = 1 } }
 
-		###
+		### SOV strategy to delete light tanks
 
 			if = { 
 				limit = { 
 					tag = SOV
-					is_ai = yes
-					has_global_flag = EAI_challenging_mode
+					EAI_MODE_challenging = yes
+					NOT = { check_variable = { EAI_FOCUS/LAND/armor_focus = global.EAI_LARM_FOCUS } }
 					NOT = { has_country_flag = EAI_SOV_CHL_deleted_tanks }
 				}
 				set_country_flag = EAI_SOV_CHL_deleted_tanks
@@ -470,6 +510,8 @@ EAI_monthly_update = {
 		else = { clr_country_flag = EAI_enemy_mines_on_our_coasts_critical }
 
 		EAI_RESOURCE_calculate_fuel_need = yes
+
+		EAI_simulate_fleet_training_monthly = yes
 	}
 }
 

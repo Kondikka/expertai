@@ -37,8 +37,6 @@ EAI_startup_effects = {
 		set_global_flag = EAI_neutral_spr
 
 		set_global_flag = EAI_lend_lease
-
-		set_global_flag = EAI_challenging_mode
 		
 		set_variable = { global.EAI_eastern_front = 1 }
 		set_variable = { global.EAI_sino_japanese_war = 2 }
@@ -58,6 +56,15 @@ EAI_startup_effects = {
 		set_country_flag = { flag = EAI_PR_block_research value = 1 days = 10 }
 		EAI_PR_priority_research_update = yes
 		EAI_PR_priority_research_update_daily = yes
+
+		### Make ENG and JAP focus on range fighters
+
+		if = {
+			limit = {
+				EAI_is_island_nation = yes
+			}
+			set_variable = {  EAI_fighter_variant = global.EAI_FIGHTER_VARIANT_E }
+		}
 	}
 
 	###
@@ -79,6 +86,30 @@ EAI_startup_effects = {
 			set_autonomy = {
 				target = MAL
 				autonomy_state = autonomy_puppet
+			}
+		}
+	}
+}
+
+EAI_delayed_startup_effects = { # Month from startup
+
+	if = { limit = { EAI_MODE_challenging = yes }
+
+		### Cheaty way to resolve trade issues
+	
+		every_country = { limit = { is_ai = yes }
+			EAI_TRADE_allies_opinions = yes
+		}
+
+		### Stop UK from taking all MAL divisions
+
+		if = { limit = { ENG = { is_ai = yes } MAL = { is_ai = yes } }
+
+			ENG ={
+				annex_country = {
+					target = MAL
+					transfer_troops = yes
+				}
 			}
 		}
 	}

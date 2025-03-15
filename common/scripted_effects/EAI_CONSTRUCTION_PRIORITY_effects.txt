@@ -27,6 +27,8 @@
 # var: global.EAI_PC_BFACILITY = 16
 # var: global.EAI_PC_RSITE = 17
 # var: global.EAI_PC_NBASE = 18
+# var: global.EAI_PC_RAIL = 19
+# var: global.EAI_PC_HUB = 20
 
 # var: global.EAI_PC_BUILDING_COST^TYPE
 # arr: global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT, val = TYPE
@@ -101,6 +103,8 @@ EAI_PC_set_global_variables = { if = { limit = { has_country_flag = EAI_PC_trace
 
 	set_variable = { global.EAI_PC_RSITE = 17 }
 	set_variable = { global.EAI_PC_NBASE = 18 }
+	set_variable = { global.EAI_PC_RAIL = 19 }
+	set_variable = { global.EAI_PC_HUB = 20 }
 
 	###
 
@@ -124,12 +128,15 @@ EAI_PC_set_global_variables = { if = { limit = { has_country_flag = EAI_PC_trace
 
 	set_variable = { global.EAI_PC_BUILDING_COST^global.EAI_PC_RSITE = 6400 }
 	set_variable = { global.EAI_PC_BUILDING_COST^global.EAI_PC_NBASE = 5000 }
+	set_variable = { global.EAI_PC_BUILDING_COST^global.EAI_PC_RAIL = 170 }
+	set_variable = { global.EAI_PC_BUILDING_COST^global.EAI_PC_HUB = 20000 }
 
 	###
 
 	set_variable = { global.EAI_PC_BUILDING_EXTRA_COST^global.EAI_PC_BUNKER = 500 }
 	set_variable = { global.EAI_PC_BUILDING_EXTRA_COST^global.EAI_PC_CBUNKER = 500 }
 	set_variable = { global.EAI_PC_BUILDING_EXTRA_COST^global.EAI_PC_NBASE = 1000 }
+	set_variable = { global.EAI_PC_BUILDING_EXTRA_COST^global.EAI_PC_RAIL = 130 }
 
 	###
 
@@ -147,6 +154,8 @@ EAI_PC_set_global_variables = { if = { limit = { has_country_flag = EAI_PC_trace
 	add_to_array = { global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT = global.EAI_PC_CBUNKER }
 	add_to_array = { global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT = global.EAI_PC_RSITE }
 	add_to_array = { global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT = global.EAI_PC_NBASE }
+	add_to_array = { global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT = global.EAI_PC_RAIL }
+	add_to_array = { global.EAI_PC_BUILDING_INFRASTRUCTURE_EFFECT = global.EAI_PC_HUB }
 
 	###
 
@@ -162,6 +171,8 @@ EAI_PC_set_global_variables = { if = { limit = { has_country_flag = EAI_PC_trace
 	add_to_array = { global.EAI_PC_BUILDING_PROVINCIAL = global.EAI_PC_BUNKER }
 	add_to_array = { global.EAI_PC_BUILDING_PROVINCIAL = global.EAI_PC_CBUNKER }
 	add_to_array = { global.EAI_PC_BUILDING_PROVINCIAL = global.EAI_PC_NBASE }
+	add_to_array = { global.EAI_PC_BUILDING_PROVINCIAL = global.EAI_PC_RAIL }
+	add_to_array = { global.EAI_PC_BUILDING_PROVINCIAL = global.EAI_PC_HUB }
 
 	###
 
@@ -235,6 +246,9 @@ EAI_PC_bimonthly_update = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 	EAI_PC_antiair = yes
 	EAI_PC_rocket_site = yes
 	EAI_PC_conversion_to_civ = yes
+	EAI_PC_railway = yes
+	EAI_PC_supply_hub = yes
+	EAI_PC_airbase = yes
 }
 
 EAI_PC_weekly_update = { if = { limit = { has_country_flag = EAI_PC_trace_functions } log = "EAI_PC_weekly_update > THIS=[this.getname] PREV=[prev.getname]" }
@@ -366,8 +380,34 @@ EAI_PC_get_building_cost = { if = { limit = { PREV = { has_country_flag = EAI_PC
 			PREV = { EAI_PC_get_province_building_cost = yes }
 		}
 
+		else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+		
+			PREV = { EAI_PC_get_railway_building_cost = yes }
+		}
+
+		else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_HUB } }
+		
+			
+		}
+
 		# if = { limit = { has_country_flag = EAI_priority_construction_detailed_logging } log = "EAI_PC_get_building_cost: building_cost_=[?building_cost_]" }
 	}
+}
+
+# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id, _project_connect_id, building_cost_
+EAI_PC_get_railway_building_cost = {
+
+	set_temp_variable = { building_cost_ = global.EAI_PC_BUILDING_EXTRA_COST^global.EAI_PC_RAIL }
+	set_temp_variable = { level = 1 }
+	meta_effect = {
+		text = {
+			add_to_temp_variable = { level = global.EAI_PC_railway_connection_level_[x]^[y] }
+		}
+		x = "[?_project_province_id]"
+		y = "[?_project_connect_id]"
+	}
+	multiply_temp_variable = { building_cost_ = level }
+	add_to_temp_variable = { building_cost_ = global.EAI_PC_BUILDING_COST^_project_building_type }
 }
 
 # THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id, building_cost_
@@ -556,6 +596,20 @@ EAI_PC_get_build_speed = { if = { limit = { PREV = { has_country_flag = EAI_PC_t
 			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_naval_base_factor } }
 			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_buildings_factor } }
 		}
+
+		else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+		
+			add_to_temp_variable = { construction_speed_ = modifier@production_speed_rail_way_factor }
+			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_rail_way_factor } }
+			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_buildings_factor } }
+		}
+
+		else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_HUB } }
+		
+			add_to_temp_variable = { construction_speed_ = modifier@production_speed_supply_node_factor }
+			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_supply_node_factor } }
+			PREV = { add_to_temp_variable = { construction_speed_ = modifier@state_production_speed_buildings_factor } }
+		}
 	
 		add_to_temp_variable = { construction_speed_ = modifier@production_speed_buildings_factor }
 
@@ -578,17 +632,20 @@ EAI_PC_get_build_speed = { if = { limit = { PREV = { has_country_flag = EAI_PC_t
 	}
 }
 
-# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id, queued_amount_
+# THIS = STATE, PREV = BUILDER, _project_building_type, _project_province_id, _project_connect_id, queued_amount_
 EAI_PC_get_num_queued_buildings_at_target = {
 
 	set_temp_variable = { queued_amount_ = 0 }
-	for_each_loop = { array = PREV.EAI_PC_queue index = check_level_pos value = check_level_id
+	for_each_loop = { array = PREV.EAI_PC_queue index = check_level_pos value = check_level_id break = check_level_b
 		if = { 
 			limit = { 
 				check_variable = { PREV.EAI_PC_building_type^check_level_id = _project_building_type }
 				check_variable = { PREV.EAI_PC_target_state^check_level_id = THIS.id }
 				if = { limit = { is_in_array = { global.EAI_PC_BUILDING_PROVINCIAL = _project_building_type } }
 					check_variable = { PREV.EAI_PC_target_province^check_level_id = _project_province_id }
+				}
+				if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+					check_variable = { PREV.EAI_PC_connect_province^check_level_id = _project_connect_id }
 				}
 			}
 		
@@ -802,6 +859,47 @@ EAI_PC_get_total_building_level = { if = { limit = { PREV = { has_country_flag =
 		add_to_temp_variable = { building_level_ = queued_amount_ }
 	}
 
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_RAIL } }
+
+		meta_effect = {
+			text = {
+				set_temp_variable = { existing_level = global.EAI_PC_railway_connection_level_[x]^[y] }
+			}
+			x = "[?_project_province_id]"
+			y = "[?_project_connect_id]"
+		}
+		set_temp_variable = { building_level_ = existing_level }
+		EAI_PC_get_num_queued_buildings_at_target = yes
+		add_to_temp_variable = { building_level_ = queued_amount_ }
+	}
+
+	else_if = { limit = { check_variable = { _project_building_type = global.EAI_PC_HUB } }
+
+		set_temp_variable = { existing_level = 0 }
+		while_loop_effect = {
+			limit = {
+				meta_trigger = {
+					text = {
+						any_province_building_level = {
+							province = {
+								id = [y]
+							}
+							building = supply_node
+							level > [x]
+						}
+					}
+					x = "[?existing_level]"
+					y = "[?_project_province_id]"
+				}
+			}
+		
+			add_to_temp_variable = { existing_level = 1 }
+		}
+		set_temp_variable = { building_level_ = existing_level }
+		EAI_PC_get_num_queued_buildings_at_target = yes
+		add_to_temp_variable = { building_level_ = queued_amount_ }
+	}
+
 	# PREV = { if = { limit = { has_country_flag = EAI_priority_construction_detailed_logging } log = "[GetYear] [GetMonth] | AI | [This.GetName] | building_level_ = [?building_level_]" } }
 }
 
@@ -812,12 +910,13 @@ EAI_PC_get_total_building_level = { if = { limit = { PREV = { has_country_flag =
 # THIS = BUILDER, _assign_fraction, _assign_max
 EAI_PC_set_max_factory_limit = { if = { limit = { has_country_flag = EAI_PC_trace_functions } log = "EAI_PC_set_max_factory_limit > THIS=[this.getname] PREV=[prev.getname] _assign_fraction=[?_assign_fraction]" }
 
-	set_temp_variable = { max_factories = num_of_civilian_factories_available_for_projects }
-	add_to_temp_variable = { max_factories = EAI_PC_assigned_factories_total }
+	set_temp_variable = { available_factories = num_of_civilian_factories_available_for_projects }
+	add_to_temp_variable = { available_factories = EAI_PC_assigned_factories_total }
 
 	### Has factories, limit to _assign_fraction
 
-		if = { limit = { check_variable = { max_factories > 1 } }
+		if = { limit = { check_variable = { available_factories > 1 } }
+			set_temp_variable = { max_factories = available_factories }
 			multiply_temp_variable = { max_factories = _assign_fraction }
 			round_temp_variable = max_factories
 			set_variable = { EAI_PC_factories_limit = max_factories }
@@ -846,10 +945,16 @@ EAI_PC_set_max_factory_limit = { if = { limit = { has_country_flag = EAI_PC_trac
 			set_variable = { EAI_PC_factories_limit = EAI_PC_override_max_factories }
 		}
 
+		if = { limit = { has_country_flag = EAI_PC_override_max_factories_factor }
+			set_temp_variable = { max_factories = available_factories }
+			multiply_temp_variable = { max_factories = EAI_PC_override_max_factories_factor }
+			set_variable = { EAI_PC_factories_limit = max_factories }
+		}
+
 	### Doesnt have factory slots left
 
 		if = { limit = { all_of_scopes = { array = controlled_states NOT = { EAI_has_free_shared_slot = yes } } }
-			set_variable = { EAI_PC_factories_limit = max_factories }
+			set_variable = { EAI_PC_factories_limit = available_factories }
 			multiply_variable = { EAI_PC_factories_limit = 0.5 }
 		}
 
@@ -967,7 +1072,9 @@ EAI_PC_assign_factories = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 
 		for_each_loop = { array = EAI_PC_queue index = queue_pos value = _project_id break = EAI_PC_assign_factories_b
 			set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
+			set_temp_variable = { _project_build_for_ally = EAI_PC_project_build_for_ally^_project_id }
 			set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
+			set_temp_variable = { _project_connect_id = EAI_PC_connect_province^_project_id }
 			if = {
 				limit = {
 					NOT = { check_variable = { EAI_PC_target_state^_project_id = 0 } }
@@ -976,7 +1083,7 @@ EAI_PC_assign_factories = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 
 						var:EAI_PC_target_state^_project_id = { 
 							
-							# Not actively constructing the same type of building in this state
+							# Not actively constructing the same type of building in this state (applies to provincial buildings even though it is not forbidden)
 							NOT = { is_in_array = { PC_active_building_type_in_@THIS = _project_building_type } }
 
 							# Has tech for this building
@@ -1078,7 +1185,9 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 		for_each_loop = { array = EAI_PC_queue value = _project_id
 
 			set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
+			set_temp_variable = { _project_build_for_ally = EAI_PC_project_build_for_ally^_project_id }
 			set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
+			set_temp_variable = { _project_connect_id = EAI_PC_connect_province^_project_id }
 
 			if = { 
 				limit = { 
@@ -1105,17 +1214,9 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 
 						### Doesnt control location
 
-							if = { limit = { check_variable = { EAI_PC_project_build_for_ally^_project_id = 0 } }
-								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_controls_location = yes } }
+							AND = {
+								NOT = { var:EAI_PC_target_state^_project_id = { EAI_PC_location_controlled_by_PREV = yes } }
 								set_temp_variable = { reason = 3 }
-							}
-							else_if = { limit = { check_variable = { EAI_PC_target_province^_project_id = 0 } }
-								NOT = { var:EAI_PC_target_state^_project_id = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } } }
-								set_temp_variable = { reason = 4 }
-							}
-							else = {
-								NOT = { var:global.province_controllers^EAI_PC_target_province^_project_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } }
-								set_temp_variable = { reason = 5 }
 							}
 
 						###
@@ -1136,6 +1237,7 @@ EAI_PC_remove_projects_from_queue = { if = { limit = { has_country_flag = EAI_PC
 								AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
 								AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
 								AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { _project_building_type = global.EAI_PC_INF } }
+								AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { _project_building_type = global.EAI_PC_RAIL } }
 								AND = { 
 									has_country_flag = EAI_PC_FACILITY_logging 
 									OR = {
@@ -1190,6 +1292,7 @@ EAI_PC_update_project_progress = { if = { limit = { has_country_flag = EAI_PC_tr
 
 		set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
 		set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
+		set_temp_variable = { _project_connect_id = EAI_PC_connect_province^_project_id }
 
 		### Update completion days
 
@@ -1388,7 +1491,9 @@ EAI_PC_project_queue_hourly_update = { if = { limit = { has_country_flag = EAI_P
 				check_variable = { EAI_PC_assigned_factories^v_1243 < 15 }
 
 				set_temp_variable = { _project_building_type = EAI_PC_building_type^v_1243 }
+				set_temp_variable = { _project_build_for_ally = EAI_PC_project_build_for_ally^v_1243 }
 				set_temp_variable = { _project_province_id = EAI_PC_target_province^v_1243 }
+				set_temp_variable = { _project_connect_id = EAI_PC_connect_province^v_1243 }
 
 				var:EAI_PC_target_state^v_1243 = { 
 
@@ -1467,34 +1572,14 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 
 			if = { limit = { has_country_flag = EAI_priority_construction_logging }
 
-				if = { limit = { NOT = { check_variable = { owner = 0 } } } log = "EAI_PC_start_project ERROR = not in country scope, THIS=[this.getname] PREV=[prev.getname]" }
+				if = { limit = { NOT = { check_variable = { owner = 0 } } } log = "EAI_PC_start_project ERROR = not executed in state scope, THIS=[prev.getname] PREV=[this.getname]" }
 				if = { limit = { is_in_array = { global.EAI_PC_BUILDING_PROVINCIAL = _project_building_type } check_variable = { _project_province_id = 0 } } log = "EAI_PC_start_project ERROR: no province id provided for provincial project type" }
 				if = { limit = { check_variable = { _project_building_type = 0 } } log = "EAI_PC_start_project ERROR: no project type provided" }
 			}
 
 		### Add to queue
 
-			if = { 
-				limit = { 
-					OR = {
-						AND = {
-							PREV = { EAI_PC_controls_location = yes }
-						}
-						AND = { # Build for ally
-							check_variable = { _project_build_for_ally = 1 }
-							OR = {
-								# Controls state
-								PREV = { CONTROLLER = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } } }
-
-								# Controls province if province type
-								AND = {
-									NOT = { check_variable = { _project_province_id = 0 } }
-									var:global.province_controllers^_project_province_id = { ROOT = { EAI_PREV_on_same_side_with_THIS = yes } }
-								}
-							}
-						}
-					}
-				}
+			if = { limit = { PREV = { EAI_PC_location_controlled_by_PREV = yes } }
 
 				### Project queue num buildings
 
@@ -1557,6 +1642,7 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 						set_variable = { EAI_PC_project_cost^_project_id = building_cost_ }
 						set_variable = { EAI_PC_target_state^_project_id = PREV.id }
 						set_variable = { EAI_PC_target_province^_project_id = _project_province_id }
+						set_variable = { EAI_PC_connect_province^_project_id = _project_connect_id }
 						set_variable = { EAI_PC_building_type^_project_id = _project_building_type }
 						set_variable = { EAI_PC_priority^_project_id = _project_priority }
 						set_variable = { EAI_PC_type_id^_project_id = _project_type_id }
@@ -1581,6 +1667,7 @@ EAI_PC_start_project = { if = { limit = { PREV = { has_country_flag = EAI_PC_tra
 									AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
 									AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
 									AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { _project_building_type = global.EAI_PC_INF } }
+									AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { _project_building_type = global.EAI_PC_RAIL } }
 									AND = { 
 										has_country_flag = EAI_PC_FACILITY_logging 
 										OR = {
@@ -1636,7 +1723,9 @@ EAI_PC_complete_project = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 				if = {
 					limit = {
 						set_temp_variable = { _project_building_type = PREV.EAI_PC_building_type^_project_id }
+						set_temp_variable = { _project_build_for_ally = PREV.EAI_PC_project_build_for_ally^_project_id }
 						set_temp_variable = { _project_province_id = PREV.EAI_PC_target_province^_project_id }
+						set_temp_variable = { _project_connect_id = PREV.EAI_PC_connect_province^_project_id }
 						OR = {
 							check_variable = { PREV.EAI_PC_has_reserved_slot^_project_id = 1 }
 							EAI_PC_can_build_project = yes
@@ -1665,6 +1754,7 @@ EAI_PC_complete_project = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 							AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
 							AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
 							AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { _project_building_type = global.EAI_PC_INF } }
+							AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { _project_building_type = global.EAI_PC_RAIL } }
 							AND = { 
 								has_country_flag = EAI_PC_FACILITY_logging 
 								OR = {
@@ -1698,6 +1788,7 @@ EAI_PC_complete_project = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_BUNKER } }
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { _project_building_type = global.EAI_PC_CBUNKER } }
 						AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { _project_building_type = global.EAI_PC_INF } }
+						AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { _project_building_type = global.EAI_PC_RAIL } }
 						AND = { 
 							has_country_flag = EAI_PC_FACILITY_logging 
 							OR = {
@@ -1893,6 +1984,46 @@ EAI_PC_add_finished_building = { if = { limit = { PREV = { has_country_flag = EA
 		set_temp_variable = { tmp_added_building_type = global.EAI_PC_NBASE }
 		add_to_variable = { PREV.EAI_PC_built_type_PC_CBUNKER_num = 1 }
 	}
+
+	else_if = { limit = { PREV = { check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_RAIL } } }
+
+		meta_effect = {
+			text = {
+				build_railway = {
+					level = 1
+					path = { [x] [y] }
+				}
+				set_variable = { global.EAI_PC_railway_connections^[x] = 1 }
+				add_to_variable = { global.EAI_PC_railway_connection_level_[x]^[y] = 1 }
+				set_variable = { global.EAI_PC_railway_connections^[y] = 1 }
+				add_to_variable = { global.EAI_PC_railway_connection_level_[y]^[x] = 1 }
+			}
+
+			x = "[?PREV.EAI_PC_target_province^_project_id]"
+			y = "[?PREV.EAI_PC_connect_province^_project_id]"
+		}
+
+		set_temp_variable = { tmp_added_building_type = global.EAI_PC_RAIL }
+		add_to_variable = { PREV.EAI_PC_built_type_PC_RAIL_num = 1 }
+	}
+
+	else_if = { limit = { PREV = { check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_HUB } } }
+
+		meta_effect = {
+			text = {
+				add_building_construction = { type = supply_node level = 1 instant_build = yes 
+					province = { 
+						id = [x]
+					}
+				}
+			}
+
+			x = "[?PREV.EAI_PC_target_province^_project_id]"
+		}
+
+		set_temp_variable = { tmp_added_building_type = global.EAI_PC_HUB }
+		add_to_variable = { PREV.EAI_PC_built_type_PC_HUB_num = 1 }
+	}
 }
 
 # THIS = BUILDER, _project_id
@@ -1911,6 +2042,7 @@ EAI_PC_end_project = { if = { limit = { has_country_flag = EAI_PC_trace_function
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_BUNKER } }
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_CBUNKER } }
 						AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_INF } }
+						AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_RAIL } }
 						AND = { 
 							has_country_flag = EAI_PC_FACILITY_logging 
 							OR = {
@@ -1963,6 +2095,7 @@ EAI_PC_end_project = { if = { limit = { has_country_flag = EAI_PC_trace_function
 
 			set_variable = { EAI_PC_target_state^_project_id = 0 }
 			clear_variable = EAI_PC_target_province^_project_id
+			clear_variable = EAI_PC_connect_province^_project_id
 			clear_variable = EAI_PC_project_cost^_project_id
 			clear_variable = EAI_PC_progress^_project_id
 			clear_variable = EAI_PC_building_type^_project_id
@@ -1991,6 +2124,15 @@ EAI_PC_end_all_projects = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 			EAI_PC_end_project = yes
 		}
 	}
+}
+
+EAI_PC_debug_complete_projects = {
+
+	for_each_loop = { array = EAI_PC_queue index = queue_pos value = _project_id
+		EAI_PC_complete_project = yes
+	}
+
+	EAI_PC_remove_projects_from_queue = yes
 }
 
 ##########################################################
@@ -2446,7 +2588,9 @@ EAI_PC_build_types_in_equal_ratio = {
 				is_in_array = { _build_types_in_equal_ratio_TYPES = EAI_PC_building_type^_project_id } 
 				check_variable = { EAI_PC_build_time^_project_id > 0 } 
 				set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
+				set_temp_variable = { _project_build_for_ally = EAI_PC_project_build_for_ally^_project_id }
 				set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
+				set_temp_variable = { _project_connect_id = EAI_PC_connect_province^_project_id }
 				var:EAI_PC_target_state^_project_id = { EAI_PC_can_build_project = yes }
 			}
 
@@ -2618,6 +2762,7 @@ EAI_PC_cancel_projects = {
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_BUNKER } }
 						AND = { has_country_flag = EAI_PC_FORT_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_CBUNKER } }
 						AND = { has_country_flag = EAI_PC_INFRA_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_INF } }
+						AND = { has_country_flag = EAI_PC_RAIL_logging check_variable = { EAI_PC_building_type^_project_id = global.EAI_PC_RAIL } }
 					}
 				} 
 

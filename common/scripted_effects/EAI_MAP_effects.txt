@@ -13,6 +13,7 @@ EAI_MAP_startup = {
 	EAI_MAP_set_province_terrain_types = yes
 	EAI_MAP_set_province_terrain_type = yes
 	EAI_MAP_set_province_river_connections = yes
+	EAI_MAP_set_province_railway_connections = yes
 
 	EAI_MAP_allied_invasion_theatres = yes
 	EAI_MAP_axis_invasion_theatres = yes
@@ -179,13 +180,51 @@ EAI_MAP_fffind_enemy_province = { # var:_province_id var:found_enemy_ var:distan
 	}
 }
 
+EAI_MAP_fffind_enemy_province_within_depth = { # var:_province_id var:_depth var:found_enemy_
+	
+	set_temp_variable = { its = 0 }
+	set_temp_variable = { max_its = 100 }
+	clear_temp_array = unexplored
+	clear_temp_array = explored
+	add_to_temp_array = { unexplored = _province_id }
+	set_temp_variable = { steps^_province_id = 0 }
+	while_loop_effect = { break = found_enemy_
+		limit = { 
+			check_variable = { its < max_its }
+			check_variable = { unexplored^num > 0 }
+		}
+		set_temp_variable = { cur_prov = unexplored^0 }
+		remove_from_temp_array = { array = unexplored index = 0 }
+		add_to_temp_array = { explored = cur_prov }
+		if = { limit = { var:global.province_controllers^cur_prov = { has_war_with = ROOT } }
+			set_temp_variable = { found_enemy_ = 1 }
+		}
+		else_if = { limit = { check_variable = { steps^cur_prov < _depth } }
+			set_temp_variable = { _get_province_id_neighbors = cur_prov }
+			EAI_MAP_get_province_neighbors = yes
+			for_each_loop = { array = province_neighbors_ 
+				if = { limit = { NOT = { is_in_array = { unexplored = v } is_in_array = { explored = v } } } 
+					add_to_temp_array = { unexplored = v }
+					set_temp_variable = { steps^v = steps^cur_prov }
+					add_to_temp_variable = { steps^v = 1 }
+				} 
+			}
+		}
+		add_to_temp_variable = { its = 1 }
+	}
+
+	###
+
+	set_temp_variable = { _depth = 0 }
+}
+
 EAI_MAP_get_nearby_states = { # var:_state arr:nearby_states_
 
 	clear_temp_array = nearby_states_
 	var:_state = {
 		every_neighbor_state = {
 			if = { limit = { NOT = { is_in_array = { nearby_states_ = THIS.id } } } add_to_temp_array = { nearby_states_ = THIS.id } }
-			every_neighbor_state = {
+			every_neighbor_state = { limit = { NOT = { state = PREV } }
 				if = { limit = { NOT = { is_in_array = { nearby_states_ = THIS.id } } } add_to_temp_array = { nearby_states_ = THIS.id } }
 			}
 		}
@@ -220,6 +259,9 @@ EAI_MAP_operation_torch_theatre = {
 					region = 126
 					# region = 225
 				}
+				NOT = { 
+				     state = 665
+				}	 
 			}
 
 			add_to_array = { global.EAI_MAP_allied_invasion_theatres = THIS.id }
@@ -281,7 +323,7 @@ EAI_MAP_operation_avalanche_theatre = {
 		}
 		set_variable = { global.EAI_MAP_allied_invasion_data_ST_end^_operation_id = global.EAI_MAP_allied_invasion_theatres^num }
 
-		### Staging areas
+	### Staging areas
 
 		every_state = {
 			limit = {
@@ -789,6 +831,8 @@ EAI_MAP_SOV_garrison_strategy_states = {
 	clear_array = global.EAI_MAP_SOV_garrison_strategy_242 242 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_242 = THIS.id } } }
 	clear_array = global.EAI_MAP_SOV_garrison_strategy_224 224 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_224 = THIS.id } } }
 	clear_array = global.EAI_MAP_SOV_garrison_strategy_260 260 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_260 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_226 226 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_226 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_226 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_226 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_226 = THIS.id } } }
+	clear_array = global.EAI_MAP_SOV_garrison_strategy_227 227 = { add_to_array = { global.EAI_MAP_SOV_garrison_strategy_227 = THIS.id } every_state = { limit = { check_variable = { distance_to@PREV < @sov_defense_radius } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_227 = THIS.id } } every_neighbor_state = { limit = { NOT = { is_in_array = { global.EAI_MAP_SOV_garrison_strategy_227 = THIS.id } } } add_to_array = { global.EAI_MAP_SOV_garrison_strategy_227 = THIS.id } } }
 }
 
 EAI_MAP_capital_defense_states = {
