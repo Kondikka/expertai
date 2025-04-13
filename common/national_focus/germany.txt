@@ -9946,7 +9946,13 @@ focus_tree = {
 					NOT = { CZE = { controls_state = 664 } }
 					NOT = { owns_state = 664 }
 				}
-				HUN = { is_friend_or_potential_friend_of_GER = no }
+				HUN = { 
+					OR = {
+						is_friend_or_potential_friend_of_GER = no
+						has_government = communism
+						has_government = democratic
+					}
+				}
 				CZE = { is_puppet_of = GER }
 				CZE = { is_in_faction_with = GER }
 			}
@@ -21841,7 +21847,7 @@ focus_tree = {
 			ELSE = {
 				add_to_variable = { GER_communist_intel_decryption_factor = 0.2 tooltip = decryption_factor_tt }
 				add_to_variable = { GER_communist_intel_encryption_factor = 0.2 tooltip = encryption_factor_tt }
-
+				
 			}
 		}
 	}
@@ -22379,8 +22385,8 @@ focus_tree = {
 			GER_add_or_modify_politburo = yes
 
 			add_to_variable = { GER_politburo_democratic_drift = 0.02 tooltip = democratic_drift_tt }
-			add_to_variable = { GER_politburo_modifier_party_popularity_stability_factor = 0.15 tooltip = party_popularity_stability_factor_tt }
-			add_to_variable = { GER_politburo_modifier_defensive_war_stability_factor = 0.15 tooltip = defensive_war_stability_factor_tt }
+			add_to_variable = { GER_politburo_party_popularity_stability_factor = 0.15 tooltip = party_popularity_stability_factor_tt }
+			add_to_variable = { GER_politburo_defensive_war_stability_factor = 0.15 tooltip = defensive_war_stability_factor_tt }
 		}
 	}
 
@@ -22656,6 +22662,7 @@ focus_tree = {
 		relative_position_id = GER_liberate_austria
 		cost = 5
 		available = {
+			is_subject = no
 			any_neighbor_country = {
 				capital_scope = {
 					is_on_continent = europe
@@ -25825,7 +25832,35 @@ focus_tree = {
 		search_filters = { FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
+			if = {
+				limit = {
+					num_faction_members > 1
+				}
+				for_each_scope_loop = {
+					array = ROOT.allies
+					add_to_variable = { GER.GER_rnd_programs_modifier_allies_count = 1 }
+					log = "[This.GetName] was added to the RnD Program§"
+				}
 
+				set_temp_variable = { temp_targets_index = GER_rnd_programs_modifier_allies_count }
+
+				while_loop_effect = {
+					limit = {
+						check_variable = { temp_targets_index > 0 }
+						check_variable = { 
+							var = GER_rnd_programs_modifier_research_speed_factor
+							value = 0.1
+							compare = less_than_or_equals
+						}
+					}
+					add_to_variable = { GER_rnd_programs_modifier_research_speed_factor = 0.01 }
+					subtract_from_temp_variable = { temp_targets_index = 1 }
+				}
+
+				hidden_effect = { #This is necessary since Germany is already accounted for when setting all of this up
+					subtract_from_variable = { GER.GER_rnd_programs_modifier_research_speed_factor = 0.01 }
+				}
+			}
 			add_dynamic_modifier = { modifier = GER_rnd_programs_modifier }
 			custom_effect_tooltip = GER_shared_rd_programs_ww_tt
 			
@@ -28861,7 +28896,7 @@ focus_tree = {
 		cost = 5
 		available = {
 			is_subject = no
-			num_faction_members > 0
+			num_faction_members > 1
 		}
 
 		bypass = {
@@ -28899,7 +28934,7 @@ focus_tree = {
 		available = {
 			is_subject = no
 			is_faction_leader = yes
-			num_faction_members > 0
+			num_faction_members > 1
 		}
 
 		search_filters = { FOCUS_FILTER_INTERNATIONAL_TRADE }
@@ -32012,6 +32047,12 @@ focus_tree = {
 						}
 					}
 				}
+				FRA = { 
+					OR = {
+						exists = no 
+						is_ally_with = ROOT 
+					}
+				}
 			}
 		}
 
@@ -32065,14 +32106,24 @@ focus_tree = {
 
 		bypass = {
 			OR = {
-				has_war_with = BEL
-				is_in_faction_with = BEL
-				BEL = { exists = no }
-			}
-			OR = {
-				has_war_with = LUX
-				is_in_faction_with = LUX
-				LUX = { exists = no }
+				AND = {
+					OR = {
+						has_war_with = BEL
+						is_in_faction_with = BEL
+						BEL = { exists = no }
+					}
+					OR = {
+						has_war_with = LUX
+						is_in_faction_with = LUX
+						LUX = { exists = no }
+					}
+				}
+				FRA = {
+					OR = {
+						exists = no 
+						is_ally_with = ROOT 
+					}
+				}
 			}
 		}
 
@@ -32168,13 +32219,21 @@ focus_tree = {
 		}
 
 		bypass = {
-			SWI = {
-				OR = {
-					exists = no
-					is_ally_with = ROOT
-					has_war_with = ROOT
-					is_guaranteed_by = ROOT
-					has_non_aggression_pact_with = ROOT
+			OR = {
+				SWI = {
+					OR = {
+						exists = no
+						is_ally_with = ROOT
+						has_war_with = ROOT
+						is_guaranteed_by = ROOT
+						has_non_aggression_pact_with = ROOT
+					}
+				}
+				FRA = {
+					OR = {
+						exists = no 
+						is_ally_with = ROOT 
+					}
 				}
 			}
 		}
