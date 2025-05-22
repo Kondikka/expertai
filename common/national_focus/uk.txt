@@ -3668,10 +3668,24 @@ focus_tree = {
 					NOT = { has_dlc = "Graveyard of Empires" }
 					RAJ = {
 						is_subject = yes
-						NOT = { has_autonomy_state = autonomy_dominion }
+						NOT = {
+							has_autonomy_state = autonomy_dominion
+							has_autonomy_state = autonomy_satellite
+						}
 					}
 				}
-				set_autonomy = { target = RAJ autonomy_state = autonomy_dominion }
+				if = {
+					limit = {
+						NOT = {
+							has_completed_focus = ENG_organize_the_blackshirts
+							has_government = fascism
+						}
+					}
+					set_autonomy = { target = RAJ autonomy_state = autonomy_dominion }
+				}
+				else = {
+					set_autonomy = { target = RAJ autonomy_state = autonomy_satellite }
+				}
 			}
 
 
@@ -8743,6 +8757,7 @@ focus_tree = {
 					name = "Lord Edward Halifax"
 					ruling_only = yes
 				}
+				NOT = {	has_character = ENG_winston_churchill } #MM: GoE content if he is transferred to India via event chain triggered by focus RAJ_the_jewel_becomes_the_crown
 			}
 		}
 
@@ -11389,18 +11404,20 @@ focus_tree = {
 					}
 				}
 				has_completed_focus = ENG_towards_indian_independence
-			}
-			if = {
+				if = {
 					limit = {
 						has_dlc = "Graveyard of Empires"
 						has_event_target = UK_INDIA
 					}
+					
 					event_target:UK_INDIA = {
 						exists = no
 						NOT = { is_subject_of = ROOT }
 					}
 				}
 			}
+		}
+
 		icon = GFX_goal_generic_position_armies
 		x = -1
 		y = 1

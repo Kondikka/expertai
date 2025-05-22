@@ -20,6 +20,8 @@ focus_tree = {
 		y = 0
 	}
 
+	shared_focus = SSB_the_saadabad_pact
+
 	focus = {
 		id = TUR_the_montreux_convention
 		icon = GFX_focus_TUR_the_montreux_convention
@@ -584,7 +586,7 @@ focus_tree = {
 		id = TUR_treaty_of_saadabad
 		icon = GFX_focus_TUR_treaty_of_saadabad
 		prerequisite = { focus = TUR_ratify_the_six_arrows }
-		x = 0
+		x = 1
 		y = 1
 		relative_position_id = TUR_ratify_the_six_arrows
 		cost = 5
@@ -600,13 +602,11 @@ focus_tree = {
 					IRQ = { exists = no }
 				}
 				is_subject = yes
-				IF = {
-					limit = {
-						has_dlc = "Graveyard of Empires"
-					}
-					has_global_flag = PER_saadabad_pact
-				}
 			}
+		}
+
+		allow_branch = {
+			NOT = { has_dlc = "Graveyard of Empires" }
 		}
 
 		search_filters = { FOCUS_FILTER_POLITICAL }
@@ -672,7 +672,7 @@ focus_tree = {
 	focus = {
 		id = TUR_assess_our_future
 		icon = GFX_focus_eng_concessions_to_the_trade_unions
-		prerequisite = { focus = TUR_treaty_of_saadabad }
+		prerequisite = { focus = TUR_ratify_the_six_arrows }
 		available = {
 			OR = {
 				has_completed_focus = TUR_democratic_transition_focus
@@ -688,8 +688,8 @@ focus_tree = {
 			}
 		}
 		x = 0
-		y = 2
-		relative_position_id = TUR_treaty_of_saadabad
+		y = 3
+		relative_position_id = TUR_ratify_the_six_arrows
 		cost = 5
 		ai_will_do = {
 			base = 10
@@ -2755,13 +2755,14 @@ focus_tree = {
 
 		available = {
 			is_subject = no
-		}
-
-		bypass = {
-			custom_trigger_tooltip = { 
-				tooltip = TUR_no_faction_members_tt
-				NOT = {
-					has_global_flag = TUR_saadabad_pact
+			if = {
+				limit = {
+					has_dlc = "Graveyard of Empires"
+				}
+				has_completed_focus = SSB_the_saadabad_pact
+				OR = {
+					is_in_faction = no
+					is_faction_leader = yes
 				}
 			}
 		}
@@ -2770,63 +2771,113 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = {
-					is_in_faction = no
+					NOT = { has_dlc = "Graveyard of Empires" }
 				}
-				create_faction = the_saadabad_concordat
-				every_country = {
+				if = {
 					limit = {
-						has_country_flag = TUR_saadabad_pact_member
+						is_in_faction = no
 					}
-					custom_effect_tooltip = invite_to_faction_tt
-					hidden_effect = { country_event = { id = generic.5 } }
-				}
-			}
-			else_if = {
-				limit = {
-					is_in_faction = yes
-					is_faction_leader = yes
-				}
-				every_country = {
-					limit = {
-						has_country_flag = TUR_saadabad_pact_member
-					}
-					country_event = { id = generic.5 }
-				}
-			}
-			else_if = {
-				limit = {
-					is_in_faction = yes
-					is_faction_leader = no
-				}
-				effect_tooltip = { 
+					create_faction = the_saadabad_concordat
 					every_country = {
 						limit = {
 							has_country_flag = TUR_saadabad_pact_member
 						}
+						custom_effect_tooltip = invite_to_faction_tt
+						hidden_effect = { country_event = { id = generic.5 } }
+					}
+				}
+				else_if = {
+					limit = {
+						is_in_faction = yes
+						is_faction_leader = yes
+					}
+					every_country = {
+						limit = {
+							has_country_flag = TUR_saadabad_pact_member
+						}
+						country_event = { id = generic.5 }
+					}
+				}
+				else_if = {
+					limit = {
+						is_in_faction = yes
+						is_faction_leader = no
+					}
+					effect_tooltip = { 
+						every_country = {
+							limit = {
+								has_country_flag = TUR_saadabad_pact_member
+							}
+							random_country = {
+								limit = {
+									is_in_faction_with = TUR
+									is_faction_leader = yes
+								}
+								PREV = { country_event = { id = generic.5 } }
+							}
+						}
+					}
+					hidden_effect = { 
 						random_country = {
 							limit = {
 								is_in_faction_with = TUR
 								is_faction_leader = yes
 							}
-							PREV = { country_event = { id = generic.5 } }
+							country_event = bftb_turkey.142
 						}
 					}
 				}
-				hidden_effect = { 
-					random_country = {
-						limit = {
-							is_in_faction_with = TUR
-							is_faction_leader = yes
-						}
-						country_event = bftb_turkey.142
+				if = {
+					limit = {
+						NOT = { has_completed_focus = TUR_treaty_of_saadabad }
 					}
+					custom_effect_tooltip = TUR_saadabad_pact_faction_tt
 				}
 			}
-			if = {
-				limit = {
-					NOT = { has_completed_focus = TUR_treaty_of_saadabad }
+			else = {
+				if = {
+					limit = {
+						is_in_faction = no
+					}
+					create_faction = the_saadabad_concordat
 				}
-				custom_effect_tooltip = TUR_saadabad_pact_faction_tt
+				custom_effect_tooltip = SSB_faction_invite_tt
+				if = {
+					limit = {
+						IRQ = {
+							has_dynamic_modifier = { modifier = SSB_saadabad_pact }
+							has_government = neutrality
+						}
+					}
+					IRQ = {
+						custom_effect_tooltip = invite_to_faction_tt
+						hidden_effect = { country_event = { id = generic.5 } }
+					}
+				}
+				if = {
+					limit = {
+						AFG = {
+							has_dynamic_modifier = { modifier = SSB_saadabad_pact }
+							has_government = neutrality
+						}
+					}
+					AFG = {
+						custom_effect_tooltip = invite_to_faction_tt
+						hidden_effect = { country_event = { id = generic.5 } }
+					}
+				}
+				if = {
+					limit = {
+						PER = {
+							has_dynamic_modifier = { modifier = SSB_saadabad_pact }
+							has_government = neutrality
+						}
+					}
+					PER = {
+						custom_effect_tooltip = invite_to_faction_tt
+						hidden_effect = { country_event = { id = generic.5 } }
+					}
+				}
 			}
 		}
 	}
@@ -3001,115 +3052,168 @@ focus_tree = {
 
 		available = {
 			is_subject = no
+			if = {
+				limit = {
+					has_dlc = "Graveyard of Empires"
+				}
+				is_faction_leader = yes
+				has_completed_focus = SSB_the_saadabad_pact
+				if = {
+					limit = { tag = PER }
+					OR = {
+						is_in_faction_with = AFG
+						is_in_faction_with = IRQ
+						is_in_faction_with = TUR
+					}
+				}
+				if = {
+					limit = { tag = IRQ }
+					OR = {
+						is_in_faction_with = AFG
+						is_in_faction_with = PER
+						is_in_faction_with = TUR
+					}
+				}
+				if = {
+					limit = { tag = AFG }
+					OR = {
+						is_in_faction_with = PER
+						is_in_faction_with = IRQ
+						is_in_faction_with = TUR
+					}
+				}
+				if = {
+					limit = { tag = TUR }
+					OR = {
+						is_in_faction_with = AFG
+						is_in_faction_with = IRQ
+						is_in_faction_with = PER
+					}
+				}
+			}
 		}
 
 		search_filters = { FOCUS_FILTER_POLITICAL }
 		completion_reward = {
-			if = { 
+			if = {
 				limit = {
-					NOT = { has_completed_focus = TUR_treaty_of_saadabad }
+					NOT = { has_dlc = "Graveyard of Empires" }
 				}
-				effect_tooltip = {
-					puppet = AFG
-					puppet = PER
-					puppet = IRQ
-				}
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					AFG = {
-						AND = {
-							NOT = { is_in_faction_with = TUR }
-							has_country_flag = TUR_saadabad_pact_member
-						}
+				if = { 
+					limit = {
+						NOT = { has_completed_focus = TUR_treaty_of_saadabad }
+					}
+					effect_tooltip = {
+						puppet = AFG
+						puppet = PER
+						puppet = IRQ
 					}
 				}
-				effect_tooltip = { TUR = { puppet = AFG } }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					PER = {
-						AND = {
-							NOT = { is_in_faction_with = TUR }
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						AFG = {
+							AND = {
+								NOT = { is_in_faction_with = TUR }
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					effect_tooltip = { TUR = { puppet = AFG } }
 				}
-				effect_tooltip = { TUR = { puppet = PER } }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					IRQ = {
-						AND = {
-							NOT = { is_in_faction_with = TUR }
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						PER = {
+							AND = {
+								NOT = { is_in_faction_with = TUR }
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					effect_tooltip = { TUR = { puppet = PER } }
 				}
-				effect_tooltip = { TUR = { puppet = IRQ } }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					SYR = {
-						AND = {
-							NOT = { is_in_faction_with = TUR }
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						IRQ = {
+							AND = {
+								NOT = { is_in_faction_with = TUR }
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					effect_tooltip = { TUR = { puppet = IRQ } }
 				}
-				effect_tooltip = { TUR = { puppet = SYR } }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					AFG = {
-						AND = {
-							is_in_faction_with = TUR
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						SYR = {
+							AND = {
+								NOT = { is_in_faction_with = TUR }
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					effect_tooltip = { TUR = { puppet = SYR } }
 				}
-				TUR = { puppet = AFG }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					PER = {
-						AND = {
-							is_in_faction_with = TUR
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						AFG = {
+							AND = {
+								is_in_faction_with = TUR
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					TUR = { puppet = AFG }
 				}
-				TUR = { puppet = PER }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					IRQ = {
-						AND = {
-							is_in_faction_with = TUR
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						PER = {
+							AND = {
+								is_in_faction_with = TUR
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					TUR = { puppet = PER }
 				}
-				TUR = { puppet = IRQ }
-			}
-			if = { 
-				limit = {
-					has_completed_focus = TUR_treaty_of_saadabad
-					SYR = {
-						AND = {
-							is_in_faction_with = TUR
-							has_country_flag = TUR_saadabad_pact_member
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						IRQ = {
+							AND = {
+								is_in_faction_with = TUR
+								has_country_flag = TUR_saadabad_pact_member
+							}
 						}
 					}
+					TUR = { puppet = IRQ }
 				}
-				TUR = { puppet = SYR }
+				if = { 
+					limit = {
+						has_completed_focus = TUR_treaty_of_saadabad
+						SYR = {
+							AND = {
+								is_in_faction_with = TUR
+								has_country_flag = TUR_saadabad_pact_member
+							}
+						}
+					}
+					TUR = { puppet = SYR }
+				}
+			}
+			else = {
+				every_country = {
+					limit = {
+						has_dynamic_modifier = { modifier = SSB_saadabad_pact }
+						NOT = { tag = TUR }
+					}
+					country_event = { id = PER_ssb_events.4 hours = 5 }
+				}
 			}
 		}
 	}
@@ -3117,17 +3221,13 @@ focus_tree = {
 	focus = {
 		id = TUR_reinstate_the_darulfununu_sahane
 		icon = GFX_goal_generic_scientific_exchange
-		prerequisite = { focus = TUR_the_pan_national_association_of_ulemas }
+		prerequisite = { focus = TUR_the_pan_national_association_of_ulemas focus = TUR_reclaiming_our_lost_empire }
 		x = -1
 		y = 1
 		relative_position_id = TUR_the_pan_national_association_of_ulemas
 		cost = 10
 		ai_will_do = {
 			base = 10
-		}
-
-		bypass = {
-			is_in_faction = no
 		}
 
 		search_filters = { FOCUS_FILTER_RESEARCH }
