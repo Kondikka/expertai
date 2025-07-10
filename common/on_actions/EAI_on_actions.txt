@@ -156,6 +156,38 @@ on_actions = {
 	on_capitulation = {
 		effect = {
 
+			### Fixes a vanilla bug for seize gold reserves decisions
+
+				#GERMANY - Set Flag in capitulated countries and add them to array for Seize Gold Reserves Decision purposes
+
+				if = {
+					limit = {
+						FROM = {
+							OR = {
+								original_tag = GER
+								is_ally_with = GER
+							}
+						}
+						ROOT = {
+							OR = {
+								capital_scope = { is_on_continent = europe }
+								original_tag = TUR
+								any_state = {
+									has_state_flag = EAI_original_capital_@ROOT
+									is_on_continent = europe
+								}
+							}
+						}
+					}
+					ROOT = {
+						set_country_flag = GER_has_capitulated_to_germany
+						add_to_array = { 
+							array = GER.GER_seize_gold_targets_array 
+							value = THIS
+						}
+					}
+				}
+
 			### Clear naval invasion target
 
 			every_country = { limit = { check_variable = { EAI_naval_invasion_target = ROOT.id } }
