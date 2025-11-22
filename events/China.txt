@@ -15,26 +15,8 @@ country_event = {
 	
 	option = { # Breaking point!
 		name = china.1.a
-		ai_chance = { factor = 90 }
-		effect_tooltip = {
-			JAP = {
-				add_war_support = 0.05
-				country_event = { id = japan.1 }
-				create_wargoal = {
-  					type = annex_everything
-  					target = CHI
-  				}
-  				create_wargoal = {
-  					type = annex_everything
-  					target = SHX
-  				}
-			}
-		}
-		hidden_effect = {
-			JAP = { country_event = { id = japan.1 } }
-		}
-		ai_chance = {
-			factor = 50
+		ai_chance = { 
+			base = 90 
 			modifier = {
 				factor = 0.5
 				has_war = yes
@@ -46,28 +28,40 @@ country_event = {
 				}
 			}
 		}
-	}
-	option = { # Make more concessions
-		name = china.1.b
-		trigger = { OR = { is_historical_focus_on = no is_ai = no } } #EAI
-		JAP = {
-			set_truce = { target = ROOT days = 180 }
-			effect_tooltip = {
-				transfer_state = 608
-				transfer_state = 597
-				transfer_state = 614
-				add_state_claim = 613
-				if = {
-					limit = {
-						ROOT = { controls_state = 743 }
-					}
-					transfer_state = 743
+
+		effect_tooltip = {
+			JAP = {
+				add_war_support = 0.05
+				country_event = { id = japan.1 }
+				declare_war_on = {
+					target = CHI
+					type = annex_everything
+				}
+				declare_war_on = {
+					target = SHX
+					type = annex_everything
+				}
+				declare_war_on = {
+					target = SND
+					type = annex_everything
+				}
+				declare_war_on = {
+					target = HBC
+					type = annex_everything
 				}
 			}
-			country_event = { id = japan.2 }
 		}
-		ai_chance = {
-			factor = 50
+
+		hidden_effect = {
+			JAP = { country_event = { id = japan.1 } }
+		}
+
+	}
+
+	option = { # Make more concessions
+		name = china.1.b
+		ai_chance = { 
+			base = 10 
 			modifier = {
 				factor = 0
 				OR = {
@@ -100,7 +94,92 @@ country_event = {
 				}
 			}
 		}
+
+		JAP = {
+
+			set_truce = { target = ROOT days = 180 }
+			effect_tooltip = {
+				IF = {
+					limit = {
+						ROOT = { controls_state = 608 }
+					}
+					transfer_state = 608
+				}
+				IF = {
+					limit = {
+						ROOT = { controls_state = 597 }
+					}
+					transfer_state = 597
+				}
+				IF = {
+					limit = {
+						ROOT = { controls_state = 1038 }
+					}
+					transfer_state = 1038
+				}
+				IF = {
+					limit = {
+						ROOT = { controls_state = 614 }
+					}
+					transfer_state = 614
+				}
+				IF = {
+					limit = {
+						ROOT = { controls_state = 743 }
+					}
+					transfer_state = 743
+				}
+				IF = {
+					limit = {
+						ROOT = { controls_state = 1039 }
+						JAP = {
+							has_subject = MEN
+						}
+					}
+					MEN = {
+						transfer_state = 1039
+					}
+				}
+				ELSE_IF = {
+					limit = {
+						ROOT = { controls_state = 1039 }
+						JAP = {
+							NOT = {
+								has_subject = MEN
+							}
+						}
+					}
+					transfer_state = 1039
+				}
+				add_state_claim = 613
+			}
+			custom_effect_tooltip = generic_skip_one_line_tt
+			if = {
+				limit = {
+					SND = { exists = yes }
+					
+				}
+
+				custom_effect_tooltip =  china.1.b_tt_SND
+			}
+
+			custom_effect_tooltip = generic_skip_one_line_tt
+
+			if = {
+				limit = {
+					HBC = { exists = yes }
+					
+				}
+
+				custom_effect_tooltip =  china.1.b_tt_HBC
+			}
+
+									
+			country_event = { id = japan.2 }
+		}
+
 	}
+
 }
 
 # Germany Withdraws Advisors
@@ -163,6 +242,9 @@ country_event = {
 		tag = PRC
 		num_of_controlled_states > 3
 		has_country_leader = { ruling_only = yes character = PRC_mao_zedong }
+		NOT = {
+			has_dlc = "No Compromise, No Surrender"
+		}
 	}
 	
 	option = {
@@ -1433,7 +1515,7 @@ country_event = {
 		}
 		OR = {
 			owns_state = 608 #Beijing
-			owns_state = 613 #Nanjing
+			owns_state = 1035 #Nanjing
 		}
 	}
 
@@ -1454,7 +1536,17 @@ country_event = {
 		trigger = {
 			owns_state = 608
 		}
-		set_capital = { state = 608 }
+		set_capital = {
+			state = 608
+			remember_old_capital = no
+		}
+
+		custom_effect_tooltip = generic_skip_one_line_tt
+
+		set_province_name = { id = 9843 name = PRC_beijing_capital_name }
+		608 = {
+			set_state_name = PRC_beijing_capital_name
+		}
 	}
 
 	#Move to Nanjing
@@ -1464,15 +1556,15 @@ country_event = {
 			base = 10
 			modifier = {
 				factor = 0
-				NOT = { 613 = { is_controlled_by = PRC } }
+				NOT = { 1035 = { is_controlled_by = PRC } }
 			}
 		}
 		trigger = {
-			owns_state = 613
+			owns_state = 1035
 		}
 		custom_effect_tooltip = CHI_nanjing_tt
 		hidden_effect = {
-			set_capital = { state = 613 }
+			set_capital = { state = 1035 }
 		}
 	}
 

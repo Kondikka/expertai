@@ -3297,8 +3297,20 @@ focus_tree = {
 		
 		search_filters = { FOCUS_FILTER_POLITICAL } 
 		completion_reward = {
-			create_faction = POL_baltic_alliance
-			set_rule = { can_create_factions = yes }
+
+			IF = {
+				limit = {
+					has_dlc = "No Compromise, No Surrender"
+				}
+				set_rule = { can_create_factions = yes }
+				create_faction_from_template = faction_template_POL_baltic_alliance
+				add_faction_initiative = 1
+			}
+			ELSE = {
+				set_rule = { can_create_factions = yes }
+				create_faction = POL_baltic_alliance
+			}
+
 			hidden_effect = {
 				if = {
 					limit = {
@@ -3421,6 +3433,12 @@ focus_tree = {
 				news_event = { hours = 6 id = news.214 }
 			}
 			unlock_national_focus = POL_the_between_the_seas_concept
+			IF = {
+				limit = {
+					has_dlc = "No Compromise, No Surrender"
+				}
+				set_faction_manifest = faction_manifest_between_the_seas
+			}
 			if = {
 				limit = {
 					ROM = {
@@ -6335,7 +6353,11 @@ focus_tree = {
 			set_rule = {
 				can_create_factions = yes
 			}
-			create_faction = POL_morges_pact
+			create_faction_from_template = {
+				template = faction_template_defensive_democratic
+				name = POL_morges_pact
+				icon = GFX_faction_logo_generic_11
+			}
 			FRA = {
 				country_event = NSB_poland_events.7
 			}
@@ -6424,6 +6446,14 @@ focus_tree = {
 		available_if_capitulated = yes
 		search_filters = { FOCUS_FILTER_POLITICAL }
 		completion_reward = {
+			set_faction_name = miedzymorze_faction
+			IF = {
+				limit = {
+					has_dlc = "No Compromise, No Surrender"
+				}
+				set_faction_manifest = faction_manifest_between_the_seas
+			}
+			
 			if = {
 				limit = {
 					ROM = {
@@ -8493,7 +8523,10 @@ focus_tree = {
 				HUN = { country_event = generic.2 }
 			}
 			else = {
-				create_faction = POL_habsburg_pact
+				create_faction_from_template = {
+					template = faction_template_habsburg_alliance
+					name = POL_habsburg_pact
+				}
 				HUN = { country_event = POL_habsburg_events.2 }
 			}
 		}
@@ -12272,17 +12305,24 @@ focus_tree = {
 		available_if_capitulated = no
 
 		search_filters = { FOCUS_FILTER_POLITICAL }
+
 		completion_reward = {
+
 			set_rule = { can_create_factions = yes }
 			if = {
 				limit = {
 					is_faction_leader = no
 				}
-				create_faction = POL_falangist_international
+				create_faction_from_template = {
+					template = faction_template_anti_communist
+					name = POL_falangist_international
+					icon = GFX_faction_logo_generic_fascist
+				}
 			}
 			else = {
 				set_faction_name = POL_falangist_international
 			}
+
 			if = {
 				limit = {
 					SPR = {
@@ -13564,16 +13604,28 @@ focus_tree = {
 					is_faction_leader = no
 				}
 				set_rule = { can_create_factions = yes }
-				create_faction = miedzymorze_faction
+				create_faction_from_template = faction_template_miedzymorze_faction
 			}
 			else = {
 				set_faction_name = miedzymorze_faction
+				IF = {
+					limit = {
+						has_dlc = "No Compromise, No Surrender"
+					}
+					set_faction_manifest = faction_manifest_between_the_seas
+				}
 			}
 			hidden_effect = {
 				news_event = { hours = 6 id = news.214 }
 			}
 			if = {
-				limit = { ROM = { NOT = { has_war_with = ROOT } } }
+				limit = {
+					ROM = {
+						exists = yes
+						is_subject = no
+						NOT = { has_war_with = ROOT }
+					}
+				}
 				ROM = {
 					country_event = { id = poland.16 days = 1 }
 				}
@@ -14116,6 +14168,7 @@ focus_tree = {
 		available = {
 			is_faction_leader = yes
 			GRE = {
+				exists = yes
 				is_subject = no
 				is_in_faction = no
 				NOT = { has_war_with = ROOT }
@@ -14165,6 +14218,7 @@ focus_tree = {
 		available = {
 			is_faction_leader = yes
 			TUR = {
+				exists = yes
 				is_subject = no
 				is_in_faction = no
 				NOT = { has_war_with = ROOT }
@@ -14216,7 +14270,12 @@ focus_tree = {
 			ITA = {
 				OR = {
 					is_in_faction = no
-					is_in_faction_with = GER
+					AND = {
+						is_in_faction_with = GER
+						NOT = {
+							is_in_faction_with = ROOT
+						}
+					}
 				}
 				is_subject = no
 				has_same_ideology = yes
@@ -15572,7 +15631,7 @@ focus_tree = {
 				name = POL_a_cruiser_navy
 				bonus = 1.0
 				uses = 1
-				category = cl_tech
+				category = ca_tech
 			}
 			#1x50% research bonus to Light Cruisers
 		}
@@ -15690,7 +15749,7 @@ focus_tree = {
 					name = POL_strike_force
 					bonus = 0.75
 					uses = 2
-					category = cl_tech
+					category = ca_tech
 				}
 				add_tech_bonus = {
 					name = POL_strike_force
@@ -15704,7 +15763,7 @@ focus_tree = {
 					name = POL_strike_force
 					bonus = 1.0
 					uses = 2
-					category = cl_tech
+					category = ca_tech
 				}
 			}
 			#1x50% research bonus to Light Cruisers & 1x50% bonus to Heavy Cruisers

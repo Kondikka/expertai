@@ -432,10 +432,10 @@ EAI_LAW_wants_war_economy = {
 
 		### Strategies
 
-		if = { limit = { original_tag = JAP is_historical_focus_on = yes }
+		# if = { limit = { original_tag = JAP is_historical_focus_on = yes }
 
-			has_completed_focus = JAP_national_defense_state
-		}
+		# 	has_completed_focus = JAP_national_defense_state
+		# }
 
 		###
 
@@ -446,7 +446,17 @@ EAI_LAW_wants_war_economy = {
 		has_war_support > 0.25
 
 		# Other PP use priorities
-		EAI_PP_store_pp_prio = yes
+		OR = {
+			EAI_PP_store_pp_prio = yes
+
+			### Strategies
+
+				AND = {
+					tag = JAP
+				}
+
+			###
+		}
 	}
 
 	### Downgrade for manpower
@@ -489,11 +499,8 @@ EAI_LAW_wants_war_economy = {
 				# Cant upgrade conscription instead
 				NOT = { EAI_LAW_upgrade_manpower_law = yes }
 				
-				# Get Mobile Warfare tech before this
-				if = { limit = { has_tech = kampfgruppe }
-		
-					has_tech = nd_conscription
-				}
+				# Get Last Stand doctrine first
+				has_doctrine = last_stand
 			}
 		}
 	}
@@ -514,6 +521,29 @@ EAI_LAW_available_war_economy = {
 	OR = {
 		has_government = fascism
 		has_government = communism
+		if = {
+			limit = {
+				PHI_SEA = yes
+			}
+			if = {
+				limit = {
+					has_idea = PHI_ties_with_nationalist_spain
+				}
+				has_idea = PHI_ties_with_nationalist_spain
+			}
+			else_if = {
+				limit = {
+					has_idea = PHI_ties_with_nationalist_spain_2
+				}
+				has_idea = PHI_ties_with_nationalist_spain_2
+			}
+			else = {
+				hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+			}
+		}
+		else = {
+			hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+		}
 		custom_trigger_tooltip = { tooltip = or_clarification_tooltip always = no }
 		AND = {
 			has_war = yes
@@ -632,10 +662,10 @@ EAI_LAW_wants_tot_economic_mobilisation = {
 		
 		### Strategies
 
-		if = { limit = { original_tag = JAP is_historical_focus_on = yes }
+		# if = { limit = { original_tag = JAP is_historical_focus_on = yes }
 
-			has_completed_focus = JAP_national_defense_state
-		}
+		# 	has_completed_focus = JAP_national_defense_state
+		# }
 
 		###
 
@@ -651,10 +681,22 @@ EAI_LAW_wants_tot_economic_mobilisation = {
 			has_idea = scraping_the_barrel
 		}
 
-		# Women in the workforce can be taken
-		if = { limit = { check_variable = { ignore_witwf = 0 } } 
-			EAI_LAW_potential_women_in_the_workforce = yes 
-			NOT = { check_variable = { EAI_PP_stored_pp < EAI_PP_max_stored_pp } }
+		OR = {
+			# Women in the workforce can be taken
+			AND = {
+				check_variable = { ignore_witwf = 0 }
+				EAI_LAW_potential_women_in_the_workforce = yes 
+				NOT = { check_variable = { EAI_PP_stored_pp < EAI_PP_max_stored_pp } }
+			}
+
+			### Strategies
+				
+				AND = {
+					is_historical_focus_on = yes
+					tag = JAP
+				}
+
+			###
 		}
 
 		# Avoid triggering draft events
@@ -664,7 +706,18 @@ EAI_LAW_wants_tot_economic_mobilisation = {
 		has_stability > 0.5
 
 		# Other PP use priorities
-		EAI_PP_store_pp_prio = yes
+		OR = {
+			EAI_PP_store_pp_prio = yes
+
+			### Strategies
+
+				AND = {
+					is_historical_focus_on = yes
+					tag = JAP
+				}
+
+			###
+		}
 	}
 
 	###
@@ -684,6 +737,15 @@ EAI_LAW_available_tot_economic_mobilisation = {
 			original_tag = GER
 		}
 		NOT = { has_completed_focus = GER_totaler_krieg }
+	}
+	if = {
+		limit = {
+			original_tag = JAP
+		}
+		NOT = { 
+			has_completed_focus = JAP_sea_national_defense_state 
+			has_completed_focus = JAP_prepare_for_the_final_war 
+		}
 	}
 
 	has_war = yes
@@ -1289,15 +1351,6 @@ EAI_LAW_wants_extensive_conscription = {
 
 				has_manpower < 1500000
 			}
-
-			AND = {
-				original_tag = JAP
-				
-				if = { limit = { has_completed_focus = JAP_purge_the_kodoha_faction }
-					
-					has_completed_focus = JAP_spiritual_mobilization
-				}
-			}
 		}
 
 		OR = {
@@ -1383,6 +1436,29 @@ EAI_LAW_available_extensive_conscription = {
 	OR = {
 		has_government = fascism
 		has_government = communism
+		if = {
+			limit = {
+				PHI_SEA = yes
+			}
+			if = {
+				limit = {
+					has_idea = PHI_ties_with_republican_spain
+				}
+				has_idea = PHI_ties_with_republican_spain
+			}
+			else_if = {
+				limit = {
+					has_idea = PHI_ties_with_republican_spain_2
+				}
+				has_idea = PHI_ties_with_republican_spain_2
+			}
+			else = {
+				hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+			}
+		}
+		else = {
+			hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+		}
 		SWE_rapid_mob_manpower_law_trigger = yes 
 		if = {
 			limit = {
@@ -1680,6 +1756,29 @@ EAI_LAW_available_service_by_requirement = {
 	OR = {
 		has_government = fascism
 		has_government = communism
+		if = {
+			limit = {
+				PHI_SEA = yes
+			}
+			if = {
+				limit = {
+					has_idea = PHI_ties_with_republican_spain
+				}
+				has_idea = PHI_ties_with_republican_spain
+			}
+			else_if = {
+				limit = {
+					has_idea = PHI_ties_with_republican_spain_2
+				}
+				has_idea = PHI_ties_with_republican_spain_2
+			}
+			else = {
+				hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+			}
+		}
+		else = {
+			hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
+		}
 		SWE_rapid_mob_manpower_law_trigger = yes
 		AND = {
 			has_war = yes
@@ -1900,12 +1999,9 @@ EAI_LAW_wants_all_adults_serve = {
 			AND = {
 				# Other PP use priorities
 				EAI_PP_store_pp_prio = yes
-
-				# Get Mobile Warfare tech before upgrading to this
-				if = { limit = { has_tech = kampfgruppe }
-
-					has_tech = nd_conscription
-				}
+				
+				# Get Last Stand doctrine first
+				has_doctrine = last_stand
 
 				# Avoid triggering draft events
 				NOT = { EAI_stability_event_trigger = yes }
@@ -2160,11 +2256,8 @@ EAI_LAW_wants_scraping_the_barrel = {
 				# Doesn't have manpower locked up in the queue
 				amount_manpower_in_deployment_queue < 50000
 
-				# Get Mobile Warfare tech before upgrading to this
-				if = { limit = { has_tech = kampfgruppe }
-
-					has_tech = nd_conscription
-				}
+				# Get Last Stand doctrine first
+				has_doctrine = last_stand
 
 				# Avoid triggering draft events
 				OR = {
@@ -2497,6 +2590,14 @@ EAI_LAW_available_free_trade = {
 		}
 		NOT = { has_completed_focus = GER_autarky_efforts }
 	}
+
+	if = {
+		limit = {
+			original_tag = PRC
+			has_dlc = "No Compromise, No Surrender"
+		}
+		NOT = { has_completed_focus = PRC_promote_paper_bills }
+	}
 }
 
 EAI_LAW_get_export_focus = { # 50% resources to market
@@ -2638,6 +2739,14 @@ EAI_LAW_available_export_focus = {
 			original_tag = GER
 		}
 		NOT = { has_completed_focus = GER_autarky_efforts }
+	}
+
+	if = {
+		limit = {
+			original_tag = PRC
+			has_dlc = "No Compromise, No Surrender"
+		}
+		NOT = { has_completed_focus = PRC_promote_paper_bills }
 	}
 }
 
@@ -2814,20 +2923,49 @@ EAI_LAW_available_closed_economy = {
 	################################################
 	
 	has_war = yes
-	OR = {
-		has_government = fascism
-		has_government = communism
+
+	IF = {
+		limit = {
+			NOT = {
+				original_tag = JAP
+			}
+		}
+		OR = {
+			has_government = fascism
+			has_government = communism
+		}
 	}
+	ELSE_IF = {
+		limit = {
+			original_tag = JAP
+		}
+		OR = {
+			has_government = fascism
+			has_government = communism
+			AND = {
+				has_completed_focus = JAP_sea_state_general_mobilization_law
+				has_government = neutrality
+			}
+		}
+	}
+	
 	OR = {
 		has_idea = war_economy
 		has_idea = tot_economic_mobilisation
-		if = {
+		IF = {
 			limit = {
 				original_tag = GER
 			}
 			has_idea = totaler_krieg_economy
 		}
-		else = {
+		ELSE_IF = {
+			limit = {
+				original_tag = JAP
+			}
+			#has_completed_focus = JAP_sea_state_general_mobilization_law
+			has_idea = national_defense_state
+		}
+		ELSE = {
 			hidden_trigger = { always = no } #NEED TO HAVE AN ALWAYS AS AN END STATEMENT IF URE USING AN IF ELSE IN AN OR STATEMENT OTHERWISE THE EVALUATION BREAKS!!
 		}
 	}
@@ -2836,7 +2974,7 @@ EAI_LAW_available_closed_economy = {
 		NOT = { has_opinion_modifier = MR_pact }
 	}
 
-	if = {
+	IF = {
 		limit = {
 			original_tag = CHI
 			has_dlc = "Waking the Tiger"
@@ -3587,12 +3725,6 @@ EAI_LAW_wants_women_in_the_workforce = {
 
 	### Strategies
 
-	if = { limit = { tag = JAP }
-	
-		has_completed_focus = JAP_purge_the_kodoha_faction
-		has_manpower < 250000
-	}
-
 	###
 
 	NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
@@ -3614,9 +3746,21 @@ EAI_LAW_available_women_in_the_workforce = { # Actual decision requirements
 	has_war = yes
 	if = {
 		limit = {
-			NOT = { original_tag = GER }
+			NOT = {
+				original_tag = GER
+				original_tag = JAP
+			}
 		}
 		has_idea = tot_economic_mobilisation
+		if = {
+			limit = {
+				original_tag = PRC
+			}
+			NOT = { 
+				has_completed_focus = PRC_holding_half_the_sky
+				has_completed_focus = PRC_promote_womens_suffrage
+			}
+		}
 	}
 	else_if = {
 		limit = {
@@ -3627,6 +3771,16 @@ EAI_LAW_available_women_in_the_workforce = { # Actual decision requirements
 			has_idea = totaler_krieg_economy
 		}
 		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+	else_if = {
+		limit = {
+			original_tag = JAP
+		}
+		OR = {
+			has_idea = tot_economic_mobilisation
+			has_idea = national_defense_state
+		}
+		NOT = { has_completed_focus = JAP_democratic_women_in_the_workforce }
 	}
 	OR = {
 		AND = {
@@ -3650,6 +3804,7 @@ EAI_LAW_available_women_in_the_workforce = { # Actual decision requirements
 			has_stability > 0.7
 		}
 	}
+	has_war = yes
 	if = {
 		limit = {
 			original_tag = GER
@@ -3666,9 +3821,21 @@ EAI_LAW_potential_women_in_the_workforce = { # Can get after switch to total mob
 	has_war = yes
 	if = {
 		limit = {
-			NOT = { original_tag = GER }
+			NOT = {
+				original_tag = GER
+				original_tag = JAP
+			}
 		}
 		# has_idea = tot_economic_mobilisation
+		if = {
+			limit = {
+				original_tag = PRC
+			}
+			NOT = { 
+				has_completed_focus = PRC_holding_half_the_sky
+				has_completed_focus = PRC_promote_womens_suffrage
+			}
+		}
 	}
 	else_if = {
 		limit = {
@@ -3679,6 +3846,16 @@ EAI_LAW_potential_women_in_the_workforce = { # Can get after switch to total mob
 		# 	has_idea = totaler_krieg_economy
 		# }
 		NOT = { has_completed_focus = GER_womens_rights_and_equality }
+	}
+	else_if = {
+		limit = {
+			original_tag = JAP
+		}
+		# OR = {
+		# 	has_idea = tot_economic_mobilisation
+		# 	has_idea = national_defense_state
+		# }
+		NOT = { has_completed_focus = JAP_democratic_women_in_the_workforce }
 	}
 	OR = {
 		AND = {
@@ -3702,6 +3879,10 @@ EAI_LAW_potential_women_in_the_workforce = { # Can get after switch to total mob
 			has_stability > 0.7
 		}
 	}
+
+	###
+	
+	has_war = yes
 	if = {
 		limit = {
 			original_tag = GER
@@ -3714,58 +3895,83 @@ EAI_LAW_missing_ws_women_in_the_workforce = { # Missing only WS
 	NOT = { has_country_flag = EAI_women_in_the_workforce_taken }
 
 	### Copied from decision
-	
-	has_war = yes
-	if = {
-		limit = {
-			NOT = { original_tag = GER }
-		}
-		# has_idea = tot_economic_mobilisation
-	}
-	else_if = {
-		limit = {
-			original_tag = GER
-		}
-		# OR = {
-		# 	has_idea = tot_economic_mobilisation
-		# 	has_idea = totaler_krieg_economy
-		# }
-		NOT = { has_completed_focus = GER_womens_rights_and_equality }
-	}
-	OR = {
-		AND = {
-			has_government = democratic
-			NOT = { has_war_support > 0.79 }
-			set_temp_variable = { witwf_ws = 0.79 } #EAI
-		}
-		AND = {
-			has_government = communism
-			NOT = { has_war_support > 0.79 }
-			set_temp_variable = { witwf_ws = 0.79 } #EAI
-		}
-		AND = {
-			has_government = fascism
-			OR = {
-				AND = { #EAI
-					NOT = { has_war_support > 0.89 }
-					set_temp_variable = { witwf_ws = 0.89 }
+
+		has_war = yes
+		if = {
+			limit = {
+				NOT = {
+					original_tag = GER
+					original_tag = JAP
 				}
-				surrender_progress > 0
+			}
+			# has_idea = tot_economic_mobilisation
+			if = {
+				limit = {
+					original_tag = PRC
+				}
+				NOT = { 
+					has_completed_focus = PRC_holding_half_the_sky
+					has_completed_focus = PRC_promote_womens_suffrage
+				}
 			}
 		}
-		AND = {
-			has_government = neutrality
-			NOT = { has_war_support > 0.84 }
-			set_temp_variable = { witwf_ws = 0.84 } #EAI
-			has_stability > 0.7
+		else_if = {
+			limit = {
+				original_tag = GER
+			}
+			# OR = {
+			# 	has_idea = tot_economic_mobilisation
+			# 	has_idea = totaler_krieg_economy
+			# }
+			NOT = { has_completed_focus = GER_womens_rights_and_equality }
 		}
-	}
-	if = {
-		limit = {
-			original_tag = GER
+		else_if = {
+			limit = {
+				original_tag = JAP
+			}
+			# OR = {
+			# 	has_idea = tot_economic_mobilisation
+			# 	has_idea = national_defense_state
+			# }
+			NOT = { has_completed_focus = JAP_democratic_women_in_the_workforce }
 		}
-		NOT = { has_completed_focus = GER_womens_rights_and_equality }
-	}
+		OR = {
+			AND = {
+				has_government = democratic
+				NOT = { has_war_support > 0.79 }
+				set_temp_variable = { witwf_ws = 0.79 } #EAI
+			}
+			AND = {
+				has_government = communism
+				NOT = { has_war_support > 0.79 }
+				set_temp_variable = { witwf_ws = 0.79 } #EAI
+			}
+			AND = {
+				has_government = fascism
+				OR = {
+					AND = { #EAI
+						NOT = { has_war_support > 0.89 }
+						set_temp_variable = { witwf_ws = 0.89 }
+					}
+					surrender_progress > 0
+				}
+			}
+			AND = {
+				has_government = neutrality
+				NOT = { has_war_support > 0.84 }
+				set_temp_variable = { witwf_ws = 0.84 } #EAI
+				has_stability > 0.7
+			}
+		}
+		has_war = yes
+		if = {
+			limit = {
+				original_tag = GER
+			}
+			NOT = { has_completed_focus = GER_womens_rights_and_equality }
+		}
+
+	###
 
 	if = { limit = { check_variable = { witwf_ws > 0 } } set_temp_variable = { needs_ws = witwf_ws } } #EAI
 }
@@ -3816,9 +4022,7 @@ EAI_stability_event_trigger = {
 
 EAI_LAW_get_manpower_doctrine = {
 	
-	NOT = { has_country_flag = EAI_MW_switched_to_manpower_branch }
-
-	has_tech = kampfgruppe
+	NOT = { has_country_flag = EAI_STRATEGY_get_last_stand_DOCTRINE }
 
 	set_temp_variable = { _check_xp = 100 }
 	EAI_XP_has_army_check_xp = yes

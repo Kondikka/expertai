@@ -1115,17 +1115,23 @@ EAI_PC_assign_factories = { if = { limit = { has_country_flag = EAI_PC_trace_fun
 					###
 				}
 
-				# Assign factories
+				### Assign factories
+
 				if = { limit = { check_variable = { available_factories_ > 0 } }
-					# Has not started construction - update building cost
-					if = { limit = { check_variable = { EAI_PC_progress^_project_id = EAI_PC_project_cost^_project_id } }
-						var:EAI_PC_target_state^_project_id = {
-							set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
-							set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
-							EAI_PC_get_building_cost = yes
+
+					### Has not started construction - update building cost
+
+						if = { limit = { check_variable = { EAI_PC_progress^_project_id = EAI_PC_project_cost^_project_id } }
+							var:EAI_PC_target_state^_project_id = {
+								set_temp_variable = { _project_building_type = EAI_PC_building_type^_project_id }
+								set_temp_variable = { _project_province_id = EAI_PC_target_province^_project_id }
+								EAI_PC_get_building_cost = yes
+							}
+							set_variable = { EAI_PC_project_cost^_project_id = building_cost_ }
 						}
-						set_variable = { EAI_PC_project_cost^_project_id = building_cost_ }
-					}
+
+					###
+					
 					EAI_PC_assign_factories_to_project = yes
 				}
 				else = {
@@ -1304,10 +1310,11 @@ EAI_PC_update_project_progress = { if = { limit = { has_country_flag = EAI_PC_tr
 
 			if = { limit = { check_variable = { EAI_PC_assigned_factories^_project_id > 0 } }
 
-				### Reserve a slot for this project by adding a dummy building to the state when starting construction
+				### Reserve a shared slot for this project by adding a dummy building to the state when starting construction
 
 					if = { 
 						limit = { 
+							is_in_array = { global.EAI_PC_BUILDING_SHARED_TYPE = _project_building_type }
 							check_variable = { EAI_PC_progress = EAI_PC_project_cost } 
 							check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 }
 						}
@@ -1358,26 +1365,23 @@ EAI_PC_update_project_progress = { if = { limit = { has_country_flag = EAI_PC_tr
 # THIS = BUILDER, _project_id, _project_building_type
 EAI_PC_reserve_building_slot = { if = { limit = { has_country_flag = EAI_PC_trace_functions } log = "EAI_PC_reserve_building_slot > THIS=[this.getname] PREV=[prev.getname] _project_id=[?_project_id] _project_building_type=[?_project_building_type]" }
 
-	if = { limit = { is_in_array = { global.EAI_PC_BUILDING_SHARED_TYPE = _project_building_type } }
+	### If set to replace a shared building, delete an existing factory
 
-		### If set to replace a shared building, delete an existing factory
+		if = { limit = { check_variable = { EAI_PC_replace_shared^_project_id = 1 } }
+			EAI_PC_delete_shared_building = yes
+		}
 
-			if = { limit = { check_variable = { EAI_PC_replace_shared^_project_id = 1 } }
-				EAI_PC_delete_shared_building = yes
+	### Reserve building slot with dummy building
+
+		if = { limit = { check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 } }
+			set_variable = { EAI_PC_has_reserved_slot^_project_id = 1 }
+			var:EAI_PC_target_state^_project_id = { 
+				add_building_construction = { type = EAI_reserved_slot level = 1 instant_build = yes }
+				add_to_variable = { EAI_PC_reserved_slots = 1 }
 			}
-	
-		### Reserve building slot with dummy building
+		}
 
-			if = { limit = { check_variable = { EAI_PC_has_reserved_slot^_project_id = 0 } }
-				set_variable = { EAI_PC_has_reserved_slot^_project_id = 1 }
-				var:EAI_PC_target_state^_project_id = { 
-					add_building_construction = { type = EAI_reserved_slot level = 1 instant_build = yes }
-					add_to_variable = { EAI_PC_reserved_slots = 1 }
-				}
-			}
-
-		###
-	}
+	###
 
 	if = { limit = { check_variable = { _project_building_type = global.EAI_PC_REF } }
 		var:EAI_PC_target_state^_project_id = { 

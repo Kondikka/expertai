@@ -1,0 +1,124 @@
+############################################################################################################
+#	Expert AI mod
+############################################################################################################
+
+### Make the AI switch subdoctrines
+
+EAI_STRATEGY_operations_doctrine = {
+
+	if = { 
+		limit = { 
+			OR = {
+				EAI_STRATEGY_get_manpower_doctrine = yes 
+				has_country_flag = EAI_STRATEGY_get_last_stand_DOCTRINE
+			}
+		}
+	
+		EAI_STRATEGY_get_last_stand_DOCTRINE = yes
+	}
+	else_if = { 
+		limit = { 
+			has_dlc = "No Compromise, No Surrender"
+			OR = {
+				EAI_STRATEGY_resist_occupation = yes
+				EAI_STRATEGY_stabilize_country = yes
+			}
+		}
+	
+		EAI_STRATEGY_get_guerilla_war_DOCTRINE = yes
+	}
+	else_if = { 
+		limit = { 
+			has_dlc = "No Compromise, No Surrender"
+			EAI_STRATEGY_invasion_focus = yes 
+		}
+	
+		EAI_STRATEGY_get_expeditionary_warfare_DOCTRINE = yes
+	}
+}
+
+EAI_STRATEGY_get_last_stand_DOCTRINE = {
+
+	if = {
+		limit = {
+			has_subdoctrine_in_track = operations
+			NOT = { 
+				has_doctrine = last_stand
+			}
+
+			###
+
+				set_temp_variable = { _xp_cost = 100 }
+				set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
+				add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+				multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_army_check_xp = yes
+
+			###
+		}
+
+		set_country_flag = EAI_STRATEGY_get_last_stand_DOCTRINE
+		EAI_XP_pay_army_xp_cost = yes
+		set_sub_doctrine = last_stand
+		if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_STRATEGY_get_last_stand_DOCTRINE" } 
+	}
+}
+
+EAI_STRATEGY_get_expeditionary_warfare_DOCTRINE = {
+
+	if = {
+		limit = {
+			has_subdoctrine_in_track = operations
+			NOT = { 
+				has_doctrine = expeditionary_warfare
+			}
+
+			###
+
+				set_temp_variable = { _xp_cost = 100 }
+				set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
+				add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+				multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_army_check_xp = yes
+
+			###
+		}
+	
+		set_country_flag = EAI_STRATEGY_get_expeditionary_warfare_DOCTRINE
+		EAI_XP_pay_army_xp_cost = yes
+		set_sub_doctrine = expeditionary_warfare
+		if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_STRATEGY_get_expeditionary_warfare_DOCTRINE" } 
+	}
+}
+
+EAI_STRATEGY_get_guerilla_war_DOCTRINE = {
+
+	if = {
+		limit = {
+			has_subdoctrine_in_track = operations
+			NOT = { 
+				has_doctrine = guerilla_war
+			}
+
+			###
+
+				set_temp_variable = { _xp_cost = 100 }
+				set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
+				add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
+				multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
+				set_temp_variable = { _check_xp = _xp_cost }
+				EAI_XP_has_army_check_xp = yes
+
+			###
+		}
+
+		set_country_flag = EAI_STRATEGY_get_guerilla_war_DOCTRINE
+		EAI_XP_pay_army_xp_cost = yes
+		set_sub_doctrine = guerilla_war
+		if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | EAI_STRATEGY_get_guerilla_war_DOCTRINE" } 
+	}
+}
+
+###

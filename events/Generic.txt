@@ -248,6 +248,23 @@ country_event = {
 		}
 		add_to_faction = FROM
 		FROM = { country_event = { id = generic.3 hours = 6 } }
+		IF = {
+			limit = {
+				has_dlc = "No Compromise, No Surrender"
+				ROOT = {
+					original_tag = SOV
+				}
+				FROM = {
+					original_tag = SIK
+					has_completed_focus = SIK_reaffirm_soviet_connections
+				}
+			}
+			SIK = {
+				every_enemy_country = {
+					white_peace = SIK
+				}
+			}
+		}
 		hidden_effect = {
 			set_country_flag = alliance_inviter@ROOT
 			FROM = { 
@@ -346,7 +363,7 @@ country_event = {
 	option = { #Reject
 		name = generic.2.f
 		ai_chance = {
-			factor = 50
+			base = 25
 			
 			modifier = {
 				factor = 0.5
@@ -428,6 +445,17 @@ country_event = {
 				}
 				factor = 0
 			}
+
+			modifier = { # It ruins the entire path if ENG says no so just don't
+				factor = 0
+				FROM = {
+					original_tag = JAP
+					OR = {
+						has_completed_focus = JAP_sea_rekindle_the_old_alliance
+						has_completed_focus = JAP_rekindle_the_old_alliance
+					}
+				}
+			}
 		}
 		FROM = { 
 			country_event = { id = generic.4 hours = 6 }
@@ -505,6 +533,7 @@ country_event = {
 				has_government = communism
 			}
 		}
+
 		IF = {
 			limit = {
 				FROM = {
@@ -724,12 +753,12 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
+			FROM = { save_event_target_as = alliance_inviter }
 			save_event_target_as = alliance_applicant
-			FROM = {
-				save_event_target_as = alliance_inviter
-			}
 		}
 	}
+
+
 
 	is_triggered_only = yes
 	
@@ -1043,6 +1072,12 @@ country_event = {
 				is_historical_focus_on = yes
 				FROM = { original_tag = JAP }
 				original_tag = SIA
+			}
+
+			modifier = {
+				factor = 0
+				FROM = { original_tag = JAP }
+				original_tag = ETH 
 			}
 		}
 		#Lone Wolf Finland can't join any factions - Tooltip for player

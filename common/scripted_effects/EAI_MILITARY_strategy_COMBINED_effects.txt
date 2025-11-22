@@ -118,11 +118,6 @@ EAI_MILITARY_COMBINED_select = { # arr:_our_side_ arr:_their_side_
 						if = { limit = { check_variable = { our_control_pct_ < _target_control_pct } }
 							set_temp_variable = { target_prio = current_prio_group }
 							for_each_loop = { array = _states_ add_to_temp_array = { _new_objectives_ = v } }
-							if = { limit = { has_country_flag = EAI_combined_operations_logging }
-								for_each_scope_loop = { array = _new_objectives_
-									log = "new obj = [this.getname]"
-								}
-							}
 							set_temp_variable = { break = 1 }
 						}
 					}
@@ -139,7 +134,6 @@ EAI_MILITARY_COMBINED_select = { # arr:_our_side_ arr:_their_side_
 			for_each_loop = { array = EAI_MILITARY_COMBINED_region_id index = id_i value = id_v
 				if = { limit = { check_variable = { EAI_MILITARY_COMBINED_region_prio^id_i = target_prio } }
 					add_to_temp_array = { _new_regions_ = id_v }
-					if = { limit = { has_country_flag = EAI_combined_operations_logging } var:id_v = { log = "new region = [?id_v]" } }
 				}
 			}
 
@@ -161,9 +155,21 @@ EAI_MILITARY_COMBINED_assign = {
 		clear_array = EAI_MILITARY_COMBINED_target_countries
 
 		set_variable = { EAI_MILITARY_COMBINED_current_prio = target_prio }
-		for_each_loop = { array = _new_objectives_ add_to_array = { EAI_MILITARY_COMBINED_objectives = v } }
-		for_each_loop = { array = _new_regions_ add_to_array = { EAI_MILITARY_COMBINED_regions = v } }
-		for_each_loop = { array = _their_side_ add_to_array = { EAI_MILITARY_COMBINED_target_countries = v } }
+		for_each_loop = { array = _new_objectives_ 
+			add_to_array = { EAI_MILITARY_COMBINED_objectives = v } 
+			if = { limit = { has_country_flag = EAI_combined_operations_logging } var:v = { log = "new obj = [this.getname]" } }
+		}
+		for_each_loop = { array = _new_regions_ 
+			add_to_array = { EAI_MILITARY_COMBINED_regions = v } 
+			if = { limit = { has_country_flag = EAI_combined_operations_logging } log = "new region = [?v]" }
+		}
+		for_each_loop = { array = _our_side_ 
+			if = { limit = { has_country_flag = EAI_combined_operations_logging } var:v = { log = "our side = [this.getname]" } }
+		}
+		for_each_loop = { array = _their_side_ 
+			add_to_array = { EAI_MILITARY_COMBINED_target_countries = v } 
+			if = { limit = { has_country_flag = EAI_combined_operations_logging } var:v = { log = "their side = [this.getname]" } }
+		}
 
 		set_country_flag = { flag = EAI_MILITARY_COMBINED_min_duration value = 1 days = @EAI_MILITARY_COMBINED_min_duration_days }
 		set_country_flag = { flag = EAI_MILITARY_NAVAL_invasion_force_reselection value = 1 days = @EAI_MILITARY_COMBINED_reselection_days }

@@ -603,7 +603,7 @@ NDefines.NAI.MIN_NUM_CONQUERED_PROVINCES_TO_DEPRIO_NAVAL_INVADED_FRONTS = 50 -- 
 -- NDefines.NAI.MIN_INVASION_PLAN_VALUE_TO_EXECUTE = -- 0.3               -- ai will only activate invasions if plan value is above this
 -- NDefines.NAI.MIN_INVASION_ORG_FACTOR_TO_EXECUTE = -- 0.9               -- ai will only activate invasions if average org factor is above this
 -- NDefines.NAI.MIN_INVASION_UNITS_READY_TO_EXECUTE = -- 0.9              -- ai will only activate invasions if this ratio of assigned units are ready
-NDefines.NAI.MAX_INVASION_SIZE = 12 -- 24                                 -- max invasion group size
+NDefines.NAI.MAX_INVASION_SIZE = 64 -- 24                                 -- max invasion group size
 NDefines.NAI.MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = 10 -- 15
 
 NDefines.NAI.MAX_DISTANCE_NAVAL_INVASION = 5000.0				-- AI is extremely unwilling to plan naval invasions above this naval distance limit.

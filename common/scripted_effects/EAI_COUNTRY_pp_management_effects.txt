@@ -27,44 +27,56 @@ EAI_PP_store = {
 
 	clamp_variable = { var = EAI_PP_max_stored_pp min = 100 } # For decisions
 
-	### Special modifier
+	### Special modifiers
 
-	if = { limit = { NOT = { EAI_PP_store_pp_prio = yes } }
+		if = { limit = { NOT = { EAI_PP_store_pp_prio = yes } }
 
-		set_variable = { EAI_PP_max_stored_pp = 30 }
-	}
+			set_variable = { EAI_PP_max_stored_pp = 30 }
+		}
 
-	if = { limit = { tag = GER }
+		if = { limit = { tag = GER }
 
-		set_variable = { EAI_PP_max_stored_pp = 150 }
-	}
+			set_variable = { EAI_PP_max_stored_pp = 150 }
+		}
 
-	if = { # Wants tot_economic_mobilisation and can potentially get witwf (it will first try to get war support with decisions)
-		limit = {
-			NOT = { has_idea = tot_economic_mobilisation }
-			OR = {
-				AND = {
-					tag = SOV 
-					date > 1940.6.1
+		if = { limit = { tag = JAP }
+
+			if = { # Needs a decision to save JAP_takahashi_korekiyo
+				limit = {
+					is_historical_focus_on = yes
+					date < 1937.1.1
 				}
-				AND = {
-					tag = GER 
-					date > 1939.1.1
-				}
-				AND = {
-					EAI_LAW_wants_tot_economic_mobilisation = yes
-				}
+			
+				set_variable = { EAI_PP_max_stored_pp = 0 }
 			}
 		}
 
-		set_variable = { EAI_PP_max_stored_pp = EAI_eco_law_cost }
-		add_to_variable = { EAI_PP_max_stored_pp = 100 }
-	}
+		if = { # Wants tot_economic_mobilisation and can potentially get witwf (it will first try to get war support with decisions)
+			limit = {
+				NOT = { has_idea = tot_economic_mobilisation }
+				OR = {
+					AND = {
+						tag = SOV 
+						date > 1940.6.1
+					}
+					AND = {
+						tag = GER 
+						date > 1939.1.1
+					}
+					AND = {
+						EAI_LAW_wants_tot_economic_mobilisation = yes
+					}
+				}
+			}
 
-	if = { limit = { check_variable = { EAI_PP_needs_pp > 0 } }
+			set_variable = { EAI_PP_max_stored_pp = EAI_eco_law_cost }
+			add_to_variable = { EAI_PP_max_stored_pp = 100 }
+		}
 
-		clamp_variable = { var = EAI_PP_max_stored_pp min = EAI_PP_needs_pp }
-	}
+		if = { limit = { check_variable = { EAI_PP_needs_pp > 0 } }
+
+			clamp_variable = { var = EAI_PP_max_stored_pp min = EAI_PP_needs_pp }
+		}
 
 	###
 
@@ -135,7 +147,24 @@ EAI_PP_give_pp_amount = { # var:_pp_amount
 
 	set_temp_variable = { add_pp = _pp_amount }
 	subtract_from_temp_variable = { add_pp = political_power }
-	if = { limit = { NOT = { check_variable = { add_pp > EAI_PP_stored_pp } } }
+
+	if = { 
+		limit = { 
+			check_variable = { add_pp > 0 }
+			set_temp_variable = { total_pp = political_power }
+			add_to_temp_variable = { total_pp = EAI_PP_stored_pp }
+			NOT = { check_variable = { total_pp < _pp_amount } }
+		}
+		subtract_from_variable = { EAI_PP_stored_pp = add_pp }
+		add_political_power = add_pp
+		if = { limit = { has_country_flag = EAI_pp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: giving AI [?add_pp]/[?_pp_amount], EAI_PP_stored_pp = [?EAI_PP_stored_pp]" }
+	}
+
+	if = { 
+		limit = { 
+			check_variable = { add_pp > 0 }
+			NOT = { check_variable = { add_pp > EAI_PP_stored_pp } } 
+		}
 		subtract_from_variable = { EAI_PP_stored_pp = add_pp }
 		add_political_power = add_pp
 		if = { limit = { has_country_flag = EAI_pp_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | PP: giving AI [?add_pp]/[?_pp_amount], EAI_PP_stored_pp = [?EAI_PP_stored_pp]" }

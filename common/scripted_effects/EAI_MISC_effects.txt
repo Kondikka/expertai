@@ -2,7 +2,7 @@
 #	Expert AI mod - misc effects
 ############################################################################################################
 
-@EAI_VERSION = 5.118
+@EAI_VERSION = 5.2
 
 EAI_set_version = {
 
@@ -469,7 +469,7 @@ EAI_MIO_add_design_team_update = {
 				}
 
 				JAP = {
-					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_INF = token:JAP_tokyo_arsenal_organization }
+					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_INF = token:JAP_kokura_arsenal_organization }
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_ART = token:JAP_osaka_army_arsenal_artillery_organization }
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_SUP = 0 }
 					set_variable = { EAI_MIO_team^global.EAI_MIO_eq_cat_AA = token:JAP_osaka_army_arsenal_artillery_organization }
@@ -2632,70 +2632,6 @@ EAI_armor_intel_startup_targets = {
 }
 
 ###
-
-EAI_mobile_warfare_doctrine_tech_switch_to_manpower_branch = {
-
-	if = {
-		limit = {
-			NOT = { has_country_flag = EAI_MW_switched_to_manpower_branch }
-
-			has_tech = kampfgruppe
-
-			set_temp_variable = { _xp_cost = 100 }
-			set_temp_variable = { xp_cost_reduction_modifier = modifier@land_doctrine_cost_factor }
-			add_to_temp_variable = { xp_cost_reduction_modifier = 1 }
-			multiply_temp_variable = { _xp_cost = xp_cost_reduction_modifier }
-			set_temp_variable = { _check_xp = _xp_cost }
-			EAI_XP_has_army_check_xp = yes
-
-			# Priority
-			OR = {
-				NOT = { EAI_LAW_upgrade_manpower_law = yes }
-
-				# Manpower failsafe
-				AND = {
-					has_war = yes
-					check_variable = { EAI_LAW_manpower_shortage_days > 90 }
-
-					# Priorities
-					NOT = {
-						EAI_LAW_get_volunteer_only = yes
-						EAI_LAW_get_limited_conscription = yes
-						EAI_LAW_get_extensive_conscription = yes
-						EAI_LAW_get_women_in_the_workforce = yes
-						EAI_LAW_get_service_by_requirement = yes
-						# EAI_LAW_get_manpower_doctrine = yes
-						# EAI_LAW_get_all_adults_serve = yes
-						# EAI_LAW_get_war_economy = yes
-						# EAI_LAW_get_partial_economic_mobilisation = yes
-						# EAI_LAW_get_scraping_the_barrel = yes
-					}
-				}
-			}
-
-			# Manpower level
-			OR = {
-				check_variable = { EAI_reserve_mp_ratio < 0.30 }
-				has_manpower < 50000
-			}
-
-			# Not currently conscripting more manpower
-			NOT = { conscription_ratio < 1.0 }
-		}
-
-		set_country_flag = EAI_MW_switched_to_manpower_branch
-		
-		EAI_XP_pay_army_xp_cost = yes
-
-		set_technology = { firebrigades = 0 }
-		set_technology = { backhand_blow = 0 }
-		set_technology = { modern_blitzkrieg = 0 }
-
-		set_technology = { volkssturm = 1 }
-
-		if = { limit = { has_country_flag = EAI_law_logging } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | switching MW doctrine branch" } 
-	}
-}
 
 EAI_remove_research_slots_from_minors_setting = {
 

@@ -8,6 +8,11 @@
 			tag = CHI
 			has_dlc = "Waking the Tiger"
 		}
+		modifier = {
+			add = 10
+			tag = RNG
+			has_dlc = "Waking the Tiger"
+		}
 	}
 	
 
@@ -82,6 +87,7 @@
 
 		search_filters = { FOCUS_FILTER_STABILITY }
 		completion_reward = {
+			add_political_power = 75 
 			add_stability = 0.05
 		}
 	}
@@ -671,8 +677,32 @@
 				remove_idea = CHI_executive_yuan
 				add_idea = CHI_legislative_yuan
 			}
-			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = CHI_kwong_jiang_political_advisor
+			IF = {
+				limit = {
+					NOT = {
+						has_character = CHI_kwong_jiang
+					}
+					NOT = {
+						original_tag = RNG
+					}
+				}
+
+				CHI = {
+					CHI_kwong_jiang = {
+						set_nationality = ROOT
+					}
+				}
+			}
+			IF = {
+				limit = {
+					NOT = {
+						original_tag = RNG
+					}
+				}
+				custom_effect_tooltip = available_political_advisor
+				CHI = { show_ideas_tooltip = CHI_kwong_jiang } 
+			}
+			
 		}
 	}
 
@@ -1751,16 +1781,18 @@
 		search_filters = { FOCUS_FILTER_STABILITY }
 		completion_reward = {
 			add_stability = 0.1
-			custom_effect_tooltip = available_political_advisor
-			if = {
+			IF = {
 				limit = {
-					has_dlc = "La Resistance"
+					NOT = { has_character = CHI_dai_li }
 				}
-				show_ideas_tooltip = CHI_dai_li_political_advisor
+				CHI = {
+					CHI_dai_li = {
+						set_nationality = ROOT
+					}
+				}
 			}
-			else = {
-				show_ideas_tooltip = CHI_dai_li_wtt_political_advisor
-			}
+			custom_effect_tooltip = available_political_advisor
+			CHI = { show_ideas_tooltip = CHI_dai_li }
 		}
 	}
 
@@ -2115,7 +2147,7 @@
 		completion_reward = {
 			CHI_hyper_inflation_level_up = yes
 			random_owned_controlled_state = {
-				prioritize = { 620 }
+				prioritize = { 1036 }
 				limit = {
 					free_building_slots = {
 						building = arms_factory
@@ -2163,8 +2195,49 @@
 		
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 		completion_reward = {
-			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = CHI_t_v_soong_political_advisor
+
+			random_owned_controlled_state = {
+				limit = {
+					is_core_of = ROOT
+					free_building_slots = {
+						building = industrial_complex
+						size > 0
+						include_locked = yes
+					}	
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}	
+			}	
+
+			IF = {
+				limit = {
+					NOT = {
+						has_character = CHI_t_v_soong
+					}
+					NOT = {
+						original_tag = RNG
+					}
+				}
+				CHI = {
+					CHI_t_v_soong = {
+						set_nationality = ROOT
+					}
+				}
+			}
+			IF = {
+				limit = {
+					NOT = {
+						original_tag = RNG
+					}
+				}
+				custom_effect_tooltip = available_political_advisor
+				CHI = { show_ideas_tooltip = CHI_t_v_soong }
+			}
+			
 		}
 	}
 

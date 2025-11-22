@@ -101,32 +101,26 @@ EAI_TEMPLATE_set_infantry_template_flags = {
 	clr_country_flag = EAI_INFANTRY_ROLE
 	clr_country_flag = EAI_INFANTRY_TEMPLATE
 
-	# DOCTRINE: GENERIC
-	if = { limit = { NOT = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } } }
+	### Select infantry width
 
 		if = { 		limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH } } EAI_TEMPLATE_generic_20w_infantry_role = yes }
 		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_26W_INF_WIDTH } } EAI_TEMPLATE_generic_26w_infantry_role = yes }
 		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH } } EAI_TEMPLATE_generic_40w_infantry_role = yes }
 		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } } EAI_TEMPLATE_generic_10w_infantry_role = yes }
-	}
 
-	# DOCTRINE: MA
-	else_if = { limit = { check_variable = { EAI_FOCUS/LAND/land_doctrine = global.EAI_MA_DOCTRINE } }
+	### Use cheap mass production template
 
-		if = { 		limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH } } EAI_TEMPLATE_mass_assault_20w_infantry_role = yes }
-		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH } } EAI_TEMPLATE_mass_assault_40w_infantry_role = yes }
-		else_if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_10W_INF_WIDTH } } EAI_TEMPLATE_generic_10w_infantry_role = yes }
-	}
+		if = { limit = { EAI_TEMPLATE_use_mass_infantry = yes }
+			set_country_flag = EAI_MASS_INFANTRY_TEMPLATE
+			set_variable = { EAI_TEMPLATE_use_mass_infantry_target = mass_infantry_target_size }
+			# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: EAI_TEMPLATE_use_mass_infantry"
+		}
+		else_if = { limit = { EAI_TEMPLATE_use_mass_infantry_abort = yes }
+			clr_country_flag = EAI_MASS_INFANTRY_TEMPLATE
+			# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: EAI_TEMPLATE_use_mass_infantry_abort"
+		}
 
-	if = { limit = { EAI_TEMPLATE_use_mass_infantry = yes }
-		set_country_flag = EAI_MASS_INFANTRY_TEMPLATE
-		set_variable = { EAI_TEMPLATE_use_mass_infantry_target = mass_infantry_target_size }
-		# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: EAI_TEMPLATE_use_mass_infantry"
-	}
-	else_if = { limit = { EAI_TEMPLATE_use_mass_infantry_abort = yes }
-		clr_country_flag = EAI_MASS_INFANTRY_TEMPLATE
-		# log = "[GetYear] [GetMonth] | AI | [Root.GetName] | TEMPLATES: EAI_TEMPLATE_use_mass_infantry_abort"
-	}
+	###
 }
 
 ###
@@ -367,311 +361,14 @@ EAI_TEMPLATE_generic_10w_infantry_role = {
 	if = { limit = { num_of_military_factories < 75 }
 
 		### VARIANT: REGULAR
-		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 411 }
-		}
-
-		### VARIANT: LARGE
-		else = {
-
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 412 }
-		}
+		set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 411 }
 	}
 
 	### DESIGN: UPGRADE
 	else_if = { limit = { NOT = { num_of_military_factories < 75 } }
 
 		### VARIANT: REGULAR
-		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 421 }
-		}
-
-		### VARIANT: LARGE
-		else = {
-
-			set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 422 }
-		}
-	}
-}
-
-###
-
-EAI_TEMPLATE_mass_assault_20w_infantry_role = {
-
-	set_country_flag = { flag = EAI_INFANTRY_ROLE value = 41 }
-
-	### Width 18w
-
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_20W_INF_WIDTH } }
-
-		### Design A
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4110 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4111 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4112 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4113 }
-				}
-			}
-		}
-
-		### Design B
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_B_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4120 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4121 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4122 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4123 }
-				}
-			}
-		}
-
-		### Design C
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_C_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4130 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4131 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4132 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4133 }
-				}
-			}
-		}
-	}
-}
-EAI_TEMPLATE_mass_assault_40w_infantry_role = {
-
-	set_country_flag = { flag = EAI_INFANTRY_ROLE value = 43 }
-
-	### Width 35w
-
-	if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_width = global.EAI_40W_INF_WIDTH } }
-
-		### Design A
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_A_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4310 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4311 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-			
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4312 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4313 }
-				}
-			}
-		}
-
-		### Design B
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_B_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4320 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4321 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4322 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4323 }
-				}
-			}
-		}
-
-		### Design C
-
-		if = { limit = { check_variable = { EAI_FOCUS/LAND/infantry_design = global.EAI_C_INF_DESIGN } }
-
-			### Cheap
-
-			if = { limit = { EAI_infantry_variant_focus_CHEAP = yes }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4330 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4331 }
-				}
-			}
-
-			### Expensive
-
-			if = { limit = { NOT = { EAI_infantry_variant_focus_CHEAP = yes } }
-
-				### Regular size
-
-				if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4332 }
-				}
-
-				### Large size
-
-				if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
-
-					set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 4333 }
-				}
-			}
-		}
+		set_country_flag = { flag = EAI_INFANTRY_TEMPLATE value = 421 }
 	}
 }
 
@@ -698,14 +395,14 @@ EAI_TEMPLATE_set_mass_infantry_template_flag = {
 
 		### Regular size
 
-		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = no }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 10 }
 		}
 
 		### Large size
 
-		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = yes }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 11 }
 		}
@@ -715,14 +412,14 @@ EAI_TEMPLATE_set_mass_infantry_template_flag = {
 
 		### Regular size
 
-		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = no }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 20 }
 		}
 
 		### Large size
 
-		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = yes }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 21 }
 		}
@@ -732,14 +429,14 @@ EAI_TEMPLATE_set_mass_infantry_template_flag = {
 
 		### Regular size
 
-		if = { limit = { NOT = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = no }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 30 }
 		}
 
 		### Large size
 
-		if = { limit = { OR = { has_tech = human_wave_offensive has_tech = vast_offensives } }
+		if = { limit = { EAI_DESIGN_INFANTRY_width_reduction_unlocked = yes }
 
 			set_country_flag = { flag = EAI_MASS_INFANTRY_TEMPLATE value = 31 }
 		}
