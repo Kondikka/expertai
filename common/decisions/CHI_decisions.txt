@@ -584,14 +584,13 @@ CHI_industrial_evacuations = {
 		target_array = ROOT.core_states
 
 		target_root_trigger = {
-			OR = {
-				has_completed_focus = CHI_industrial_evacuations
-				has_completed_focus = CHI_sea_industrial_evacuations
-				has_completed_focus = CHI_relocate_factories_from_the_coast
-			}
+			has_completed_focus = CHI_relocate_factories_from_the_coast
 		}
 
 		visible = {
+			any_controlled_state = { #If you don't control anyother state than FROM, you can't move the factories
+				NOT = { state = FROM }
+			}
 			FROM = {
 				is_controlled_by = ROOT
 				OR = {
@@ -4281,7 +4280,7 @@ political_actions = {
 
 		}
 		
-		cost = 25
+		cost = 5
 
 		ai_will_do = {
 			base = 1
@@ -4444,11 +4443,22 @@ CHI_xian_incident = {
 		icon = generic_political_discourse
 
 		visible = {
-			NOT = {
-				OR = {
-					has_global_flag = CHI_xian_fired
-					has_global_flag = early_united_front
+			if = {
+				limit = {
+					has_dlc = "No Compromise, No Surrender"
 				}
+				NOT = {
+					CHI = {
+						has_faction_template = faction_template_chinese_united_front
+					}
+					PRC = {
+						has_faction_template = faction_template_chinese_united_front
+					}
+				}	
+			}
+			NOT = {
+				has_global_flag = CHI_xian_fired
+				has_global_flag = early_united_front
 			}
 			CHI = {
 				has_country_leader = {
@@ -7634,6 +7644,8 @@ CHI_integrate_the_warlords_sea_cat = {
 	CHI_press_warlord_to_become_puppet = {
 		icon = GFX_decision_eng_trade_unions_demand
 
+		priority = 10
+
 		ai_will_do = {
 			base = 5
 			modifier = {
@@ -8110,6 +8122,8 @@ CHI_integrate_the_warlords_sea_cat = {
 
 	CHI_press_warlord_to_become_puppet_with_affirm_civilian_primacy = {
 		icon = GFX_decision_eng_trade_unions_demand
+
+		priority = 10
 
 		ai_will_do = {
 			base = 5
@@ -8650,10 +8664,10 @@ CHI_integrate_the_warlords_sea_cat = {
 				has_faction_template = faction_template_wang_front
 				has_faction_template = faction_template_chinese_united_front
 			}
-			NOT = { has_completed_focus = CHI_impair_the_control_yuan }
 		}
 
 		visible = {
+			NOT = { has_completed_focus = CHI_impair_the_control_yuan }
 		} 
 
 		ai_hint_pp_cost = 50

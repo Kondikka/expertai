@@ -1020,6 +1020,14 @@ foreign_politics = {
 
 		target_array = enemies
 
+		target_root_trigger = {
+			NOT = { has_country_flag = JAP_offered_china_white_peace_flag }
+			is_subject = no
+			any_enemy_country = {
+				is_literally_china = yes
+			}
+		}
+		
 		target_trigger = {
 			#Target is FROM
 			FROM = {
@@ -1033,48 +1041,6 @@ foreign_politics = {
 				exists = yes 
 				is_subject = no
 			}
-			is_subject = no
-			any_enemy_country = {
-				is_literally_china = yes
-			}
-			if = { limit = { has_global_flag = EOUH_active }
-				NOT = {  #EOUH
-					OR = {
-						CHI = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						GXC = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						MAN = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						PRC = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						SHX = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						SIK = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						XSM = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-						YUN = {
-							is_ally_with = ROOT
-							has_war_with = event_target:WTT_current_china_leader
-						}
-					}
-				}
-			}
 		}
 
 		cost = 0
@@ -1086,6 +1052,7 @@ foreign_politics = {
 		}
 
 		complete_effect = {
+			set_country_flag = JAP_offered_china_white_peace_flag
 			event_target:WTT_current_china_leader = {
 				country_event = { 
 					id = wtt_japan.126 
@@ -2210,8 +2177,19 @@ JAP_pacific_guardian = {
 		visible = {
 			has_completed_focus = JAP_create_greater_east_asian_treaty_organization
 		}
+
 		available = {
-			
+			is_subject = no 
+			OR = {
+				is_faction_leader = yes
+				AND = {
+					is_faction_leader = no
+					any_allied_country = {
+						is_faction_leader = yes
+						has_government = democratic 
+					}
+				}
+			}
 		}
 
 		target_array = global.asian_and_oceanian_countries
@@ -3555,7 +3533,14 @@ operations = {
 		allowed = { always = no } #Activated from effect
 
 		available = {
-			has_border_war_with = SOV # Japan shouldn't lose war support if they actually use the window of opportunity
+			
+			hidden_trigger = {
+				OR = {
+					has_border_war_with = SOV # Japan shouldn't lose war support if they actually use the window of opportunity
+					has_country_flag = JAP_did_the_border_war_flag
+				}
+			}
+				
 		}
 
 		highlight_states = {
