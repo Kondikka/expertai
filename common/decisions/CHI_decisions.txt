@@ -7565,8 +7565,10 @@ CHI_internal_politics_cat = {
 		}
 		
 		available = {
-			FROM = {
-				NOT = { has_state_flag = CHI_coring_this_asian_state_in_progress_flag }
+			hidden_trigger = {
+				FROM = {
+					NOT = { has_state_flag = CHI_coring_this_asian_state_in_progress_flag }
+				}
 			}
 			FROM = {
 				compliance > 50
@@ -7593,7 +7595,7 @@ CHI_internal_politics_cat = {
 	        	}
 	        }
 	    }
-	    on_map_mode = map_only
+	    on_map_mode = map_and_decisions_view
 
 	    cost = 30		
 
@@ -11120,6 +11122,7 @@ CHI_x_y_force_cat = {
 			command_power > 75
 		}
 		custom_cost_text = decision_cost_CP_75
+		fire_only_once = yes
 		ai_will_do = {
 			base = 10
 			modifier = {
@@ -11151,15 +11154,17 @@ CHI_x_y_force_cat = {
 
 		complete_effect = {
 			custom_effect_tooltip = CHI_form_x_force_tt
-			hidden_effect = {
-				add_command_power = -75
-			}
+			custom_effect_tooltip = generic_skip_one_line_tt
 
 			if = {
 				limit = {
 					YUN = {
 						exists = yes
-						NOT = { has_war_with = ROOT }
+						NOT = { 
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+							gives_military_access_to = ROOT
+						}
 					}
 				}
 
@@ -11172,7 +11177,11 @@ CHI_x_y_force_cat = {
 				limit = {
 					SIC = {
 						exists = yes
-						NOT = { has_war_with = ROOT }
+						NOT = { 
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+							gives_military_access_to = ROOT
+						}
 					}
 				}
 
@@ -11185,7 +11194,11 @@ CHI_x_y_force_cat = {
 				limit = {
 					BRM = {
 						exists = yes
-						NOT = { has_war_with = ROOT }
+						NOT = { 
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+							gives_military_access_to = ROOT
+						}
 					}
 				}
 
@@ -11198,7 +11211,11 @@ CHI_x_y_force_cat = {
 				limit = {
 					RAJ = {
 						exists = yes
-						NOT = { has_war_with = ROOT }
+						NOT = { 
+							has_war_with = ROOT
+							is_in_faction_with = ROOT
+							gives_military_access_to = ROOT
+						}
 					}
 				}
 
@@ -11207,109 +11224,124 @@ CHI_x_y_force_cat = {
 				}
 			}
 
-			if = { #This should be RAJ 99% of the time but just in case
-				limit = {
-					435 = {
-						controller = {
-							NOT = { ROOT = { has_military_access_to = PREV } }
-						}
-					}
-				}
 
-				435 = {
-					controller = {
-						give_military_access = ROOT
-					}
-				}
-			}
-
-			division_template = {
-				name = "X-Force"
-				is_locked = no
-
-				regiments = {
-					infantry = { x = 0 y = 0 }
-					infantry = { x = 0 y = 1 }
-					infantry = { x = 0 y = 2 }
-					infantry = { x = 0 y = 3 }
-
-					infantry = { x = 1 y = 0 }
-					infantry = { x = 1 y = 1 }
-					infantry = { x = 1 y = 2 }
-					infantry = { x = 1 y = 3 }
-
-					infantry = { x = 2 y = 0 }
-					infantry = { x = 2 y = 1 }
-					infantry = { x = 2 y = 2 }
-					infantry = { x = 2 y = 3 }
-
-					infantry = { x = 3 y = 0 }
-					infantry = { x = 3 y = 1 }
-					infantry = { x = 3 y = 2 }
-				}
-				support = {
-					
-				}
-			}
-
-			if = {
-				limit = {
-					435 = {
-						controller = {
-							NOT = { has_war_with = ROOT }
-							surrender_progress < 0.9
-							ROOT = { has_military_access_to = PREV }
-						}
-					}
-				}
+			hidden_effect = {
+				add_command_power = -75
 				
-
-				set_variable = { controller_435 = 435.controller }  
-
-				transfer_state = 435
-				435 = {
-					create_unit = {
-						division = "name = \"30th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
-						owner = CHI
-						prioritize_location = 4516 
-					
-						count = 1
+				if = { #This should be RAJ 99% of the time but just in case
+					limit = {
+						435 = {
+							controller = {
+								NOT = { ROOT = { has_military_access_to = PREV } }
+							}
+						}
 					}
 
-					create_unit = {
-						division = "name = \"22nd Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
-						owner = CHI
-						prioritize_location = 4516 
-					
-						count = 1
-					}
-
-					create_unit = {
-						division = "name = \"38th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
-						owner = CHI
-						prioritize_location = 4516 
-					
-						count = 1
-					}
-
-					create_unit = {
-						division = "name = \"14th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
-						owner = CHI
-						prioritize_location = 4516 
-					
-						count = 1
-					}
-
-					create_unit = {
-						division = "name = \"50th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
-						owner = CHI
-						prioritize_location = 4516 
-					
-						count = 1
+					435 = {
+						controller = {
+							give_military_access = ROOT
+						}
 					}
 				}
-				var:controller_435 = { transfer_state = 435 }
-				clear_variable = controller_435
+				delete_unit_template_and_units = {
+					division_template = "X-Force"
+					disband = yes #if yes, will refund equipment/manpower.
+				}
+				division_template = {
+					name = "X-Force"
+					is_locked = no
+
+					regiments = {
+						infantry = { x = 0 y = 0 }
+						infantry = { x = 0 y = 1 }
+						infantry = { x = 0 y = 2 }
+						infantry = { x = 0 y = 3 }
+
+						infantry = { x = 1 y = 0 }
+						infantry = { x = 1 y = 1 }
+						infantry = { x = 1 y = 2 }
+						infantry = { x = 1 y = 3 }
+
+						infantry = { x = 2 y = 0 }
+						infantry = { x = 2 y = 1 }
+						infantry = { x = 2 y = 2 }
+						infantry = { x = 2 y = 3 }
+
+						infantry = { x = 3 y = 0 }
+						infantry = { x = 3 y = 1 }
+						infantry = { x = 3 y = 2 }
+					}
+					support = {
+						
+					}
+				}
+				if = {
+					limit = {
+						435 = {
+							controller = {
+								NOT = { has_war_with = ROOT }
+								surrender_progress < 0.9
+								ROOT = { has_military_access_to = PREV }
+							}
+						}
+					}
+					
+
+					set_variable = { controller_435 = 435.controller }  
+
+					transfer_state = 435
+					435 = {
+						create_unit = {
+							division = "name = \"30th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+
+						create_unit = {
+							division = "name = \"22nd Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+
+						create_unit = {
+							division = "name = \"38th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+
+						create_unit = {
+							division = "name = \"14th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+
+						create_unit = {
+							division = "name = \"50th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+
+						create_unit = {
+							division = "name = \"50th Division\" division_template = \"X-Force\" start_experience_factor = 0.4 start_equipment_factor = 0.5 start_manpower_factor = 1"
+							owner = CHI
+							prioritize_location = 4516 
+						
+							count = 1
+						}
+					}
+					var:controller_435 = { transfer_state = 435 }
+					clear_variable = controller_435
+				}
 			}
 		}
 	}
@@ -11321,6 +11353,7 @@ CHI_x_y_force_cat = {
 			command_power > 99
 		}
 		custom_cost_text = decision_cost_CP_100_pp_75
+		fire_only_once = yes
 		ai_will_do = {
 			base = 10
 			modifier = {
@@ -11369,10 +11402,6 @@ CHI_x_y_force_cat = {
 		}
 
 		complete_effect = {
-			hidden_effect = {
-				add_political_power = -75
-				add_command_power = -100
-			}
 			custom_effect_tooltip = CHI_form_y_force_tt
 			division_template = {
 				name = "Y-Force"
@@ -11398,6 +11427,9 @@ CHI_x_y_force_cat = {
 				}
 			}
 			hidden_effect = {
+				add_political_power = -75
+				add_command_power = -100
+
 				325 = {
 					create_unit = {
 					    division = "name = \"9th Division\" division_template = \"Y-Force\" start_experience_factor = 0.5 start_equipment_factor = 0.6 start_manpower_factor = 1"

@@ -12,6 +12,7 @@
 @PR_rubber_processing = 900
 @PR_construction = 1000
 @PR_excavation = 950
+@PR_energy_gain = 1200
 
 EAI_PR_STRATEGIES_industry_technologies = {
 
@@ -25,6 +26,7 @@ EAI_PR_STRATEGIES_industry_technologies = {
 	EAI_PR_STRATEGIES_rubber_processing = yes
 	EAI_PR_STRATEGIES_construction = yes
 	EAI_PR_STRATEGIES_excavation = yes
+	EAI_PR_STRATEGIES_energy_gain = yes
 }
 
 ###
@@ -708,6 +710,55 @@ EAI_PR_STRATEGIES_excavation = {
 		if = { limit = { set_temp_variable = { _prio_tech = token:excavation5 } set_temp_variable = { _prio_val = prio_cat }
 
 			date > 1943.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+	}
+}
+
+EAI_PR_STRATEGIES_energy_gain = {
+
+	if = { 
+		limit = { 
+			always = yes
+		}
+
+		set_temp_variable = { prio_cat = @PR_energy_gain }
+
+		############################
+		# Strategies
+		############################
+
+			# if = { limit = { tag = SOV }
+			# 	if = {
+			# 		limit = {
+			# 			always = yes
+			# 		}
+				
+			# 		multiply_temp_variable = { prio_cat = 1 }
+			# 	}
+			# }
+
+		############################
+
+		set_temp_variable = { _val_ = EAI_coal_resource_shortage }
+		set_temp_variable = { _min = 0 }
+		set_temp_variable = { _max = 3 }
+		EAI_MATH_normalize = yes
+		multiply_temp_variable = { prio_cat = _val_ }
+
+		### improved_equipment_conversion
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:improved_equipment_conversion } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1939.1.1
+				
+		} EAI_PR_add_to_priority_research_queue = yes }
+
+		### advanced_equipment_conversion
+
+		if = { limit = { set_temp_variable = { _prio_tech = token:advanced_equipment_conversion } set_temp_variable = { _prio_val = prio_cat }
+
+			date > 1939.1.1
 				
 		} EAI_PR_add_to_priority_research_queue = yes }
 	}

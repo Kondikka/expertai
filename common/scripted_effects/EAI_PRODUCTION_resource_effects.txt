@@ -135,6 +135,22 @@ EAI_RESOURCE_check_resource_needs = {
 	clamp_variable = { var = EAI_needs_chromium min = 0 max = 3 }
 	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_needs_chromium = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: CHROMIUM needed, resource@chromium = [?resource@chromium], resource_imported@chromium = [?resource_imported@chromium]" }
 
+	### coal
+
+	if = {
+		limit = {
+			OR = {
+				check_variable = { resource@coal < -20 }
+				check_variable = { resource_imported@coal > 20 }
+			}
+		}
+
+		add_to_variable = { EAI_needs_coal = 1 }
+	}
+	else = { subtract_from_variable = { EAI_needs_coal = 1 } }
+	clamp_variable = { var = EAI_needs_coal min = 0 max = 3 }
+	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_needs_coal = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: coal needed, resource@coal = [?resource@coal], resource_imported@coal = [?resource_imported@coal]" }
+
 	##################################################################################
 
 	### allied resource needs
@@ -307,6 +323,33 @@ EAI_RESOURCE_check_resource_shortages = {
 	clamp_variable = { var = EAI_chromium_resource_shortage min = 0 max = 3 }
 	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_chromium_resource_shortage = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: CHROMIUM shortage, deficit : need = [?chromium_deficit|%0]" }
 
+	### coal
+
+	if = {
+		limit = {
+			# there is a deficit
+			check_variable = { resource@coal < 0 }
+			
+			# total needed for production
+			set_temp_variable = { coal_needed = resource_consumed@coal }
+			multiply_temp_variable = { coal_needed = -1 }
+			add_to_temp_variable = { coal_needed = resource@coal }
+
+			# need is at least this much
+			check_variable = { coal_needed < @resource_shortage_min_need }
+
+			# deficit is >25% of total need
+			set_temp_variable = { coal_deficit = resource@coal }
+			divide_temp_variable = { coal_deficit = coal_needed }
+			check_variable = { coal_deficit > @resource_shortage_limit }
+		}
+
+		add_to_variable = { EAI_coal_resource_shortage = 1 }
+	}
+	else = { subtract_from_variable = { EAI_coal_resource_shortage = 1 } }
+	clamp_variable = { var = EAI_coal_resource_shortage min = 0 max = 3 }
+	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_coal_resource_shortage = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: coal shortage, deficit : need = [?coal_deficit|%0]" }
+
 	##############################################################################################################################
 	#	Massive shortage
 	##############################################################################################################################
@@ -383,6 +426,20 @@ EAI_RESOURCE_check_resource_shortages = {
 	else = { subtract_from_variable = { EAI_chromium_resource_massive_shortage = 1 } }
 	clamp_variable = { var = EAI_chromium_resource_massive_shortage min = 0 max = 3 }
 	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_chromium_resource_massive_shortage = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: CHROMIUM shortage, deficit : need = [?chromium_deficit|%0]" }
+
+	### coal
+
+	if = {
+		limit = {
+			# there is a deficit
+			check_variable = { resource@coal < @resource_massive_shortage_min_need }
+		}
+
+		add_to_variable = { EAI_coal_resource_massive_shortage = 1 }
+	}
+	else = { subtract_from_variable = { EAI_coal_resource_massive_shortage = 1 } }
+	clamp_variable = { var = EAI_coal_resource_massive_shortage min = 0 max = 3 }
+	if = { limit = { has_country_flag = EAI_resources_logging check_variable = { EAI_coal_resource_massive_shortage = 3 } } log = "[GetYear] [GetMonth] | AI | [Root.GetName] | RESOURCES: coal shortage, deficit : need = [?coal_deficit|%0]" }
 }
 
 ###
