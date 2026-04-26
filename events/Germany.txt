@@ -1993,6 +1993,7 @@ country_event = {
 				is_historical_focus_on = yes
 				NOT = { HUN = { has_completed_focus = HUN_protect_austria } }
 				NOT = { ITA = { has_completed_focus = ITA_guarantee_austrian_independence } }
+				NOT = { CZE = { has_completed_focus = CZE_assist_austria } }
 				NOT = {
 					strength_ratio = {
 						tag = GER
@@ -2020,6 +2021,15 @@ country_event = {
 				HUN = {
 					OR = {
 						has_completed_focus = HUN_protect_austria
+						is_in_faction_with = AUS
+					}
+				}
+			}
+			modifier = {
+				add = 100
+				CZE = {
+					OR = {
+						has_completed_focus = CZE_assist_austria
 						is_in_faction_with = AUS
 					}
 				}
@@ -2243,6 +2253,25 @@ country_event = {
 					CZE = { is_subject_of = ROOT }
 				}
 			}
+			#Pfot
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.85
+				CZE = {
+					has_completed_focus = CZE_outreach_to_the_western_powers
+				}
+			}
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.60 #Was more worried about the fighter gap
+				CZE = {
+					has_completed_focus = CZE_supply_fighters_for_allies
+				}
+			}
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.45
+				CZE = {
+					has_completed_focus = CZE_demand_guarantees
+				}
+			}
 		}
 
 		#Send follow-up event to next country
@@ -2285,13 +2314,23 @@ country_event = {
 					relation = guarantee
 					active = no
 				}
-				add_ai_strategy = {
+			add_ai_strategy = {
 				type = protect
 				id = CZE
 				value = -100
 			}
 		}
-
+		if = {
+			limit = {
+				country_exists = CZE
+			}
+			add_ai_strategy = { #Back out on you once, not going to back you up again
+				type = diplo_action_desire
+				id = CZE
+				target = guarantee
+				value = -100
+			}
+		}
 		if = {
 			limit = {
 				CZE = { is_in_faction_with = ROOT }
@@ -2334,9 +2373,31 @@ country_event = {
 						}
 						NOT = {
 							is_in_faction_with = CZE
+							CZE = {
+								has_completed_focus = CZE_supply_fighters_for_allies
+							}
 							has_war_with = GER
 						}
 					}
+				}
+			}
+			#Pfot
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 1.2
+				CZE = {
+					has_completed_focus = CZE_outreach_to_the_western_powers
+				}
+			}
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 1.4 #Was more worried about the fighter gap
+				CZE = {
+					has_completed_focus = CZE_supply_fighters_for_allies
+				}
+			}
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 3
+				CZE = {
+					has_completed_focus = CZE_demand_guarantees
 				}
 			}
 		}
@@ -2509,6 +2570,25 @@ country_event = {
 					surrender_progress > 0.1
 				}
 			}
+			#Pfot
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.85
+				CZE = {
+					has_completed_focus = CZE_outreach_to_the_western_powers
+				}
+			}
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.65
+				CZE = {
+					has_completed_focus = CZE_supply_fighters_for_allies
+				}
+			}
+			modifier = { #ROOT is less willing to accept the deal if Czech completed this focus
+				factor = 0.40
+				CZE = {
+					has_completed_focus = CZE_demand_guarantees
+				}
+			}
 		}
 
 		# Notify CZE and they hate us (with good reason)
@@ -2566,6 +2646,18 @@ country_event = {
 				value = -100
 			}
 		}
+		if = {
+			limit = {
+				country_exists = CZE
+			}
+			add_ai_strategy = { #Back out on you once, not going to back you up again
+				type = diplo_action_desire
+				id = CZE
+				target = guarantee
+				value = -100
+			}
+		}
+
 		#Some fallout to YUG
 		if = {
 			limit = {
@@ -2608,8 +2700,32 @@ country_event = {
 					is_in_faction_with = GER
 					AND = {
 						is_historical_focus_on = yes
-						NOT = {	is_in_faction_with = CZE }
+						NOT = {
+							is_in_faction_with = CZE
+							CZE = {		#PfOT
+								has_completed_focus = CZE_supply_fighters_for_allies
+							}
+						}
 					}
+				}
+			}
+			#Pfot
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 1.2
+				CZE = {
+					has_completed_focus = CZE_outreach_to_the_western_powers
+				}
+			}
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 1.3
+				CZE = {
+					has_completed_focus = CZE_supply_fighters_for_allies
+				}
+			}
+			modifier = { #ROOT is more willing to support the Czechs if they completed this focus
+				factor = 5
+				CZE = {
+					has_completed_focus = CZE_demand_guarantees
 				}
 			}
 		}
@@ -3062,12 +3178,36 @@ country_event = {
 				is_subject = yes
 				NOT = { is_subject_of = GER } #puppeted CZE wouldn't surrender Sudetenland otherwise
 			}
+			modifier = {
+				factor = 0
+				has_completed_focus = CZE_the_legacy_of_ottokar
+			}
 		}
 
 		GER = { 
 			country_event = {
 				id = germany.50 
 				hours = 2
+			}
+		}
+		#pfot
+		if = { 
+			limit = {
+				has_dlc = "Peace For Our Time"
+			}
+			if = {
+				limit = {
+					has_government = democratic
+				}
+				custom_effect_tooltip = generic_skip_one_line_tt
+				custom_effect_tooltip = CZE_the_fall_of_the_republic_warning_munich_tt
+			}
+			hidden_effect = {
+				country_event = {
+					id = MUN_the_fall_of_the_republic.1
+					days = 6
+    				random_hours = 24
+				}
 			}
 		}
 	}
@@ -3353,6 +3493,20 @@ country_event = {
 			if = {
 				limit = {
 					CZE = { controls_state = 664 }
+				}
+				CZE = {
+					country_event = germany.59
+				}
+			}
+			else_if = {
+				limit = {
+					SLO = {
+						controls_state = 664
+						is_subject_of = CZE
+					}
+				}
+				SLO = {
+					country_event = germany.59
 				}
 				CZE = {
 					country_event = germany.59
@@ -3676,6 +3830,42 @@ country_event = {
 			type = annex_everything
 			target = CZE
 		}
+		if = {
+			limit = {
+				SLO = {
+					exists = yes
+					is_subject_of = CZE
+				}
+			}
+			add_ai_strategy = {
+				type = declare_war
+				id = SLO
+				value = 100
+			}
+			add_ai_strategy = {
+				type = conquer
+				id = SLO
+				value = 100
+			}
+		}
+		if = {
+			limit = {
+				RUT = {
+					exists = yes
+					is_subject_of = CZE
+				}
+			}
+			add_ai_strategy = {
+				type = declare_war
+				id = RUT
+				value = 100
+			}
+			add_ai_strategy = {
+				type = conquer
+				id = RUT
+				value = 100
+			}
+		}
 	}
 }
 
@@ -3695,6 +3885,455 @@ country_event = {
 
 	is_triggered_only = yes
 
+	option = { #Same as germany.55.a but we puppet Bohemia as well
+		name = germany.55.e
+		trigger = {
+			ROOT = { #Some extra sanity checks to be overly safe in this context
+				has_war = no
+			}
+			CZE = {
+				has_full_control_of_state = 9
+				has_full_control_of_state = 75
+				has_war = no
+			}
+			any_state = {
+				or = {
+					state = 70
+					state = 71
+					state = 73
+					state = 664
+				}
+				OR = {
+					is_controlled_by = CZE
+					if = {
+						limit = {
+							SLO = {
+								is_subject_of = CZE
+							}
+						}
+						is_controlled_by = SLO
+					}
+					if = {
+						limit = {
+							RUT = {
+								is_subject_of = CZE
+							}
+						}
+						is_controlled_by = RUT
+					}
+				}
+			}
+		}
+		ai_chance = {
+			base = 50
+			modifier = {
+				factor = 2
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 10
+				SLO = {
+					is_ai = no
+				}
+			}
+		}
+		if = {
+			limit = {
+				SLO = {
+					exists = no
+				}
+			}
+			set_country_flag = GER_slovakia_doesn_not_exist
+		}
+		if = {
+			limit = {
+				SLO = { #Or we were a puppet of the country we just annexed
+					exists = yes
+					is_subject_of = CZE
+				}
+			}
+			set_country_flag = GER_slovakia_was_a_puppet_of_cze
+		}
+		if = {
+			limit = {
+				70 = {
+					OR = { #check controller instead
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			SLO = { transfer_state = 70 }
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				70 = {
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			#This is purely here to inform the player that SLO will have claims on this state, since it's already a core
+			effect_tooltip = {
+				SLO = { add_state_claim = 70 }
+			}
+		}
+
+		if = {
+			limit = {
+				71 = {
+					OR = {
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			SLO = { transfer_state = 71 }
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				71 = {
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			#This is purely here to inform the player that SLO will have claims on this state, since it's already a core
+			effect_tooltip = {
+				SLO = { add_state_claim = 71 }
+			}
+		}
+
+		if = {
+			limit = {
+				664 = {
+					OR = {
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			SLO = { transfer_state = 664 }
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				NOT = { has_country_flag = GER_first_vienna_award_flag }
+				664 = {
+					OR = {
+						is_owned_by = CZE
+						is_owned_by = GER
+					}
+				}
+				664 = {
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			#This is purely here to inform the player that SLO will have claims on this state, since it's already a core
+			effect_tooltip = {
+				SLO = { add_state_claim = 664 }
+			}
+		}
+
+		if = {
+			limit = {
+				country_exists = HUN
+				154 = { is_controlled_by = HUN }
+				HUN = {
+					is_friend_or_potential_friend_of_GER = yes
+				}
+				73 = {
+					NOT = { is_controlled_by = HUN }
+					OR = {
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			HUN = { transfer_state = 73 }
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				country_exists = HUN
+				154 = { is_controlled_by = HUN }
+				HUN = {
+					is_friend_or_potential_friend_of_GER = yes
+				}
+				73 = {
+					NOT = { is_controlled_by = HUN }
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			HUN = { add_state_claim = 73 }
+		}
+		else_if = {
+			limit = {
+				OR = {
+					NOT = { 154 = { is_controlled_by = HUN } }
+					HUN = { is_friend_or_potential_friend_of_GER = no }
+				}
+				73 = {
+					OR = {
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			SLO = { transfer_state = 73 }
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				73 = {
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			#This is purely here to inform the player that SLO will have claims on this state, since it's already a core
+			effect_tooltip = {
+				SLO = { add_state_claim = 73 }
+			}
+		}
+
+
+		if = {
+			limit = { country_exists = CZE }
+			if = {
+				limit = {
+					SLO = {
+						is_ai = yes #If player they already got this in the Czech events
+					}
+				}
+				SLO = {
+					inherit_technology = CZE
+				}
+			}
+			annex_country = { target = CZE }
+			effect_tooltip = {
+				puppet = RKH
+			}
+			hidden_effect = {
+				activate_decision = GER_reichsprotektorat_bohemia_moravia #the part that's different 
+			}
+
+			if = {
+				limit = {
+					has_full_control_of_state = 75
+				}
+				RKH = {
+					transfer_state = 75
+				}
+			}
+			if = {
+				limit = {
+					has_full_control_of_state = 9
+				}
+				RKH = {
+					transfer_state = 9
+				}
+			}
+			add_political_power = 10
+			add_war_support = 0.1
+		}
+
+		if = { #Only puppet Slovakia if they hold land
+			limit = {
+				OR = {
+					has_country_flag = GER_slovakia_doesn_not_exist
+					has_country_flag = GER_slovakia_was_a_puppet_of_cze
+				}
+				any_state = {
+					or = {
+						state = 70
+						state = 71
+						state = 73
+						state = 664
+					}
+					is_controlled_by = SLO
+				}
+			}
+			puppet = SLO
+		}
+
+		if = {
+			limit = {
+				country_exists = POL
+				OR = {
+					NOT = {	has_wargoal_against = POL }
+					NOT = { POL = { has_wargoal_against = ROOT }}
+					NOT = { has_war_with = POL }
+				}
+				72 = {
+					OR = {
+						is_controlled_by = CZE
+						is_controlled_by = GER
+					}
+				}
+			}
+			POL = { transfer_state = 72 } # Give Poland Zaolzie
+		}
+		else_if = { #Don't transfer ownership of the state if it's controlled by an ally
+			limit = {
+				OR = {
+					NOT = {	has_wargoal_against = POL }
+					NOT = { POL = { has_wargoal_against = ROOT }}
+					NOT = { has_war_with = POL }
+				}
+				72 = {
+					is_controlled_by_ROOT_or_ally = no
+				}
+			}
+			POL = { add_state_claim = 72 }
+		}
+
+		CZE = {
+			every_core_state = {
+				limit = {
+					NOT = { is_core_of = SLO }
+					OR = {
+						is_controlled_by = ROOT
+						is_controlled_by = RKH
+					}
+				}
+				add_claim_by = GER
+				set_compliance = 55
+			}
+		}
+
+		if = {
+			limit = { has_global_flag = GER_HUN_CZE_split }
+			HUN = { country_event = DOD_hungary.106 }
+		}
+
+		GER_czechoslovakia_modify_mefo_bills_or_economy_of_conquest = yes
+		GER_seize_gold_reserves_in_europe_peacefully = yes
+
+		add_to_variable = { var = GER_mefo_bill_counter value = -10 }
+
+		if = { #pfot
+			limit = {
+				has_dlc = "Peace For Our Time"
+			}
+			#Hungary or FROM 153 owner get's event on if they should invade RUT if it exists after the breakup of the Czechs
+			if = { #First some overly safe sanity checks
+				limit = {
+					country_exists = RUT
+					HUN = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								has_war_with = GER
+								is_in_faction_with = RUT
+								has_war_together_with = RUT
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					HUN = { country_event = { id = MUN_the_fall_of_the_republic.4 days = 1 } }
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+			else_if = {
+				limit = { #First some overly safe sanity checks
+					country_exists = RUT
+					any_other_country = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								original_tag = CZE
+								original_tag = GER
+								original_tag = SLO
+								tag = RKH
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						is_major = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					random_other_country = {
+						limit = {
+							exists = yes
+							is_neighbor_of = RUT
+							controls_state = 154
+							has_war = no
+							is_subject = no
+							NOT = {
+								OR = {
+									original_tag = CZE
+									original_tag = GER
+									original_tag = SLO
+									tag = RKH
+								}
+							}
+						}
+						THIS = {
+							set_country_flag = CZE_pfot_rut_war_news_event_flag #Tags THIS so they can trigger the news event
+							country_event = { id = MUN_the_fall_of_the_republic.4 days = 1 } 
+						}
+					}
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+				
+			}
+		}
+
+		hidden_effect = {
+			country_event = { hours = 6 id = news.60 }
+			every_state = {
+				limit = {
+					is_controlled_by = SLO
+				}
+				add_core_of = SLO
+			}
+			SLO = {
+				add_manpower = 9876
+				if = {
+					limit = {
+						has_dlc = "No Step Back"
+					}
+					load_oob = "SLO_1939_nsb"
+				}
+				else = {
+					load_oob = "SLO_1939"
+				}
+			}
+		}
+	}
+
 	option = {
 		name = germany.55.a
 		trigger = {
@@ -3705,13 +4344,31 @@ country_event = {
 					state = 73
 					state = 664
 				}
-				is_controlled_by = CZE
+				OR = {
+					is_controlled_by = CZE
+					if = {
+						limit = {
+							SLO = {
+								is_subject_of = CZE
+							}
+						}
+						is_controlled_by = SLO
+					}
+					if = {
+						limit = {
+							RUT = {
+								is_subject_of = CZE
+							}
+						}
+						is_controlled_by = RUT
+					}
+				}
 			}
 		}
 		ai_chance = {
 			base = 50
 			modifier = {
-				factor = 2
+				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
@@ -3722,6 +4379,15 @@ country_event = {
 				}
 			}
 			set_country_flag = GER_slovakia_doesn_not_exist
+		}
+		if = {
+			limit = {
+				SLO = { #Or we were a puppet of the country we just annexed
+					exists = yes
+					is_subject_of = CZE
+				}
+			}
+			set_country_flag = GER_slovakia_was_a_puppet_of_cze
 		}
 		if = {
 			limit = {
@@ -3864,12 +4530,26 @@ country_event = {
 				inherit_technology = CZE
 			}
 			annex_country = { target = CZE }
+			# if = {	#MUN - marijn211: Could change the code a bit so states are temporarily transfered to prevent the player briefly seeing the game over screen
+			# 	limit = {
+			# 		CZE = {
+			# 			is_ai = no
+			# 		}
+			# 	}
+			# 	activate_decision = GER_reichsprotektorat_bohemia_moravia
+			# 	RKH = {
+			# 		change_tag_from = CZE
+			# 	}
+			# }
 			add_war_support = 0.1
 		}
 
 		if = { #Only puppet Slovakia if they hold land
 			limit = {
-				has_country_flag = GER_slovakia_doesn_not_exist
+				OR = {
+					has_country_flag = GER_slovakia_doesn_not_exist
+					has_country_flag = GER_slovakia_was_a_puppet_of_cze
+				}
 				any_state = {
 					or = {
 						state = 70
@@ -3935,6 +4615,112 @@ country_event = {
 
 		add_to_variable = { var = GER_mefo_bill_counter value = -10 }
 
+		if = { #pfot
+			limit = {
+				has_dlc = "Peace For Our Time"
+			}
+			#Hungary or FROM 153 owner get's event on if they should invade RUT if it exists after the breakup of the Czechs
+			if = { #First some overly safe sanity checks
+				limit = {
+					country_exists = RUT
+					HUN = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								has_war_with = GER
+								is_in_faction_with = RUT
+								has_war_together_with = RUT
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					HUN = { country_event = { id = MUN_the_fall_of_the_republic.4 days = 1 } }
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+			else_if = {
+				limit = { #First some overly safe sanity checks
+					country_exists = RUT
+					any_other_country = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								original_tag = CZE
+								original_tag = GER
+								original_tag = SLO
+								tag = RKH
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					random_other_country = {
+						limit = {
+							exists = yes
+							is_neighbor_of = RUT
+							controls_state = 154
+							has_war = no
+							is_subject = no
+							NOT = {
+								OR = {
+									original_tag = CZE
+									original_tag = GER
+									original_tag = SLO
+									tag = RKH
+								}
+							}
+						}
+						THIS = {
+							set_country_flag = CZE_pfot_rut_war_news_event_flag #Tags THIS so they can trigger the news event
+							country_event = { id = MUN_the_fall_of_the_republic.4 days = 3 } 
+						}
+					}
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+		}
+
 		hidden_effect = {
 			country_event = { hours = 6 id = news.60 }
 			every_state = {
@@ -3965,6 +4751,12 @@ country_event = {
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 0
+				SLO = {
+					is_ai = no
+				}
 			}
 			modifier = { #EAI
 				factor = 0
@@ -4020,6 +4812,109 @@ country_event = {
 		GER_seize_gold_reserves_in_europe_peacefully = yes
 
 		add_to_variable = { var = GER_mefo_bill_counter value = -10 }
+
+		if = { #pfot
+			limit = {
+				has_dlc = "Peace For Our Time"
+			}
+			#Hungary or FROM 153 owner get's event on if they should invade RUT if it exists after the breakup of the Czechs
+			if = { #First some overly safe sanity checks
+				limit = {
+					country_exists = RUT
+					HUN = { #doesn't fire in this context for HUN
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								has_war_with = GER
+								is_in_faction_with = RUT
+								has_war_together_with = RUT
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					HUN = { country_event = { id = MUN_the_fall_of_the_republic.4 days = 3 } }
+				}
+			}
+			else_if = {
+				limit = { #First some overly safe sanity checks
+					country_exists = RUT
+					any_other_country = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								original_tag = CZE
+								original_tag = GER
+								original_tag = SLO
+								tag = RKH
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					random_other_country = {
+						limit = {
+							exists = yes
+							is_neighbor_of = RUT
+							controls_state = 154
+							has_war = no
+							is_subject = no
+							NOT = {
+								OR = {
+									original_tag = CZE
+									original_tag = GER
+									original_tag = SLO
+									tag = RKH
+								}
+							}
+						}
+						THIS = {
+							set_country_flag = CZE_pfot_rut_war_news_event_flag #Tags THIS so they can trigger the news event
+							country_event = { id = MUN_the_fall_of_the_republic.4 days = 3 } 
+						}
+					}
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+		}
 	}
 	option = {
 		name = germany.55.c
@@ -4033,8 +4928,23 @@ country_event = {
 		}
 		add_political_power = -50
 		if = {
-			limit = { country_exists = CZE }
-			annex_country = { target = CZE }
+			limit = { 
+				country_exists = CZE 
+			}
+			if = {
+				limit = {
+					country_exists = SLO
+					SLO = {
+						is_subject_of = CZE
+					}
+				}
+				annex_country = { 
+					target = SLO
+				}
+			}
+			annex_country = { 
+				target = CZE 
+			}
 			add_war_support = 0.1
 		}
 		else_if = { #This is a backup and should never be possible
@@ -4130,6 +5040,112 @@ country_event = {
 			GER_seize_gold_reserves_in_europe_peacefully = yes
 			add_to_variable = { var = GER_mefo_bill_counter value = -10 }
 		}
+
+		if = { #pfot
+			limit = {
+				has_dlc = "Peace For Our Time"
+			}
+			#Hungary or FROM 153 owner get's event on if they should invade RUT if it exists after the breakup of the Czechs
+			if = { #First some overly safe sanity checks
+				limit = {
+					country_exists = RUT
+					HUN = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								has_war_with = GER
+								is_in_faction_with = RUT
+								has_war_together_with = RUT
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					HUN = { country_event = { id = MUN_the_fall_of_the_republic.4 days = 1 } }
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+			else_if = {
+				limit = { #First some overly safe sanity checks
+					country_exists = RUT
+					any_other_country = {
+						exists = yes
+						is_neighbor_of = RUT
+						controls_state = 154
+						has_war_with_major = no
+						is_subject = no
+						NOT = {
+							OR = {
+								original_tag = CZE
+								original_tag = GER
+								original_tag = SLO
+								tag = RKH
+							}
+						}
+					}
+					RUT = {
+						controls_state = 73
+						is_subject = no
+						is_in_faction = no
+						has_idea = CZE_back_against_the_mountains_RUT
+						NOT = {
+							has_war_together_with = GER
+							has_war_together_with = SOV
+							OR = {
+								is_guaranteed_by = ENG
+								is_guaranteed_by = FRA
+							}
+						}
+					}
+				}
+				hidden_effect = {
+					random_other_country = {
+						limit = {
+							exists = yes
+							is_neighbor_of = RUT
+							controls_state = 154
+							has_war = no
+							is_subject = no
+							NOT = {
+								OR = {
+									original_tag = CZE
+									original_tag = GER
+									original_tag = SLO
+									tag = RKH
+								}
+							}
+						}
+						THIS = {
+							set_country_flag = CZE_pfot_rut_war_news_event_flag #Tags THIS so they can trigger the news event
+							country_event = { id = MUN_the_fall_of_the_republic.4 days = 3 } 
+						}
+					}
+					RUT = {
+						load_oob = "RUT_fall_of_the_republic"
+					}
+				}
+			}
+		}
 	}
 
 	option = {
@@ -4145,11 +5161,26 @@ country_event = {
 			}
 		}
 		HUN = { country_event = DOD_hungary.101 }
+		add_political_power = 25
 		add_war_support = 0.1
 
 		GER_czechoslovakia_modify_mefo_bills_or_economy_of_conquest = yes
 		GER_seize_gold_reserves_in_europe_peacefully = yes
 		add_to_variable = { var = GER_mefo_bill_counter value = -10 }
+	}
+
+	after = {
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_cosmetic_tag = CZE_puppet
+					NOT = {
+						is_subject_of = CZE
+					}
+				}
+				drop_cosmetic_tag = yes
+			}
+		}
 	}
 }
 
@@ -4182,6 +5213,22 @@ country_event = {
 				OR = {
 					is_fully_controlled_by = FROM
 					is_fully_controlled_by = CZE
+					if = {
+						limit = {
+							SLO = {
+								is_subject_of = CZE
+							}
+						}
+						is_fully_controlled_by = SLO
+					}
+					if = {
+						limit = {
+							RUT = {
+								is_subject_of = CZE
+							}
+						}
+						is_fully_controlled_by = RUT
+					}
 				}
 			}
 			transfer_state_to = ROOT
@@ -4257,6 +5304,14 @@ country_event = {
 					OR = {
 						is_owned_by = CZE
 						is_owned_by = GER
+						if = {
+							limit = {
+								RUT = {
+									is_subject_of = CZE
+								}
+							}
+							is_owned_by = RUT
+						}
 					}
 				}
 			}
@@ -4269,6 +5324,14 @@ country_event = {
 					OR = {
 						is_owned_by = CZE
 						is_owned_by = GER
+						if = {
+							limit = {
+								RUT = {
+									is_subject_of = CZE
+								}
+							}
+							is_owned_by = RUT
+						}
 					}
 				}
 			}
