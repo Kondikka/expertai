@@ -1,0 +1,202 @@
+############################################################################################################
+#	Expert AI mod - Advanced Frontline Prioritization
+############################################################################################################
+
+# This strategy improves AI decision-making when handling multiple fronts
+# It intelligently allocates troops based on threat level, strategic importance,
+# and available resources to prevent the AI from spreading too thin
+
+# Primary front prioritization - used when AI is fighting on multiple fronts to focus on the most important one
+EAI_MILITARY_primary_front_prioritization = {
+	enable = {
+		# Only activate when at war and has multiple active fronts
+		is_at_war = yes
+		has_war_with = FROM
+		OR = {
+			check_variable = { num_of_active_fronts > 1 }
+			has_country_flag = EAI_fighting_multiple_fronts
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize fronts against major enemies first
+	ai_strategy = {
+		type = front_control
+		tag = FROM
+		country_trigger = {
+			FROM = { is_major = yes }
+		}
+		value = 150
+	}
+	
+	# Prioritize fronts where we're losing ground
+	ai_strategy = {
+		type = front_control
+		tag = FROM
+		country_trigger = {
+			FROM = {
+				has_war_with = ROOT
+				any_owned_state = {
+					is_contested = yes
+					is_capital = yes
+				}
+			}
+		}
+		value = 200
+	}
+	
+	# Prioritize defensive fronts for our own territory
+	ai_strategy = {
+		type = front_control
+		tag = FROM
+		area = default
+		state_trigger = {
+			is_core_of = ROOT
+			is_contested = yes
+		}
+		value = 250
+	}
+	
+	# Prioritize defense of the capital region even higher
+	ai_strategy = {
+		type = front_control
+		tag = FROM
+		area = default
+		state_trigger = {
+			is_core_of = ROOT
+			OR = {
+				is_capital = yes
+				is_in_capital_area = yes
+			}
+			is_contested = yes
+		}
+		value = 300
+	}
+}
+
+# Secondary front management - allocate minimum resources to secondary fronts
+EAI_MILITARY_secondary_front_management = {
+	enable = {
+		# Only activate when at war and has multiple active fronts
+		is_at_war = yes
+		has_war_with = FROM
+		OR = {
+			check_variable = { num_of_active_fronts > 1 }
+			has_country_flag = EAI_fighting_multiple_fronts
+		}
+		
+		# Front is considered secondary if it's not against a major
+		FROM = { 
+			NOT = { is_major = yes }
+			NOT = { has_country_flag = EAI_priority_enemy }
+		}
+		
+		# And we're not defending core territory on this front
+		NOT = {
+			any_owned_state = {
+				is_core_of = ROOT
+				is_controlled_by = FROM
+			}
+		}
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Reduce troop allocation to secondary fronts
+	ai_strategy = {
+		type = front_control
+		tag = FROM
+		value = -50
+	}
+	
+	# Still maintain minimum presence
+	ai_strategy = {
+		type = front_unit_request
+		tag = FROM
+		value = 8    # Minimum divisions to allocate
+	}
+}
+
+# Dynamic troop allocation based on frontline length
+EAI_MILITARY_adaptive_frontline_allocation = {
+	enable = {
+		is_at_war = yes
+		has_war_with = FROM
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Increase division allocation on longer fronts
+	ai_strategy = {
+		type = front_unit_request
+		tag = FROM
+		state_trigger = {
+			is_owned_by = FROM
+			is_contested = yes
+			# Calculate additional divisions needed based on state size/borders
+			calc_true_if = {
+				amount = 3
+				has_long_border_with = ROOT
+				is_coastal = yes
+				is_island_state = yes
+			}
+		}
+		value = 3    # Add more divisions per qualifying state
+	}
+	
+	# Ensure proper breakthrough support for offensives
+	ai_strategy = {
+		type = front_armor_request
+		tag = FROM
+		state_trigger = {
+			is_owned_by = FROM
+			is_fully_controlled_by = FROM
+			has_battle_plans = {
+				has_offensive_line = yes
+				targeting_state = PREV
+			}
+		}
+		value = 4    # Request more armor divisions for planned offensives
+	}
+}
+
+# Improved garrison distribution and management
+EAI_MILITARY_improved_garrison_allocation = {
+	enable = {
+		is_at_war = yes
+	}
+	
+	abort_when_not_enabled = yes
+	
+	# Prioritize garrisoning valuable industrial states
+	ai_strategy = {
+		type = garrison_state_value
+		value = 50
+		
+		state_trigger = {
+			is_owned_by = ROOT
+			OR = {
+				industrial_complex > 2
+				arms_factory > 2
+				synthetic_refinery > 0
+				nuclear_reactor > 0
+				rocket_site > 0
+			}
+		}
+	}
+	
+	# Prioritize garrisoning victory points
+	ai_strategy = {
+		type = garrison_state_value
+		value = 30
+		
+		state_trigger = {
+			is_owned_by = ROOT
+			OR = {
+				has_state_flag = is_victory_point_state
+				state_population > 1000000
+			}
+		}
+	}
+} 
